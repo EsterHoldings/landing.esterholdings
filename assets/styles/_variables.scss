@@ -1,0 +1,37 @@
+// Dynamic variables
+:root {
+  // Space step (padding, margin )
+  --spacer: 10px;
+  // ...
+  --default-transition: 0.5s;
+  // ...
+  --color-background: white;
+  --color-text: black;
+  // ...
+  --color-default: gainsboro;
+  --color-primary: blue;
+  --color-secondary: blue;
+  --color-info: lightblue;
+  --color-success: green;
+  --color-warning: orange;
+  --color-danger: #af160e;
+  --color-dark: #7b7b81;
+  --color-light: white;
+}
+
+// Static variables
+// Space step (padding, margin )
+$spacer: var(--spacer);
+// ...
+$primary: var(--color-primary);
+$secondary: var(--color-secondary);
+$info: var(--color-info);
+$success: var(--color-success);
+$warning: var(--color-warning);
+$danger: var(--color-danger);
+$light: var(--color-light);
+$dark: var(--color-dark);
+
+// Background
+//$background-color: $light;
+//$text-color: $dark;
