@@ -1,12 +1,21 @@
 <template>
   <UiButtonDefault class="btn--primary" :type="props.type" @click="handleClick">
-    <slot />
+    <slot v-if="!props.isLoading" />
+    <div v-if="props.isLoading">
+      <UiIconSpinnerDefault/>
+    </div>
   </UiButtonDefault>
 </template>
 
 <script lang="ts" setup>
+// @ts-ignore
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+// @ts-ignore
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+
 const props = defineProps({
   type: {
+    // @ts-ignore
     type: String as PropType<"button" | "submit" | "reset" | undefined>,
     default: "button",
   },

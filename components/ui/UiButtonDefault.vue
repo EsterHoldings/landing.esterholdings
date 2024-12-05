@@ -14,14 +14,19 @@
     :type="props.type"
     @click="handleClick"
   >
-    <UiIconSpinnerLoader v-if="isLoading" style="width: 1rem; height: 1rem" />
+    <UiIconSpinnerDefault v-if="isLoading" />
     <slot v-if="!isLoading" />
   </button>
 </template>
 
 <script lang="ts" setup>
+// @ts-ignore
+import UiIconSpinnerLoader from "~/components/ui/UiIconSpinnerLoader.vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+
 const props = defineProps({
   type: {
+    // @ts-ignore
     type: String as PropType<"button" | "submit" | "reset" | undefined>,
     default: "button",
   },
@@ -42,9 +47,10 @@ const handleClick = (): void => emit("click");
 .btn {
   background-color: transparent;
   border: 1px solid gainsboro;
-  border-radius: 10px;
-  padding: 10px 20px;
+  border-radius: 5px;
+  padding: 0 20px;
   min-width: min-content;
+  height: 50px;
 
   &--info {
     background-color: #719edf;
@@ -61,7 +67,7 @@ const handleClick = (): void => emit("click");
   }
 
   &--dark {
-    background-color: #07212d;
+    background-color: var(--color-dark);
     color: white;
   }
 

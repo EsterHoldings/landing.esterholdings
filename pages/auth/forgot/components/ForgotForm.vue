@@ -31,6 +31,11 @@
       :isLoading="isLoading"
       >SEND RESET LINK
     </UiButtonPrimary>
+
+    <div>
+      <br>
+      <nuxt-link to="/auth/login">Login</nuxt-link>
+    </div>
   </div>
 </template>
 

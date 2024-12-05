@@ -1,7 +1,11 @@
 <template>
-  <div></div>
+  <div>Dashboard</div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
 
-<style lang="scss" scoped></style>
+</script>
+
+<style lang="scss" scoped>
+
+</style>

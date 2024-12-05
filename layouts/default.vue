@@ -1,20 +1,33 @@
 <template>
-  <div class="container">
-    <TheHeader />
-    <div class="page--min-height h-100"><slot /></div>
-    <TheFooter />
+  <div class="container-fluid">
+    <div class="page-wrapper">
+      <TheHeaderSideBar/>
+      <div class="page-content">
+        <div class="page">
+          <slot/>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import TheHeader from "@/components/block/TheHeader.vue";
+import TheHeaderSideBar from "~/components/block/TheHeaderSideBar.vue";
 import TheFooter from "@/components/block/TheFooter.vue";
 </script>
 
 <style lang="scss" scoped>
-@media screen and (max-width: 1040px) {
-  .container {
-    padding: 0 10px;
+.page {
+  height: 100vh;
+
+  &-wrapper {
+    display: flex;
+  }
+
+  &-content {
+    width: 100%;
   }
 }
+
 </style>
+

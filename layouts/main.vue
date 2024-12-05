@@ -1,15 +1,33 @@
 <template>
-  <div class="container">
-    <TheHeader />
-    <!-- TODO :: HERE WILL BE ADDED SIDEBAR COMPONENT -->
-    <div class="page--min-height">
-      <slot />
+  <div class="container-fluid">
+    <div class="page-wrapper">
+      <div class="page-content">
+        <div class="page">
+          <slot />
+        </div>
+        <TheFooter />
+      </div>
     </div>
-    <TheFooter />
   </div>
 </template>
 
 <script setup lang="ts">
-// import TheHeader from "@/components/block/TheHeader.vue";
-// import TheFooter from "@/components/block/TheFooter.vue";
+import TheHeaderSideBar from "~/components/block/TheHeaderSideBar.vue";
+import TheFooter from "@/components/block/TheFooter.vue";
 </script>
+
+<style lang="scss" scoped>
+.page {
+  height: calc(100vh - 150px);
+
+  &-wrapper {
+    display: flex;
+  }
+
+  &-content {
+    width: 100%;
+  }
+}
+
+</style>
+

@@ -13,6 +13,7 @@ import ForgotForm from "@/pages/auth/forgot/components/ForgotForm.vue";
 
 definePageMeta({
   middleware: ["not-auth"],
+  layout: "main"
 });
 
 onMounted(() =>

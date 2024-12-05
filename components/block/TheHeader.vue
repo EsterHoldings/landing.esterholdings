@@ -11,7 +11,7 @@
 
           <div class="header__menu-right_item">
             <NuxtLink
-                to="/docs"
+                to="/ui"
             >Docs
             </NuxtLink>
           </div>
@@ -37,16 +37,14 @@
 </template>
 
 <script lang="ts" setup>
-import ThemePicker from "~/components/block/pickers/ThemePicker.vue";
+import UiTextH1 from "~/components/ui/UiTextH1.vue";
 
 const route = useRoute();
-
 const currentRouteName = computed(() => route.name);
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/styles/variables";
-
+//@import "@/assets/styles/variables";
 .router-link-exact-active {
   opacity: 0.5;
 }

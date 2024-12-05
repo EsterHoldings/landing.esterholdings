@@ -1,0 +1,132 @@
+<template>
+  <li class="item" :class="{'active': isActive}" @click="handleClickMenuItem($event)">
+    <div class="item__indicator" :class="{'active': isActive}"></div>
+    <div class="item__icon">
+<!--      <NuxtLink :to="to">-->
+        <component :is="icon"></component>
+<!--      </NuxtLink>-->
+    </div>
+    <div class="item__title" :class="{'hide': !props.sideBarIsOpen}">
+<!--      <NuxtLink :to="to">-->
+        {{ title }}
+<!--      </NuxtLink>-->
+    </div>
+  </li>
+</template>
+
+<script lang="ts" setup>
+import {computed} from "vue";
+import {useRoute} from 'vue-router';
+
+const emit = defineEmits(['click'])
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  },
+  to: {
+    type: String,
+    required: true
+  },
+  icon: {
+    type: String,
+    default: ""
+  },
+  sideBarIsOpen: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const route = useRoute()
+
+const isActive = computed(() => route.path === props.to)
+
+const handleClickMenuItem = (event: Event) => emit('click', props.to)
+</script>
+
+<style scoped lang="scss">
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  margin-top: 1px;
+  height: 50px;
+
+  background-color: transparent;
+
+  transition: .3s;
+
+  &:hover {
+    transition: .3s;
+    background-color: #C8C8C8;
+  }
+
+  &.active {
+    background-color: #C8C8C8;
+  }
+
+  &__indicator {
+    position: absolute;
+    width: 8px;
+    height: 100%;
+
+    background-color: #C8C8C8;
+
+    &.active {
+      background-color: #3E3939;
+    }
+  }
+
+  &__icon {
+    padding-left: 20px;
+  }
+
+  &__title {
+    padding-left: 20px;
+    width: 100%;
+    height: 100%;
+    transition: 3s;
+    opacity: 1;
+    white-space: nowrap;
+
+    z-index: 3;
+    display: flex;
+    align-items: center;
+
+    color: #210e32;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      color: #210e32;
+    }
+
+    &.hide {
+      transition: .1s;
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    //a {
+    //  z-index: 3;
+    //  display: flex;
+    //  align-items: center;
+    //
+    //  width: 100%;
+    //  height: 100%;
+    //
+    //  color: #210e32;
+    //  font-size: 14px;
+    //  font-weight: 500;
+    //
+    //  &:hover {
+    //    color: #210e32;
+    //  }
+    //}
+  }
+}
+</style>

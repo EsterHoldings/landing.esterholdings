@@ -13,6 +13,7 @@ import RegistrationForm from "@/pages/auth/registration/components/RegistrationF
 
 definePageMeta({
   middleware: ["not-auth"],
+  layout: "main"
 });
 </script>
 

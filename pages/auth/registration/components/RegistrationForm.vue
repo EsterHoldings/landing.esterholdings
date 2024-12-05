@@ -99,6 +99,11 @@
     >
       REGISTRATION
     </UiButtonPrimary>
+
+    <div>
+      <br>
+      <nuxt-link to="/auth/login">Login</nuxt-link>
+    </div>
   </div>
 </template>
 
