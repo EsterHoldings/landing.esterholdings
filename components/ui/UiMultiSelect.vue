@@ -1,0 +1,202 @@
+<template>
+  <div class="modal">
+    <div class="multi-select-wrapper" ref="multiSelectRef">
+      <div
+          class="multi-select"
+          :class="{ 'is-open': isListVisible, 'is-invalid': isInvalid }"
+          @click="toggleList"
+      >
+        <div v-if="selectedDataComputed.length === 0">
+          <span class="multi-select__placeholder">{{ props.placeholder }}</span>
+        </div>
+        <div
+            class="multi-select__item"
+            v-for="itemX in selectedDataComputed"
+            :key="itemX.id"
+        >
+          <span
+              class="multi-select__item__remove"
+              @click.stop="handleClickRemove(itemX.id)"
+          >
+            +
+          </span>
+          <span class="multi-select__item__text">{{ itemX.name }}</span>
+        </div>
+      </div>
+      <div class="multi-select__list-wrapper" v-if="isListVisible">
+        <div class="multi-select__list">
+          <div
+              class="multi-select__list__item"
+              :class="{ 'is-select': isItemSelected(itemY.id) }"
+              v-for="itemY in data"
+              :key="itemY.id"
+              @click="handleSelectItem(itemY.id)"
+          >
+            {{ itemY.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { ref, computed } from "vue";
+
+interface IMultiSelectItem {
+  id: string;
+  name: string;
+}
+
+const emit = defineEmits(["update", "remove", "open", "close"]);
+
+const props = defineProps({
+  selected: {
+    type: Array<IMultiSelectItem>,
+    default: [],
+  },
+  data: {
+    type: Array<IMultiSelectItem>,
+    default: [],
+  },
+  placeholder: {
+    type: String,
+    default: "",
+  },
+  isInvalid: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const isListVisible = ref(false);
+const multiSelectRef = ref<HTMLElement | null>(null);
+const selectedDataComputed = computed(() => {
+  return props.data.filter(item => props.selected.includes(item.id));
+});
+
+const isItemSelected = (id) => props.selected.includes(id);
+const handleSelectItem = (id: string) => emit("update", id)
+
+const toggleList = () => (isListVisible.value = !isListVisible.value) ? emit('open') : emit('close')
+
+const handleClickRemove = (id: string) => emit("remove", id)
+
+</script>
+
+<style lang="scss" scoped>
+.multi-select {
+  border-radius: 5px;
+  border: 1px solid var(--color-text);
+  padding: 15px;
+  min-height: 40px;
+
+  flex-wrap: wrap;
+  gap: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  &__placeholder {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--color-text-muted);
+  }
+
+  &__item {
+    position: relative;
+    display: flex;
+
+    &__remove {
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      top: -7px;
+      right: 1px;
+      border: 1px solid #d77272;
+      background-color: #f7f7f7;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 200;
+      transform: rotate(45deg);
+      transform-origin: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      &:hover {
+        background-color: #d77272;
+        cursor: pointer;
+      }
+    }
+
+    &__text {
+      border: 1px solid #b4cbef;
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      white-space: pre;
+    }
+  }
+
+  &.is-open {
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+  }
+
+  &.is-invalid {
+    border: 1px solid red;
+  }
+
+  &__list {
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    border-radius: 0 0 5px 5px;
+    border: 1px solid var(--color-text);
+    overflow: scroll;
+    max-height: 200px;
+
+    &-wrapper {
+      position: relative;
+    }
+
+    &__item {
+      background-color: gainsboro;
+      height: 30px;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      transition: background-color 0.3s;
+      font-weight: 200;
+      font-size: 16px;
+
+      &.is-select {
+        background-color: #b3cbef !important;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background-color: #bbd2f8 !important;
+      }
+
+      &:nth-child(odd) {
+        background-color: gainsboro;
+      }
+
+      &:nth-child(even) {
+        background-color: lightgray;
+      }
+    }
+  }
+
+  &-wrapper {
+    position: relative;
+  }
+}
+</style>

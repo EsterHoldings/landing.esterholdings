@@ -3,7 +3,9 @@
     <div v-if="title.length > 0" class="panel--default__title">
       <div class="panel--default__title-content">
         {{ props.title }}
-        <slot name="title-extra"></slot>
+        <div>
+          <slot name="title-extra"></slot>
+        </div>
       </div>
     </div>
     <div class="panel--default__content">
@@ -29,7 +31,7 @@ const props = defineProps({
 
     &__title {
       font-weight: 600;
-      padding: 20px;
+      padding: 10px;
 
       &-content {
         display: flex;

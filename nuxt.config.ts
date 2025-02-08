@@ -1,5 +1,8 @@
 // @ts-ignore
 export default defineNuxtConfig({
+  typescript: {
+    shim: false,
+  },
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
   ssr: true,
@@ -8,6 +11,9 @@ export default defineNuxtConfig({
   ],
   modules: [
     "@pinia/nuxt",
+  ],
+  plugins: [
+    '~/plugins/eventBus.ts'
   ],
   imports: {
     dirs: ["stores"],

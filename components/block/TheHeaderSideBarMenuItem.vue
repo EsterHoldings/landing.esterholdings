@@ -30,7 +30,7 @@ const props = defineProps({
     required: true
   },
   icon: {
-    type: String,
+    type: Object,
     default: ""
   },
   sideBarIsOpen: {

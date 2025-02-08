@@ -5,7 +5,8 @@
       "~/*": ["./*"],
       "@/*": ["./*"]
     },
-    "types": ["pinia", "@pinia/nuxt", "axios", "./types/vue-shim.d.ts"]
+    "types": ["pinia", "@pinia/nuxt", "axios", "./types/vue-shim.d.ts"],
+    "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [
     "types/**/*.d.ts",
@@ -15,6 +16,16 @@
     "layouts/**/*.vue",
     "composables/**/*.ts",
     "plugins/**/*.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
+    ".nuxt/types/imports.d.ts",
     ".nuxt/types/imports.d.ts",
     ".nuxt/types/imports.d.ts",
     ".nuxt/types/imports.d.ts"

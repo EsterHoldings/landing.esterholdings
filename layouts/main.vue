@@ -19,6 +19,7 @@ import TheFooter from "@/components/block/TheFooter.vue";
 <style lang="scss" scoped>
 .page {
   height: calc(100vh - 150px);
+  overflow: scroll;
 
   &-wrapper {
     display: flex;

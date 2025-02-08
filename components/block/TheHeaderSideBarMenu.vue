@@ -81,6 +81,6 @@ const handleClickMenuItem = (to: string) => {
 
 <style scoped lang="scss">
 .nav {
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 141px);
 }
 </style>

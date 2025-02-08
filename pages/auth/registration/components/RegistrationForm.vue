@@ -114,7 +114,7 @@ import {
   resetValidationRegistrationForm,
 } from "../composables/validation";
 import { validatorLoginForm } from "~/pages/auth/login/composables/validation";
-import { useAppCore } from "~/composables/services/validation/useAppCore";
+import { useAppCore } from "~/composables/useAppCore";
 // import { serverSideErrorsHandler } from "@/utils/validation/server-side-errors-handler.helper";
 
 const props = defineProps({ formData: { type: Object, required: true } });

@@ -10,12 +10,8 @@
       <UiInput
         type="text"
         placeholder="example@test.com"
-        @input="
-          validatorLoginForm?.doValidateField('email', $event.target.value)
-        "
-        @blur="
-          validatorLoginForm?.doValidateField('email', $event.target.value)
-        "
+        @input="validatorLoginForm?.doValidateField('email', $event.target.value)"
+        @blur="validatorLoginForm?.doValidateField('email', $event.target.value)"
         :value="props.formData?.email"
         :isDirty="validatorLoginForm?.errorsFormData?.email?.isDirty"
         :isInvalid="
@@ -70,7 +66,7 @@ import {
   validateLoginForm,
   resetValidationLoginForm,
 } from "@/pages/auth/login/composables/validation";
-import { useAppCore } from "~/composables/services/validation/useAppCore";
+import { useAppCore } from "~/composables/useAppCore";
 import UiTextH2 from "~/components/ui/UiTextH2.vue";
 import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";

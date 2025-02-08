@@ -19,6 +19,7 @@ import TheFooter from "@/components/block/TheFooter.vue";
 <style lang="scss" scoped>
 .page {
   height: 100vh;
+  //overflow: scroll;
 
   &-wrapper {
     display: flex;
@@ -26,6 +27,8 @@ import TheFooter from "@/components/block/TheFooter.vue";
 
   &-content {
     width: 100%;
+    overflow-y: scroll;
+    height: 100vh;
   }
 }
 

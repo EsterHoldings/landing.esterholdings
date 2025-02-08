@@ -1,73 +1,163 @@
 <template>
   <PanelDefault title="# Roles">
-
     <template #title-extra>
-      <div>+</div>
+      <div class="add-btn" @click="handleClickAddRole">+</div>
     </template>
-
-    <div class="panel-search">
-      <UiInput
-          class="panel-search__input"
-          placeholder="Search"
-          :borderNone="true"
-          :paddingNone="true"
-      >
-        <template #icon-left>
-          <UiIconSearch/>
-        </template>
-      </UiInput>
-    </div>
-
+    <RolesPanelSearch
+        @input="handleInputSearch"
+        :isLoading="isLoadingSearch"
+        :value="searchFilter"
+    />
     <TableDefault
         :columns="rolesColumns"
         :data="rolesData"
+        :isLoading="isLoading"
+        :rowsPerPage="4"
     />
-
-    <PaginationDefault/>
-
+    <PaginationDefault
+        :isLoading="isLoading"
+        :perPage="perPage"
+        :page="page"
+        :totalRows="totalRows"
+        @perPageChange="handleChangePerPage"
+        @pageChange="handleChangePage"
+    />
   </PanelDefault>
 </template>
 
 <script lang="ts" setup>
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
-import UiFormControl from "~/components/ui/UiFormControl.vue";
-import UiInput from "~/components/ui/UiInput.vue";
+import {ref, inject, onMounted, onUnmounted} from "vue";
 import TableDefault from "~/components/block/tables/TableDefault.vue";
+import UiIconEdit from "~/components/ui/UiIconEdit.vue";
+import UiIconDelete from "~/components/ui/UiIconDelete.vue";
 import PaginationDefault from "~/components/block/paginations/PaginationDefault.vue";
-import {onMounted, reactive} from "vue";
-import UiIconSearch from "~/components/ui/UiIconSearch.vue";
-import axios from "axios";
-import { format } from "date-fns";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import RolesPanelAddNew from "~/pages/access/components/RolesPanelAddNew.vue";
+import RolesPanelEdit from "~/pages/access/components/RolesPanelEdit.vue";
+import RolesPanelSearch from "~/pages/access/components/RolesPanelSearch.vue";
+import useAppCore from "~/composables/useAppCore";
+import useEventBus from "~/composables/useEventBus";
+import {debounce} from "~/utils/helper/debounce";
+
+interface IPermissionItem {
+  name: string;
+}
+
+const appCore = useAppCore();
+
+const isLoading = ref(true);
+const isLoadingSearch = ref(false);
+const perPage = ref(3);
+const page = ref(1);
+const totalRows = ref(0);
+const searchFields = ref(["name"]);
+const searchFilter = ref("");
 
 const rolesColumns = ref([
-  {title: "Name", key: "name"},
-  {title: "Permissions", key: "permissions"},
-  {title: "", key: "options"},
+  { title: "Name", key: "name" },
+  { title: "Permissions", key: "permissions" },
+  { title: "", key: "options" },
 ]);
+
 const rolesData = ref([]);
 
-onMounted(async () => {
-  const response = await axios.get('http://localhost:8000/api/roles');
-  rolesData.value = response.data.data;
+const { openModal } = inject("modalControl") as { openModal: Function };
 
-  console.log(response.data.data);
+const handleClickEditIcon = (id: string) =>
+    openModal(RolesPanelEdit, { title: "Edit Role", id });
 
-  rolesData.value.forEach(role => {
-    role.permissions = role.permissions.map(permission => permission.name);
-    role.options = "+ - -";
+const handleClickDeleteIcon = async (id: string) => {
+  await appCore.roles.delete(id);
+  await loadData();
+};
+
+const loadData = async (isFilterQuery = false) => {
+  console.log('LOAD DATA LOAD DATA LOAD DATA LOAD DATA LOAD DATA LOAD DATA');
+  const params = {
+    page: isFilterQuery ? 1 : page.value,
+    perPage: perPage.value,
+    searchFilter: searchFilter.value,
+    searchFields: searchFields.value,
+  };
+
+  const response = await appCore.roles.get(params);
+
+  totalRows.value = response.data.data.total;
+  rolesData.value = response.data.data.data;
+
+  rolesData.value.forEach((role) => {
+    role.permissions = [...role.permissions.map((permission: IPermissionItem) => permission.name)];
+    role.options = [
+      {
+        isIcon: true,
+        is: UiIconEdit,
+        props: {},
+        events: { click: () => handleClickEditIcon(role.id) },
+      },
+      {
+        isIcon: true,
+        is: UiIconDelete,
+        props: {},
+        events: { click: () => handleClickDeleteIcon(role.id) },
+      },
+    ];
   });
+
+  isLoading.value = false;
+};
+
+const handleClickAddRole = () =>
+    openModal(RolesPanelAddNew, { title: "Add new Role" });
+
+const handleInputSearch = debounce(async (event: any) => {
+  try {
+    isLoadingSearch.value = true;
+    searchFilter.value = event.target.value;
+    await loadData(true);
+  } finally {
+    isLoadingSearch.value = false;
+  }
+}, 300);
+
+const handleChangePerPage = async (value: number) => {
+  page.value = 1;
+  perPage.value = value;
+  await loadData();
+};
+
+const handleChangePage = async (value: number) => {
+  page.value = value;
+  await loadData();
+};
+
+onMounted(async () => {
+  await loadData();
+  useEventBus.on('loadDataForRoles', loadData)
+});
+
+onUnmounted(async () => {
+
 })
 </script>
 
 <style lang="scss" scoped>
-.panel-search {
-  border: none;
-  border-radius: 0;
-  border-top: 1px solid var(--color-secondary);
-  margin-bottom: 0;
+.add-btn {
+  background-color: var(--color-secondary);
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.1s;
 
-  &__input {
-    border: none;
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.5;
   }
 }
 </style>

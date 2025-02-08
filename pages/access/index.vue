@@ -7,7 +7,7 @@
     <div class="access-page__content">
       <div class="access-page__content__top">
         <div class="access-page__content__top__left">
-          <RolesPanel/>
+          <RolesPanel />
         </div>
         <div class="access-page__content__top__right">
           <PermissionsPanel/>
@@ -32,7 +32,7 @@ import UsersPanel from "~/pages/access/components/UsersPanel.vue";
 <style lang="scss" scoped>
 .access {
   &-page {
-    height: 100vh;
+    height: calc(100vh - 40px);
     width: 100%;
     padding: 20px;
 
@@ -46,6 +46,10 @@ import UsersPanel from "~/pages/access/components/UsersPanel.vue";
         display: flex;
         justify-content: space-between;
         gap: 20px;
+
+        @media (max-width: 1130px) {
+          flex-direction: column;
+        }
 
         &__left {
           width: 100%;

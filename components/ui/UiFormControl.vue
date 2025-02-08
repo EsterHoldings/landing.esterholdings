@@ -4,7 +4,7 @@
       class="ui-form-control__label"
       :class="{
         hide: label.length === 0,
-        'has-error': props.errors?.length > 0,
+        // 'has-error': props.errors?.length > 0,
       }"
     >
       {{ props.label }}
@@ -34,6 +34,7 @@ const props = defineProps({
 
 .text-error {
   font-size: 13px;
+  margin-top: 5px;
 }
 
 .has-error {

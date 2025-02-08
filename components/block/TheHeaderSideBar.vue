@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 
 import TheHeaderSideBarMenu from "~/components/block/TheHeaderSideBarMenu.vue";
 import UiIconArrowsLeft from "~/components/ui/UiIconArrowsLeft.vue";
@@ -38,12 +39,22 @@ import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 import UiIconLogout from "~/components/ui/UiIconLogout.vue";
 import UiImageCircle from "~/components/ui/UiImageCircle.vue";
 
-const isOpen = ref(true);
+const isOpen = ref(false);
+
+onMounted(() => {
+  const storedState = localStorage.getItem("sidebarIsOpen");
+  if (storedState !== null) {
+    isOpen.value = storedState === "true";
+  }
+});
+
+const handleClickOpenCloseSideBar = () => {
+  isOpen.value = !isOpen.value;
+  localStorage.setItem("sidebarIsOpen", isOpen.value.toString());
+};
 
 const route = useRoute();
 const currentRouteName = computed(() => route.name);
-
-const handleClickOpenCloseSideBar = () => isOpen.value = !isOpen.value;
 </script>
 
 <style scoped lang="scss">

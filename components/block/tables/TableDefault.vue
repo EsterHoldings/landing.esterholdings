@@ -2,7 +2,7 @@
   <div class="table-container">
     <table class="table">
       <thead>
-      <tr>
+      <tr v-if="columns.length > 0">
         <th
             v-for="(col, index) in columns"
             :key="'head-' + index"
@@ -11,9 +11,28 @@
           {{ col.title }}
         </th>
       </tr>
+      <tr v-if="columns?.length === 0">
+        <th class="table__header">{{ isLoading ? "..." : "---" }}</th>
+      </tr>
       </thead>
-      <tbody>
+
+      <tbody class="table__body">
       <tr
+          v-if="isLoading || data.length === 0"
+          v-for="rowIndex in rowsPerPage"
+          :key="'loader-row-' + rowIndex"
+      >
+        <td
+            v-for="(col, colIndex) in columns"
+            :key="'loader-cell-' + rowIndex + '-' + colIndex"
+            class="table__body__loader"
+        >
+          <UiLoaderPlaceholder/>
+        </td>
+      </tr>
+
+      <tr
+          v-if="!isLoading"
           v-for="(row, rowIndex) in data"
           :key="'row-' + rowIndex"
           class="table__row"
@@ -21,13 +40,33 @@
         <td
             v-for="(col, colIndex) in columns"
             :key="'cell-' + rowIndex + '-' + colIndex"
-            class="table__cell"
+            :class="['table__cell', { 'table__cell--icons': col.key === 'options' }]"
         >
-          <span v-if="Array.isArray(row[col.key])">
-              {{ row[col.key].join(', ') }}
+          <template v-if="Array.isArray(row[col.key]) && row[col.key][0]?.isIcon">
+            <div
+                v-for="(icon, iconIndex) in row[col.key]"
+                :key="'icon-' + rowIndex + '-' + colIndex + '-' + iconIndex"
+                :class="{ 'icon-container': icon.isIcon }"
+            >
+              <component
+                  v-if="icon.is"
+                  :is="icon.is"
+                  v-bind="icon.props"
+                  v-on="icon.events"
+              >
+                <template v-if="icon.slot">
+                  <component :is="icon.slot"/>
+                </template>
+              </component>
+            </div>
+          </template>
+
+          <span v-else-if="Array.isArray(row[col.key])">
+            {{ row[col.key].join(", ") }}
           </span>
+
           <span v-else>
-              {{ row[col.key] !== undefined ? row[col.key] : '-' }}
+            {{ row[col.key] !== undefined ? row[col.key] : "-" }}
           </span>
         </td>
       </tr>
@@ -37,15 +76,28 @@
 </template>
 
 <script lang="ts" setup>
+import UiLoaderPlaceholder from "~/components/ui/UiLoaderPlaceholder.vue";
+
 const props = defineProps({
   columns: {
-    type: Array as () => { title: string; key: string }[],
-    default: () => []
+    type: Array as () => {
+      title: string;
+      key: string;
+    }[],
+    default: () => [],
   },
   data: {
     type: Array as () => Record<string, any>[],
-    default: () => []
-  }
+    default: () => [],
+  },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
+  rowsPerPage: {
+    type: Number,
+    default: 4,
+  },
 });
 </script>
 
@@ -60,7 +112,6 @@ const props = defineProps({
   border-collapse: collapse;
   background-color: #fff;
   font-family: Montserrat, sans-serif;
-  //border: 1px solid #ddd;
 }
 
 .table th {
@@ -78,13 +129,11 @@ const props = defineProps({
   color: #3e3939;
   font-weight: 500;
   border: 1px solid #ddd;
+}
 
-  &:first-child {
-    border-left: none;
-  }
-
-  &:last-child {
-    border-right: none;
+.table__body {
+  &__loader {
+    background-color: rgba(183, 182, 182, 0.29);
   }
 }
 
@@ -96,11 +145,39 @@ const props = defineProps({
   background-color: #f1f1f1;
 }
 
-.table__cell {
-  //border: 1px solid #ddd;
-}
-
 .table__cell:last-child {
   text-align: center;
+}
+
+.table__cell--icons {
+  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: .1s;
+  margin-right: 5px;
+  height: 22px;
+  width: 22px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:active {
+    background-color: #8f8f8f;
+    transition: .1s;
+  }
+
+  &:hover {
+    background-color: #dddddd;
+    transition: .1s;
+  }
 }
 </style>

@@ -6,6 +6,10 @@
 </template>
 
 <script lang="ts" setup>
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import UiIconSpinnerLoader from "~/components/ui/UiIconSpinnerLoader.vue";
+import {PropType} from "vue";
+
 const props = defineProps({
   type: {
     type: String as PropType<"button" | "submit" | "reset" | undefined>,

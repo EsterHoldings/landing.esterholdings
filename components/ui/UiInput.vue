@@ -1,6 +1,6 @@
 <template>
   <div class="input">
-    <div class="input-icon--left">
+    <div v-if="slots['icon-left']" class="input-icon--left">
       <slot name="icon-left" />
     </div>
     <input
@@ -17,10 +17,14 @@
         @input="onInput"
         @blur="onBlur"
     />
+    <div v-if="isLoading" class="is-loading"><UiIconSpinnerDefault /></div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useSlots } from "vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+
 const props = defineProps({
   type: {
     type: String,
@@ -47,6 +51,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
   borderNone: {
     type: Boolean,
     default: false,
@@ -58,6 +66,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["focus", "input", "blur"]);
+
+const slots = useSlots();
 
 const onFocus = (event: any): void => emit("focus", event);
 const onInput = (event: any): void => emit("input", event);
@@ -93,6 +103,16 @@ input {
   align-items: center;
   justify-content: space-between;
 
+  .is-loading {
+    height: 10px;
+    width: 10px;
+    margin-right: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   &-icon--left {
     display: flex;
     align-items: center;
@@ -102,11 +122,11 @@ input {
     width: 40px;
   }
 
-  &.padding {
+  &>.padding {
     padding: 15px;
   }
 
-  &.border {
+  &>.border {
     border: 1px solid var(--color-text);
     border-radius: 5px;
   }
@@ -119,13 +139,13 @@ input {
     line-height: 17px;
     letter-spacing: 0em;
   }
-}
 
-.is-invalid {
-  border-color: red;
-}
+  .is-invalid {
+    border-color: red
+  }
 
-.is-valid {
-  border-color: green;
+  .is-valid {
+    border-color: green;
+  }
 }
 </style>
