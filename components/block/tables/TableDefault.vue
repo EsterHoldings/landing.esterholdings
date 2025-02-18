@@ -17,8 +17,13 @@
       </thead>
 
       <tbody class="table__body">
+
+      <tr v-if="!isLoading && data.length === 0">
+        <td>Nothing to show... =(</td>
+      </tr>
+
       <tr
-          v-if="isLoading || data.length === 0"
+          v-if="isLoading"
           v-for="rowIndex in rowsPerPage"
           :key="'loader-row-' + rowIndex"
       >
@@ -42,6 +47,7 @@
             :key="'cell-' + rowIndex + '-' + colIndex"
             :class="['table__cell', { 'table__cell--icons': col.key === 'options' }]"
         >
+          <!-- Логіка для isIcon (залишаємо без змін) -->
           <template v-if="Array.isArray(row[col.key]) && row[col.key][0]?.isIcon">
             <div
                 v-for="(icon, iconIndex) in row[col.key]"
@@ -61,13 +67,37 @@
             </div>
           </template>
 
-          <span v-else-if="Array.isArray(row[col.key])">
-            {{ row[col.key].join(", ") }}
-          </span>
+          <!-- Нова логіка для відображення компоненту або рядка, переданого через slot -->
+          <template v-else-if="Array.isArray(row[col.key]) && row[col.key].length && row[col.key][0].is">
+            <div class="custom-component-wrapper">
+              <component
+                  v-for="(compData, compIndex) in row[col.key]"
+                  :key="'comp-' + rowIndex + '-' + colIndex + '-' + compIndex"
+                  :is="compData.is"
+                  v-bind="compData.props"
+                  v-on="compData.events"
+              >
+                <template v-if="compData.slot">
+                  <template v-if="typeof compData.slot === 'string' || typeof compData.slot === 'number'">
+                    {{ compData.slot }}
+                  </template>
+                  <template v-else>
+                    <component :is="compData.slot"/>
+                  </template>
+                </template>
+              </component>
+            </div>
+          </template>
 
+          <!-- Якщо масив, але не містить об'єктів з компонентами -->
+          <span v-else-if="Array.isArray(row[col.key])">
+              {{ row[col.key].join(", ") }}
+            </span>
+
+          <!-- За замовчуванням -->
           <span v-else>
-            {{ row[col.key] !== undefined ? row[col.key] : "-" }}
-          </span>
+              {{ row[col.key] !== undefined ? row[col.key] : "-" }}
+            </span>
         </td>
       </tr>
       </tbody>
@@ -152,7 +182,7 @@ const props = defineProps({
 .table__cell--icons {
   text-align: center;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 }
 

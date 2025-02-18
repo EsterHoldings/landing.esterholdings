@@ -12,7 +12,7 @@ export class PermissionsModule implements BasicModuleInterface {
         return await this.permissionsService.get(params);
     }
 
-    async getFirst(id:any): Promise<any> {
+    async getById(id:any): Promise<any> {
         return await this.permissionsService.getFirst(id);
     }
 

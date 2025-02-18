@@ -1,8 +1,5 @@
 <template>
   <PanelDefault title="# Permissions">
-    <template #title-extra>
-      <div>+</div>
-    </template>
     <div class="panel-search">
       <UiInput
           class="panel-search__input"
@@ -18,42 +15,103 @@
     <TableDefault
         :columns="permissionsColumns"
         :data="permissionsData"
+        :isLoading="isLoading"
+        :rowsPerPage="4"
     />
-    <PaginationDefault/>
+    <PaginationDefault
+        :isLoading="isLoading"
+        :perPage="perPage"
+        :page="page"
+        :totalRows="totalRows"
+        @perPageChange="handleChangePerPage"
+        @pageChange="handleChangePage"
+    />
   </PanelDefault>
 </template>
 
 <script lang="ts" setup>
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
-import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";
-import TableDefault from "~/components/block/tables/TableDefault.vue";
-import PaginationDefault from "~/components/block/paginations/PaginationDefault.vue";
-import {reactive} from "vue";
 import UiIconSearch from "~/components/ui/UiIconSearch.vue";
+import UiSwitchToggle from "~/components/ui/UiSwitchToggle.vue";
+import TableDefault from "~/components/block/tables/TableDefault.vue";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import PaginationDefault from "~/components/block/paginations/PaginationDefault.vue";
+
+import useAppCore from "~/composables/useAppCore";
+import {onMounted, reactive, ref} from "vue";
+import useEventBus from "~/composables/useEventBus";
+
+const appCore = useAppCore();
+
+const isLoading = ref(false);
+const isLoadingSearch = ref(false);
+const perPage = ref(3);
+const page = ref(1);
+const totalRows = ref(0);
+const searchFields = ref(["name"]);
+const searchFilter = ref("");
 
 const permissionsColumns = reactive([
-  {title: "Title", key: "title"},
-  {title: "IsActive", key: "is_active"},
+  {title: "Id", key: "id"},
+  {title: "Name", key: "name"},
+  {title: "", key: "options"},
 ]);
-const permissionsData = reactive([
-  {
-    title: "Can Craete User",
-    is_active: "true"
-  },
-  {
-    title: "Can Read User",
-    is_active: "true"
-  },
-  {
-    title: "Can Update User",
-    is_active: "true"
-  },
-  {
-    title: "Can Delete User",
-    is_active: "false"
-  },
-]);
+
+let permissionsData = reactive([]);
+
+const loadData = async (isFilterQuery = false) => {
+  const params = {
+    page: isFilterQuery ? 1 : page.value,
+    perPage: perPage.value,
+    searchFilter: searchFilter.value,
+    searchFields: searchFields.value,
+  };
+
+  const response = await appCore.permissions.get(params);
+
+  totalRows.value = response.data.data.total;
+
+  let responsePermissionsData = response.data.data.data;
+  responsePermissionsData.forEach((permission: any) => {
+    permission.options = [
+      {
+        is: UiSwitchToggle,
+        props: {
+          modelValue: permission.is_active
+        },
+        events: { click: () => handleSwitchPermission(permission) },
+      },
+    ];
+  });
+
+  isLoading.value = false;
+
+  permissionsData.splice(0, permissionsData.length, ...responsePermissionsData);
+};
+
+const handleSwitchPermission = async (permission:any) => {
+  await appCore.permissions.patch(permission.id, {
+    is_active: !permission.is_active
+  })
+  useEventBus.emit("loadDataForPermissions");
+}
+
+const handleChangePerPage = async (value: number) => {
+  page.value = 1;
+  perPage.value = value;
+  await loadData();
+};
+
+const handleChangePage = async (value: number) => {
+  page.value = value;
+  await loadData();
+};
+
+onMounted(async () => {
+  isLoading.value = true;
+  await loadData();
+  useEventBus.on('loadDataForPermissions', loadData)
+});
 </script>
 
 <style lang="scss" scoped>

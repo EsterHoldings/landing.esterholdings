@@ -31,12 +31,16 @@ const props = defineProps({
 
     &__title {
       font-weight: 600;
-      padding: 10px;
+      padding: 0 10px;
+      height: 40px;
+      display: flex;
+      align-items: center;
 
       &-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        width: 100%;
       }
     }
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as process from "process";
 
 interface ApiUtilInterface {
   get(path: string, data: any, config: any): any;
@@ -14,7 +15,7 @@ export class ApiUtil implements ApiUtilInterface {
 
   constructor() {
     const axiosConfig = {
-      baseURL: "http://localhost:8000/api",
+      baseURL: process.env.NUXT_API_URL, // "http://localhost:8000/api",
       timeout: 30000,
       // headers: {
       //   Authorization:

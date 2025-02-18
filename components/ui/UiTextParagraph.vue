@@ -1,11 +1,10 @@
 <template>
-  <p>
-    <slot></slot>
-  </p>
+  <p @click="handleClick"><slot/></p>
 </template>
 
-<script>
-export default {};
+<script lang="ts" setup>
+const emit = defineEmits(["click"]);
+const handleClick = (): void => emit("click");
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,8 @@
 <template>
   <PanelDefault title="# Roles">
     <template #title-extra>
-      <div class="add-btn" @click="handleClickAddRole">+</div>
+      <UiButtonDefault class="add-btn" @click="handleClickAddRole">+</UiButtonDefault>
+<!--      <div class="add-btn" @click="handleClickAddRole">+</div>-->
     </template>
     <RolesPanelSearch
         @input="handleInputSearch"
@@ -38,6 +39,7 @@ import RolesPanelSearch from "~/pages/access/components/RolesPanelSearch.vue";
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
 import {debounce} from "~/utils/helper/debounce";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 
 interface IPermissionItem {
   name: string;
@@ -53,6 +55,8 @@ const totalRows = ref(0);
 const searchFields = ref(["name"]);
 const searchFilter = ref("");
 
+const { openModal } = inject("modalControl") as { openModal: Function };
+
 const rolesColumns = ref([
   { title: "Name", key: "name" },
   { title: "Permissions", key: "permissions" },
@@ -60,8 +64,6 @@ const rolesColumns = ref([
 ]);
 
 const rolesData = ref([]);
-
-const { openModal } = inject("modalControl") as { openModal: Function };
 
 const handleClickEditIcon = (id: string) =>
     openModal(RolesPanelEdit, { title: "Edit Role", id });
@@ -72,7 +74,6 @@ const handleClickDeleteIcon = async (id: string) => {
 };
 
 const loadData = async (isFilterQuery = false) => {
-  console.log('LOAD DATA LOAD DATA LOAD DATA LOAD DATA LOAD DATA LOAD DATA');
   const params = {
     page: isFilterQuery ? 1 : page.value,
     perPage: perPage.value,

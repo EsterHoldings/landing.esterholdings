@@ -60,7 +60,9 @@ import UsersPanel from "~/pages/access/components/UsersPanel.vue";
         }
       }
 
-      &__bottom {}
+      &__bottom {
+        padding-bottom: 20px;
+      }
     }
   }
 }
