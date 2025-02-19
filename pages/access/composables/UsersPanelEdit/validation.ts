@@ -2,14 +2,14 @@ import useValidation from "../../../../composables/useValidation";
 
 import { formData } from ".";
 
-export const validatorRoleForm: any = useValidation(formData, {
+export const validatorUserForm: any = useValidation(formData, {
     roles: ["required"],
 });
 
-export const validateRoleForm: any = (doSendFormCallback: any): void =>
-    validatorRoleForm.doValidate() && doSendFormCallback();
-export const resetValidationRoleForm: any = (): void =>
-    validatorRoleForm.clearFieldsErrors() && resetFormData();
+export const validateUserForm: any = (doSendFormCallback: any): void =>
+    validatorUserForm.doValidate() && doSendFormCallback();
+export const resetValidationUserForm: any = (): void =>
+    validatorUserForm.clearFieldsErrors() && resetFormData();
 
 export const resetFormData: any = (): void => {
     formData.roles = [];

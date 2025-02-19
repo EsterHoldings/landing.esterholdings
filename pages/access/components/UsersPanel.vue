@@ -86,29 +86,12 @@ const loadData = async (isFilterQuery = false) => {
         slot: user.id
       }
     ];
-    user.first_name = [
-      {
-        is: UiTextParagraph,
-        props: {},
-        events: { click: () => console.log(user.id) },
-        slot: user.first_name
-      }
-    ];
-    user.phone = [
-      {
-        is: UiTextParagraph,
-        props: {},
-        events: { click: () => console.log(user.id) },
-        slot: user.phone
-      }
-    ];
-
     user.options = [
       {
         isIcon: true,
         is: UiIconEdit,
         props: {},
-        events: { click: () => handleOpenClientPage(user.id) },
+        events: { click: () => handleOpenClientPage(user.id[0].slot) },
       },
     ];
   });
@@ -118,6 +101,7 @@ const loadData = async (isFilterQuery = false) => {
 };
 
 const handleOpenClientPage = (id:string) => {
+  console.log('handleOpenClientPage', id);
   openModal(UsersPanelEdit, { title: "Edit User Roles", id });
 }
 

@@ -9,10 +9,12 @@
         'padding': !paddingNone,
         'is-invalid': isDirty && isInvalid,
         'is-valid': isDirty && !isInvalid,
+        'disabled': props.disabled,
       }"
         :type="props.type"
         :placeholder="props.placeholder"
         :value="props.value"
+        :disabled="props.disabled"
         @focus="onFocus"
         @input="onInput"
         @blur="onBlur"
@@ -60,6 +62,10 @@ const props = defineProps({
     default: false,
   },
   paddingNone: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
     type: Boolean,
     default: false,
   },
@@ -146,6 +152,10 @@ input {
 
   .is-valid {
     border-color: green;
+  }
+
+  .disabled {
+    background-color: #e5e5e5;
   }
 }
 </style>

@@ -20,6 +20,7 @@ import TheFooter from "@/components/block/TheFooter.vue";
 .page {
   height: calc(100vh - 150px);
   overflow: scroll;
+  background-color: #3c42483d;
 
   &-wrapper {
     display: flex;

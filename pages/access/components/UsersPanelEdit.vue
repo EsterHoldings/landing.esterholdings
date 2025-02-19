@@ -12,17 +12,26 @@
         :class="{'without-top': !props.title}"
     >
       <div class="roles-panel__edit__content__fields">
-        <UiFormControl label="Roles" :errors="validatorRoleForm?.errorsFormData?.permissions?.errors">
+
+        <UiFormControl label="Name">
+          <UiInput
+              placeholder="..."
+              :disabled="true"
+              :value="formData.name"
+          />
+        </UiFormControl>
+
+        <UiFormControl label="Roles" :errors="validatorUserForm?.errorsFormData?.roles?.errors">
           <UiMultiSelect
-              placeholder="Choose permissions"
-              :data="permissionsData"
-              :selected="formData.permissions"
-              :isDirty="validatorRoleForm?.errorsFormData?.permissions?.isDirty"
-              :isInvalid="validatorRoleForm?.errorsFormData?.permissions?.errors?.length > 0"
-              @update="handleUpdateMultiSelectPermissions"
-              @remove="handleRemoveMultiSelectPermission"
-              @open="handleOpenMultiSelectPermissions"
-              @close="handleCloseMultiSelectPermissions"
+              placeholder="Choose roles"
+              :data="rolesData"
+              :selected="formData.roles"
+              :isDirty="validatorUserForm?.errorsFormData?.roles?.isDirty"
+              :isInvalid="validatorUserForm?.errorsFormData?.roles?.errors?.length > 0"
+              @update="handleUpdateMultiSelectRoles"
+              @remove="handleRemoveMultiSelectRoles"
+              @open="handleOpenMultiSelectRoles"
+              @close="handleCloseMultiSelectRoles"
           />
         </UiFormControl>
       </div>
@@ -45,7 +54,7 @@ import UiInput from "~/components/ui/UiInput.vue";
 import UiMultiSelect from "~/components/ui/UiMultiSelect.vue";
 import UiTextH2 from "~/components/ui/UiTextH2.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import {validatorRoleForm} from "~/pages/access/composables/UsersPanelEdit/validation";
+import {validatorUserForm} from "~/pages/access/composables/UsersPanelEdit/validation";
 import {formData} from "~/pages/access/composables/UsersPanelEdit";
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
@@ -61,49 +70,51 @@ const props = defineProps({
   }
 })
 
-let permissionsData = reactive([]);
+let rolesData = reactive([]);
 
 const app = useAppCore();
 
 const { closeModal } = inject("modalControl") as { closeModal: Function };
 
-const getRole = async () => {
-  const response = await app.roles.getById(props.id);
-  const selectedPermissions = response.data.data.permissions;
+const getUser = async () => {
+  const response = await app.users.getById(props.id);
+  const selectedRoles = response.data.data.roles;
 
+
+  formData.id = response.data.data.id;
   formData.name = response.data.data.name;
-  formData.permissions = selectedPermissions.map(permission => permission.id);
+  formData.roles = selectedRoles.map(role => role.id);
 }
 
-const getPermissions = async () => {
-  const response = await app.permissions.get();
-  permissionsData = response.data.data.data;
+const getRoles = async () => {
+  const response = await app.roles.get({perPage: 20});
+  rolesData = response.data.data.data;
 };
 
 
 const validateThisField = () => {
-  validatorRoleForm?.doValidateField('permissions', formData.permissions);
+  validatorUserForm?.doValidateField('roles', formData.roles);
 };
 
-const handleUpdateMultiSelectPermissions = (selectedId: string) => {
-  const index = formData.permissions.indexOf(selectedId);
+const handleUpdateMultiSelectRoles = (selectedId: string) => {
+  const index = formData.roles.indexOf(selectedId);
   if (index !== -1) {
-    formData.permissions.splice(index, 1);
+    formData.roles.splice(index, 1);
   } else {
-    formData.permissions.push(selectedId);
+    formData.roles.push(selectedId);
   }
   validateThisField();
 };
 
-const handleRemoveMultiSelectPermission = (id: string) => {
-  const index = formData.permissions.indexOf(id);
-  if (index !== -1) formData.permissions.splice(index, 1);
+const handleRemoveMultiSelectRoles = (id: string) => {
+  const index = formData.roles.indexOf(id);
+  if (index !== -1) formData.roles.splice(index, 1);
   validateThisField();
 };
 
-const handleOpenMultiSelectPermissions = () => {
-  if (validatorRoleForm?.errorsFormData?.permissions)
-    validatorRoleForm.errorsFormData.permissions.isDirty = true;
+const handleOpenMultiSelectRoles = () => {
+  if (validatorUserForm?.errorsFormData?.roles)
+    validatorUserForm.errorsFormData.roles.isDirty = true;
 }
 const handleCloseMultiSelectPermissions = () => validateThisField();
 
@@ -119,8 +130,8 @@ const handleSubmitForm = async () => {
 }
 
 onMounted(async () => {
-  await getPermissions();
-  await getRole();
+  await getRoles();
+  await getUser();
 })
 </script>
 
