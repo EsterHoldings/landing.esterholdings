@@ -80,7 +80,6 @@ const getUser = async () => {
   const response = await app.users.getById(props.id);
   const selectedRoles = response.data.data.roles;
 
-
   formData.id = response.data.data.id;
   formData.name = response.data.data.name;
   formData.roles = selectedRoles.map(role => role.id);
@@ -121,7 +120,7 @@ const handleCloseMultiSelectPermissions = () => validateThisField();
 const handleSubmitForm = async () => {
 
   try {
-    await app.roles.patch(props.id, formData);
+    await app.users.patch(props.id, { roles: formData.roles });
     closeModal();
     useEventBus.emit("loadDataForRoles");
   } catch (errorResponse) {
