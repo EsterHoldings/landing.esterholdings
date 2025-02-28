@@ -15,7 +15,7 @@
       </div>
       <br>
       <div class="access-page__content__bottom">
-        <UsersPanel/>
+        <AdminsPanel/>
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@ import UiTextH1 from "~/components/ui/UiTextH1.vue";
 import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 import RolesPanel from "~/pages/access/components/RolesPanel.vue";
 import PermissionsPanel from "~/pages/access/components/PermissionsPanel.vue";
-import UsersPanel from "~/pages/access/components/UsersPanel.vue";
+import AdminsPanel from "~/pages/access/components/AdminsPanel.vue";
 </script>
 
 <style lang="scss" scoped>

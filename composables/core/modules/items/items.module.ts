@@ -1,6 +1,6 @@
 import ItemsService from "~/composables/core/modules/items/items.service";
 
-export class ItemsModule implements BasicModuleInterface {
+export class ItemsModule {
   private itemsService: ItemsService;
   constructor() {
     this.itemsService = new ItemsService();

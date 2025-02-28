@@ -1,16 +1,16 @@
 <template>
-  <PanelDefault title="# Users">
+  <PanelDefault title="# Admins">
     <template #title-extra>
-      <div>+</div>
+      <UiButtonDefault class="add-btn" @click="handleClickAddRole">+</UiButtonDefault>
     </template>
-    <UsersPanelSearch
+    <AdminsPanelSearch
         @input="handleInputSearch"
         :isLoading="isLoadingSearch"
         :value="searchFilter"
     />
     <TableDefault
-        :columns="usersColumns"
-        :data="usersData"
+        :columns="adminsColumns"
+        :data="adminsData"
         :isLoading="isLoading"
         :rowsPerPage="5"
     />
@@ -31,15 +31,16 @@ import {debounce} from "~/utils/helper/debounce";
 import TableDefault from "~/components/block/tables/TableDefault.vue";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import PaginationDefault from "~/components/block/paginations/PaginationDefault.vue";
-import UsersPanelSearch from "~/pages/access/components/UsersPanelSearch.vue";
 
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
 import UiIconEdit from "~/components/ui/UiIconEdit.vue";
-import UiIconDelete from "~/components/ui/UiIconDelete.vue";
 import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
-import RolesPanelEdit from "~/pages/access/components/RolesPanelEdit.vue";
-import UsersPanelEdit from "~/pages/access/components/UsersPanelEdit.vue";
+import AdminsPanelEdit from "~/pages/access/components/AdminsPanelEdit.vue";
+import AdminsPanelSearch from "~/pages/access/components/AdminsPanelSearch.vue";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import RolesPanelAddNew from "~/pages/access/components/RolesPanelAddNew.vue";
+import AdminsPanelAddNew from "~/pages/access/components/AdminsPanelAddNew.vue";
 
 const appCore = useAppCore();
 
@@ -48,21 +49,23 @@ const isLoadingSearch = ref(false);
 const perPage = ref(5);
 const page = ref(1);
 const totalRows = ref(0);
-const searchFields = ref(["id", "first_name", "phone", "country"]);
+const searchFields = ref(["id", "nickname", "email"]);
 const searchFilter = ref("");
 
 const { openModal } = inject("modalControl") as { openModal: Function };
+const handleClickAddRole = () =>
+    openModal(AdminsPanelAddNew, { title: "Add new Admin" });
 
-const usersColumns = reactive([
+const adminsColumns = reactive([
   {title: "Id", key: "id"},
-  {title: "FirstName", key: "first_name"},
-  {title: "Phone", key: "phone"},
-  {title: "Country", key: "country"},
+  {title: "Nickname", key: "nickname"},
+  {title: "Email", key: "email"},
+  {title: "Roles", key: "roles"},
   {title: "CreatedAt", key: "created_at"},
   {title: "Options", key: "options"},
 ]);
 
-const usersData = reactive([]);
+const adminsData = reactive([]);
 
 const loadData = async (isFilterQuery = false) => {
   const params = {
@@ -72,12 +75,12 @@ const loadData = async (isFilterQuery = false) => {
     searchFields: searchFields.value,
   };
 
-  const response = await appCore.users.get(params);
+  const response = await appCore.admins.get(params);
 
   totalRows.value = response.data.data.total;
 
-  let responseUsersData = response.data.data.data;
-  responseUsersData.forEach((user:any) => {
+  let responseAdminsData = response.data.data.data;
+  responseAdminsData.forEach((user:any) => {
     user.id = [
       {
         is: UiTextParagraph,
@@ -86,6 +89,9 @@ const loadData = async (isFilterQuery = false) => {
         slot: user.id
       }
     ];
+
+    user.roles = user.roles.map(role => role.name);
+
     user.options = [
       {
         isIcon: true,
@@ -97,12 +103,11 @@ const loadData = async (isFilterQuery = false) => {
   });
 
   isLoading.value = false;
-  usersData.splice(0, usersData.length, ...responseUsersData);
+  adminsData.splice(0, adminsData.length, ...responseAdminsData);
 };
 
 const handleOpenClientPage = (id:string) => {
-  console.log('handleOpenClientPage', id);
-  openModal(UsersPanelEdit, { title: "Edit User Roles", id });
+  openModal(AdminsPanelEdit, { title: "Edit Admin Roles", id });
 }
 
 const handleChangePerPage = async (value: number) => {
@@ -129,7 +134,7 @@ const handleInputSearch = debounce(async (event: any) => {
 onMounted(async () => {
   isLoading.value = true;
   await loadData();
-  useEventBus.on('loadDataForUsers', loadData)
+  useEventBus.on('loadDataForAdmins', loadData)
 });
 </script>
 
@@ -146,6 +151,26 @@ onMounted(async () => {
     &.input {
       padding: 0 !important;
     }
+  }
+}
+
+.add-btn {
+  background-color: var(--color-secondary);
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.1s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.5;
   }
 }
 </style>

@@ -1,33 +1,41 @@
 <template>
-  <div class="roles-panel__edit">
+  <div class="admins-panel__edit">
     <div
-        class="roles-panel__edit__top"
+        class="admins-panel__edit__top"
         v-if="props.title"
     >
       <UiTextH2>{{ props.title }}</UiTextH2>
     </div>
 
     <div
-        class="roles-panel__edit__content"
+        class="admins-panel__edit__content"
         :class="{'without-top': !props.title}"
     >
-      <div class="roles-panel__edit__content__fields">
+      <div class="admins-panel__edit__content__fields">
 
-        <UiFormControl label="Name">
+        <UiFormControl label="Nickname">
           <UiInput
-              placeholder="..."
               :disabled="true"
-              :value="formData.name"
+              placeholder="Enter Role nickname"
+              :value="formData.nickname"
           />
         </UiFormControl>
 
-        <UiFormControl label="Roles" :errors="validatorUserForm?.errorsFormData?.roles?.errors">
+        <UiFormControl label="Email">
+          <UiInput
+              :disabled="true"
+              placeholder="example@gmail.com"
+              :value="formData.email"
+          />
+        </UiFormControl>
+
+        <UiFormControl label="Roles" :errors="validatorAdminForm?.errorsFormData?.roles?.errors">
           <UiMultiSelect
               placeholder="Choose roles"
               :data="rolesData"
               :selected="formData.roles"
-              :isDirty="validatorUserForm?.errorsFormData?.roles?.isDirty"
-              :isInvalid="validatorUserForm?.errorsFormData?.roles?.errors?.length > 0"
+              :isDirty="validatorAdminForm?.errorsFormData?.roles?.isDirty"
+              :isInvalid="validatorAdminForm?.errorsFormData?.roles?.errors?.length > 0"
               @update="handleUpdateMultiSelectRoles"
               @remove="handleRemoveMultiSelectRoles"
               @open="handleOpenMultiSelectRoles"
@@ -38,12 +46,12 @@
     </div>
   </div>
 
-  <div class="roles-panel__edit__bottom">
+  <div class="admins-panel__edit__bottom">
     <UiButtonDefault
-        class="roles-panel__edit__bottom__save-btn"
+        class="admins-panel__edit__bottom__save-btn"
         state="secondary"
         @click="handleSubmitForm"
-    >Create new & Save</UiButtonDefault>
+    >Update & Save</UiButtonDefault>
   </div>
 </template>
 
@@ -54,8 +62,8 @@ import UiInput from "~/components/ui/UiInput.vue";
 import UiMultiSelect from "~/components/ui/UiMultiSelect.vue";
 import UiTextH2 from "~/components/ui/UiTextH2.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import {validatorUserForm} from "~/pages/access/composables/UsersPanelEdit/validation";
-import {formData} from "~/pages/access/composables/UsersPanelEdit";
+import {validatorAdminForm} from "~/pages/access/composables/AdminsPanelEdit/validation";
+import {formData} from "~/pages/access/composables/AdminsPanelEdit";
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
 
@@ -76,12 +84,15 @@ const app = useAppCore();
 
 const { closeModal } = inject("modalControl") as { closeModal: Function };
 
-const getUser = async () => {
-  const response = await app.users.getById(props.id);
+const getAdmin = async () => {
+  const response = await app.admins.getById(props.id);
   const selectedRoles = response.data.data.roles;
 
+  console.log('selectedRoles', selectedRoles);
+
   formData.id = response.data.data.id;
-  formData.name = response.data.data.name;
+  formData.nickname = response.data.data.nickname;
+  formData.email = response.data.data.email;
   formData.roles = selectedRoles.map(role => role.id);
 }
 
@@ -90,9 +101,8 @@ const getRoles = async () => {
   rolesData = response.data.data.data;
 };
 
-
 const validateThisField = () => {
-  validatorUserForm?.doValidateField('roles', formData.roles);
+  validatorAdminForm?.doValidateField('roles', formData.roles);
 };
 
 const handleUpdateMultiSelectRoles = (selectedId: string) => {
@@ -112,17 +122,17 @@ const handleRemoveMultiSelectRoles = (id: string) => {
 };
 
 const handleOpenMultiSelectRoles = () => {
-  if (validatorUserForm?.errorsFormData?.roles)
-    validatorUserForm.errorsFormData.roles.isDirty = true;
+  if (validatorAdminForm?.errorsFormData?.roles)
+    validatorAdminForm.errorsFormData.roles.isDirty = true;
 }
-const handleCloseMultiSelectPermissions = () => validateThisField();
+const handleCloseMultiSelectRoles = () => validateThisField();
 
 const handleSubmitForm = async () => {
 
   try {
-    await app.users.patch(props.id, { roles: formData.roles });
+    await app.admins.patch(props.id, { roles: formData.roles });
     closeModal();
-    useEventBus.emit("loadDataForRoles");
+    useEventBus.emit("loadDataForAdmins");
   } catch (errorResponse) {
     console.log('handleSubmitForm -> errorResponse', errorResponse);
   }
@@ -130,12 +140,12 @@ const handleSubmitForm = async () => {
 
 onMounted(async () => {
   await getRoles();
-  await getUser();
+  await getAdmin();
 })
 </script>
 
 <style lang="scss" scoped>
-.roles-panel__edit {
+.admins-panel__edit {
   &__top {
     height: 50px;
 

@@ -13,6 +13,6 @@ export const resetValidationRoleForm: any = (): void =>
     validatorRoleForm.clearFieldsErrors() && resetFormData();
 
 export const resetFormData: any = (): void => {
-    formData.value.name = "";
-    formData.value.permissions = [];
+    formData.name = "";
+    formData.permissions = [];
 };

@@ -18,6 +18,8 @@
         @focus="onFocus"
         @input="onInput"
         @blur="onBlur"
+        readonly
+        onfocus="this.removeAttribute('readonly');"
     />
     <div v-if="isLoading" class="is-loading"><UiIconSpinnerDefault /></div>
   </div>

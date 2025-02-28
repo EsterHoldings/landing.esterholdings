@@ -8,8 +8,8 @@ export interface BasicModuleInterface {
 }
 
 export interface AuthModuleInterface {
-    doRegistration(data:any):BasicModuleInterface
-    doLogin(data:any):BasicModuleInterface
-    doLogout():BasicModuleInterface
-    getStore():BasicModuleInterface
+    doRegistration(data:any):Promise<any>
+    doLogin(data:any):Promise<any>
+    doLogout():Promise<any>
+    getStore():Promise<any>
 }

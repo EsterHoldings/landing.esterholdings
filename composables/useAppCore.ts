@@ -1,16 +1,17 @@
+import AdminsModule from "~/composables/core/modules/admins/admins.module";
 import AccountsModule from "~/composables/core/modules/accounts/accounts.module";
-import ClientsModule from "~/composables/core/modules/auth/clients.module";
+import AuthModule from "~/composables/core/modules/clients/auth.module";
 import ItemsModule from "~/composables/core/modules/items/items.module";
 import RolesModule from "~/composables/core/modules/roles/roles.module";
 import PermissionsModule from "~/composables/core/modules/permissions/permissions.module";
 import UsersModule from "~/composables/core/modules/users/users.module";
 import HelperModule from "~/composables/core/modules/helper/helper.module";
-import AuthModule from "~/composables/core/modules/clients/auth.module";
 
 export interface ICoreModules {
+    admins : AdminsModule;
     accounts : AccountsModule;
     auth: AuthModule;
-    clients: ClientsModule;
+    clients: AuthModule;
     items: ItemsModule;
     roles: RolesModule;
     permissions: PermissionsModule;
@@ -20,9 +21,10 @@ export interface ICoreModules {
 
 export const useAppCore = (): ICoreModules => {
     return {
+        admins: new AdminsModule(),
         accounts: new AccountsModule(),
         auth: new AuthModule(),
-        clients: new ClientsModule(),
+        clients: new AuthModule(),
         items: new ItemsModule(),
         roles: new RolesModule(),
         permissions: new PermissionsModule(),

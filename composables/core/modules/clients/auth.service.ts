@@ -1,22 +1,22 @@
-import ApiUtil from "~/utils/api/api.util";
+import useApi from "~/composables/useApi";
 
 export class AuthService {
-  private apiUtil: any;
+  private useApi: any;
 
   constructor() {
-    this.apiUtil = ApiUtil.getInstance();
+    this.useApi = new useApi();
   }
 
   async login(formData: Object): Promise<any> {
-    return await this.apiUtil.post("/auth/login", formData);
+    return await this.useApi.post("/auth/login", formData);
   }
 
   async registration(formData: Object): Promise<any> {
-    return await this.apiUtil.post("/auth/register", formData);
+    return await this.useApi.post("/auth/register", formData);
   }
 
   async logout(formData: Object): Promise<any> {
-    return await this.apiUtil.post("/auth/logout");
+    return await this.useApi.post("/auth/logout");
   }
 }
 

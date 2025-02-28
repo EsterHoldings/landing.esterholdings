@@ -117,7 +117,8 @@ const appCore = useAppCore();
 const doSendForm = async () => {
   try {
     isLoading.value = true;
-    await appCore.auth.doLogin(props.formData);
+    const response = await appCore.auth.doLogin(props.formData);
+
     await useRouter().push({ path: "/" });
   } catch (e: any) {
     console.log("LoginForm -> doSendForm -> catch", e.message);

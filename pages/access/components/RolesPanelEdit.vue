@@ -46,7 +46,7 @@
         class="roles-panel__edit__bottom__save-btn"
         state="secondary"
         @click="handleSubmitForm"
-    >Create new & Save</UiButtonDefault>
+    >Update & Save</UiButtonDefault>
   </div>
 </template>
 

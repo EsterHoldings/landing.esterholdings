@@ -14,22 +14,22 @@ export class AuthModule implements AuthModuleInterface {
 
   constructor() {
     this.authService = new AuthService();
-    // this.authStore = useAuthStore();
+    this.authStore = useAuthStore();
   }
 
   getStore(): any {
     return this.authStore;
   }
 
-  doLogin(data: any): BasicModuleInterface {
+  doLogin(data: any): Promise<any> {
+    return this.authService.login(data);
+  }
+
+  doLogout(): Promise<any> {
     return undefined;
   }
 
-  doLogout(): BasicModuleInterface {
-    return undefined;
-  }
-
-  doRegistration(data: any): BasicModuleInterface {
+  doRegistration(data: any): Promise<any> {
     return undefined;
   }
 }

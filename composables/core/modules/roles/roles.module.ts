@@ -17,7 +17,6 @@ export class RolesModule implements BasicModuleInterface {
     }
 
     async post(data:any): Promise<any> {
-        console.log('Roles module POST', data);
         return await this.rolesService.post(data);
     }
 
