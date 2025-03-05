@@ -57,8 +57,8 @@ import UiInput from "~/components/ui/UiInput.vue";
 import UiMultiSelect from "~/components/ui/UiMultiSelect.vue";
 import UiTextH2 from "~/components/ui/UiTextH2.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import {validatorRoleForm} from "~/pages/access/composables/RolesPanelEdit/validation";
-import {formData} from "~/pages/access/composables/RolesPanelEdit";
+import {validatorRoleForm} from "~/pages/admin/access/composables/RolesPanelEdit/validation";
+import {formData} from "~/pages/admin/access/composables/RolesPanelEdit";
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
 
