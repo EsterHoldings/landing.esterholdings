@@ -2,7 +2,7 @@
   <nav class="nav">
     <ul class="nav-menu">
       <TheHeaderSideBarMenuItem
-          v-for="menuItem in menuList"
+          v-for="menuItem in menuItems"
           :title="menuItem.title"
           :to="menuItem.to"
           :icon="menuItem.icon"

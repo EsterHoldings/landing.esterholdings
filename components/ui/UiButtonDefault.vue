@@ -54,7 +54,8 @@ const handleClick = (): void => emit("click");
   // height: 50px;
 
   height: 46px;
-  border-radius: 50px;
+  //border-radius: 50px;
+  border-radius: var(--ui-border--raduis);
   display: flex;
   flex-direction: row;
   justify-content: center;

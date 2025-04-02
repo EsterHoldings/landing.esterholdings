@@ -29,7 +29,7 @@ import LatestUpdatesSection from "~/pages/landing/sections/LatestUpdatesSection.
 import CookieModal from "~/components/block/modals/CookieModal.vue";
 
 definePageMeta({
-  middleware: ["not-auth"],
+  middleware: ["not-auth-client"],
   layout: "main",
 });
 </script>

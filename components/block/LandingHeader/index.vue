@@ -5,7 +5,7 @@
       <UiContainer>
         <header class="header">
           <div class="logo">
-            <UiIconLogo />
+            <NuxtLink to="/"><UiIconLogo /></NuxtLink>
           </div>
 
           <div
@@ -28,15 +28,21 @@
           </nav>
           <div class="actions-wrapper">
             <div class="actions">
-              <UiButtonDefault state="link" class="login"
-                >Log In</UiButtonDefault
-              >
+              <UiButtonDefault state="link" class="login">
+                <NuxtLink to="/auth/login">
+                  Log In
+                </NuxtLink>
+              </UiButtonDefault>
 
-              <UiButtonDefault state="primary" class="register"
-                >Register</UiButtonDefault
-              >
+              <UiButtonDefault state="primary" class="register">
+                <NuxtLink to="/auth/registration">
+                  Register
+                </NuxtLink>
+              </UiButtonDefault>
+
               <UiIconGlobe class="icon" />
               <UiIconMoon class="icon" />
+
             </div>
           </div>
         </header>

@@ -1,25 +1,22 @@
 <template>
   <div class="page--min-height login">
-    <div class="login-form-wrapper">
-      <div class="login-form-wrapper__logo">
-        <UiIconLogo />
-      </div>
-      <LoginForm :formData="formData" />
+    <div class="login-form__wrapper">
+      <PanelDefault class="login-form__panel-default">
+        <LoginForm :formData="formData" />
+      </PanelDefault>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { formData } from "./composables";
-// @ts-ignore
 import LoginForm from "@/pages/auth/login/components/LoginForm.vue";
-// @ts-ignore
-import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 
 // @ts-ignore
 definePageMeta({
-  middleware: ["not-auth"],
-  layout: "empty"
+  middleware: ["not-auth-client"],
+  layout: "guest"
 });
 </script>
 
@@ -28,16 +25,30 @@ definePageMeta({
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  width: 100%;
 
-  &-form-wrapper {
-    max-width: 600px;
-    width: 100%;
-
+  &-form {
     &__logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 80px;
+      height: 100px;
+    }
+
+    &__wrapper {
+      padding: 10px;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &__panel-default {
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
     }
   }
 }

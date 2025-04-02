@@ -1,13 +1,14 @@
 <template>
   <div class="page__wrapper">
+    <TheGuestHeader/>
     <div class="page">
-      askdjnaskdjaskdjn
       <slot />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import TheGuestHeader from "~/components/block/TheGuestHeader.vue";
 </script>
 
 <style lang="scss" scoped>

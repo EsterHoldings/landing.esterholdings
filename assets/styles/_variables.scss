@@ -23,8 +23,13 @@
   //-------- UI -------- //
 
   --color-ui-background: #000028;
+  --color-ui-background-opacity-80: rgba(0, 0, 40, 0.33);
+
   --color-ui-primary: #0051ff;
   --color-ui-primary-defalt: #ffffff;
+
+  --color-ui-accent: #ff6b00;
+
   --color-ui-warning: #f75709;
   --color-sticker-ui-success: #03c11f;
   --color-sticker-ui-danger: #d93025;
@@ -42,9 +47,11 @@
   --color-ui-text: #d3d3d3;
 
   // Ui elements settings
+  --ui-border--raduis: 8px;
+
   // Blocks
   // Inputs
-  --ui-input--border-radius: 25px;
+  --ui-input--border-radius: var(--ui-border--raduis);
   --ui-input--height: 46px;
   // Buttons
 }
