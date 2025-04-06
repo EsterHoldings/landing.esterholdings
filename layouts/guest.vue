@@ -1,13 +1,15 @@
 <template>
   <div class="page__wrapper">
+    <TheGuestHeader/>
     <div class="page">
-      askdjnaskdjaskdjn
       <slot />
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TheGuestHeader from "~/components/block/TheGuestHeader.vue";
+</script>
 
 <style lang="scss" scoped>
 .page {
@@ -16,7 +18,7 @@
   overflow: hidden;
 
   &__wrapper {
-    background-color: var(--ui-background);
+    background-color: var(--color-ui-background);
   }
 }
 </style>

@@ -1,34 +1,57 @@
-import { type Ref, computed, ref } from "vue";
-import { defineStore } from "pinia";
-import { getItem as getItemFromCookieStorage } from "~/utils/storage/cookie";
-import {
-  COOKIE_STORAGE__ACCESS_TOKEN,
-  COOKIE_STORAGE__REFRESH_TOKEN,
-} from "~/constants/storage";
+import { defineStore } from 'pinia';
+import { ref, computed, watch } from 'vue';
+import useAppCore from "~/composables/useAppCore";
 
-export const useAuthStore = defineStore("auth", () => {
-  const accessToken: Ref<string> = ref(
-    getItemFromCookieStorage(COOKIE_STORAGE__ACCESS_TOKEN) || ""
-  );
-  const refreshToken: Ref<string> = ref(
-    getItemFromCookieStorage(COOKIE_STORAGE__REFRESH_TOKEN) || ""
-  );
+export const useAuthStore = defineStore('userAuth', () => {
+  const accessToken = ref('');
+  const refreshToken = ref('');
+
+  if (process.client) {
+    const storedAccessToken = localStorage.getItem('user_access_token');
+    const storedRefreshToken = localStorage.getItem('user_refresh_token');
+
+    if (storedAccessToken) {
+      accessToken.value = storedAccessToken;
+    }
+    if (storedRefreshToken) {
+      refreshToken.value = storedRefreshToken;
+    }
+  }
 
   const isAuthenticated = computed(() => !!accessToken.value);
 
-  const setAccessToken = (value: string): void => {
-    accessToken.value = value;
-  };
+  watch(accessToken, (newValue) => {
+    if (process.client) {
+      localStorage.setItem('user_access_token', newValue);
+    }
+  });
+  watch(refreshToken, (newValue) => {
+    if (process.client) {
+      localStorage.setItem('user_refresh_token', newValue);
+    }
+  });
 
-  const setRefreshToken = (value: string): void => {
+  function setAccessToken(value: string) {
+    accessToken.value = value;
+  }
+
+  function setRefreshToken(value: string) {
     refreshToken.value = value;
-  };
+  }
+
+  async function initAuth() {
+    if (!process.client) return;
+    if (!accessToken.value) return;
+
+    const appCore = useAppCore();
+  }
 
   return {
-    isAuthenticated,
     accessToken,
     refreshToken,
+    isAuthenticated,
     setAccessToken,
     setRefreshToken,
+    initAuth,
   };
 });

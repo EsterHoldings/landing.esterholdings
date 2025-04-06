@@ -5,12 +5,14 @@
       <UiContainer>
         <header class="header">
           <div class="logo">
-            <UiIconLogo
-              :class="{
-                'svg-invert':
-                  uiStore.headerScrolled && themeStore.currentTheme !== 'dark',
-              }"
-            />
+            <NuxtLink to="/">
+              <UiIconLogo
+                :class="{
+                  'svg-invert':
+                    uiStore.headerScrolled && themeStore.currentTheme !== 'dark',
+                }"
+              />
+            </NuxtLink>
           </div>
 
           <div
@@ -39,23 +41,27 @@
           </nav>
           <div class="actions-wrapper">
             <div class="actions">
-              <UiButtonDefault
-                state="link"
-                class="login"
-                :class="{
-                  'is-theme-light':
-                    uiStore.headerScrolled &&
-                    themeStore.currentTheme !== 'dark',
-                }"
-                >Log In
-              </UiButtonDefault>
+              <NuxtLink to="/auth/login">
+                <UiButtonDefault
+                  state="link"
+                  class="login"
+                  :class="{
+                    'is-theme-light':
+                      uiStore.headerScrolled &&
+                      themeStore.currentTheme !== 'dark',
+                  }"
+                  >Log In
+                </UiButtonDefault>
+              </NuxtLink>
 
-              <UiButtonDefault
-                state="primary"
-                class="register"
-                v-if="!isMenuOpen"
-                >Register
-              </UiButtonDefault>
+              <NuxtLink to="/auth/registration">
+                <UiButtonDefault
+                  state="primary"
+                  class="register"
+                  v-if="!isMenuOpen"
+                  >Register
+                </UiButtonDefault>
+              </NuxtLink>
 
               <div
                 class="actions-icons"

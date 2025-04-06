@@ -52,33 +52,15 @@
         @click="validateLoginForm(doSendForm)"
         :isLoading="isLoading"
         state="primary"
-    >LOGIN
-    </UiButtonDefault>
+    >Login</UiButtonDefault>
 
-    <div class="login-form__oauth-buttons">
-      <UiButtonDefault
-          state="info"
-          class="oauth-button oauth-button_google"
-          data-tooltip="Sign in with Google"
-      >
-        <UiIconGoogle/>
-      </UiButtonDefault>
-
-      <UiButtonDefault
-          state="dark"
-          class="oauth-button oauth-button_apple"
-          data-tooltip="Sign in with Apple"
-      >
-        <UiIconApple/>
-      </UiButtonDefault>
-
-      <UiButtonDefault
-          state="secondary"
-          class="oauth-button oauth-button_developer"
-          data-tooltip=" Sign in as a developer"
-      >
-        <UiIconDeveloper/>
-      </UiButtonDefault>
+    <div class="login-form__links">
+      <div class="login-form__link">
+        <NuxtLink to="/auth/registration">Sign Up</NuxtLink>
+      </div>
+      <div class="login-form__link">
+        <NuxtLink to="/auth/forgot">Forgot password</NuxtLink>
+      </div>
     </div>
   </div>
 </template>
@@ -102,6 +84,10 @@ import {
   resetValidationLoginForm,
 } from "@/pages/auth/login/composables/validation";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
+import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+import {useAdminAuthStore} from "~/stores/adminAuthStore";
+import {navigateTo} from "nuxt/app";
+import {useAuthStore} from "~/stores/authStore";
 
 const props = defineProps({formData: {type: Object, required: true}});
 
@@ -109,11 +95,23 @@ const isLoading = ref(false);
 const appCore = useAppCore();
 
 const doSendForm = async () => {
+
   try {
     isLoading.value = true;
+    const authStore = useAuthStore();
+
     const response = await appCore.auth.doLogin(props.formData);
-    console.log('ADMIN LOGIN RESPONSE: ', response);
-    await useRouter().push({path: "/"});
+
+    const accessToken = response.data.data.access_token;
+    const refreshToken = response.data.data.refresh_token;
+
+    localStorage.setItem('user_access_token', accessToken);
+    localStorage.setItem('user_refresh_token', refreshToken);
+
+    authStore.setAccessToken(accessToken);
+    authStore.setRefreshToken(refreshToken);
+
+    navigateTo('/dashboard')
   } catch (e: any) {
     console.log("LoginForm -> doSendForm -> catch", e.message);
   } finally {
@@ -130,16 +128,29 @@ onUnmounted(() => resetValidationLoginForm());
 
 <style lang="scss" scoped>
 .login-form {
+  color: #c4c4c4;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  //height: calc(100vh - 295px);
-  color: #c4c4c4;
-  background-color: red;
+
+  &__link {
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__links {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
 
   &__title {
     text-align: center;
-    //margin-top: 100px;
+    margin-bottom: 30px;
   }
 
   &__field {
@@ -149,67 +160,6 @@ onUnmounted(() => resetValidationLoginForm());
   &__btn {
     margin-top: 30px;
     margin-bottom: 40px;
-  }
-
-  &__submit {
-    margin: auto;
-  }
-
-  &__oauth-buttons {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  &__forgot-link {
-    margin-top: 10px;
-    text-align: center;
-  }
-}
-
-.oauth-button {
-  padding: 0 18px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  cursor: pointer;
-
-  &::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    top: 120%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-  }
-
-  &:hover::after {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  &_apple {
-    background: black !important;
-
-    svg {
-      filter: invert(1);
-    }
-  }
-
-  &_google {
-    background: rgb(66, 133, 244);
   }
 }
 </style>

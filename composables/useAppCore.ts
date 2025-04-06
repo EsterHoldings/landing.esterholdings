@@ -8,6 +8,7 @@ import PermissionsModule from "~/composables/core/modules/permissions/permission
 import UsersModule from "~/composables/core/modules/users/users.module";
 import HelperModule from "~/composables/core/modules/helper/helper.module";
 import S3Module from "~/composables/core/modules/s3/s3.module";
+import PaymentsModule from "~/composables/core/modules/payments/payments.module";
 
 export interface ICoreModules {
     adminAuth : AdminAuthModule;
@@ -17,6 +18,7 @@ export interface ICoreModules {
     clients: AuthModule;
     items: ItemsModule;
     roles: RolesModule;
+    payments: PaymentsModule;
     permissions: PermissionsModule;
     users: UsersModule;
     helper: HelperModule;
@@ -33,6 +35,7 @@ export const useAppCore = (): ICoreModules => {
         items: new ItemsModule(),
         roles: new RolesModule(),
         permissions: new PermissionsModule(),
+        payments: new PaymentsModule(),
         users: new UsersModule(),
         helper: new HelperModule(),
         s3: new S3Module(),
