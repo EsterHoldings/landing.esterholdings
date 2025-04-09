@@ -1,15 +1,24 @@
 <template>
-  <UiContainer>
-    <div class="menu-wrapper">
-      <div class="menu-grid">
+  <UiContainer :class="{ 'menu-wrapper-mobile': props.isMobile }">
+    <div
+      class="menu-wrapper"
+      :class="{ 'menu-wrapper-mobile': props.isMobile }"
+    >
+      <div class="menu-grid" :class="{ 'menu-mobile': props.isMobile }">
         <HeaderMenuItem
-          v-for="[title, items] in Object.entries(headerItems)"
+          v-for="[title, items] in Object.entries(props.headerItems)"
           :key="title"
           :title="title"
           :items="items"
+          :isMobile="props.isMobile"
         />
 
-        <div class="menu-banner">BANNER</div>
+        <div
+          class="menu-banner"
+          :class="{ 'menu-banner_mobile': props.isMobile }"
+        >
+          BANNER
+        </div>
       </div>
     </div>
   </UiContainer>
@@ -19,43 +28,17 @@
 import UiContainer from "~/components/ui/UiContainer.vue";
 import HeaderMenuItem from "~/components/block/LandingHeader/components/HeaderMenuItem.vue";
 
-const headerItems = {
-  "Account overview": [
-    { name: "Standard", path: "#" },
-    { name: "Pro", path: "#" },
-    { name: "Islamic", path: "#" },
-    { name: "Demo", path: "#" },
-  ],
+const props = defineProps({
+  headerItems: {
+    type: Object,
+    default: () => ({}),
+  },
 
-  "Market Instruments": [
-    { name: "Forex", path: "#" },
-    { name: "Metals", path: "#" },
-    { name: "Stock CFDs", path: "#" },
-    { name: "Crypto CFDs", path: "#" },
-    { name: "Commodities", path: "#" },
-    { name: "Indices", path: "#" },
-    { name: "ETFs", path: "#" },
-  ],
-  Platform: [
-    { name: "MT4 Desktop", path: "#" },
-    { name: "MT 4 Mobile", path: "#" },
-  ],
-
-  "Trading conditions": [
-    { name: "Account replenishment", path: "#" },
-    { name: "Withdrawal of funds", path: "#" },
-  ],
-
-  "Trader's HUB": [
-    { name: "Trader's blog", path: "#" },
-    { name: "Economic calendar", path: "#" },
-    { name: "Market news", path: "#" },
-  ],
-  "TANDEM trading": [
-    { name: "For trader", path: "#" },
-    { name: "For investor", path: "#" },
-  ],
-};
+  isMobile: {
+    type: Boolean,
+    default: false,
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -63,6 +46,10 @@ const headerItems = {
   padding: 30px;
   background: var(--ui-background);
   border-radius: 16px;
+
+  &-mobile {
+    padding: 0px;
+  }
 }
 
 .menu-grid {
@@ -84,5 +71,14 @@ const headerItems = {
   justify-content: center;
   color: white;
   font-weight: bold;
+
+  &_mobile {
+    display: none;
+  }
+}
+
+.menu-mobile {
+  display: flex;
+  flex-direction: column;
 }
 </style>

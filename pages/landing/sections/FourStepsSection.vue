@@ -3,7 +3,8 @@
     <UiContainer>
       <div class="four-steps">
         <UiTextH3 class="four-steps__title">
-          Open an account in <span class="highlight">4 simple steps</span>
+          Open an account in <br />
+          <span class="highlight">4 simple steps</span>
         </UiTextH3>
 
         <div class="four-steps__container">
@@ -78,6 +79,10 @@ const steps = ref([
   font-weight: 700;
   color: var(--ui-text-main);
   margin-bottom: 80px;
+
+  br {
+    display: none;
+  }
 }
 
 .highlight {
@@ -145,6 +150,14 @@ const steps = ref([
 }
 
 @media (max-width: 991px) {
+  .four-steps__title {
+    font-size: 26px;
+
+    br {
+      display: block;
+    }
+  }
+
   .four-steps__container {
     gap: 10px;
     flex-wrap: wrap;
@@ -163,7 +176,7 @@ const steps = ref([
   }
 
   .four-steps__button {
-    margin: 50px auto;
+    display: none;
   }
 }
 

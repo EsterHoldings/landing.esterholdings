@@ -1,14 +1,16 @@
 <template>
   <div>
     <div v-if="isMenuOpen" class="overlay blurred"></div>
-    <div :class="{ blurred: isBlurred || isMenuOpen }" class="header__wrapper">
+    <div
+      :class="{ blurred: isBlurred, 'nav--open': isMenuOpen }"
+      class="header__wrapper"
+    >
       <UiContainer>
-        <header class="header">
+        <header class="header" :class="{ 'header-is-open-menu ': isMenuOpen }">
           <div class="logo">
             <UiIconLogo
               :class="{
-                'svg-invert':
-                  uiStore.headerScrolled && themeStore.currentTheme !== 'dark',
+                'svg-invert': isThemeLight,
               }"
             />
           </div>
@@ -17,8 +19,7 @@
             class="burger-menu"
             :class="{
               'burger-menu--open': isMenuOpen,
-              'is-theme-light':
-                uiStore.headerScrolled && themeStore.currentTheme !== 'dark',
+              'is-theme-light': isThemeLight,
             }"
             @click="toggleMenu"
           >
@@ -37,15 +38,14 @@
               @mouseenter="handleMouseEnter(link.name)"
             />
           </nav>
-          <div class="actions-wrapper">
+
+          <div class="actions-wrapper" :class="{ 'is-menu-open': isMenuOpen }">
             <div class="actions">
               <UiButtonDefault
                 state="link"
                 class="login"
                 :class="{
-                  'is-theme-light':
-                    uiStore.headerScrolled &&
-                    themeStore.currentTheme !== 'dark',
+                  'is-theme-light': isThemeLight,
                 }"
                 >Log In
               </UiButtonDefault>
@@ -57,17 +57,11 @@
                 >Register
               </UiButtonDefault>
 
-              <div
-                class="actions-icons"
-                v-if="isMenuOpen"
-                :class="{ 'is-menu-open': isMenuOpen }"
-              >
+              <div class="actions-icons">
                 <UiIconGlobe
                   class="icon"
                   :class="{
-                    'svg-invert':
-                      uiStore.headerScrolled &&
-                      themeStore.currentTheme !== 'dark',
+                    'svg-invert': isThemeLight,
                   }"
                 />
 
@@ -80,17 +74,13 @@
                     <UiIconMoon
                       v-if="themeStore.currentTheme === 'dark'"
                       :class="{
-                        'svg-invert':
-                          uiStore.headerScrolled &&
-                          themeStore.currentTheme !== 'dark',
+                        'svg-invert': isThemeLight,
                       }"
                     />
 
                     <UiIconSun
                       :class="{
-                        'svg-invert':
-                          uiStore.headerScrolled &&
-                          themeStore.currentTheme !== 'dark',
+                        'svg-invert': isThemeLight,
                       }"
                       v-else
                     />
@@ -106,24 +96,45 @@
           :class="{ 'nav--open': isMenuOpen }"
           class="mobile-nav"
         >
-          <UiContainer>
-            <nav>
-              <HeaderMobileLink
-                v-for="link in linksList"
-                :key="link"
-                :name="link.name"
-                :path="link.path"
-              />
-            </nav>
-          </UiContainer>
+          <nav>
+            <HeaderMobileLink
+              v-for="link in linksList"
+              :key="link"
+              :name="link.name"
+              :path="link.path"
+              :headerItems="headerItems"
+              :activeLink="activeLink"
+              @click="handleMouseEnter(link.name)"
+            />
+
+            <div class="mobile-acions">
+              <UiButtonDefault state="primary" class="register"
+                >Register
+              </UiButtonDefault>
+
+              <UiButtonDefault
+                state="link"
+                :class="{
+                  'is-theme-light': isThemeLight,
+                }"
+                >Log In
+              </UiButtonDefault>
+            </div>
+
+            <div class="mobile-banner">
+              <UiTextH6>BANNER</UiTextH6>
+            </div>
+          </nav>
         </div>
       </UiContainer>
     </div>
 
     <transition name="fade" mode="out-in">
       <HeaderMenu
+        v-if="uiStore.showMenu && headerItems[activeLink]"
+        :key="activeLink"
+        :headerItems="headerItems[activeLink]"
         class="fixed-header-menu"
-        v-if="uiStore.showMenu"
         @mouseleave="handleMouseLeave"
       />
     </transition>
@@ -131,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import useTrackScroll from "./composables/trackScroll";
 import { useUiStore } from "~/stores/uiStore";
 import { useThemeStore } from "~/stores/themeStore.js";
@@ -145,13 +156,14 @@ import HeaderLink from "./components/HeaderLink.vue";
 import HeaderMobileLink from "./components/HeaderMobileLink.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
 import HeaderMenu from "~/components/block/LandingHeader/components/HeaderMenu.vue";
+import UiTextH6 from "~/components/ui/UiTextH6.vue";
 
 const themeStore = useThemeStore();
 const uiStore = useUiStore();
 
 const { isBlurred } = useTrackScroll();
 const isMenuOpen = ref(false);
-const activeLink = ref(null);
+const activeLink = ref("");
 
 const linksList = [
   {
@@ -168,23 +180,85 @@ const linksList = [
   },
 ];
 
+const headerItems = {
+  Trading: {
+    "Account overview": [
+      { name: "Standard", path: "#" },
+      { name: "Pro", path: "#" },
+      { name: "Islamic", path: "#" },
+      { name: "Demo", path: "#" },
+    ],
+
+    "Market Instruments": [
+      { name: "Forex", path: "#" },
+      { name: "Metals", path: "#" },
+      { name: "Stock CFDs", path: "#" },
+      { name: "Crypto CFDs", path: "#" },
+      { name: "Commodities", path: "#" },
+      { name: "Indices", path: "#" },
+      { name: "ETFs", path: "#" },
+    ],
+    Platform: [
+      { name: "MT4 Desktop", path: "#" },
+      { name: "MT 4 Mobile", path: "#" },
+    ],
+
+    "Trading conditions": [
+      { name: "Account replenishment", path: "#" },
+      { name: "Withdrawal of funds", path: "#" },
+    ],
+
+    "Trader's HUB": [
+      { name: "Trader's blog", path: "#" },
+      { name: "Economic calendar", path: "#" },
+      { name: "Market news", path: "#" },
+    ],
+    "TANDEM trading": [
+      { name: "For trader", path: "#" },
+      { name: "For investor", path: "#" },
+    ],
+  },
+
+  Partnership: {},
+
+  Company: {},
+};
+
+const isThemeLight = computed(() => {
+  return (
+    (uiStore.headerScrolled && themeStore.currentTheme !== "dark") ||
+    (themeStore.currentTheme !== "dark" && isMenuOpen.value)
+  );
+});
+
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
+  uiStore.showMenu = false;
+
   if (isMenuOpen.value) {
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
   } else {
     document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
   }
 };
 
 const handleMouseEnter = (name) => {
-  activeLink.value = name;
-  uiStore.showMenu = true;
+  if (activeLink.value !== name) {
+    activeLink.value = name;
+    uiStore.showMenu = true;
+  } else {
+    activeLink.value = "";
+    uiStore.showMenu = false;
+  }
 };
 
 const handleMouseLeave = () => {
   uiStore.showMenu = false;
-  activeLink.value = null;
+  activeLink.value = "";
 };
 </script>
 
@@ -201,6 +275,7 @@ const handleMouseLeave = () => {
 }
 
 .header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -243,6 +318,10 @@ const handleMouseLeave = () => {
 }
 
 .burger-menu {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   display: none;
   width: 30px;
   height: 25px;
@@ -291,22 +370,47 @@ const handleMouseLeave = () => {
   left: 0;
   width: 100%;
   height: calc(100vh - 80px);
-  padding: 40px;
+  padding: 10px;
   z-index: 10001;
+  overflow-y: auto;
   transform: translateY(-30px) scale(0.98);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 
   nav {
+    padding: 20px;
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 40px;
+
+    .mobile-acions {
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .mobile-banner {
+      padding: 54px 154px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      background: var(--ui-background-card);
+
+      h6 {
+        text-align: center;
+        color: var(--ui-text-main);
+      }
+    }
   }
 }
 
-.mobile-nav.nav--open {
+.nav--open {
   opacity: 1;
   transform: translateY(0) scale(1);
+  background: var(--ui-background);
 }
 
 .actions {
@@ -320,6 +424,10 @@ const handleMouseLeave = () => {
   .icon {
     cursor: pointer;
     margin-right: 16px;
+  }
+
+  &-icons {
+    display: flex;
   }
 }
 
@@ -345,33 +453,50 @@ const handleMouseLeave = () => {
   .burger-menu {
     display: flex;
   }
-}
-
-@media (max-width: 575px) {
-  .logo {
-    svg {
-      width: auto;
-      height: 40px;
-    }
-  }
 
   .login {
     display: none;
     padding: 0;
   }
 
-  .register {
-    padding: 15px;
+  .actions-wrapper {
+    padding-right: 50px;
   }
 
-  .actions {
-    margin-left: 137px;
+  .actions-icons {
+    display: none;
   }
 
   .is-menu-open {
     padding-left: 15px;
-    margin-left: 15px;
     border-left: 1px solid var(--ui-gray);
+
+    .actions {
+      &-icons {
+        display: block;
+      }
+    }
+  }
+
+  .header-is-open-menu {
+    justify-content: unset !important;
+    transition: all 0.2s ease;
+  }
+}
+
+@media (max-width: 575px) {
+  .logo {
+    margin-right: 15px;
+    padding-left: 25px;
+
+    svg {
+      width: auto;
+      height: 40px;
+    }
+  }
+
+  .register {
+    padding: 15px;
   }
 }
 </style>

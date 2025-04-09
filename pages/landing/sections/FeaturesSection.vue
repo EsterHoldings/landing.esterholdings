@@ -185,6 +185,9 @@ const items = ref([
 }
 
 @media (max-width: 991px) {
+  .features_section_title {
+    display: none;
+  }
   .feature_title {
     font-size: 16px;
   }

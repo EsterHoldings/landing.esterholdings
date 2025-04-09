@@ -4,8 +4,8 @@
       <div class="banner-section__wrapper">
         <div class="banner-image">
           <UiImage class="banner-image__image" src="/static/banner-bg.png" />
-          <UiImage
-            class="banner-image__image"
+          <img
+            class="banner-image__image small"
             src="/static/banner-bg-front.png"
           />
         </div>
@@ -50,6 +50,7 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 
   &__wrapper {
     position: relative;
+    overflow: hidden;
     height: 450px;
     width: 100%;
   }
@@ -92,9 +93,21 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   object-fit: cover;
 }
 
+img.banner-image__image.small {
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60vw !important;
+  z-index: 0;
+}
+
 @media (max-width: 991px) {
-  .banner-section {
-    padding: 0;
+  .banner-title {
+    font-size: 26px;
+  }
+
+  img.banner-image__image.small {
+    top: 58%;
   }
 }
 
@@ -102,6 +115,11 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   .banner-content {
     padding: 10px;
     width: 100%;
+  }
+
+  img.banner-image__image.small {
+    width: 90vw !important;
+    top: 65%;
   }
 }
 </style>

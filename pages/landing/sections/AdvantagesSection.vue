@@ -1,7 +1,7 @@
 <template>
   <section class="advantages_section">
     <div class="advantages_container">
-      <div class="advantage_item">
+      <!-- <div class="advantage_item">
         <UiTextH3 class="bold">10+</UiTextH3>
         <UiTextH6 class="advantage_item_subtitle"
           >Years of experience in field
@@ -16,12 +16,36 @@
       <div class="advantage_item">
         <UiTextH3 class="bold">5* Rated</UiTextH3>
         <UiTextH6 class="advantage_item_subtitle">Customer service</UiTextH6>
+      </div> -->
+
+      <div
+        v-for="(item, index) in cleanAdvantages"
+        :key="index"
+        class="advantage_item"
+      >
+        <UiTextH3 class="bold">{{ item.value }}</UiTextH3>
+        <UiTextH6 class="advantage_item_subtitle">
+          {{ item.label }}
+        </UiTextH6>
+        <div class="divider"></div>
       </div>
     </div>
   </section>
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { tm } = useI18n();
+
+const advantages = tm("advantages");
+
+const cleanAdvantages = advantages.map((item) => ({
+  value: item.value?.body?.static || "",
+  label: item.label?.body?.static || "",
+}));
+
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
 import UiTextH6 from "~/components/ui/UiTextH6.vue";
 </script>
@@ -66,7 +90,7 @@ import UiTextH6 from "~/components/ui/UiTextH6.vue";
 .divider {
   width: 1px;
   height: 50px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background: var(--color-stroke-ui);
 }
 
 @media (max-width: 991px) {
@@ -76,35 +100,37 @@ import UiTextH6 from "~/components/ui/UiTextH6.vue";
     padding: 20px;
   }
 
-  .advantage_item {
-    h3 {
-      font-size: 25px;
-    }
+  .advantages_container {
+    flex-direction: column;
+  }
+
+  .divider {
+    transform: rotate(90deg);
   }
 }
 
 @media (max-width: 767px) {
   .advantage_item {
     h3 {
-      font-size: 20px;
+      font-size: 26px;
     }
   }
 }
 
-@media (max-width: 576px) {
-  .advantages_section {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
+// @media (max-width: 576px) {
+//   .advantages_section {
+//     margin-top: 20px;
+//     margin-bottom: 20px;
+//   }
 
-  .advantage_item {
-    h3 {
-      font-size: 16px;
-    }
+//   .advantage_item {
+//     h3 {
+//       font-size: 16px;
+//     }
 
-    h6 {
-      font-size: 13px;
-    }
-  }
-}
+//     h6 {
+//       font-size: 13px;
+//     }
+//   }
+// }
 </style>

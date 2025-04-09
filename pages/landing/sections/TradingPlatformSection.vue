@@ -61,6 +61,36 @@
       </div>
 
       <div class="background-glow"></div>
+
+      <div class="floating__wrapper">
+        <UiTextTrading
+          class="floating__item"
+          title="Mobile trading"
+          subTitle="Full control over transactions at any time."
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="Trading Platform"
+          subTitle="Level up with our products"
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="Ester MetaTrader 4"
+          subTitle="The popular, classic solution"
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="High speed and reliability"
+          subTitle="Works even on weak PCs."
+          hasBorder
+        />
+      </div>
     </div>
   </section>
 </template>
@@ -78,7 +108,7 @@ const themeStore = useThemeStore();
   position: relative;
   text-align: center;
   padding: 100px 20px;
-  height: 800px;
+  min-height: 900px;
   background-color: var(--ui-background);
   color: var(--ui-text-main);
   transition: var(--default-transition);
@@ -186,6 +216,10 @@ const themeStore = useThemeStore();
   }
 }
 
+.floating__wrapper {
+  display: none;
+}
+
 .platform-title {
   display: flex;
   justify-content: center;
@@ -238,6 +272,10 @@ const themeStore = useThemeStore();
   }
 
   .device-laptop {
+    &_position {
+      right: 40% !important;
+    }
+
     img {
       width: 75%;
     }
@@ -261,58 +299,82 @@ const themeStore = useThemeStore();
 }
 
 @media (max-width: 991px) {
+  .trading-wrapper {
+    display: none;
+  }
   .devices {
     max-width: 767px;
-  }
+    display: flex;
+    flex-direction: column;
 
-  .platform-title {
-    margin-right: 500px;
-  }
+    .device-main_position,
+    .device-laptop_position,
+    .device-ipad_position,
+    .device-phone_position {
+      display: none;
+    }
 
-  .device-laptop {
-    right: 40% !important;
-  }
-}
+    .device-main {
+      img {
+        width: 90%;
+      }
+    }
 
-@media (max-width: 767px) {
-  .devices {
-    max-width: 565px;
+    .device-laptop {
+      right: 35%;
+      top: 55%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .device-ipad {
+      top: 60%;
+      left: 50% !important;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .device-phone {
+      img {
+        width: 100%;
+      }
+    }
   }
 
   .blur-circle {
     display: none;
   }
 
-  .platform-title {
-    margin: 0;
-    margin-bottom: 50px;
-    text-align: center;
-  }
+  .floating__wrapper {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-  .device-main {
-    &_position {
+    .floating__item {
+      display: flex;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .trading-platform_title {
+    font-size: 26px;
+    br {
       display: none;
-    }
-
-    img {
-      width: 100%;
-    }
-  }
-
-  .device-laptop {
-    display: none;
-  }
-
-  .device-ipad {
-    img {
-      width: 100%;
     }
   }
 
   .device-phone {
-    img {
-      width: 100%;
-    }
+    top: 68% !important;
+    left: 80% !important;
+  }
+  .floating__wrapper {
+    margin-top: 100px;
   }
 }
 </style>

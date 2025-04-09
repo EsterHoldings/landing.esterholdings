@@ -34,7 +34,7 @@
           </div>
           <UiButtonDefault
             :state="item.change > 0 ? 'success--outline' : 'danger--outline'"
-            >Trade</UiButtonDefault
+            >{{ $t("running-line-btn") }}</UiButtonDefault
           >
         </div>
       </div>

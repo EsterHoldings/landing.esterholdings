@@ -5,6 +5,7 @@
         <ul class="logo">
           <li>
             <UiIconLogo
+              class="logo-svg"
               :class="{ 'svg-invert': themeStore.currentTheme !== 'dark' }"
             />
           </li>
@@ -143,6 +144,10 @@ footer {
     flex-direction: column;
     gap: 10px;
 
+    &-svg {
+      padding-right: 30px;
+    }
+
     &-text {
       width: 206px;
       color: var(--ui-text-secondary);
@@ -195,18 +200,24 @@ footer {
 
 @media (max-width: 767px) {
   footer {
+    padding: 15px;
     margin-top: 0;
   }
   .footer__content {
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 30px;
+  }
+
+  .logo {
+    .logo-text {
+      width: 100%;
+    }
   }
 }
 
 @media (max-width: 576px) {
   .logo {
     width: 100%;
-    align-items: center;
   }
 }
 </style>

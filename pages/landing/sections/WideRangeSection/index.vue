@@ -35,4 +35,12 @@ import UiTabs from "~/components/ui/UiTabs.vue";
     margin-top: 29px;
   }
 }
+
+@media (max-width: 991px) {
+  .wide_range_section {
+    h3 {
+      font-size: 26px;
+    }
+  }
+}
 </style>

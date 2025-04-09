@@ -17,6 +17,7 @@
       <div class="help-block">
         <UiTextH4>
           Need Help? Visit our
+          <br />
           <a href="#" class="help-block__link">Help Section</a>
         </UiTextH4>
       </div>
@@ -89,6 +90,10 @@ const theNews = ref([
   h4 {
     color: var(--ui-text-main);
     font-weight: 700;
+
+    br {
+      display: none;
+    }
   }
 
   &:hover {
@@ -118,6 +123,10 @@ const theNews = ref([
 
   .help-block {
     margin-top: 50px;
+
+    h4 > br {
+      display: block;
+    }
   }
 }
 </style>

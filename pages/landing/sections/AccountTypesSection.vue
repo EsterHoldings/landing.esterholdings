@@ -175,6 +175,10 @@ const setActive = (index: number) => {
     flex-direction: column;
   }
 
+  .account-types__title {
+    font-size: 26px;
+  }
+
   .account-content {
     padding: 40px;
   }
