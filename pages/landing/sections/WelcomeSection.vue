@@ -3,17 +3,31 @@
     <SliderDefault class="welcome__slider" :autoPlayInterval="10000" />
     <UiContainer>
       <div class="welcome__content">
-        <UiTextH1>
+        <!-- <UiTextH1>
           Trade <span class="welcome__title--highlight">Smarter</span>, <br />
           Trade Faster !
+          <span v-html="$t('welcome-title')" />
+
+          <img class="rocket" src="/static/rocket.png" alt="Rocket" />
+        </UiTextH1> -->
+
+        <UiTextH1>
+          {{ $t("welcome-title.before") }}
+          <span class="welcome__title--highlight">{{
+            $t("welcome-title.highlight")
+          }}</span
+          >,<br />
+          {{ $t("welcome-title.after") }}
           <img class="rocket" src="/static/rocket.png" alt="Rocket" />
         </UiTextH1>
+
         <UiTextH5 class="welcome__text">
-          Access global markets, including Forex, Stocks, and CFDs, with <br />
-          fast execution, low spreads, and real-time market analysis.
+          {{ $t("welcome__text") }}
         </UiTextH5>
         <div>
-          <UiButtonDefault state="primary">Trade Now</UiButtonDefault>
+          <UiButtonDefault state="primary">{{
+            $t("welcome-btn")
+          }}</UiButtonDefault>
         </div>
       </div>
       <div class="welcome__running-line-default">
@@ -25,6 +39,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
+
 import UiTextH1 from "~/components/ui/UiTextH1.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
@@ -33,6 +48,7 @@ import UiImage from "~/components/ui/UiImage.vue";
 import TheSlider from "~/components/block/slider/TheSlider.vue";
 import SliderDefault from "~/components/block/sliders/SliderDefault.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
+import UiQRCode from "~/components/ui/UiQRCode.vue";
 
 const items = ref([
   { name: "EURUSD", price: 1.04282, change: 0.00014 },

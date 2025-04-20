@@ -7,16 +7,21 @@
     ]"
   >
     <div class="trading-platform_overlay">
-      <UiTextH3 class="trading-platform_title"
-        >Legendary platform for successful<br />
-        Forex and CFD trading
+      <UiTextH3 class="trading-platform_title">
+        {{ t("platform__title") }}
       </UiTextH3>
 
       <div class="blur-circle"></div>
       <div class="platform-title">
-        <UiTextTrading
+        <!-- <UiTextTrading
           title="Trading Platform"
           subTitle="Level up with our products"
+          color="primary"
+        /> -->
+
+        <UiTextTrading
+          :title="t('platform__features[0].title')"
+          :subTitle="t('platform__features[0].text')"
           color="primary"
         />
       </div>
@@ -25,10 +30,17 @@
         <div class="device device-laptop">
           <img src="/static/Macbook.png" alt="Laptop Trading" />
 
-          <UiTextTrading
+          <!-- <UiTextTrading
             class="device device-laptop_position"
             title="Mobile trading"
             subTitle="Full control over transactions at any time."
+            hasBorder
+          /> -->
+
+          <UiTextTrading
+            class="device device-laptop_position"
+            :title="t('platform__features[1].title')"
+            :subTitle="t('platform__features[1].text')"
             hasBorder
           />
         </div>
@@ -36,10 +48,17 @@
         <div class="device device-main">
           <img src="/static/iMac.png" alt="Trading Platform" />
 
-          <UiTextTrading
+          <!-- <UiTextTrading
             class="device device-main_position"
             title="Ester MetaTrader 4"
             subTitle="The popular, classic solution"
+            hasBorder
+          /> -->
+
+          <UiTextTrading
+            class="device device-main_position"
+            :title="t('platform__features[2].title')"
+            :subTitle="t('platform__features[2].text')"
             hasBorder
           />
         </div>
@@ -51,34 +70,83 @@
         <div class="device device-ipad">
           <img src="/static/iPad.png" alt="Mobile Trading" />
 
-          <UiTextTrading
+          <!-- <UiTextTrading
             class="device device-ipad_position"
             title="High speed and reliability"
             subTitle="Works even on weak PCs."
+            color="warning"
+          /> -->
+
+          <UiTextTrading
+            class="device device-ipad_position"
+            :title="t('platform__features[3].title')"
+            :subTitle="t('platform__features[3].text')"
             color="warning"
           />
         </div>
       </div>
 
       <div class="background-glow"></div>
+
+      <div class="floating__wrapper">
+        <!-- <UiTextTrading
+          class="floating__item"
+          title="Mobile trading"
+          subTitle="Full control over transactions at any time."
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="Trading Platform"
+          subTitle="Level up with our products"
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="Ester MetaTrader 4"
+          subTitle="The popular, classic solution"
+          hasBorder
+        />
+
+        <UiTextTrading
+          class="floating__item"
+          title="High speed and reliability"
+          subTitle="Works even on weak PCs."
+          hasBorder
+        /> -->
+
+        <UiTextTrading
+          class="floating__item"
+          v-for="(item, index) in platformFeatures"
+          :key="index"
+          :title="t(`platform__features[${index}].title`)"
+          :subTitle="t(`platform__features[${index}].text`)"
+          hasBorder
+        />
+      </div>
     </div>
   </section>
 </template>
 
 <script lang="ts" setup>
+import { useThemeStore } from "~/stores/themeStore";
+import { useI18n } from "vue-i18n";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
 import UiTextTrading from "~/components/ui/UiTextTrading.vue";
-import { useThemeStore } from "~/stores/themeStore";
 
 const themeStore = useThemeStore();
+const { t } = useI18n();
+
+const platformFeatures = [0, 1, 2, 3];
 </script>
 
 <style lang="scss" scoped>
 .trading-platform {
   position: relative;
-  text-align: center;
   padding: 100px 20px;
-  height: 800px;
+  min-height: 900px;
   background-color: var(--ui-background);
   color: var(--ui-text-main);
   transition: var(--default-transition);
@@ -105,6 +173,8 @@ const themeStore = useThemeStore();
   &_title {
     color: var(--ui-text-main);
     margin-bottom: 90px;
+    white-space: pre-line;
+    text-align: center;
   }
 
   &_overlay {
@@ -186,6 +256,10 @@ const themeStore = useThemeStore();
   }
 }
 
+.floating__wrapper {
+  display: none;
+}
+
 .platform-title {
   display: flex;
   justify-content: center;
@@ -238,6 +312,10 @@ const themeStore = useThemeStore();
   }
 
   .device-laptop {
+    &_position {
+      right: 40% !important;
+    }
+
     img {
       width: 75%;
     }
@@ -261,58 +339,92 @@ const themeStore = useThemeStore();
 }
 
 @media (max-width: 991px) {
+  .trading-platform {
+    min-height: 1100px;
+  }
+  .trading-wrapper {
+    display: none;
+  }
   .devices {
     max-width: 767px;
-  }
+    display: flex;
+    flex-direction: column;
 
-  .platform-title {
-    margin-right: 500px;
-  }
+    .device-main_position,
+    .device-laptop_position,
+    .device-ipad_position,
+    .device-phone_position {
+      display: none;
+    }
 
-  .device-laptop {
-    right: 40% !important;
-  }
-}
+    .device-main {
+      img {
+        width: 90%;
+      }
+    }
 
-@media (max-width: 767px) {
-  .devices {
-    max-width: 565px;
+    .device-laptop {
+      right: 35%;
+      top: 55%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .device-ipad {
+      top: 60%;
+      left: 50% !important;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .device-phone {
+      img {
+        width: 100%;
+      }
+    }
   }
 
   .blur-circle {
     display: none;
   }
 
-  .platform-title {
-    margin: 0;
-    margin-bottom: 50px;
-    text-align: center;
-  }
+  .floating__wrapper {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-  .device-main {
-    &_position {
-      display: none;
-    }
-
-    img {
-      width: 100%;
+    .floating__item {
+      display: flex;
     }
   }
+}
 
-  .device-laptop {
-    display: none;
+@media (max-width: 767px) {
+  .trading-platform {
+    min-height: calc(900px + 4 * 50px);
   }
-
-  .device-ipad {
-    img {
-      width: 100%;
-    }
+  .trading-platform_title {
+    font-size: 26px;
+    white-space: normal;
   }
 
   .device-phone {
-    img {
-      width: 100%;
-    }
+    top: 68% !important;
+    left: 80% !important;
+  }
+  .floating__wrapper {
+    margin-top: 100px;
+  }
+}
+
+@media (max-width: 500px) {
+  .trading-platform {
+    min-height: 900px;
   }
 }
 </style>

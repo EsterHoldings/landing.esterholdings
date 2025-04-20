@@ -51,7 +51,7 @@ const setActiveTab = (tabId: string) => {
   gap: 15px;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
 }
 
 .tabs__item {
@@ -66,6 +66,8 @@ const setActiveTab = (tabId: string) => {
   align-items: center;
   padding: 16px 26px;
   cursor: pointer;
+  white-space: nowrap;
+  scroll-snap-align: center;
 
   h5 {
     color: var(--ui-text-main);
@@ -82,14 +84,18 @@ const setActiveTab = (tabId: string) => {
 }
 
 @media (max-width: 991px) {
-  .tabs {
-    padding: 10px;
-  }
-  .tabs__item {
-    padding: 16px !important;
+  .tabs__wrapper {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
 
-    h5 {
-      font-size: 13px;
+    .tabs__item {
+      padding: 10px 20px;
+      width: 100%;
+      h5 {
+        font-size: 14px;
+      }
     }
   }
 }

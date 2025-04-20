@@ -5,13 +5,16 @@
       :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
     >
       <div class="forex__content">
-        <UiTextH3 class="forex__title">Forex</UiTextH3>
+        <UiTextH3 class="forex__title">
+          {{ t("wide_range_tabs.Forex.title") }}</UiTextH3
+        >
         <UiTextH5 class="forex__text">
-          Trade 70 major, minor & exotic currency pairs<br />
-          with competitive trading conditions.
+          {{ t("wide_range_tabs.Forex.description") }}
         </UiTextH5>
         <div>
-          <UiButtonDefault state="primary">Trade Forex</UiButtonDefault>
+          <UiButtonDefault state="primary">
+            {{ t("wide_range_tabs.Forex.btn") }}</UiButtonDefault
+          >
         </div>
       </div>
 
@@ -27,7 +30,9 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiImage from "~/components/ui/UiImage.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
 
+import { useI18n } from "vue-i18n";
 import { useThemeStore } from "~/stores/themeStore";
+const { t } = useI18n();
 
 const themeStore = useThemeStore();
 </script>
@@ -64,6 +69,8 @@ const themeStore = useThemeStore();
     border-radius: 15px;
     border: 1px solid var(--ui-stroke);
     overflow: hidden;
+    box-shadow: inset 0 -50px 50px -20px var(--ui-background),
+      inset 0 50px 50px -20px var(--ui-background);
 
     &::after {
       content: "";
@@ -76,6 +83,8 @@ const themeStore = useThemeStore();
       right: -200px;
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
+      box-shadow: inset 0 -50px 50px -20px var(--ui-background),
+        inset 0 50px 50px -20px var(--ui-background);
     }
 
     &::before {
@@ -89,6 +98,8 @@ const themeStore = useThemeStore();
       right: 260px;
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
+      box-shadow: inset 0 -50px 50px -20px var(--ui-background),
+        inset 0 50px 50px -20px var(--ui-background);
     }
   }
 
@@ -132,35 +143,63 @@ const themeStore = useThemeStore();
 }
 
 @media (max-width: 991px) {
+  .forex {
+    padding: 0 !important;
+  }
+
+  .forex__title {
+    font-size: 26px;
+  }
+
   .forex__text {
     br {
       display: none;
     }
   }
-  .forex__content {
-    max-width: 300px;
-  }
-
-  .forex__img {
-    top: 10%;
-    width: 63%;
-  }
-}
-
-@media (max-width: 767px) {
   .wrapper {
-    padding: 20px !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 25px !important;
+
+    &::after {
+      top: 0 !important;
+      width: 200px !important;
+      height: 200px !important;
+    }
+
+    &::before {
+      top: 0 !important;
+      width: 200px !important;
+      height: 200px !important;
+    }
+  }
+
+  .forex__content {
+    order: 2;
   }
 
   .forex__img {
-    top: 25%;
-    width: 50%;
+    position: static;
+    order: 1;
+    width: 100%;
   }
 }
 
-@media (max-width: 575px) {
-  .forex__img {
-    display: none;
-  }
-}
+// @media (max-width: 767px) {
+//   .wrapper {
+//     padding: 20px !important;
+//   }
+
+//   .forex__img {
+//     top: 25%;
+//     width: 50%;
+//   }
+// }
+
+// @media (max-width: 575px) {
+//   .forex__img {
+//     display: none;
+//   }
+// }
 </style>

@@ -16,8 +16,9 @@
 
       <div class="help-block">
         <UiTextH4>
-          Need Help? Visit our
-          <a href="#" class="help-block__link">Help Section</a>
+          {{ t("helpSection") }}
+          <br />
+          <a href="#" class="help-block__link">{{ t("helpLinkText") }}</a>
         </UiTextH4>
       </div>
     </UiContainer>
@@ -25,11 +26,14 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import UiCard from "~/components/ui/UiCard.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
+
+const { t, tm } = useI18n();
 
 const theNews = ref([
   {
@@ -89,6 +93,10 @@ const theNews = ref([
   h4 {
     color: var(--ui-text-main);
     font-weight: 700;
+
+    br {
+      display: none;
+    }
   }
 
   &:hover {
@@ -118,6 +126,10 @@ const theNews = ref([
 
   .help-block {
     margin-top: 50px;
+
+    h4 > br {
+      display: block;
+    }
   }
 }
 </style>

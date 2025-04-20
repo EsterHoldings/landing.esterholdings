@@ -3,7 +3,10 @@
     <UiContainer>
       <div class="four-steps">
         <UiTextH3 class="four-steps__title">
-          Open an account in <span class="highlight">4 simple steps</span>
+          {{ t("four_steps_section.title.before") }} <br />
+          <span class="highlight">{{
+            t("four_steps_section.title.highlight")
+          }}</span>
         </UiTextH3>
 
         <div class="four-steps__container">
@@ -14,16 +17,18 @@
           >
             <UiTextH3 class="four-steps__number">{{ index + 1 }}</UiTextH3>
             <div class="four-steps__content">
-              <UiTextH4 class="four-steps__heading">{{ step.title }}</UiTextH4>
+              <UiTextH4 class="four-steps__heading">{{
+                step.title.body.static
+              }}</UiTextH4>
               <UiTextH5 class="four-steps__description"
-                >{{ step.description }}
+                >{{ step.text.body.static }}
               </UiTextH5>
             </div>
           </div>
         </div>
 
         <UiButtonDefault state="primary" class="four-steps__button"
-          >Open account
+          >{{ t("four_steps_section.button") }}
         </UiButtonDefault>
       </div>
     </UiContainer>
@@ -31,6 +36,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
@@ -39,27 +45,9 @@ import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
 
-const steps = ref([
-  {
-    title: "Register",
-    description:
-      "Choose an account type and complete our fast and secure application form",
-  },
-  {
-    title: "Verify",
-    description: "Use our digital onboarding system for fast verification",
-  },
-  {
-    title: "Fund",
-    description:
-      "Fund your trading account using a wide range of funding methods",
-  },
-  {
-    title: "Trade",
-    description:
-      "Start trading on your live account and access +2,100 instruments",
-  },
-]);
+const { t, tm } = useI18n();
+
+const steps = tm("four_steps_section.items");
 </script>
 
 <style lang="scss" scoped>
@@ -78,6 +66,10 @@ const steps = ref([
   font-weight: 700;
   color: var(--ui-text-main);
   margin-bottom: 80px;
+
+  br {
+    display: none;
+  }
 }
 
 .highlight {
@@ -145,6 +137,14 @@ const steps = ref([
 }
 
 @media (max-width: 991px) {
+  .four-steps__title {
+    font-size: 26px;
+
+    br {
+      display: block;
+    }
+  }
+
   .four-steps__container {
     gap: 10px;
     flex-wrap: wrap;
@@ -163,7 +163,7 @@ const steps = ref([
   }
 
   .four-steps__button {
-    margin: 50px auto;
+    display: none;
   }
 }
 

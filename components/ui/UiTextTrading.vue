@@ -107,4 +107,11 @@ const props = defineProps({
     }
   }
 }
+
+@media (max-width: 991px) {
+  .trading-wrapper {
+    width: 100%;
+    padding: 14px;
+  }
+}
 </style>

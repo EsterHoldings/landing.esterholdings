@@ -35,11 +35,11 @@
   --color-sticker-ui-danger: #d93025;
   --color-stroke-ui-light: #1b63ff;
   --color-stroke-ui-dark: #011644;
-  --color-stroke-ui: linear-gradient(
-    137.67deg,
-    #1b63ff 2.397%,
-    #011644 99.041%
-  );
+  // --color-stroke-ui: linear-gradient(
+  //   137.67deg,
+  //   #1b63ff 2.397%,
+  //   #011644 99.041%
+  // );
   --color-ui-grey: #b8b8c3;
 
   //MAIN COLOR VAR-----
@@ -50,7 +50,12 @@
   --ui-sticker-success: #03c11f;
   --ui-sticker-danger: #f41112;
 
-  --ui-stroke: linear-gradient(137.67deg, #1b63ff 2.397%, #011644 99.041%);
+  --ui-stroke: linear-gradient(137.67deg, #1b63ffff 2.397%, #011644ff 99.041%);
+  --color-stroke-ui: linear-gradient(
+    137.67deg,
+    #1b63ff 2.397%,
+    #011644 99.041%
+  );
 
   --ui-gray: #b8b8c3;
   --ui-background: #000028;
