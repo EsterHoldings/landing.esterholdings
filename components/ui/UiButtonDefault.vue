@@ -9,6 +9,7 @@
       'btn--primary': props.state === 'primary',
       'btn--warning': props.state === 'warning',
       'btn--success': props.state === 'success',
+      'btn--info--outline': props.state === 'info--outline',
       'btn--success--outline': props.state === 'success--outline',
       'btn--danger--outline': props.state === 'danger--outline',
       'btn--secondary': props.state === 'secondary',
@@ -53,7 +54,7 @@ const handleClick = (): void => emit("click");
   // padding: 0 20px;
   // min-width: min-content;
   // height: 50px;
-
+  box-sizing: border-box;
   height: 46px;
   //border-radius: 50px;
   border-radius: var(--ui-border--raduis);
@@ -109,6 +110,21 @@ const handleClick = (): void => emit("click");
   &--warning {
     background-color: var(--ui-primary-accent);
     color: white;
+  }
+
+  &--info {
+    background-color: var(--color-ui-primary);
+    color: white;
+
+    &--outline {
+      border: 1px solid var(--color-ui-primary);
+      background-color: transparent;
+      color: var(--color-ui-primary);
+
+      &:hover {
+        background: var(--color-ui-primary) !important;
+      }
+    }
   }
 
   &--success {

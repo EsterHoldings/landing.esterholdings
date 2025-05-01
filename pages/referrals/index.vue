@@ -2,7 +2,7 @@
   <UiContainer>
     <div class="referrals">
       <div class="referrals__title">
-        <h3>Referral system</h3>
+        <UiTextH4>Referral system</UiTextH4>
       </div>
       <div class="referrals__content">
         <UiTextH1>Coming Soon</UiTextH1>
@@ -19,11 +19,9 @@ import {definePageMeta} from "~/.nuxt/imports";
 import UiTextH1 from "~/components/ui/UiTextH1.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
 import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
+import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
-definePageMeta({
-  layout: "cabinet",
-  middleware: ["auth-client"]
-});
+definePageMeta({ layout: 'cabinet', middleware: ['auth-client'] });
 
 </script>
 

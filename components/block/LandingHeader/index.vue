@@ -47,15 +47,17 @@
             :class="{ 'is-menu-open': isMobileMenuOpen }"
           >
             <div class="actions">
-              <UiButtonDefault
-                state="link"
-                class="login"
-                :class="{
-                  'is-theme-light': isThemeLight,
-                }"
-              >
-                {{ t("header.auth.login") }}
-              </UiButtonDefault>
+              <NuxtLink to="/auth/login">
+                <UiButtonDefault
+                  state="link"
+                  class="login"
+                  :class="{
+                    'is-theme-light': isThemeLight,
+                  }"
+                >
+                  {{ t("header.auth.login") }}
+                </UiButtonDefault>
+              </NuxtLink>
 
               <UiButtonDefault
                 state="primary"

@@ -1,8 +1,5 @@
 <template>
   <main class="landing">
-    <!--    <WelcomeSection />-->
-
-
     <div ref="welcomeRef">
       <WelcomeSection/>
     </div>

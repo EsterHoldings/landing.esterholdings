@@ -60,11 +60,16 @@ const handleClickMenuItem = (event: Event) => emit('click', props.to)
   flex-direction: column;
 
   margin-top: 1px;
-  height: 65px;
+  height: 80px;
 
   background-color: transparent;
 
   transition: .3s;
+
+  &.active {
+    background-color: var(--color-stroke-ui-dark);
+    border-right: 1px solid var(--color-ui-primary);
+  }
 
 
   &:hover {
@@ -80,7 +85,7 @@ const handleClickMenuItem = (event: Event) => emit('click', props.to)
     position: absolute;
     left: 0;
     top: 0;
-    width: 8px;
+    width: 1px;
     height: 100%;
 
     background-color: var(--color-stroke-ui-dark);
@@ -91,18 +96,18 @@ const handleClickMenuItem = (event: Event) => emit('click', props.to)
   }
 
   &__icon {
-    padding-left: 20px;
+    //padding-left: 20px;
     padding-top: 10px;
   }
 
   &__title {
-    padding-bottom: 10px;
-    padding-left: 20px;
+    padding: 0 10px 10px;
     width: 100%;
     height: 100%;
     transition: 3s;
     opacity: 1;
-    white-space: nowrap;
+    white-space: pre-wrap;
+    text-align: center;
     cursor: pointer;
 
     z-index: 3;

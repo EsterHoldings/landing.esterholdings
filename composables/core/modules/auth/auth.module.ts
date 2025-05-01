@@ -10,18 +10,13 @@ export class AuthModule {
     return new Promise((res, rej) => res(true));
   }
   async doLogin(params: {}):Promise<any> {
-    const response = await this.authService.postLogin(params);
-    console.log('Response: ', response);
-    console.log('Response data: ', response.data);
-    // If status - 200
-    // 1. Save accessToken and refreshToken
-    return response;
+    return await this.authService.postLogin(params);
   }
   async doLogout(params: {}):Promise<any> {
-    return new Promise((res, rej) => res(true));
+    return await this.authService.postLogout();
   }
   async doForgotPass(params: {}):Promise<any> {
-    return new Promise((res, rej) => res(true));
+    return new Promise(() => {});
   }
 }
 export default AuthModule;

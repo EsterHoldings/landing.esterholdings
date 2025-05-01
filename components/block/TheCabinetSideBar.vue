@@ -5,10 +5,16 @@
         <NuxtLink to="/"><UiIconLogo /></NuxtLink>
       </div>
       <div class="side-bar-cabinet__top__profile">
+        <NuxtLink to="/ru/profile">
         <div class="side-bar-cabinet__top__profile__image">
           <UiIconUser />
         </div>
-        <div>...</div>
+        </NuxtLink>
+<!--        <div class="side-bar-cabinet__top__profile__name">-->
+<!--          <NuxtLink to="/ru/profile">-->
+<!--            Firstname-->
+<!--          </NuxtLink>-->
+<!--        </div>-->
       </div>
     </div>
     <div class="side-bar-cabinet__content">
@@ -17,7 +23,7 @@
     <div class="side-bar-cabinet__bottom">
       <UiIconGlobe />
       <UiIconMoon />
-      <UiIconLogout />
+      <UiIconLogout @click="handleClickLogout" />
     </div>
   </header>
 </template>
@@ -30,6 +36,18 @@ import UiIconLogout from "~/components/ui/UiIconLogout.vue";
 import UiIconGlobe from "~/components/ui/UiIconGlobe.vue";
 import UiIconMoon from "~/components/ui/UiIconMoon.vue";
 import UiIconUser from "~/components/ui/UiIconUser.vue";
+import {useAuthStore} from "~/stores/authStore";
+import {useRoute} from "vue-router";
+import {navigateTo} from "nuxt/app";
+
+const authStore = useAuthStore();
+const router = useRoute();
+
+const handleClickLogout = () => {
+  authStore.setAccessToken('');
+  authStore.setRefreshToken('');
+  navigateTo('/auth/login')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -37,7 +55,7 @@ import UiIconUser from "~/components/ui/UiIconUser.vue";
   position: fixed;
   color: white;
   height: 100vh;
-  width: 200px;
+  width: 6.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,9 +83,31 @@ import UiIconUser from "~/components/ui/UiIconUser.vue";
 
     flex-direction: column;
 
-    &__logo {}
+    &__logo {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     &__profile {
-      margin-top: 20px;
+
+      &__image {
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+        width: 60px;
+        border: 3px solid var(--color-stroke-ui-dark);
+        border-radius: 25%;
+      }
+
+      &__name {
+        margin-top: 15px;
+        width: 100%;
+        font-size: 13px;
+      }
     }
   }
 
@@ -88,7 +128,7 @@ import UiIconUser from "~/components/ui/UiIconUser.vue";
     justify-content: space-between;
     border-top: 1px solid var(--color-stroke-ui-dark);
 
-    padding: 0 30px;
+    padding: 0 10px;
   }
 }
 

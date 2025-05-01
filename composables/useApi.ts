@@ -16,12 +16,7 @@ export class useApi {
 
       // TODO :: Переделать все на стор
       if (forClient) token = localStorage.getItem('user_access_token');
-      console.log('(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)');
-      console.log(token);
-      console.log('(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)(*)');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      if (token) { config.headers.Authorization = `Bearer ${token}`; }
 
       return config;
     });

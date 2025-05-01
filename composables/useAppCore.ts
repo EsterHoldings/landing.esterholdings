@@ -31,7 +31,7 @@ export const useAppCore = (): ICoreModules => {
         admins: new AdminsModule(),
         accounts: new AccountsModule(),
         auth: new AuthModule(),
-        clients: new AuthModule(),
+        clients: new AuthModule(), // TODO :: Fix
         items: new ItemsModule(),
         roles: new RolesModule(),
         permissions: new PermissionsModule(),

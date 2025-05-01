@@ -27,42 +27,48 @@ import {useRouter} from "vue-router";
 import UiIconSupport from "~/components/ui/UiIconSupport.vue";
 import UiIconPayment from "~/components/ui/UiIconPayment.vue";
 
+import { useI18n } from 'vue-i18n'
+const addCurrentLocaleToPath = (path = '') => {
+  const { locale } = useI18n({ useScope: 'global' })
+  return `/${locale.value}/${path}`;
+}
+
 const router = useRouter();
 const sideBarIsOpen = ref(true)
 const menuItems = [
   {
     title: 'Dashboard',
-    to: '/dashboard',
+    to: addCurrentLocaleToPath('dashboard'),
     icon: UiIconHome,
   },
   {
     title: 'Payment details',
-    to: '/payments/details',
+    to: addCurrentLocaleToPath('payments/details'),
     icon: UiIconClients,
   },
   {
     title: 'Accounts',
-    to: '/accounts',
+    to: addCurrentLocaleToPath('accounts'),
     icon: UiIconUser,
   },
   {
     title: 'Referral system',
-    to: '/referrals',
+    to: addCurrentLocaleToPath('referrals'),
     icon: UiIconReferral,
   },
   {
     title: 'Billing',
-    to: '/payments',
+    to: addCurrentLocaleToPath('payments'),
     icon: UiIconPayment,
   },
-  {
-    title: 'Settings',
-    to: '/settings',
-    icon: UiIconSetting,
-  },
+  // {
+  //   title: 'Settings',
+  //   to: addCurrentLocaleToPath('settings'),
+  //   icon: UiIconSetting,
+  // },
   {
     title: 'Support',
-    to: '/support',
+    to: addCurrentLocaleToPath('support'),
     icon: UiIconSupport,
   }
 ];

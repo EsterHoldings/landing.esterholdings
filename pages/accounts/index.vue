@@ -2,7 +2,7 @@
   <UiContainer>
     <div class="accounts">
       <div class="accounts__title">
-        <h3>Accounts</h3>
+        <UiTextH4>Accounts</UiTextH4>
       </div>
       <div class="accounts__content">
         <div class="accounts__content__options">
@@ -62,7 +62,7 @@
         <template v-if="accounts.length > 0">
           <PanelDefault class="accounts__content__account_item" v-for="account in accounts" :key="account.id">
             <div class="accounts__content__account_item__data-wrapper">
-              <div>{{ account.type }}</div>
+              <div>{{ account.account_type.name }}</div>
               <div>{{ account.leverage }}</div>
               <div>{{ account.number }}</div>
               <div>
@@ -113,6 +113,7 @@ import useAppCore from "~/composables/useAppCore";
 import { computed, onMounted, reactive, ref, inject } from "vue";
 import {definePageMeta} from "~/.nuxt/imports";
 import AccountsCreateNew from "~/pages/accounts/components/AccountsCreateNew.vue";
+import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
 definePageMeta({ layout: "cabinet", middleware: ["auth-client"] });
 
@@ -206,7 +207,6 @@ const loadData = async () => {
   perPage.value = response.data.data.per_page;
   currentPage.value = response.data.data.current_page;
   total.value = response.data.data.total;
-
   const accountsData = response.data.data.data.map(x => { x.isSpinning = false; return x; });
   accounts.splice(0, accounts.length, ...accountsData);
 };

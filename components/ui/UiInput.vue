@@ -86,9 +86,9 @@ const onBlur = (event: any): void => emit("blur", event);
 input {
   width: 100%;
   height: var(--ui-input--height);
-  border: none;
   outline: none;
-  background-color: transparent;
+  background-color: var(--ui-background);
+  border: 1px solid var(--color-stroke-ui-dark);
   color: var(--color-ui-text);
 }
 
@@ -135,7 +135,8 @@ input {
 
   & > .border {
     border: 1px solid var(--color-stroke-ui-dark);
-    border-radius: var(--ui-input--border-radius);
+    //border-radius: var(--ui-input--border-radius);
+    border-radius: 10px;
   }
 
   &::placeholder {

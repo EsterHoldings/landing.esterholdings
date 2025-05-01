@@ -22,7 +22,7 @@
 
   //-------- UI -------- //
 
-  --color-ui-background: #000028;
+  --color-ui-background: rgba(0, 0, 40, 0.95);
   --color-ui-background-opacity-80: rgba(0, 0, 40, 0.33);
 
   --color-ui-primary: #0051ff;
@@ -47,7 +47,7 @@
   --ui-primary-accent: #f75709;
   --ui-primary-neutral: #ffffff;
 
-  --ui-sticker-success: #03c11f;
+  --ui-sticker-success: #008001;
   --ui-sticker-danger: #f41112;
 
   --ui-stroke: linear-gradient(137.67deg, #1b63ffff 2.397%, #011644ff 99.041%);
@@ -60,6 +60,7 @@
   --ui-gray: #b8b8c3;
   --ui-background: #000028;
   --ui-background-secondary: #031743;
+  --ui-background-panel: #011644b5;
   --ui-background-card: #01014e;
 
   --ui-text-main: #ffffff;

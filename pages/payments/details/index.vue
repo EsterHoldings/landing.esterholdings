@@ -1,133 +1,126 @@
 <template>
   <UiContainer>
-    <div class="payments">
-      <div class="payments__title">
-        <h3>Payment details</h3>
+    <div class="payments-details">
+      <div class="payments-details__title">
+        <UiTextH4>Payment details</UiTextH4>
       </div>
-      <div class="payments__content">
-        <div class="payments__content__options">
-          <div class="payments__content__option">
-            <UiButtonDefault state="success"
-                             @click="handleClickCreateNewAccount"
-            >Create new payment</UiButtonDefault>
-          </div>
-        </div>
+      <PanelDefault>
+        <div class="payments-details__content">
 
-        <div class="payments__content__payment_item__options">
-          <UiInput @input="handleInputSearch" :value="search" placeholder="Search" />
-        </div>
-
-        <div class="payments__content__payment_item__data-wrapper--header">
-
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('id')">Id</span>
-            <UiIconSort :active="orderBy === 'id'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('id')"
-            />
+          <div class="payments-details__content__payment_item__options">
+            <div class="payments-details__content__payment_item__options__search">
+              <UiInput @input="handleInputSearch" :value="search" placeholder="Search" />
+            </div>
+            <div class="payments-details__content__payment_item__options__actions">
+              <UiButtonDefault state="success--outline"
+                               @click="handleClickCreateNewAccount"
+              >Create new payment detail</UiButtonDefault>
+            </div>
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('payment_system')">Paysystem</span>
-            <UiIconSort :active="orderBy === 'payment_system'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('payment_system')"
-            />
+          <div class="payments-details__content__payment_item__data-wrapper--header">
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span @click="handleOrderByAndDirection('id')">Title</span>
+              <UiIconSort :active="orderBy === 'id'"
+                          :direction="orderDirection"
+                          @click="handleOrderByAndDirection('id')"
+              />
+            </div>
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span @click="handleOrderByAndDirection('payment_system')">Paysystem</span>
+              <UiIconSort :active="orderBy === 'payment_system'"
+                          :direction="orderDirection"
+                          @click="handleOrderByAndDirection('payment_system')"
+              />
+            </div>
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span  @click="handleOrderByAndDirection('currency')">Currency</span>
+              <UiIconSort :active="orderBy === 'currency'"
+                          :direction="orderDirection"
+                          @click="handleOrderByAndDirection('currency')"
+              />
+            </div>
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span  @click="handleOrderByAndDirection('amount')">Amount</span>
+              <UiIconSort :active="orderBy === 'amount'"
+                          :direction="orderDirection"
+                          @click="handleOrderByAndDirection('amount')"
+              />
+            </div>
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span  @click="handleOrderByAndDirection('created_at')">CreatedAt</span>
+              <UiIconSort :active="orderBy === 'created_at'"
+                          :direction="orderDirection"
+                          @click="handleOrderByAndDirection('created_at')"
+              />
+            </div>
+
+            <div class="payments-details__content__payment_item__data-wrapper--header__cell">
+              <span  @click="handleOrderByAndDirection('created_at')"></span>
+            </div>
+
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('status')">Status</span>
-            <UiIconSort :active="orderBy === 'status'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('status')"
-            />
-          </div>
+          <template v-if="payments.length === 0">
+            <div class="payments-details__content__nothing-to-show">
+              Nothing to show =(
+            </div>
+          </template>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('currency')">Currency</span>
-            <UiIconSort :active="orderBy === 'currency'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('currency')"
-            />
-          </div>
-
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('amount')">Amount</span>
-            <UiIconSort :active="orderBy === 'amount'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('amount')"
-            />
-          </div>
-
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('created_at')">CreatedAt</span>
-            <UiIconSort :active="orderBy === 'created_at'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('created_at')"
-            />
-          </div>
-
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('created_at')"></span>
-          </div>
-
-        </div>
-
-        <template v-if="payments.length === 0">
-          <div class="payments__content__nothing-to-show">
-            Nothing to show =(
-          </div>
-        </template>
-
-        <template v-if="payments.length > 0">
-          <PanelDefault class="payments__content__payment_item"
-                        v-for="payment in payments"
-                        :key="payment.id"
-          >
-            <div class="payments__content__payment_item__data-wrapper">
-              <div @click="copyToClipboard(payment.id)"
-                   style="display: flex;"
-              >
-                <UiIconCopy />
-                <span style="margin-left: 5px; font-size: 12px;">{{ shortId(payment.id) }}</span>
-              </div>
-              <div>{{ payment.payment_system }}</div>
-              <div>{{ payment.status }}</div>
-              <div>{{ payment.currency }}</div>
-              <div :class="[Math.random() < 0.5 ? 'withdrawal' : 'deposit']">{{ payment.amount }}</div>
-              <div class="date">{{ new Date(payment.created_at).toLocaleString() }}</div>
-              <div>
-                <UiIconUpdate class="icon-update" ref="iconUpdate" :class="{ spinning: spinIcon }"
-                              @click="handleIconClick(payment.id)" @animationend="onIconAnimationEnd" />
+          <template v-if="payments.length > 0">
+            <div class="payments-details__content__payment_item"
+                          v-for="payment in payments"
+                          :key="payment.id"
+            >
+              <div class="payments-details__content__payment_item__data-wrapper">
+<!--                <div @click="copyToClipboard(payment.id)"-->
+<!--                     style="display: flex;"-->
+<!--                >-->
+<!--                  <UiIconCopy />-->
+<!--                </div>-->
+                <div>{{ payment.payment_system }}</div>
+                <div>{{ payment.status }}</div>
+                <div>{{ payment.currency }}</div>
+                <div :class="[Math.random() < 0.5 ? 'withdrawal' : 'deposit']">{{ payment.amount }}</div>
+                <div class="date">{{ new Date(payment.created_at).toLocaleString() }}</div>
+                <div>
+                  <UiIconUpdate class="icon-update" ref="iconUpdate" :class="{ spinning: spinIcon }"
+                                @click="handleIconClick(payment.id)" @animationend="onIconAnimationEnd" />
+                </div>
               </div>
             </div>
-          </PanelDefault>
-        </template>
+          </template>
 
-        <div class="payments__content__pagination">
-          <button class="page-btn" v-if="currentPage !== 1 && total > perPage" @click="goPrev">Prev</button>
+          <div class="payments-details__content__pagination">
+            <button class="page-btn" v-if="currentPage !== 1 && total > perPage" @click="goPrev">Prev</button>
 
-          <button v-if="visiblePages[0] > 1" class="page-link" @click="setPage(1)">1</button>
-          <span v-if="visiblePages[0] > 2">...</span>
+            <button v-if="visiblePages[0] > 1" class="page-link" @click="setPage(1)">1</button>
+            <span v-if="visiblePages[0] > 2">...</span>
 
-          <button v-for="page in visiblePages"
-                  :key="page"
-                  class="page-link"
-                  :class="{ active: currentPage === page }"
-                  @click="setPage(page)">
-            {{ page }}
-          </button>
+            <button v-for="page in visiblePages"
+                    :key="page"
+                    class="page-link"
+                    :class="{ active: currentPage === page }"
+                    @click="setPage(page)">
+              {{ page }}
+            </button>
 
-          <span v-if="visiblePages[visiblePages.length - 1] < totalPages">...</span>
-          <button v-if="visiblePages[visiblePages.length - 1] < totalPages"
-                  class="page-link"
-                  @click="setPage(totalPages)">
-            {{ totalPages }}
-          </button>
+            <span v-if="visiblePages[visiblePages.length - 1] < totalPages">...</span>
+            <button v-if="visiblePages[visiblePages.length - 1] < totalPages"
+                    class="page-link"
+                    @click="setPage(totalPages)">
+              {{ totalPages }}
+            </button>
 
-          <button class="page-btn" v-if="currentPage !== totalPages && total > perPage" @click="goNext">Next</button>
+            <button class="page-btn" v-if="currentPage !== totalPages && total > perPage" @click="goNext">Next</button>
+          </div>
         </div>
-      </div>
+      </PanelDefault>
     </div>
   </UiContainer>
 </template>
@@ -144,6 +137,7 @@ import {computed, inject, onMounted, reactive, ref} from "vue";
 import {definePageMeta} from "~/.nuxt/imports";
 import UiIconCopy from "~/components/ui/UiIconCopy.vue";
 import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
+import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
 definePageMeta({
   layout: "cabinet",
@@ -340,7 +334,7 @@ onMounted(async () => {
   }
 }
 
-.payments {
+.payments-details {
   padding-bottom: 40px;
 
   &__title {
@@ -348,6 +342,7 @@ onMounted(async () => {
   }
 
   &__content {
+    padding: 20px;
 
     &__nothing-to-show {
       height: 40vh;
@@ -356,17 +351,10 @@ onMounted(async () => {
       justify-content: center;
     }
 
-    &__option {
-      &s {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 20px;
-      }
-    }
-
     &__payment_item__data-wrapper--header {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      //grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
       column-gap: 20px;
       row-gap: 10px;
       padding: 20px;
@@ -396,22 +384,38 @@ onMounted(async () => {
     &__payment_item {
       padding: 20px;
       width: 100%;
-      margin-bottom: 10px;
+      border-bottom: 1px solid var(--color-stroke-ui-dark);
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
         background-color: var(--color-stroke-ui-dark);
+        border-bottom: 1px solid var(--color-ui-primary);
       }
 
       &__options {
-        // code...
-        &.input {
-          border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &__search {
+          .input {
+            border-radius: var(--ui-border--raduis);
+            min-width: 400px;
+          }
+        }
+
+        &__actions {
+          // code...
         }
       }
 
       &__data-wrapper {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        //grid-template-columns: 80px 1fr 1fr 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
         column-gap: 20px;
         row-gap: 10px;
         align-items: center;
@@ -437,13 +441,18 @@ onMounted(async () => {
       gap: 8px;
 
       .page-btn, .page-link {
-        padding: 6px 12px;
         border: 1px solid var(--color-ui-border);
         background: var(--color-ui-background);
         cursor: pointer;
         font-size: 14px;
-        border-radius: 4px;
+        border-radius: 5px;
         color: white;
+        height: 22px;
+        min-width: 22px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .page-link.active {

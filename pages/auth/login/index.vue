@@ -26,29 +26,29 @@ definePageMeta({
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 100%;
+  width: 100dvw; // TODO :: It is Dynamic View Width
 
   &-form {
     &__logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100px;
+      height: 100dvh;
     }
 
     &__wrapper {
       padding: 10px;
-      height: 100vh;
+      height: calc(100dvh - 20px); // TODO :: ??? Check it
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
+      width: calc(100dvw - 20px);
     }
 
     &__panel-default {
       padding: 40px;
       max-width: 600px;
-      width: 100%;
+      width: 100dvw;
     }
   }
 }

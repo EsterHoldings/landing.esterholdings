@@ -2,7 +2,7 @@
   <UiContainer>
     <div class="payments">
       <div class="payments__title">
-        <h3>Billing</h3>
+        <UiTextH4>Billing</UiTextH4>
       </div>
       <div class="payments__content">
         <div class="payments__content__options">
@@ -144,6 +144,7 @@ import {computed, inject, onMounted, reactive, ref} from "vue";
 import {definePageMeta} from "~/.nuxt/imports";
 import UiIconCopy from "~/components/ui/UiIconCopy.vue";
 import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
+import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
 definePageMeta({
   layout: "cabinet",
@@ -405,7 +406,7 @@ onMounted(async () => {
       &__options {
         // code...
         &.input {
-          border-radius: 8px;
+          border-radius: var(--ui-border--raduis);
         }
       }
 

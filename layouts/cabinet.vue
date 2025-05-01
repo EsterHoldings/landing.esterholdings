@@ -1,46 +1,57 @@
 <template>
   <div class="page__wrapper">
     <TheCabinetSideBar/>
-    <transition name="fade" mode="out-in">
-      <div class="page" :key="$route.fullPath">
+    <UiImage class="bg-image" src="/space.gif" />
+    <Transition name="fade" mode="out-in">
+      <div class="page" :key="route.fullPath">
         <slot />
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import TheCabinetSideBar from "~/components/block/TheCabinetSideBar.vue";
+import TheCabinetSideBar from '~/components/block/TheCabinetSideBar.vue'
+import { useRoute } from 'vue-router'
+import UiImage from "~/components/ui/UiImage.vue";
+const route = useRoute()
 </script>
 
 <style lang="scss" scoped>
+.bg-image {
+  position: fixed;
+  left: 0;
+  top: 0;
+  opacity: 1;
+  z-index: -1;
+}
+
 .page__wrapper {
   background-color: var(--color-ui-background);
+  height: 100vh;
+  overflow: hidden;
 }
 
 .page {
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  padding: 40px 40px 40px 142px;
+  overflow-y: auto;
   color: white;
-  padding: 40px 40px 40px 240px;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }
 
-/* Коли з'являється нова сторінка (enter) – плавне підвищення непрозорості */
-.fade-enter {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
-.fade-enter-active {
-  transition: opacity 0.5s ease; /* або інший час/тип анімації */
-}
-.fade-enter-to {
+
+.fade-enter-to,
+.fade-leave-from {
   opacity: 1;
 }
 
-/* Коли йде стара сторінка (leave) – немає анімації, зникає миттєво */
-.fade-leave, .fade-leave-active, .fade-leave-to {
-  opacity: 1;
-  transition: none;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 150ms ease;
 }
 </style>

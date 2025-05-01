@@ -39,7 +39,6 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-
 import UiTextH1 from "~/components/ui/UiTextH1.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";

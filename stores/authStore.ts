@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import useAppCore from "~/composables/useAppCore";
+import {navigateTo} from "nuxt/app";
+import {ROUTE_ADMIN_AUTH_LOGIN} from "~/constants/routes";
 
 export const useAuthStore = defineStore('userAuth', () => {
   const accessToken = ref('');
@@ -44,6 +46,10 @@ export const useAuthStore = defineStore('userAuth', () => {
     if (!accessToken.value) return;
 
     const appCore = useAppCore();
+  }
+
+  const authLogout = async () => {
+    // TODO :: Implement
   }
 
   return {
