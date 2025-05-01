@@ -1,21 +1,21 @@
 <template>
   <div
     class="account-card"
-    :data-text="currentAccount?.title.body.static"
+    :data-text="currentAccount?.title.body?.static"
     :class="{ active: activeIndex === index }"
     @mouseenter="setActive(index)"
   >
     <div class="account-content">
       <UiTextH3 v-if="activeIndex === index" class="account-title bold">
-        {{ currentAccount?.title.body.static }}
+        {{ currentAccount?.title.body?.static }}
 
         <UiTextH5 class="account-subtitle">
-          {{ currentAccount?.label.body.static }}
+          {{ currentAccount?.label.body?.static }}
         </UiTextH5>
       </UiTextH3>
 
       <UiTextH5 v-if="activeIndex === index" class="account-description">
-        {{ currentAccount?.description.body.static }}
+        {{ currentAccount?.description.body?.static }}
       </UiTextH5>
 
       <UiButtonDefault state="primary" v-if="activeIndex === index">
@@ -25,10 +25,10 @@
       <div v-else class="account-mini">
         <UiTextH3
           class="account-mini_title bold"
-          :key="currentAccount?.title.body.static"
+          :key="currentAccount?.title.body?.static"
         >
-          {{ currentAccount?.title.body.static }}
-          <UiTextH5>{{ currentAccount?.label.body.static }}</UiTextH5>
+          {{ currentAccount?.title.body?.static }}
+          <UiTextH5>{{ currentAccount?.label.body?.static }}</UiTextH5>
         </UiTextH3>
 
         <UiIconArrowRight class="arrow" />
@@ -57,8 +57,8 @@ watchEffect(() => {
 
   accountsMap.value = Array.isArray(array)
     ? array.reduce((acc, item) => {
-        if (item?.id.body.static) {
-          acc[item.id.body.static] = item;
+        if (item?.id.body?.static) {
+          acc[item.id.body?.static] = item;
         }
         return acc;
       }, {} as Record<string, any>)

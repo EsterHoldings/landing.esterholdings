@@ -11,7 +11,7 @@
       v-for="(item, index) in tm(`${basePath}.items`)"
       :key="index"
     >
-      <UiTextH6>{{ item.body.static }}</UiTextH6>
+      <UiTextH6>{{ item.body?.static }}</UiTextH6>
     </li>
   </ul>
 </template>

@@ -18,10 +18,10 @@
             <UiTextH3 class="four-steps__number">{{ index + 1 }}</UiTextH3>
             <div class="four-steps__content">
               <UiTextH4 class="four-steps__heading">{{
-                step.title.body.static
+                step.title.body?.static
               }}</UiTextH4>
               <UiTextH5 class="four-steps__description"
-                >{{ step.text.body.static }}
+                >{{ step.text.body?.static }}
               </UiTextH5>
             </div>
           </div>

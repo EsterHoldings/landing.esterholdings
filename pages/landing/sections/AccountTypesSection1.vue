@@ -11,20 +11,20 @@
           v-for="(account, index) in accounts"
           :key="index"
           class="account-card"
-          :data-text="account.title.body.static"
+          :data-text="account.title.body?.static"
           :class="{ active: activeIndex === index }"
           @mouseenter="setActive(index)"
         >
           <div class="account-content">
             <UiTextH3 v-if="activeIndex === index" class="account-title bold">
-              {{ account.title.body.static }}
+              {{ account.title.body?.static }}
               <UiTextH5 class="account-subtitle">{{
-                account.label.body.static
+                account.label.body?.static
               }}</UiTextH5>
             </UiTextH3>
 
             <UiTextH5 v-if="activeIndex === index" class="account-description">
-              {{ account.description.body.static }}
+              {{ account.description.body?.static }}
             </UiTextH5>
 
             <UiButtonDefault state="primary" v-if="activeIndex === index">
@@ -33,8 +33,8 @@
 
             <div v-else class="account-mini">
               <UiTextH3 class="account-mini_title bold"
-                >{{ account.title.body.static }}
-                <UiTextH5>{{ account.label.body.static }}</UiTextH5>
+                >{{ account.title.body?.static }}
+                <UiTextH5>{{ account.label.body?.static }}</UiTextH5>
               </UiTextH3>
 
               <UiIconArrowRight class="arrow" />
