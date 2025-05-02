@@ -7,9 +7,11 @@
         :key="index"
       >
         <div class="advantage_item">
-          <UiTextH3 class="bold">{{ item.value.body.static }}</UiTextH3>
+          <UiTextH3 class="bold">{{
+            item.value?.body?.static ?? item.value
+          }}</UiTextH3>
           <UiTextH6 class="advantage_item_subtitle">
-            {{ item.label.body.static }}
+            {{ item.label?.body?.static ?? item.label }}
           </UiTextH6>
         </div>
 

@@ -41,6 +41,8 @@ export default defineNuxtConfig({
       jsTsFormatResource: false,
     },
     escapeParameterHtml: false,
+    runtimeOnly: false,
+    compositionOnly: true,
   },
 
   vite: {
@@ -52,6 +54,6 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/**": { ssr: false } as any,
-    '/': { ssr: true } as any,
+    "/": { ssr: true } as any,
   },
 });
