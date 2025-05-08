@@ -6,15 +6,19 @@
     >
       <div class="cryptocurrency-CDs__content">
         <UiTextH3 class="cryptocurrency-CDs__title">
-          {{ t("landing.wide_range_tabs.CryptocurrencyCDs.title") }}</UiTextH3
+          {{
+            t("landing.sections.wide_range_tabs.CryptocurrencyCDs.title")
+          }}</UiTextH3
         >
         <UiTextH5 class="cryptocurrency-CDs__text">
-          {{ t("landing.wide_range_tabs.CryptocurrencyCDs.description") }}
+          {{
+            t("landing.sections.wide_range_tabs.CryptocurrencyCDs.description")
+          }}
         </UiTextH5>
         <div>
           <UiButtonDefault state="primary">
             {{
-              t("landing.wide_range_tabs.CryptocurrencyCDs.btn")
+              t("landing.sections.wide_range_tabs.CryptocurrencyCDs.btn")
             }}</UiButtonDefault
           >
         </div>

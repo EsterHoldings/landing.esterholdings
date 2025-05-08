@@ -6,14 +6,16 @@
     >
       <div class="indices__content">
         <UiTextH3 class="indices__title">
-          {{ t("landing.wide_range_tabs.Indices.title") }}</UiTextH3
+          {{ t("landing.sections.wide_range_tabs.Indices.title") }}</UiTextH3
         >
         <UiTextH5 class="indices__text">
-          {{ t("landing.wide_range_tabs.Indices.description") }}
+          {{ t("landing.sections.wide_range_tabs.Indices.description") }}
         </UiTextH5>
         <div>
           <UiButtonDefault state="primary">
-            {{ t("landing.wide_range_tabs.Indices.btn") }}</UiButtonDefault
+            {{
+              t("landing.sections.wide_range_tabs.Indices.btn")
+            }}</UiButtonDefault
           >
         </div>
       </div>

@@ -1,15 +1,15 @@
 <template>
-    <ul class="side-bar-cabinet__menu">
-      <TheCabinetSideBarMenuItem
-          v-for="menuItem in menuItems"
-          :title="menuItem.title"
-          :to="menuItem.to"
-          :icon="menuItem.icon"
-          :sideBarIsOpen="sideBarIsOpen"
-          :key="menuItem.title"
-          @click="handleClickMenuItem"
-      />
-    </ul>
+  <ul class="side-bar-cabinet__menu">
+    <TheCabinetSideBarMenuItem
+      v-for="menuItem in menuItems"
+      :title="menuItem.title"
+      :to="menuItem.to"
+      :icon="menuItem.icon"
+      :sideBarIsOpen="sideBarIsOpen"
+      :key="menuItem.title"
+      @click="handleClickMenuItem"
+    />
+  </ul>
 </template>
 
 <script lang="ts" setup>
@@ -22,56 +22,58 @@ import UiIconProfile from "~/components/ui/UiIconProfile.vue";
 import UiIconSetting from "~/components/ui/UiIconSetting.vue";
 import UiIconKeys from "~/components/ui/UiIconKeys.vue";
 
-import {ref} from "vue";
-import {useRouter} from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import UiIconSupport from "~/components/ui/UiIconSupport.vue";
 import UiIconPayment from "~/components/ui/UiIconPayment.vue";
 
-import { useI18n } from 'vue-i18n'
-const addCurrentLocaleToPath = (path = '') => {
-  const { locale } = useI18n({ useScope: 'global' })
+import { useI18n } from "vue-i18n";
+
+const { locale, t } = useI18n({ useScope: "global" });
+const addCurrentLocaleToPath = (path = "") => {
   return `/${locale.value}/${path}`;
-}
+};
 
 const router = useRouter();
-const sideBarIsOpen = ref(true)
-const menuItems = [
+const sideBarIsOpen = ref(true);
+
+const menuItems = computed(() => [
   {
-    title: 'Dashboard',
-    to: addCurrentLocaleToPath('dashboard'),
+    title: t("cabinet.menu.dashboard"),
+    to: addCurrentLocaleToPath("dashboard"),
     icon: UiIconHome,
   },
   {
-    title: 'Payment details',
-    to: addCurrentLocaleToPath('payments/details'),
+    title: t("cabinet.menu.payment_details"),
+    to: addCurrentLocaleToPath("payments/details"),
     icon: UiIconClients,
   },
   {
-    title: 'Accounts',
-    to: addCurrentLocaleToPath('accounts'),
+    title: t("cabinet.menu.accounts"),
+    to: addCurrentLocaleToPath("accounts"),
     icon: UiIconUser,
   },
   {
-    title: 'Referral system',
-    to: addCurrentLocaleToPath('referrals'),
+    title: t("cabinet.menu.referral_system"),
+    to: addCurrentLocaleToPath("referrals"),
     icon: UiIconReferral,
   },
   {
-    title: 'Billing',
-    to: addCurrentLocaleToPath('payments'),
+    title: t("cabinet.menu.billing"),
+    to: addCurrentLocaleToPath("payments"),
     icon: UiIconPayment,
   },
   // {
-  //   title: 'Settings',
-  //   to: addCurrentLocaleToPath('settings'),
+  //   title: t("cabinet.menu.settings"),
+  //   to: addCurrentLocaleToPath("settings"),
   //   icon: UiIconSetting,
   // },
   {
-    title: 'Support',
-    to: addCurrentLocaleToPath('support'),
+    title: t("cabinet.menu.support"),
+    to: addCurrentLocaleToPath("support"),
     icon: UiIconSupport,
-  }
-];
+  },
+]);
 
 const handleClickMenuItem = (to: string) => {
   router.push(to);

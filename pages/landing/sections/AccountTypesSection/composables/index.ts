@@ -10,12 +10,12 @@ export const currentTabContent = {
 export function useTabs() {
   const { tm, t } = useI18n();
 
-  const raw = tm("landing.account_types__categories");
+  const raw = tm("landing.sections.account_types__categories");
 
   const tabs = ref(
     Array.isArray(raw)
       ? raw.map((item: any, index: number) => {
-          const key = `landing.account_types__categories[${index}]`;
+          const key = `landing.sections.account_types__categories[${index}]`;
 
           return {
             id: t(`${key}.id`),

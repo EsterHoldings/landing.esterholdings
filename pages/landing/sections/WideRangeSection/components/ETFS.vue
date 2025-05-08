@@ -6,14 +6,16 @@
     >
       <div class="etfs__content">
         <UiTextH3 class="ETFS__title">
-          {{ t("landing.wide_range_tabs.ETFS.title") }}</UiTextH3
+          {{ t("landing.sections.wide_range_tabs.ETFS.title") }}</UiTextH3
         >
         <UiTextH5 class="forex__text">
-          {{ t("landing.wide_range_tabs.ETFS.description") }}
+          {{ t("landing.sections.wide_range_tabs.ETFS.description") }}
         </UiTextH5>
         <div>
           <UiButtonDefault state="primary">
-            {{ t("landing.wide_range_tabs.etfs.btn") }}</UiButtonDefault
+            {{
+              t("landing.sections.wide_range_tabs.etfs.btn")
+            }}</UiButtonDefault
           >
         </div>
       </div>

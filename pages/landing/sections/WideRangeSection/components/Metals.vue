@@ -6,14 +6,16 @@
     >
       <div class="metals__content">
         <UiTextH3 class="metals__title">
-          {{ t("landing.wide_range_tabs.Metals.title") }}</UiTextH3
+          {{ t("landing.sections.wide_range_tabs.Metals.title") }}</UiTextH3
         >
         <UiTextH5 class="metals__text">
-          {{ t("landing.wide_range_tabs.Metals.description") }}
+          {{ t("landing.sections.wide_range_tabs.Metals.description") }}
         </UiTextH5>
         <div>
           <UiButtonDefault state="primary">
-            {{ t("landing.wide_range_tabs.Metals.btn") }}</UiButtonDefault
+            {{
+              t("landing.sections.wide_range_tabs.Metals.btn")
+            }}</UiButtonDefault
           >
         </div>
       </div>

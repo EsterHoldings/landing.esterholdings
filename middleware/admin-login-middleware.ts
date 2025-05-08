@@ -1,16 +1,15 @@
-import { defineNuxtRouteMiddleware, navigateTo } from 'nuxt/app'
-import { useAdminAuthStore } from '../stores/adminAuthStore'
+import { defineNuxtRouteMiddleware, navigateTo } from "nuxt/app";
+import { useAdminAuthStore } from "../stores/adminAuthStore";
 
 export default defineNuxtRouteMiddleware((to, from) => {
+  if (process.server) {
+    console.log("Skip logic");
+    return;
+  }
 
-    if (process.server) {
-        console.log('Skip logic');
-        return;
-    }
+  const adminAuthStore = useAdminAuthStore();
 
-    const adminAuthStore = useAdminAuthStore();
-
-    if (!!adminAuthStore.accessToken) {
-        return navigateTo('/admin/access');
-    }
+  if (!!adminAuthStore.accessToken) {
+    return navigateTo("/admin/access");
+  }
 });

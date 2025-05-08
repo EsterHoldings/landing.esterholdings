@@ -3,9 +3,9 @@
     <UiContainer>
       <div class="four-steps">
         <UiTextH3 class="four-steps__title">
-          {{ t("landing.four_steps_section.title.before") }} <br />
+          {{ t("landing.sections.four_steps_section.title.before") }} <br />
           <span class="highlight">{{
-            t("landing.four_steps_section.title.highlight")
+            t("landing.sections.four_steps_section.title.highlight")
           }}</span>
         </UiTextH3>
 
@@ -26,7 +26,7 @@
         </div>
 
         <UiButtonDefault state="primary" class="four-steps__button"
-          >{{ t("landing.four_steps_section.button") }}
+          >{{ t("landing.sections.four_steps_section.button") }}
         </UiButtonDefault>
       </div>
     </UiContainer>
@@ -45,13 +45,13 @@ import UiContainer from "~/components/ui/UiContainer.vue";
 
 const { t, tm } = useI18n();
 
-const stepsRaw = tm("landing.four_steps_section.items");
+const stepsRaw = tm("landing.sections.four_steps_section.items");
 
 const steps = ref(
   Array.isArray(stepsRaw)
     ? stepsRaw.map((_, index) => ({
-        title: t(`landing.four_steps_section.items[${index}].title`),
-        text: t(`landing.four_steps_section.items[${index}].text`),
+        title: t(`landing.sections.four_steps_section.items[${index}].title`),
+        text: t(`landing.sections.four_steps_section.items[${index}].text`),
       }))
     : []
 );

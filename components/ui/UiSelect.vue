@@ -1,39 +1,35 @@
 <template>
   <div :class="['select', { dropup }]" ref="wrapper">
     <div
-        ref="body"
-        class="select__body"
-        :class="{ 'is-open': isOpen }"
-        @click="toggle"
+      ref="body"
+      class="select__body"
+      :class="{ 'is-open': isOpen }"
+      @click="toggle"
     >
       {{ displayText }}
     </div>
 
     <div v-if="isOpen" class="select__options">
       <div
-          class="select__option no-select"
-          :class="{ active: internalValue === null }"
-          @click="choose(null)"
+        class="select__option no-select"
+        :class="{ active: internalValue === null }"
+        @click="choose(null)"
       >
-        No selected...
+        {{ t("ui-components.ui-select") }}
       </div>
       <div
-          v-for="item in data"
-          :key="item.value"
-          class="select__option"
-          :class="{ active: internalValue === item.value }"
-          @click="choose(item)"
+        v-for="item in data"
+        :key="item.value"
+        class="select__option"
+        :class="{ active: internalValue === item.value }"
+        @click="choose(item)"
       >
         {{ item.text }}
       </div>
     </div>
 
     <select v-model="internalValue" hidden>
-      <option
-          v-for="item in data"
-          :key="item.value"
-          :value="item.value"
-      >
+      <option v-for="item in data" :key="item.value" :value="item.value">
         {{ item.text }}
       </option>
     </select>
@@ -41,11 +37,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { useI18n } from "vue-i18n";
+import { ref, computed, watch, nextTick } from "vue";
 
-interface Option { id: string; value: string; text: string; }
+interface Option {
+  id: string;
+  value: string;
+  text: string;
+}
+const { t } = useI18n({ useScope: "global" });
 const props = defineProps<{ data: Option[]; value?: string | null }>();
-const emit = defineEmits(['change']);
+const emit = defineEmits(["change"]);
 const data = props.data;
 
 const isOpen = ref(false);
@@ -53,10 +55,15 @@ const dropup = ref(false);
 const body = ref<HTMLElement | null>(null);
 
 const internalValue = ref<string | null>(props.value ?? null);
-watch(() => props.value, v => internalValue.value = v ?? null);
+watch(
+  () => props.value,
+  (v) => (internalValue.value = v ?? null)
+);
 
 const displayText = computed(
-    () => data.find(i => i.value === internalValue.value)?.text || 'No selected...'
+  () =>
+    data.find((i) => i.value === internalValue.value)?.text ||
+    t("ui-components.ui-select")
 );
 
 function toggle() {
@@ -76,7 +83,7 @@ function calcDropup() {
 
 function choose(item: Option | null) {
   internalValue.value = item?.value ?? null;
-  emit('change', internalValue.value);
+  emit("change", internalValue.value);
   isOpen.value = false;
 }
 </script>

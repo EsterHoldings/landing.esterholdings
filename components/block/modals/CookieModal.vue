@@ -2,14 +2,14 @@
   <div>
     <div v-if="showCookieModal" class="cookie-modal">
       <UiTextH5 class="cookie-modal_text">
-        {{ t("modals.cookie-modal.text") }}
+        {{ t("ui-components.modals.cookie-modal.text") }}
       </UiTextH5>
       <div class="cookie-modal__actions">
         <UiButtonDefault state="primary" @click="acceptCookies">
-          {{ t("modals.cookie-modal.btn-successful") }}
+          {{ t("ui-components.modals.cookie-modal.btn-successful") }}
         </UiButtonDefault>
         <UiButtonDefault state="warning" @click="declineCookies">
-          {{ t("modals.cookie-modal.btn-negative") }}
+          {{ t("ui-components.modals.cookie-modal.btn-negative") }}
         </UiButtonDefault>
       </div>
     </div>

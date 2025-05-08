@@ -2,130 +2,201 @@
   <UiContainer>
     <div class="payments">
       <div class="payments__title">
-        <UiTextH4>Billing</UiTextH4>
+        <UiTextH4>{{ t("cabinet.billing.title") }}</UiTextH4>
       </div>
       <div class="payments__content">
         <div class="payments__content__options">
           <div class="payments__content__option">
-            <UiButtonDefault state="success"
-                             @click="handleClickCreateNewAccount"
-            >Create new payment</UiButtonDefault>
+            <UiButtonDefault
+              state="success"
+              @click="handleClickCreateNewAccount"
+            >
+              {{ t("cabinet.billing.create") }}</UiButtonDefault
+            >
           </div>
         </div>
 
         <div class="payments__content__payment_item__options">
-          <UiInput @input="handleInputSearch" :value="search" placeholder="Search" />
+          <UiInput
+            @input="handleInputSearch"
+            :value="search"
+            :placeholder="t('cabinet.billing.search')"
+          />
         </div>
 
         <div class="payments__content__payment_item__data-wrapper--header">
-
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('id')">Id</span>
-            <UiIconSort :active="orderBy === 'id'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('id')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('id')">{{
+              t("cabinet.billing.columns.id")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'id'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('id')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('payment_system')">Paysystem</span>
-            <UiIconSort :active="orderBy === 'payment_system'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('payment_system')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('payment_system')">{{
+              t("cabinet.billing.columns.paysystem")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'payment_system'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('payment_system')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('status')">Status</span>
-            <UiIconSort :active="orderBy === 'status'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('status')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('status')">{{
+              t("cabinet.billing.columns.status")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'status'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('status')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('currency')">Currency</span>
-            <UiIconSort :active="orderBy === 'currency'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('currency')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('currency')">{{
+              t("cabinet.billing.columns.currency")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'currency'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('currency')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('amount')">Amount</span>
-            <UiIconSort :active="orderBy === 'amount'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('amount')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('amount')">{{
+              t("cabinet.billing.columns.amount")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'amount'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('amount')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('created_at')">CreatedAt</span>
-            <UiIconSort :active="orderBy === 'created_at'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('created_at')"
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('created_at')">{{
+              t("cabinet.billing.columns.createdAt")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'created_at'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('created_at')"
             />
           </div>
 
-          <div class="payments__content__payment_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('created_at')"></span>
+          <div
+            class="payments__content__payment_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('created_at')"></span>
           </div>
-
         </div>
 
         <template v-if="payments.length === 0">
           <div class="payments__content__nothing-to-show">
-            Nothing to show =(
+            {{ t("cabinet.billing.nothingToShow") }}
           </div>
         </template>
 
         <template v-if="payments.length > 0">
-          <PanelDefault class="payments__content__payment_item"
-                        v-for="payment in payments"
-                        :key="payment.id"
+          <PanelDefault
+            class="payments__content__payment_item"
+            v-for="payment in payments"
+            :key="payment.id"
           >
             <div class="payments__content__payment_item__data-wrapper">
-              <div @click="copyToClipboard(payment.id)"
-                   style="display: flex;"
-              >
+              <div @click="copyToClipboard(payment.id)" style="display: flex">
                 <UiIconCopy />
-                <span style="margin-left: 5px; font-size: 12px;">{{ shortId(payment.id) }}</span>
+                <span style="margin-left: 5px; font-size: 12px">{{
+                  shortId(payment.id)
+                }}</span>
               </div>
               <div>{{ payment.payment_system }}</div>
               <div>{{ payment.status }}</div>
               <div>{{ payment.currency }}</div>
-              <div :class="[Math.random() < 0.5 ? 'withdrawal' : 'deposit']">{{ payment.amount }}</div>
-              <div class="date">{{ new Date(payment.created_at).toLocaleString() }}</div>
+              <div :class="[Math.random() < 0.5 ? 'withdrawal' : 'deposit']">
+                {{ payment.amount }}
+              </div>
+              <div class="date">
+                {{ new Date(payment.created_at).toLocaleString() }}
+              </div>
               <div>
-                <UiIconUpdate class="icon-update" ref="iconUpdate" :class="{ spinning: spinIcon }"
-                              @click="handleIconClick(payment.id)" @animationend="onIconAnimationEnd" />
+                <UiIconUpdate
+                  class="icon-update"
+                  ref="iconUpdate"
+                  :class="{ spinning: spinIcon }"
+                  @click="handleIconClick(payment.id)"
+                  @animationend="onIconAnimationEnd"
+                />
               </div>
             </div>
           </PanelDefault>
         </template>
 
         <div class="payments__content__pagination">
-          <button class="page-btn" v-if="currentPage !== 1 && total > perPage" @click="goPrev">Prev</button>
+          <button
+            class="page-btn"
+            v-if="currentPage !== 1 && total > perPage"
+            @click="goPrev"
+          >
+            {{ t("cabinet.billing.pagination.prev") }}
+          </button>
 
-          <button v-if="visiblePages[0] > 1" class="page-link" @click="setPage(1)">1</button>
+          <button
+            v-if="visiblePages[0] > 1"
+            class="page-link"
+            @click="setPage(1)"
+          >
+            1
+          </button>
           <span v-if="visiblePages[0] > 2">...</span>
 
-          <button v-for="page in visiblePages"
-                  :key="page"
-                  class="page-link"
-                  :class="{ active: currentPage === page }"
-                  @click="setPage(page)">
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            class="page-link"
+            :class="{ active: currentPage === page }"
+            @click="setPage(page)"
+          >
             {{ page }}
           </button>
 
-          <span v-if="visiblePages[visiblePages.length - 1] < totalPages">...</span>
-          <button v-if="visiblePages[visiblePages.length - 1] < totalPages"
-                  class="page-link"
-                  @click="setPage(totalPages)">
+          <span v-if="visiblePages[visiblePages.length - 1] < totalPages"
+            >...</span
+          >
+          <button
+            v-if="visiblePages[visiblePages.length - 1] < totalPages"
+            class="page-link"
+            @click="setPage(totalPages)"
+          >
             {{ totalPages }}
           </button>
 
-          <button class="page-btn" v-if="currentPage !== totalPages && total > perPage" @click="goNext">Next</button>
+          <button
+            class="page-btn"
+            v-if="currentPage !== totalPages && total > perPage"
+            @click="goNext"
+          >
+            {{ t("cabinet.billing.pagination.next") }}
+          </button>
         </div>
       </div>
     </div>
@@ -133,6 +204,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
@@ -140,27 +212,28 @@ import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
 import UiInput from "~/components/ui/UiInput.vue";
 import UiIconSort from "~/components/ui/UiIconSort.vue";
 import useAppCore from "~/composables/useAppCore";
-import {computed, inject, onMounted, reactive, ref} from "vue";
-import {definePageMeta} from "~/.nuxt/imports";
+import { computed, inject, onMounted, reactive, ref } from "vue";
+import { definePageMeta } from "~/.nuxt/imports";
 import UiIconCopy from "~/components/ui/UiIconCopy.vue";
 import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
 definePageMeta({
   layout: "cabinet",
-  middleware: ["auth-client"]
+  middleware: ["auth-client"],
 });
 
+const { t } = useI18n({ useScope: "global" });
 const appCore = useAppCore();
 
-const ORDER_DIRECTION_ASC = 'asc';
-const ORDER_DIRECTION_DESC = 'desc';
+const ORDER_DIRECTION_ASC = "asc";
+const ORDER_DIRECTION_DESC = "desc";
 
-const search = ref('');
+const search = ref("");
 const total = ref(0);
 const perPage = ref(4);
 const currentPage = ref(1);
-const orderBy = ref('');
+const orderBy = ref("");
 const orderDirection = ref(ORDER_DIRECTION_DESC);
 
 const payments = reactive([]);
@@ -209,7 +282,7 @@ async function goNext() {
 }
 
 const handleIconClick = (id: string) => {
-  const payment = payments.find(x => x.id === id);
+  const payment = payments.find((x) => x.id === id);
   if (payment) payment.isSpinning = true;
 };
 
@@ -224,7 +297,10 @@ const handleInputSearch = async (event) => {
 };
 
 const handleOrderByAndDirection = async (value) => {
-  orderDirection.value = orderDirection.value === ORDER_DIRECTION_ASC ? ORDER_DIRECTION_DESC : ORDER_DIRECTION_ASC;
+  orderDirection.value =
+    orderDirection.value === ORDER_DIRECTION_ASC
+      ? ORDER_DIRECTION_DESC
+      : ORDER_DIRECTION_ASC;
   orderBy.value = value;
   await loadData();
 };
@@ -242,18 +318,21 @@ const loadData = async () => {
   currentPage.value = response.data.data.current_page;
   total.value = response.data.data.total;
 
-  const paymentsData = response.data.data.data.map(x => { x.isSpinning = false; return x; });
+  const paymentsData = response.data.data.data.map((x) => {
+    x.isSpinning = false;
+    return x;
+  });
   payments.splice(0, payments.length, ...paymentsData);
 };
 
 const shortId = (uuid: string) => {
-  return uuid.split('-').pop()
-}
+  return uuid.split("-").pop();
+};
 
 const copyToClipboard = (paymentId) => {
-  const id = shortId(paymentId)
-  navigator.clipboard.writeText(id)
-}
+  const id = shortId(paymentId);
+  navigator.clipboard.writeText(id);
+};
 
 // --- --- ---
 
@@ -261,7 +340,7 @@ const copyToClipboard = (paymentId) => {
 const { openModal } = inject("modalControl") as { openModal: Function };
 
 const handleClickCreateNewAccount = () =>
-    openModal(AdminsPanelAddNew, { title: "Add new Admin" });
+  openModal(AdminsPanelAddNew, { title: t("cabinet.billing.panel-title") });
 
 onMounted(async () => {
   await loadData();
@@ -269,7 +348,6 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-
 .date {
   width: 140px;
   font-size: 14px;
@@ -349,7 +427,6 @@ onMounted(async () => {
   }
 
   &__content {
-
     &__nothing-to-show {
       height: 40vh;
       display: flex;
@@ -373,7 +450,7 @@ onMounted(async () => {
       padding: 20px;
       width: 100%;
 
-      &> div:last-child {
+      & > div:last-child {
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -437,7 +514,8 @@ onMounted(async () => {
       justify-content: center;
       gap: 8px;
 
-      .page-btn, .page-link {
+      .page-btn,
+      .page-link {
         padding: 6px 12px;
         border: 1px solid var(--color-ui-border);
         background: var(--color-ui-background);

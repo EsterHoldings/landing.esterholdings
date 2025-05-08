@@ -9,7 +9,7 @@
     />
 
     <transition name="fade">
-      <ul v-if="isOpen" class="dropdown">
+      <ul v-if="isOpen" class="dropdown" :class="{ top: props.isSidebar }">
         <li
           v-for="(label, code) in languages"
           :key="code"
@@ -31,9 +31,10 @@ import UiIconGlobe from "~/components/ui/UiIconGlobe.vue";
 
 const props = defineProps({
   isInvert: Boolean,
+  isSidebar: Boolean,
 });
 
-const { locale, locales, setLocale } = useI18n();
+const { locale, setLocale } = useI18n();
 
 const isOpen = ref(false);
 const wrapperRef = ref(null);
@@ -97,6 +98,21 @@ onBeforeUnmount(() => {
     padding: 8px 0;
     z-index: 11;
 
+    &.top {
+      top: auto;
+      bottom: 40px;
+      left: 0;
+    }
+
+    .flag {
+      font-size: 16px;
+    }
+
+    .label {
+      font-weight: 500;
+      color: black;
+    }
+
     li {
       display: flex;
       align-items: center;
@@ -116,20 +132,15 @@ onBeforeUnmount(() => {
 
       &.active {
         background: var(--ui-background-hover);
-        color: var(--ui-primary-accent);
+
+        .label {
+          color: var(--ui-primary-accent) !important;
+        }
 
         &:hover {
           background: rgba(0, 0, 40, 0.15);
           color: var(--ui-primary-accent);
         }
-      }
-
-      .flag {
-        font-size: 16px;
-      }
-
-      .label {
-        font-weight: 500;
       }
     }
   }

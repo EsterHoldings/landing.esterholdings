@@ -4,11 +4,11 @@
       <PanelDefault class="user-photo-uploader">
         <div class="uploader-body">
           <div v-if="previewUrl" class="avatar-preview">
-            <img :src="previewUrl" alt="Preview"/>
+            <img :src="previewUrl" alt="Preview" />
             <div
-                v-if="previewUrl && !loading"
-                class="btn-delete"
-                @click="remove"
+              v-if="previewUrl && !loading"
+              class="btn-delete"
+              @click="remove"
             ></div>
           </div>
           <div v-else class="avatar-placeholder">
@@ -16,26 +16,36 @@
           </div>
           <div class="actions">
             <input
-                id="fileSelectionBtn"
-                type="file"
-                accept="image/*"
-                @change="onFileChange"
-                hidden
+              id="fileSelectionBtn"
+              type="file"
+              accept="image/*"
+              @change="onFileChange"
+              hidden
             />
             <div class="btn-select" @click="clickSelectionFile">
-              Choose file
+              {{
+                t(
+                  "cabinet.profile.components.tab-user-documents.buttons.choose"
+                )
+              }}
             </div>
             <UiButtonDefault
-                class="btn-upload"
-                state="info--outline"
-                :disabled="!file || loading || !!error"
-                @click="upload"
+              class="btn-upload"
+              state="info--outline"
+              :disabled="!file || loading || !!error"
+              @click="upload"
             >
-              {{ loading ? uploadProgress + '%' : 'Upload' }}
+              {{
+                loading
+                  ? uploadProgress + "%"
+                  : t(
+                      "cabinet.profile.components.tab-user-documents.buttons.upload"
+                    )
+              }}
             </UiButtonDefault>
           </div>
           <div v-if="loading" class="progress-bar">
-            <div class="progress" :style="{ width: uploadProgress + '%' }"/>
+            <div class="progress" :style="{ width: uploadProgress + '%' }" />
           </div>
           <p v-if="error" class="error">{{ error }}</p>
         </div>
@@ -51,94 +61,106 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios'
-import {ref, onMounted} from 'vue'
-import {useToast} from "vue-toastification";
+import { useI18n } from "vue-i18n";
+import axios from "axios";
+import { ref, onMounted } from "vue";
+import { useToast } from "vue-toastification";
 
-import useApi from '~/composables/useApi'
-import PanelDefault from '~/components/block/panels/PanelDefault.vue'
-import UiButtonDefault from '~/components/ui/UiButtonDefault.vue'
+import useApi from "~/composables/useApi";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 
 import useAppCore from "~/composables/useAppCore";
 
+const { t } = useI18n();
 const toast = useToast();
 const appCore = useAppCore();
-const api = new useApi(true)
-const MAX_SIZE = 2 * 1024 * 1024
+const api = new useApi(true);
+const MAX_SIZE = 2 * 1024 * 1024;
 
-const file = ref<File | null>(null)
-const previewUrl = ref<string>('')
-const uploadProgress = ref(0)
-const loading = ref(false)
-const error = ref('')
+const file = ref<File | null>(null);
+const previewUrl = ref<string>("");
+const uploadProgress = ref(0);
+const loading = ref(false);
+const error = ref("");
 
 onMounted(async () => {
-  const {data} = await appCore.auth.getAuthUser();
-  previewUrl.value = data.photo_url || '';
-})
+  const { data } = await appCore.auth.getAuthUser();
+  previewUrl.value = data.photo_url || "";
+});
 
 function clickSelectionFile() {
-  document.getElementById('fileSelectionBtn')?.click()
+  document.getElementById("fileSelectionBtn")?.click();
 }
 
 function onFileChange(e: Event) {
-  error.value = ''
-  const f = (e.target as HTMLInputElement).files?.[0]
-  if (!f) return
-  if (!f.type.startsWith('image/')) {
-    error.value = 'Тільки зображення';
-    return
+  error.value = "";
+  const f = (e.target as HTMLInputElement).files?.[0];
+  if (!f) return;
+  if (!f.type.startsWith("image/")) {
+    error.value = t(
+      "cabinet.profile.components.tab-user-documents.errors.type"
+    );
+    return;
   }
   if (f.size > MAX_SIZE) {
-    error.value = 'Макс. розмір 2 МБ';
-    return
+    error.value = t(
+      "cabinet.profile.components.tab-user-documents.errors.size"
+    );
+    return;
   }
-  file.value = f
-  previewUrl.value = URL.createObjectURL(f)
-  uploadProgress.value = 0
+  file.value = f;
+  previewUrl.value = URL.createObjectURL(f);
+  uploadProgress.value = 0;
 }
 
 async function upload() {
-  if (!file.value) return
-  loading.value = true
-  error.value = ''
+  if (!file.value) return;
+  loading.value = true;
+  error.value = "";
 
   try {
-    const {data} = await api.post('client/s3/presign', {
+    const { data } = await api.post("client/s3/presign", {
       filename: file.value.name,
-      contentType: file.value.type
-    })
+      contentType: file.value.type,
+    });
 
     await axios.put(data.url, file.value, {
-      headers: {'Content-Type': file.value.type},
-      onUploadProgress: e => {
-        uploadProgress.value = Math.round((e.loaded * 100) / (e.total || 1))
-      }
-    })
+      headers: { "Content-Type": file.value.type },
+      onUploadProgress: (e) => {
+        uploadProgress.value = Math.round((e.loaded * 100) / (e.total || 1));
+      },
+    });
 
-    const res = await api.post('client/user/photo', {key: data.key});
+    const res = await api.post("client/user/photo", { key: data.key });
     previewUrl.value = res.data.photo_url;
     file.value = null;
 
-    toast.success('Фотография профиля успешно\nобновлена и отправлены на проверку!')
+    toast.success(
+      t("cabinet.profile.components.tab-user-documents.messages.upload_success")
+    );
   } catch {
-    error.value = 'Не вдалося завантажити фото';
+    error.value = t(
+      "cabinet.profile.components.tab-user-documents.messages.upload_error"
+    );
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function remove() {
-  loading.value = true
-  error.value = ''
+  loading.value = true;
+  error.value = "";
   try {
-    await api.delete('client/user/photo');
-    previewUrl.value = ''
-    file.value = null
+    await api.delete("client/user/photo");
+    previewUrl.value = "";
+    file.value = null;
   } catch {
-    error.value = 'Не вдалося видалити фото';
+    error.value = t(
+      "cabinet.profile.components.tab-user-documents.messages.delete_error"
+    );
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -202,17 +224,18 @@ async function remove() {
   padding: 20px;
 
   .title {
-    margin-bottom: 20px
+    margin-bottom: 20px;
   }
 
   .uploader-body {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    align-items: center
+    align-items: center;
   }
 
-  .avatar-preview, .avatar-placeholder {
+  .avatar-preview,
+  .avatar-placeholder {
     position: relative;
     width: 300px;
     height: 300px;
@@ -230,12 +253,12 @@ async function remove() {
   .avatar-preview img {
     width: 100%;
     height: 100%;
-    object-fit: cover
+    object-fit: cover;
   }
 
   .icon {
     font-size: 2.5rem;
-    color: #9ca3af
+    color: #9ca3af;
   }
 
   .actions {
@@ -262,13 +285,13 @@ async function remove() {
     .progress {
       height: 100%;
       background: #3b82f6;
-      transition: width .2s
+      transition: width 0.2s;
     }
   }
 
   .error {
     color: #dc2626;
-    margin-top: 8px
+    margin-top: 8px;
   }
 }
 </style>

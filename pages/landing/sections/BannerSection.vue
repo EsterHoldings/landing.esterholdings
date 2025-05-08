@@ -12,15 +12,15 @@
 
         <div class="banner-content">
           <UiTextH3 class="banner-title bold">
-            {{ t("landing.banner_section.title") }}</UiTextH3
+            {{ t("landing.sections.banner_section.title") }}</UiTextH3
           >
           <UiTextH6 class="banner-subtitle">
-            {{ t("landing.banner_section.subtitle") }}
+            {{ t("landing.sections.banner_section.subtitle") }}
           </UiTextH6>
 
           <div>
             <UiButtonDefault state="primary">
-              {{ t("landing.banner_section.button") }}</UiButtonDefault
+              {{ t("landing.sections.banner_section.button") }}</UiButtonDefault
             >
           </div>
         </div>

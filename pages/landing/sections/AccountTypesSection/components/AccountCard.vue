@@ -1,34 +1,38 @@
 <template>
   <div
     class="account-card"
-    :data-text="t(`landing.accounts__options[${currentIndex}].title`)"
+    :data-text="t(`landing.sections.accounts__options[${currentIndex}].title`)"
     :class="{ active: activeIndex === index }"
     @mouseenter="setActive(index)"
   >
     <div class="account-content">
       <UiTextH3 v-if="activeIndex === index" class="account-title bold">
-        {{ t(`landing.accounts__options[${currentIndex}].title`) }}
+        {{ t(`landing.sections.accounts__options[${currentIndex}].title`) }}
 
         <UiTextH5 class="account-subtitle">
-          {{ t(`landing.accounts__options[${currentIndex}].label`) }}
+          {{ t(`landing.sections.accounts__options[${currentIndex}].label`) }}
         </UiTextH5>
       </UiTextH3>
 
       <UiTextH5 v-if="activeIndex === index" class="account-description">
-        {{ t(`landing.accounts__options[${currentIndex}].description`) }}
+        {{
+          t(`landing.sections.accounts__options[${currentIndex}].description`)
+        }}
       </UiTextH5>
 
       <UiButtonDefault state="primary" v-if="activeIndex === index">
-        {{ t("landing.accounts__btn") }}
+        {{ t("landing.sections.accounts__btn") }}
       </UiButtonDefault>
 
       <div v-else class="account-mini">
         <UiTextH3
           class="account-mini_title bold"
-          :key="currentAccount?.title.body?.static"
+          :key="t(`landing.sections.accounts__options[${currentIndex}].title`)"
         >
-          {{ currentAccount?.title.body?.static }}
-          <UiTextH5>{{ currentAccount?.label.body?.static }}</UiTextH5>
+          {{ t(`landing.sections.accounts__options[${currentIndex}].title`) }}
+          <UiTextH5>{{
+            t(`landing.sections.accounts__options[${currentIndex}].label`)
+          }}</UiTextH5>
         </UiTextH3>
 
         <UiIconArrowRight class="arrow" />
@@ -53,11 +57,11 @@ const { t, tm } = useI18n();
 const accountsMap = ref<Record<string, any>>({});
 
 watchEffect(() => {
-  const array = tm("landing.accounts__options") || [];
+  const array = tm("landing.sections.accounts__options") || [];
 
   accountsMap.value = Array.isArray(array)
     ? array.reduce((acc, item, index) => {
-        const id = t(`landing.accounts__options[${index}].id`);
+        const id = t(`landing.sections.accounts__options[${index}].id`);
         acc[id] = index;
         return acc;
       }, {} as Record<string, number>)

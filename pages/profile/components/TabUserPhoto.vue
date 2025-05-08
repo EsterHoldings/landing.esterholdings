@@ -6,9 +6,9 @@
           <div v-if="previewUrl" class="avatar-preview">
             <img :src="previewUrl" alt="Preview" />
             <div
-                v-if="previewUrl && !loading"
-                class="btn-delete"
-                @click="remove"
+              v-if="previewUrl && !loading"
+              class="btn-delete"
+              @click="remove"
             ></div>
           </div>
           <div v-else class="avatar-placeholder">
@@ -16,22 +16,30 @@
           </div>
           <div class="actions">
             <input
-                id="fileSelectionBtn"
-                type="file"
-                accept="image/*"
-                @change="onFileChange"
-                hidden
+              id="fileSelectionBtn"
+              type="file"
+              accept="image/*"
+              @change="onFileChange"
+              hidden
             />
             <div class="btn-select" @click="clickSelectionFile">
-              Choose file
+              {{
+                t("cabinet.profile.components.tab-user-photo.buttons.choose")
+              }}
             </div>
             <UiButtonDefault
-                class="btn-upload"
-                state="info--outline"
-                :disabled="!file || loading || !!error"
-                @click="upload"
+              class="btn-upload"
+              state="info--outline"
+              :disabled="!file || loading || !!error"
+              @click="upload"
             >
-              {{ loading ? uploadProgress + '%' : 'Upload' }}
+              {{
+                loading
+                  ? uploadProgress + "%"
+                  : t(
+                      "cabinet.profile.components.tab-user-photo.buttons.upload"
+                    )
+              }}
             </UiButtonDefault>
           </div>
           <div v-if="loading" class="progress-bar">
@@ -52,103 +60,113 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios'
-import { ref, computed, onMounted } from 'vue'
-import { useToast } from 'vue-toastification'
+import { useI18n } from "vue-i18n";
+import axios from "axios";
+import { ref, computed, onMounted } from "vue";
+import { useToast } from "vue-toastification";
 
-import useApi from '~/composables/useApi'
-import PanelDefault from '~/components/block/panels/PanelDefault.vue'
-import UiButtonDefault from '~/components/ui/UiButtonDefault.vue'
-import { useAuthStore } from '~/stores/authStore'
+import useApi from "~/composables/useApi";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import { useAuthStore } from "~/stores/authStore";
 
-const toast = useToast()
-const api = new useApi(true)
-const authStore = useAuthStore()
+const { t } = useI18n();
+const toast = useToast();
+const api = new useApi(true);
+const authStore = useAuthStore();
 
-const file = ref<File | null>(null)
-const uploadProgress = ref<number>(0)
-const loading = ref<boolean>(false)
-const error = ref<string>('')
+const file = ref<File | null>(null);
+const uploadProgress = ref<number>(0);
+const loading = ref<boolean>(false);
+const error = ref<string>("");
 
 // Використовуємо photoUrl з Pinia
 const previewUrl = computed<string>({
   get: () => authStore.photoUrl,
   set: (val: string) => authStore.setPhotoUrl(val),
-})
+});
 
-const MAX_SIZE = 2 * 1024 * 1024
+const MAX_SIZE = 2 * 1024 * 1024;
 
 function clickSelectionFile() {
-  document.getElementById('fileSelectionBtn')?.click()
+  document.getElementById("fileSelectionBtn")?.click();
 }
 
 function onFileChange(e: Event) {
-  error.value = ''
-  const f = (e.target as HTMLInputElement).files?.[0]
-  if (!f) return
-  if (!f.type.startsWith('image/')) {
-    error.value = 'Тільки зображення'
-    return
+  error.value = "";
+  const f = (e.target as HTMLInputElement).files?.[0];
+  if (!f) return;
+  if (!f.type.startsWith("image/")) {
+    error.value = t("cabinet.profile.components.tab-user-photo.errors.type");
+    return;
   }
   if (f.size > MAX_SIZE) {
-    error.value = 'Макс. розмір 2 МБ'
-    return
+    error.value = t("cabinet.profile.components.tab-user-photo.errors.size");
+    return;
   }
-  file.value = f
-  previewUrl.value = URL.createObjectURL(f)
-  uploadProgress.value = 0
+  file.value = f;
+  previewUrl.value = URL.createObjectURL(f);
+  uploadProgress.value = 0;
 }
 
 async function upload() {
-  if (!file.value) return
-  loading.value = true
-  error.value = ''
+  if (!file.value) return;
+  loading.value = true;
+  error.value = "";
 
   try {
-    const { data } = await api.post('client/s3/presign', {
+    const { data } = await api.post("client/s3/presign", {
       filename: file.value.name,
       contentType: file.value.type,
-    })
+    });
 
     await axios.put(data.url, file.value, {
-      headers: { 'Content-Type': file.value.type },
-      onUploadProgress: e => {
-        uploadProgress.value = Math.round((e.loaded * 100) / (e.total || 1))
+      headers: { "Content-Type": file.value.type },
+      onUploadProgress: (e) => {
+        uploadProgress.value = Math.round((e.loaded * 100) / (e.total || 1));
       },
-    })
+    });
 
-    const res = await api.post('client/user/photo', { key: data.key })
+    const res = await api.post("client/user/photo", { key: data.key });
     // Оновлюємо як локально, так і в Pinia
-    previewUrl.value = res.data.photo_url
-    file.value = null
+    previewUrl.value = res.data.photo_url;
+    file.value = null;
 
-    toast.success('Фото профілю успішно оновлено')
+    toast.success(
+      t("cabinet.profile.components.tab-user-photo.messages.upload_success")
+    );
   } catch {
-    error.value = 'Не вдалося завантажити фото'
+    error.value = t(
+      "cabinet.profile.components.tab-user-photo.messages.upload_error"
+    );
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function remove() {
-  loading.value = true
-  error.value = ''
+  loading.value = true;
+  error.value = "";
   try {
-    await api.delete('client/user/photo')
-    previewUrl.value = ''
-    file.value = null
-    toast.success('Фото профілю видалено')
+    await api.delete("client/user/photo");
+    previewUrl.value = "";
+    file.value = null;
+    toast.success(
+      t("cabinet.profile.components.tab-user-photo.messages.delete_success")
+    );
   } catch {
-    error.value = 'Не вдалося видалити фото'
+    error.value = t(
+      "cabinet.profile.components.tab-user-photo.messages.delete_error"
+    );
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 onMounted(async () => {
   // Підвантажуємо дані користувача разом з photoUrl
-  await authStore.initAuth()
-})
+  await authStore.initAuth();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -210,17 +228,18 @@ onMounted(async () => {
   padding: 20px;
 
   .title {
-    margin-bottom: 20px
+    margin-bottom: 20px;
   }
 
   .uploader-body {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    align-items: center
+    align-items: center;
   }
 
-  .avatar-preview, .avatar-placeholder {
+  .avatar-preview,
+  .avatar-placeholder {
     position: relative;
     width: 300px;
     height: 300px;
@@ -238,12 +257,12 @@ onMounted(async () => {
   .avatar-preview img {
     width: 100%;
     height: 100%;
-    object-fit: cover
+    object-fit: cover;
   }
 
   .icon {
     font-size: 2.5rem;
-    color: #9ca3af
+    color: #9ca3af;
   }
 
   .actions {
@@ -270,17 +289,16 @@ onMounted(async () => {
     .progress {
       height: 100%;
       background: #3b82f6;
-      transition: width .2s
+      transition: width 0.2s;
     }
   }
 
   .error {
     color: #dc2626;
-    margin-top: 8px
+    margin-top: 8px;
   }
 }
 </style>
-
 
 <!--<template>-->
 <!--  <div class="user-photo__wrapper">-->

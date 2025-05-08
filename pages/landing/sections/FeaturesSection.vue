@@ -43,9 +43,9 @@ const { t } = useI18n();
 
 const features = computed(() => {
   return Array.from({ length: 6 }, (_, index) => ({
-    icon: t(`landing.features__items[${index}].icon`),
-    title: t(`landing.features__items[${index}].title`),
-    description: t(`landing.features__items[${index}].text`),
+    icon: t(`landing.sections.features__items[${index}].icon`),
+    title: t(`landing.sections.features__items[${index}].title`),
+    description: t(`landing.sections.features__items[${index}].text`),
   }));
 });
 

@@ -7,50 +7,67 @@
       <div class="side-bar-cabinet__top__profile">
         <NuxtLink to="/ru/profile">
           <div
-              :class="[
-                'side-bar-cabinet__top__profile__image',
-                { 'active': isProfileRoute }
-              ]"
+            :class="[
+              'side-bar-cabinet__top__profile__image',
+              { active: isProfileRoute },
+            ]"
           >
-          <UiIconUser v-if="!authStore.photoUrl" />
-          <img
+            <UiIconUser v-if="!authStore.photoUrl" />
+            <img
               v-if="authStore.photoUrl"
               :src="authStore.photoUrl"
               alt="User Photo"
-          >
-        </div>
+            />
+          </div>
         </NuxtLink>
-<!--        <div class="side-bar-cabinet__top__profile__name">-->
-<!--          <NuxtLink to="/ru/profile">-->
-<!--            Firstname-->
-<!--          </NuxtLink>-->
-<!--        </div>-->
+        <!--        <div class="side-bar-cabinet__top__profile__name">-->
+        <!--          <NuxtLink to="/ru/profile">-->
+        <!--            Firstname-->
+        <!--          </NuxtLink>-->
+        <!--        </div>-->
       </div>
     </div>
     <div class="side-bar-cabinet__content">
       <TheCabinetSideBarMenu />
     </div>
     <div class="side-bar-cabinet__bottom">
-      <UiIconGlobe />
-      <UiIconMoon />
+      <!-- <UiIconGlobe /> -->
+      <LanguageSwitcher isSidebar :isInvert="isThemeLight" class="icon" />
+
+      <transition name="fade" mode="out-in">
+        <span
+          :key="themeStore.currentTheme"
+          @click="themeStore.toggleTheme()"
+          class="icon"
+        >
+          <UiIconMoon v-if="themeStore.currentTheme === 'dark'" />
+          <UiIconSun v-else />
+        </span>
+      </transition>
       <UiIconLogout @click="handleClickLogout" />
     </div>
   </header>
 </template>
 
 <script lang="ts" setup>
+import { useUiStore } from "~/stores/uiStore";
+import { useThemeStore } from "~/stores/themeStore.js";
 import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 import TheCabinetSideBarMenu from "~/components/block/TheCabinetSideBarMenu.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiIconLogout from "~/components/ui/UiIconLogout.vue";
 import UiIconGlobe from "~/components/ui/UiIconGlobe.vue";
 import UiIconMoon from "~/components/ui/UiIconMoon.vue";
+import UiIconSun from "~/components/ui/UiIconSun.vue";
 import UiIconUser from "~/components/ui/UiIconUser.vue";
-import {useAuthStore} from "~/stores/authStore";
-import {useRoute} from "vue-router";
-import {navigateTo} from "nuxt/app";
-import {computed} from "vue";
+import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
+import { useAuthStore } from "~/stores/authStore";
+import { useRoute } from "vue-router";
+import { navigateTo } from "nuxt/app";
+import { computed } from "vue";
 
+const themeStore = useThemeStore();
+const uiStore = useUiStore();
 const authStore = useAuthStore();
 const router = useRoute();
 
@@ -59,17 +76,21 @@ if (!authStore.user) {
 }
 
 const handleClickLogout = () => {
-  authStore.setAccessToken('');
-  authStore.setRefreshToken('');
-  navigateTo('/auth/login')
-}
+  authStore.setAccessToken("");
+  authStore.setRefreshToken("");
+  navigateTo("/auth/login");
+};
+
+const isThemeLight = computed(() => {
+  return uiStore.headerScrolled && themeStore.currentTheme !== "dark";
+});
+
 const route = useRoute();
 const isProfileRoute = computed(() => {
-  const segments = route.path.split('/')
-  const last = segments[segments.length - 1]
-  return last === 'profile'
-})
-
+  const segments = route.path.split("/");
+  const last = segments[segments.length - 1];
+  return last === "profile";
+});
 </script>
 
 <style lang="scss" scoped>
@@ -88,10 +109,10 @@ const isProfileRoute = computed(() => {
 
   box-shadow: 0 0 5px -1px rgba(255, 249, 249, 0.1);
   //animation: shadowPulse 2s infinite alternate ease-in-out;
-  transition: .5s;
+  transition: 0.5s;
 
   &:hover {
-    transition: .3s;
+    transition: 0.3s;
     box-shadow: 0 0 5px 1px var(--color-stroke-ui-dark);
   }
 
@@ -171,5 +192,19 @@ const isProfileRoute = computed(() => {
   100% {
     box-shadow: 0 0 5px 1px var(--color-stroke-ui-dark);
   }
+}
+
+.icon {
+  cursor: pointer;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

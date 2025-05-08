@@ -2,26 +2,28 @@
   <UiContainer>
     <div class="profile">
       <div class="profile__title">
-        <UiTextH4>Profile</UiTextH4>
+        <!-- <UiTextH4>Profile</UiTextH4> -->
+
+        <UiTextH4>{{ t("cabinet.profile.index.title") }}</UiTextH4>
         <TabsDefault
-            :tabsList="tabsList"
-            @selectTab="handleActiveTab"
-            :activeTabIndex="activeTabIndex"
+          :tabsList="tabsList"
+          @selectTab="handleActiveTab"
+          :activeTabIndex="activeTabIndex"
         />
       </div>
       <transition name="slide-short" mode="out-in">
         <component
-            :is="tabsList[activeTabIndex].component"
-            :key="activeTabIndex"
+          :is="tabsList[activeTabIndex].component"
+          :key="activeTabIndex"
         />
       </transition>
     </div>
   </UiContainer>
 </template>
 
-
 <script lang="ts" setup>
-import { reactive, ref, onMounted, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { reactive, ref, onMounted, watch, computed } from "vue";
 import { definePageMeta } from "~/.nuxt/imports";
 import UiContainer from "~/components/ui/UiContainer.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
@@ -33,19 +35,39 @@ import TabChangePassword from "~/pages/profile/components/TabChangePassword.vue"
 
 definePageMeta({
   layout: "cabinet",
-  middleware: ["auth-client"]
+  middleware: ["auth-client"],
 });
+const { t } = useI18n();
 
 const STORAGE_KEY = "profileActiveTab";
 const activeTabIndex = ref(0);
 
-const tabsList = reactive([
-  { label: "General", component: TabGeneral },
-  { label: "User photo", component: TabUserPhoto },
-  { label: "Documents", component: TabUserDocuments },
-  { label: "Verification", component: TabUserPhoto },
-  { label: "Change password", component: TabChangePassword },
-]);
+// const tabsList = reactive([
+//   { label: "General", component: TabGeneral },
+//   { label: "User photo", component: TabUserPhoto },
+//   { label: "Documents", component: TabUserDocuments },
+//   { label: "Verification", component: TabUserPhoto },
+//   { label: "Change password", component: TabChangePassword },
+// ]);
+
+const tabsList = computed(() => {
+  return [
+    { label: t("cabinet.profile.index.tabs.general"), component: TabGeneral },
+    { label: t("cabinet.profile.index.tabs.photo"), component: TabUserPhoto },
+    {
+      label: t("cabinet.profile.index.tabs.documents"),
+      component: TabUserDocuments,
+    },
+    {
+      label: t("cabinet.profile.index.tabs.verification"),
+      component: TabUserPhoto,
+    },
+    {
+      label: t("cabinet.profile.index.tabs.change_password"),
+      component: TabChangePassword,
+    },
+  ];
+});
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY);

@@ -1,4 +1,23 @@
 {
+  "ui-components": {
+    "modals": {
+      "cookie-modal": {
+        "text": "Этот сайт использует файлы cookie для улучшения пользовательского опыта. Продолжая использовать сайт, вы соглашаетесь с использованием файлов cookie.",
+        "btn-successful": "Принять",
+        "btn-negative": "Отклонить"
+      }
+    },
+
+    "lines": {
+      "running-line-btn": "Торговля"
+    },
+
+    "tables": {
+      "table-default": "Нечего показывать..."
+    },
+
+    "ui-select": "Нет выбранных..."
+  },
   "landing": {
     "header": {
       "nav": {
@@ -85,203 +104,203 @@
       }
     },
 
-    "running-line-btn": "Торговля",
-
-    "advantages": [
-      {
-        "value": "10+",
-        "label": "Лет опыта в индустрии"
-      },
-      {
-        "value": "1 160 000+",
-        "label": "Клиентов"
-      },
-      {
-        "value": "Рейтинг 5*",
-        "label": "Служба поддержки"
-      }
-    ],
-
-    "platform__title": "Легендарная платформа для успешной торговли на\n Forex и CFD",
-    "platform__features": [
-      {
-        "title": "Торговая платформа",
-        "text": "Повышайте уровень с нашими продуктами"
-      },
-      {
-        "title": "Мобильная торговля",
-        "text": "Полный контроль над сделками в любое время."
-      },
-      {
-        "title": "Ester MetaTrader 4",
-        "text": "Популярное классическое решение"
-      },
-      {
-        "title": "Высокая скорость и надёжность",
-        "text": "Работает даже на слабых ПК."
-      }
-    ],
-
-    "feature__title": "Почему выбирают нас?",
-    "features__items": [
-      {
-        "title": "Инструменты",
-        "text": "Forex/Спот\nАкции/Индексы",
-        "icon": "/static/F-Wrench & Screwdriver.png"
-      },
-      {
-        "title": "Ликвидность:\n200+ ведущих",
-        "text": "Финансовых институтов",
-        "icon": "/static/F-Building Library.png"
-      },
-      {
-        "title": "Плавающий спред",
-        "text": "от 0 пунктов",
-        "icon": "/static/F-Money.png"
-      },
-      {
-        "title": "Уровни лимит и стоп",
-        "text": "= 0",
-        "icon": "/static/LIMIT AND STOP LEVELS.png"
-      },
-      {
-        "title": "Самые быстрые серверные технологии",
-        "text": "с высокой скоростью обработки ордеров",
-        "icon": "/static/F-Rocket.png"
-      },
-      {
-        "title": "Банковская защита",
-        "text": "торговых счетов",
-        "icon": "/static/L-Shield Done.png"
-      }
-    ],
-
-    "accounts__title": "Выберите подходящий тип торгового счёта",
-    "accounts__btn": "Открыть счёт",
-
-    "account_types__categories": [
-      { "id": "Standard", "label": "Стандартный" },
-      { "id": "Pro", "label": "ПРО" },
-      { "id": "Tandem", "label": "Тандем" },
-      { "id": "Islamic", "label": "Исламский" }
-    ],
-
-    "accounts__options": [
-      {
-        "id": "Standard",
-        "title": "Стандартный",
-        "label": "счёт",
-        "description": "Отличный счет для всех типов трейдеров с плавающими спредами на валютном рынке от 1,2 пункта через MT4/MT5 и возможностью торговли микролотами."
-      },
-      {
-        "id": "Pro",
-        "title": "Про",
-        "label": "счёт",
-        "description": "Спреды профессионального уровня с меньшими затратами."
-      },
-      {
-        "id": "Islamic",
-        "title": "Исламский",
-        "label": "счёт",
-        "description": "Торговля без свопов для исламских трейдеров."
-      },
-      {
-        "id": "Tandem",
-        "title": "Тандем",
-        "label": "счёт",
-        "description": "Тестируйте торговые стратегии без риска."
-      }
-    ],
-
-    "wide_range__title": "Широкий выбор торговых продуктов",
-
-    "wide_range__categories": [
-      { "id": "forex", "label": "Форекс" },
-      { "id": "metals", "label": "Металлы" },
-      { "id": "cryptocurrency CDs", "label": "Криптовалютные CD" },
-      { "id": "indices", "label": "Индексы" },
-      { "id": "shares", "label": "Акции" },
-      { "id": "energy", "label": "Энергия" },
-      { "id": "ETFS", "label": "ETFS" }
-    ],
-    "wide_range_tabs": {
-      "Forex": {
-        "title": "Форекс",
-        "description": "Торгуйте 70 основными, второстепенными и экзотическими валютными парами на выгодных условиях.",
-        "btn": "Торговать на Форекс"
-      },
-
-      "Metals": {
-        "title": "Металлы",
-        "description": "Торгуйте металлическими товарами, такими как золото,\n серебро и платина.",
-        "btn": "Торговать металлами"
-      },
-
-      "CryptocurrencyCDs": {
-        "title": "Криптовалютные CFD",
-        "description": "Торгуйте CFD на Bitcoin, CFD на Ether, CFD на Doge\n и другие криптовалютные CDS и CFD на альткоины",
-        "btn": "Торговать криптовалютными CFD"
-      },
-
-      "Indices": {
-        "title": "Индексы",
-        "description": "Торгуйте основными и второстепенными индексными CD спотовыми и\n фьючерсными контрактами по всему миру.",
-        "btn": "Торговать индексами"
-      },
-
-      "Shares": {
-        "title": "Акции",
-        "description": "Тысячи публичных компаний из США,\nВеликобритании и ЕС доступны для торговли.",
-        "btn": "Торговать акциями"
-      },
-
-      "Energy": {
-        "title": "Энергоресурсы",
-        "description": "Откройте возможности на рынке нефти (США и Великобритания)\nи природного газа (спот и фьючерсные контракты).",
-        "btn": "Торговать энергоресурсами"
-      },
-
-      "ETFS": {
-        "title": "ETFs",
-        "description": "Получите доступ к мировым рынкам с CFD на ETFs —\nот облигаций до сырьевых товаров, недвижимости и волатильности.",
-        "btn": "Торговать ETFs"
-      }
-    },
-
-    "four_steps_section": {
-      "title": {
-        "before": "Откройте счёт за",
-        "highlight": "4 простых шага"
-      },
-      "button": "Открыть счёт",
-      "items": [
+    "sections": {
+      "advantages": [
         {
-          "title": "Регистрация",
-          "text": "Выберите тип счёта и заполните нашу быструю и безопасную форму заявки"
+          "value": "10+",
+          "label": "Лет опыта в индустрии"
         },
         {
-          "title": "Подтверждение",
-          "text": "Пройдите быструю верификацию через нашу цифровую систему"
+          "value": "1 160 000+",
+          "label": "Клиентов"
         },
         {
-          "title": "Пополнение",
-          "text": "Пополните торговый счёт с помощью различных платёжных методов"
-        },
-        {
-          "title": "Торговля",
-          "text": "Начните торговать на реальном счёте и получите доступ к более чем 2 100 инструментам"
+          "value": "Рейтинг 5*",
+          "label": "Служба поддержки"
         }
-      ]
-    },
+      ],
 
-    "banner_section": {
-      "title": "Торгуйте на рынках как профессионал!",
-      "subtitle": "Будь вы новичок или опытный трейдер — наши продвинутые инструменты и ресурсы помогут принимать обоснованные решения.",
-      "button": "Начать торговать!"
-    },
+      "platform__title": "Легендарная платформа для успешной торговли на\n Forex и CFD",
+      "platform__features": [
+        {
+          "title": "Торговая платформа",
+          "text": "Повышайте уровень с нашими продуктами"
+        },
+        {
+          "title": "Мобильная торговля",
+          "text": "Полный контроль над сделками в любое время."
+        },
+        {
+          "title": "Ester MetaTrader 4",
+          "text": "Популярное классическое решение"
+        },
+        {
+          "title": "Высокая скорость и надёжность",
+          "text": "Работает даже на слабых ПК."
+        }
+      ],
 
-    "helpSection": "Нужна Помощь? Посетите наш",
-    "helpLinkText": "Раздел Помощи",
+      "feature__title": "Почему выбирают нас?",
+      "features__items": [
+        {
+          "title": "Инструменты",
+          "text": "Forex/Спот\nАкции/Индексы",
+          "icon": "/static/F-Wrench & Screwdriver.png"
+        },
+        {
+          "title": "Ликвидность:\n200+ ведущих",
+          "text": "Финансовых институтов",
+          "icon": "/static/F-Building Library.png"
+        },
+        {
+          "title": "Плавающий спред",
+          "text": "от 0 пунктов",
+          "icon": "/static/F-Money.png"
+        },
+        {
+          "title": "Уровни лимит и стоп",
+          "text": "= 0",
+          "icon": "/static/LIMIT AND STOP LEVELS.png"
+        },
+        {
+          "title": "Самые быстрые серверные технологии",
+          "text": "с высокой скоростью обработки ордеров",
+          "icon": "/static/F-Rocket.png"
+        },
+        {
+          "title": "Банковская защита",
+          "text": "торговых счетов",
+          "icon": "/static/L-Shield Done.png"
+        }
+      ],
+
+      "accounts__title": "Выберите подходящий тип торгового счёта",
+      "accounts__btn": "Открыть счёт",
+
+      "account_types__categories": [
+        { "id": "Standard", "label": "Стандартный" },
+        { "id": "Pro", "label": "ПРО" },
+        { "id": "Tandem", "label": "Тандем" },
+        { "id": "Islamic", "label": "Исламский" }
+      ],
+
+      "accounts__options": [
+        {
+          "id": "Standard",
+          "title": "Стандартный",
+          "label": "счёт",
+          "description": "Отличный счет для всех типов трейдеров с плавающими спредами на валютном рынке от 1,2 пункта через MT4/MT5 и возможностью торговли микролотами."
+        },
+        {
+          "id": "Pro",
+          "title": "Про",
+          "label": "счёт",
+          "description": "Спреды профессионального уровня с меньшими затратами."
+        },
+        {
+          "id": "Islamic",
+          "title": "Исламский",
+          "label": "счёт",
+          "description": "Торговля без свопов для исламских трейдеров."
+        },
+        {
+          "id": "Tandem",
+          "title": "Тандем",
+          "label": "счёт",
+          "description": "Тестируйте торговые стратегии без риска."
+        }
+      ],
+
+      "wide_range__title": "Широкий выбор торговых продуктов",
+
+      "wide_range__categories": [
+        { "id": "forex", "label": "Форекс" },
+        { "id": "metals", "label": "Металлы" },
+        { "id": "cryptocurrency CDs", "label": "Криптовалютные CD" },
+        { "id": "indices", "label": "Индексы" },
+        { "id": "shares", "label": "Акции" },
+        { "id": "energy", "label": "Энергия" },
+        { "id": "ETFS", "label": "ETFS" }
+      ],
+      "wide_range_tabs": {
+        "Forex": {
+          "title": "Форекс",
+          "description": "Торгуйте 70 основными, второстепенными и экзотическими валютными парами на выгодных условиях.",
+          "btn": "Торговать на Форекс"
+        },
+
+        "Metals": {
+          "title": "Металлы",
+          "description": "Торгуйте металлическими товарами, такими как золото,\n серебро и платина.",
+          "btn": "Торговать металлами"
+        },
+
+        "CryptocurrencyCDs": {
+          "title": "Криптовалютные CFD",
+          "description": "Торгуйте CFD на Bitcoin, CFD на Ether, CFD на Doge\n и другие криптовалютные CDS и CFD на альткоины",
+          "btn": "Торговать криптовалютными CFD"
+        },
+
+        "Indices": {
+          "title": "Индексы",
+          "description": "Торгуйте основными и второстепенными индексными CD спотовыми и\n фьючерсными контрактами по всему миру.",
+          "btn": "Торговать индексами"
+        },
+
+        "Shares": {
+          "title": "Акции",
+          "description": "Тысячи публичных компаний из США,\nВеликобритании и ЕС доступны для торговли.",
+          "btn": "Торговать акциями"
+        },
+
+        "Energy": {
+          "title": "Энергоресурсы",
+          "description": "Откройте возможности на рынке нефти (США и Великобритания)\nи природного газа (спот и фьючерсные контракты).",
+          "btn": "Торговать энергоресурсами"
+        },
+
+        "ETFS": {
+          "title": "ETFs",
+          "description": "Получите доступ к мировым рынкам с CFD на ETFs —\nот облигаций до сырьевых товаров, недвижимости и волатильности.",
+          "btn": "Торговать ETFs"
+        }
+      },
+
+      "four_steps_section": {
+        "title": {
+          "before": "Откройте счёт за",
+          "highlight": "4 простых шага"
+        },
+        "button": "Открыть счёт",
+        "items": [
+          {
+            "title": "Регистрация",
+            "text": "Выберите тип счёта и заполните нашу быструю и безопасную форму заявки"
+          },
+          {
+            "title": "Подтверждение",
+            "text": "Пройдите быструю верификацию через нашу цифровую систему"
+          },
+          {
+            "title": "Пополнение",
+            "text": "Пополните торговый счёт с помощью различных платёжных методов"
+          },
+          {
+            "title": "Торговля",
+            "text": "Начните торговать на реальном счёте и получите доступ к более чем 2 100 инструментам"
+          }
+        ]
+      },
+
+      "banner_section": {
+        "title": "Торгуйте на рынках как профессионал!",
+        "subtitle": "Будь вы новичок или опытный трейдер — наши продвинутые инструменты и ресурсы помогут принимать обоснованные решения.",
+        "button": "Начать торговать!"
+      },
+
+      "helpSection": "Нужна Помощь? Посетите наш",
+      "helpLinkText": "Раздел Помощи"
+    },
 
     "footer": {
       "description": "Основная цель Ester — создать лучшие и самые прозрачные условия для розничных и корпоративных трейдеров.",
@@ -321,11 +340,484 @@
     }
   },
 
-  "modals": {
-    "cookie-modal": {
-      "text": "Этот сайт использует файлы cookie для улучшения пользовательского опыта. Продолжая использовать сайт, вы соглашаетесь с использованием файлов cookie.",
-      "btn-successful": "Принять",
-      "btn-negative": "Отклонить"
+  "cabinet": {
+    "menu": {
+      "dashboard": "Главная",
+      "payment_details": "Платёжные данные",
+      "accounts": "Аккаунты",
+      "referral_system": "Реферальная система",
+      "billing": "Оплата",
+      "support": "Поддержка"
+    },
+
+    "dashboard": {
+      "title": "Панель управления",
+      "accountVerification": {
+        "title": "Проверка аккаунта",
+        "subtitle": "Проверка в процессе",
+        "addressFailed": "Проверка адреса не удалась!",
+        "documentVerified": "Документ успешно проверен!",
+        "paymentInProgress": "Проверка платежа в процессе!",
+        "profileInProgress": "Проверка профиля в процессе!",
+        "profileButton": "Профиль"
+      },
+      "actions": {
+        "newDeposit": "Новый депозит",
+        "newWithdrawal": "Новый вывод",
+        "chartPlaceholder": "Здесь будет график"
+      },
+      "mt4": {
+        "title": "Счета MT4",
+        "openNewAccount": "Открыть новый счёт",
+        "table": {
+          "account": "Счёт",
+          "type": "Тип",
+          "balance": "Баланс",
+          "status": "Статус",
+          "active": "Активен",
+          "inactive": "Неактивен"
+        }
+      }
+    },
+
+    "billing": {
+      "title": "Платежи",
+      "create": "Создать новый платёж",
+      "search": "Поиск",
+      "columns": {
+        "id": "ID",
+        "paysystem": "Платёжная система",
+        "status": "Статус",
+        "currency": "Валюта",
+        "amount": "Сумма",
+        "createdAt": "Дата создания"
+      },
+      "nothingToShow": "Нет данных =(",
+      "pagination": {
+        "prev": "Назад",
+        "next": "Вперёд"
+      },
+
+      "panel-title": "Добавить нового администратора"
+    },
+
+    "payments": {
+      "title": "Детали платежей",
+      "search": "Поиск",
+      "create": "Добавить новый платёж",
+      "columns": {
+        "title": "Название",
+        "paysystem": "Платёжная система",
+        "currency": "Валюта",
+        "createdAt": "Дата создания"
+      },
+      "nothingToShow": "Нет данных =(",
+      "pagination": {
+        "prev": "Назад",
+        "next": "Вперёд"
+      }
+    },
+
+    "profile": {
+      "components": {
+        "tab-change-password": {
+          "labels": {
+            "old_password": "Старый пароль",
+            "new_password": "Новый пароль",
+            "new_password_confirmation": "Подтверждение пароля"
+          },
+          "placeholders": {
+            "old_password": "*********",
+            "new_password": "*********",
+            "new_password_confirmation": "*********"
+          },
+          "button": "Сохранить новый пароль",
+          "success": "Пароль успешно обновлён!"
+        },
+
+        "tab-general": {
+          "labels": {
+            "email": "Электронная почта",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "mid_name": "Отчество",
+            "birthdate": "Дата рождения",
+            "phone": "Телефон",
+            "country": "Страна",
+            "state": "Штат / Область",
+            "city": "Город",
+            "address": "Адрес",
+            "postal_code": "Почтовый индекс"
+          },
+          "placeholders": {
+            "email": "example1test.com",
+            "first_name": "Иван",
+            "last_name": "Иванов",
+            "mid_name": "Петрович",
+            "birthdate": "",
+            "phone": "",
+            "country": "Россия",
+            "state": "Московская область",
+            "city": "Москва",
+            "address": "ул. Пример, д. 2Б, кв. 8",
+            "postal_code": "000000"
+          },
+          "button": "Сохранить и отправить на верификацию",
+          "success": "Данные пользователя успешно обновлены и отправлены на проверку!"
+        },
+
+        "tab-user-documents": {
+          "buttons": {
+            "choose": "Выбрать файл",
+            "upload": "Загрузить"
+          },
+          "messages": {
+            "upload_success": "Фотография профиля успешно обновлена и отправлена на проверку!",
+            "upload_error": "Не удалось загрузить фото",
+            "delete_error": "Не удалось удалить фото"
+          },
+          "errors": {
+            "type": "Только изображения",
+            "size": "Максимальный размер — 2 МБ"
+          }
+        },
+
+        "tab-user-photo": {
+          "buttons": {
+            "choose": "Выбрать файл",
+            "upload": "Загрузить"
+          },
+          "messages": {
+            "upload_success": "Фото профиля успешно обновлено",
+            "delete_success": "Фото профиля удалено",
+            "upload_error": "Не удалось загрузить фото",
+            "delete_error": "Не удалось удалить фото"
+          },
+          "errors": {
+            "type": "Только изображения",
+            "size": "Максимальный размер — 2 МБ"
+          }
+        }
+      },
+
+      "index": {
+        "tabs": {
+          "general": "Общие",
+          "photo": "Фото пользователя",
+          "documents": "Документы",
+          "verification": "Верификация",
+          "change_password": "Сменить пароль"
+        },
+        "title": "Профиль"
+      }
+    },
+
+    "accounts": {
+      "title": "Счета",
+      "openNew": "Открыть новый счёт",
+      "search": "Поиск",
+      "columns": {
+        "type": "Тип счёта",
+        "leverage": "Кредитное плечо",
+        "number": "Номер счёта",
+        "balance": "Баланс МТ"
+      },
+      "nothingToShow": "Нет данных =(",
+      "pagination": {
+        "prev": "Назад",
+        "next": "Вперёд"
+      },
+
+      "accounts-form": {
+        "title": "Открыть новый счёт",
+        "fields": {
+          "accountType": "Тип счёта",
+          "phonePassword": "Телефонный пароль",
+          "phonePasswordPlaceholder": "Введите телефонный пароль"
+        },
+        "actions": {
+          "submit": "Открыть новый счёт"
+        }
+      }
+    }
+  },
+
+  "admin": {
+    "menu": {
+      "dashboard": "Главная",
+      "clients": "Клиенты",
+      "accounts": "Аккаунты",
+      "referral": "Реферальная система",
+      "payments": "Платежи",
+      "settings": "Настройки",
+      "access": "Доступ"
+    },
+
+    "access": {
+      "index": {
+        "title": "Управление доступом",
+        "subtitle": "( Роли и разрешения )"
+      },
+      "components": {
+        "admins-panel": {
+          "title": "# Администраторы",
+          "columns": {
+            "id": "ID",
+            "nickname": "Никнейм",
+            "email": "Электронная почта",
+            "roles": "Роли",
+            "createdAt": "Дата создания",
+            "options": "Действия"
+          },
+          "actions": {
+            "addNewAdmin": "Добавить администратора"
+          }
+        },
+        "admins-panel-add-new": {
+          "title": "Создать администратора",
+          "fields": {
+            "nickname": "Никнейм",
+            "email": "Электронная почта",
+            "password": "Пароль",
+            "roles": "Роли"
+          },
+          "placeholders": {
+            "nickname": "Введите никнейм администратора",
+            "email": "example1gmail.com",
+            "roles": "Выберите роли"
+          },
+          "actions": {
+            "submit": "Создать и сохранить"
+          }
+        },
+        "admins-panel-edit": {
+          "title": "Редактировать роли администратора",
+          "labels": {
+            "nickname": "Никнейм",
+            "email": "Электронная почта",
+            "roles": "Роли"
+          },
+          "placeholders": {
+            "nickname": "Введите никнейм роли",
+            "email": "example1gmail.com",
+            "roles": "Выберите роли"
+          },
+          "actions": {
+            "submit": "Обновить и сохранить"
+          }
+        },
+        "admins-panel-search": {
+          "placeholder": "Поиск"
+        },
+        "permissions-panel": {
+          "title": "# Разрешения",
+          "searchPlaceholder": "Поиск",
+          "columns": {
+            "id": "ID",
+            "name": "Название"
+          }
+        },
+        "roles-panel": {
+          "title": "# Роли",
+          "addTitle": "Добавить роль",
+          "editTitle": "Редактировать роль",
+          "columns": {
+            "name": "Название",
+            "permissions": "Разрешения"
+          }
+        },
+        "roles-panel-add-new": {
+          "labels": {
+            "name": "Название",
+            "permissions": "Разрешения"
+          },
+          "placeholders": {
+            "name": "Введите название роли",
+            "permissions": "Выберите разрешения"
+          },
+          "actions": {
+            "createAndSave": "Создать и сохранить"
+          }
+        },
+        "roles-panel-edit": {
+          "labels": {
+            "name": "Название",
+            "permissions": "Разрешения"
+          },
+          "placeholders": {
+            "name": "Введите название роли",
+            "permissions": "Выберите разрешения"
+          },
+          "actions": {
+            "updateAndSave": "Обновить и сохранить"
+          }
+        },
+        "roles-panel-search": {
+          "placeholder": "Поиск"
+        }
+      }
+    },
+
+    "accounts": {
+      "index": {
+        "title": "Аккаунты",
+        "subtitle": "Список аккаунтов"
+      },
+      "components": {
+        "accounts-panel": {
+          "title": "# Клиенты",
+          "addTitle": "Добавить клиента",
+          "editTitle": "Редактировать клиента",
+          "columns": {
+            "id": "ID",
+            "name": "Имя",
+            "email": "Электронная почта",
+            "phone": "Телефон",
+            "created_at": "Дата создания",
+            "options": "Действия"
+          }
+        },
+        "accounts-panel-add-new": {
+          "labels": {
+            "email": "Электронная почта",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "mid_name": "Отчество",
+            "birthdate": "Дата рождения",
+            "phone": "Телефон",
+            "country": "Страна",
+            "city": "Город",
+            "address": "Адрес",
+            "postal_code": "Почтовый индекс",
+            "password": "Пароль",
+            "password_confirmation": "Подтверждение пароля"
+          },
+          "placeholders": {
+            "email": "Введите эл. почту",
+            "first_name": "Введите имя",
+            "last_name": "Введите фамилию",
+            "mid_name": "Введите отчество",
+            "phone": "Введите телефон",
+            "address": "Введите адрес",
+            "postal_code": "Введите индекс",
+            "password": "Введите пароль",
+            "password_confirmation": "Подтвердите пароль"
+          },
+          "submit": "Создать и сохранить"
+        },
+        "accounts-panel-edit": {
+          "labels": {
+            "name": "Имя",
+            "permissions": "Разрешения"
+          },
+          "placeholders": {
+            "name": "Введите название роли",
+            "permissions": "Выберите разрешения"
+          },
+          "submit": "Обновить и сохранить"
+        },
+        "accounts-panel-search": {
+          "placeholder": "Поиск клиентов..."
+        }
+      }
+    },
+
+    "clients": {
+      "index": {
+        "title": "Клиенты",
+        "subtitle": "Список клиентов"
+      },
+      "components": {
+        "clients-panel": {
+          "title": "# Клиенты",
+          "addTitle": "Добавить клиента",
+          "editTitle": "Редактировать клиента",
+
+          "columns": {
+            "id": "ID",
+            "email": "Электронная почта",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "phone": "Телефон",
+            "created_at": "Дата создания",
+            "options": "Действия"
+          }
+        },
+        "clients-panel-add-new": {
+          "labels": {
+            "email": "Электронная почта",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "mid_name": "Отчество",
+            "birthdate": "Дата рождения",
+            "phone": "Телефон",
+            "country": "Страна",
+            "city": "Город",
+            "address": "Адрес",
+            "postal_code": "Почтовый индекс",
+            "password": "Пароль",
+            "password_confirmation": "Подтверждение пароля"
+          },
+          "placeholders": {
+            "email": "Введите эл. почту",
+            "first_name": "Введите имя",
+            "last_name": "Введите фамилию",
+            "mid_name": "Введите отчество",
+            "phone": "Введите телефон",
+            "address": "Введите адрес",
+            "postal_code": "Введите индекс",
+            "password": "Введите пароль",
+            "password_confirmation": "Подтвердите пароль"
+          },
+          "submit": "Создать и сохранить"
+        },
+        "clients-panel-edit": {
+          "labels": {
+            "name": "Имя",
+            "permissions": "Разрешения"
+          },
+          "placeholders": {
+            "name": "Введите название роли",
+            "permissions": "Выберите разрешения"
+          },
+          "submit": "Обновить и сохранить"
+        },
+        "clients-panel-search": {
+          "placeholder": "Поиск клиентов..."
+        }
+      }
+    },
+
+    "dashboard": {},
+
+    "profile": {},
+
+    "referral": {},
+
+    "settings": {
+      "title": "Настройки",
+      "tabs": {
+        "general": "Общие",
+        "appearance": "Внешний вид",
+        "secure": "Безопасность"
+      },
+      "tables": {
+        "appearance": {
+          "variable": "Имя переменной",
+          "preview": "Превью",
+          "picker": "Выбор цвета",
+          "background": "Фон",
+          "text": "Пример текста",
+          "button": "Кнопка"
+        },
+        "security": {
+          "key": "Ключ",
+          "value": "Значение (в секундах)"
+        },
+        "general": {
+          "button": "Загрузить"
+        }
+      }
     }
   }
 }

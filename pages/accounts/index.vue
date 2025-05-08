@@ -2,72 +2,106 @@
   <UiContainer>
     <div class="accounts">
       <div class="accounts__title">
-        <UiTextH4>Accounts</UiTextH4>
+        <UiTextH4>{{ t("cabinet.accounts.title") }}</UiTextH4>
       </div>
       <div class="accounts__content">
         <div class="accounts__content__options">
           <div class="accounts__content__option">
-            <UiButtonDefault state="success"
-                             @click="handleClickCreateNewAccount"
-            >Open new account</UiButtonDefault>
+            <UiButtonDefault
+              state="success"
+              @click="handleClickCreateNewAccount"
+            >
+              {{ t("cabinet.accounts.openNew") }}</UiButtonDefault
+            >
           </div>
         </div>
 
         <div class="accounts__content__account_item__options">
-          <UiInput @input="handleInputSearch" :value="search" placeholder="Search" />
+          <UiInput
+            @input="handleInputSearch"
+            :value="search"
+            :placeholder="t('cabinet.accounts.search')"
+          />
         </div>
 
         <div class="accounts__content__account_item__data-wrapper--header">
-
-          <div class="accounts__content__account_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('type')">Тип счета</span>
-            <UiIconSort :active="orderBy === 'type'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('type')"
+          <div
+            class="accounts__content__account_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('type')">{{
+              t("cabinet.accounts.columns.type")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'type'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('type')"
             />
           </div>
 
-          <div class="accounts__content__account_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('leverage')">Кредитное плечо</span>
-            <UiIconSort :active="orderBy === 'leverage'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('leverage')"
+          <div
+            class="accounts__content__account_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('leverage')">{{
+              t("cabinet.accounts.columns.leverage")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'leverage'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('leverage')"
             />
           </div>
 
-          <div class="accounts__content__account_item__data-wrapper--header__cell">
-            <span @click="handleOrderByAndDirection('number')">Номер счета</span>
-            <UiIconSort :active="orderBy === 'number'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('number')"
+          <div
+            class="accounts__content__account_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('number')">{{
+              t("cabinet.accounts.columns.number")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'number'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('number')"
             />
           </div>
 
-          <div class="accounts__content__account_item__data-wrapper--header__cell">
-            <span  @click="handleOrderByAndDirection('balance')">Баланс МТ</span>
-            <UiIconSort :active="orderBy === 'balance'"
-                        :direction="orderDirection"
-                        @click="handleOrderByAndDirection('balance')"
+          <div
+            class="accounts__content__account_item__data-wrapper--header__cell"
+          >
+            <span @click="handleOrderByAndDirection('balance')">{{
+              t("cabinet.accounts.columns.balance")
+            }}</span>
+            <UiIconSort
+              :active="orderBy === 'balance'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('balance')"
             />
           </div>
-
         </div>
 
         <template v-if="accounts.length === 0">
           <div class="accounts__content__nothing-to-show">
-            Nothing to show =(
+            {{ t("cabinet.accounts.nothingToShow") }}
           </div>
         </template>
 
         <template v-if="accounts.length > 0">
-          <PanelDefault class="accounts__content__account_item" v-for="account in accounts" :key="account.id">
+          <PanelDefault
+            class="accounts__content__account_item"
+            v-for="account in accounts"
+            :key="account.id"
+          >
             <div class="accounts__content__account_item__data-wrapper">
               <div>{{ account.account_type.name }}</div>
               <div>{{ account.leverage }}</div>
               <div>{{ account.number }}</div>
               <div>
-                <UiIconUpdate class="icon-update" ref="iconUpdate" :class="{ spinning: spinIcon }"
-                              @click="handleIconClick(account.id)" @animationend="onIconAnimationEnd" />
+                <UiIconUpdate
+                  class="icon-update"
+                  ref="iconUpdate"
+                  :class="{ spinning: spinIcon }"
+                  @click="handleIconClick(account.id)"
+                  @animationend="onIconAnimationEnd"
+                />
                 <span class="balance-sum">{{ account.balance }}</span>
               </div>
             </div>
@@ -75,27 +109,51 @@
         </template>
 
         <div class="accounts__content__pagination">
-          <button class="page-btn" v-if="currentPage !== 1 && total > perPage" @click="goPrev">Prev</button>
+          <button
+            class="page-btn"
+            v-if="currentPage !== 1 && total > perPage"
+            @click="goPrev"
+          >
+            {{ t("cabinet.accounts.pagination.prev") }}
+          </button>
 
-          <button v-if="visiblePages[0] > 1" class="page-link" @click="setPage(1)">1</button>
+          <button
+            v-if="visiblePages[0] > 1"
+            class="page-link"
+            @click="setPage(1)"
+          >
+            1
+          </button>
           <span v-if="visiblePages[0] > 2">...</span>
 
-          <button v-for="page in visiblePages"
-                  :key="page"
-                  class="page-link"
-                  :class="{ active: currentPage === page }"
-                  @click="setPage(page)">
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            class="page-link"
+            :class="{ active: currentPage === page }"
+            @click="setPage(page)"
+          >
             {{ page }}
           </button>
 
-          <span v-if="visiblePages[visiblePages.length - 1] < totalPages">...</span>
-          <button v-if="visiblePages[visiblePages.length - 1] < totalPages"
-                  class="page-link"
-                  @click="setPage(totalPages)">
+          <span v-if="visiblePages[visiblePages.length - 1] < totalPages"
+            >...</span
+          >
+          <button
+            v-if="visiblePages[visiblePages.length - 1] < totalPages"
+            class="page-link"
+            @click="setPage(totalPages)"
+          >
             {{ totalPages }}
           </button>
 
-          <button class="page-btn" v-if="currentPage !== totalPages && total > perPage" @click="goNext">Next</button>
+          <button
+            class="page-btn"
+            v-if="currentPage !== totalPages && total > perPage"
+            @click="goNext"
+          >
+            {{ t("cabinet.accounts.pagination.next") }}
+          </button>
         </div>
       </div>
     </div>
@@ -103,6 +161,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
@@ -111,22 +170,23 @@ import UiInput from "~/components/ui/UiInput.vue";
 import UiIconSort from "~/components/ui/UiIconSort.vue";
 import useAppCore from "~/composables/useAppCore";
 import { computed, onMounted, reactive, ref, inject } from "vue";
-import {definePageMeta} from "~/.nuxt/imports";
+import { definePageMeta } from "~/.nuxt/imports";
 import AccountsCreateNew from "~/pages/accounts/components/AccountsCreateNew.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
 definePageMeta({ layout: "cabinet", middleware: ["auth-client"] });
 
+const { t } = useI18n({ useScope: "global" });
 const appCore = useAppCore();
 
-const ORDER_DIRECTION_ASC = 'asc';
-const ORDER_DIRECTION_DESC = 'desc';
+const ORDER_DIRECTION_ASC = "asc";
+const ORDER_DIRECTION_DESC = "desc";
 
-const search = ref('');
+const search = ref("");
 const total = ref(0);
 const perPage = ref(6);
 const currentPage = ref(1);
-const orderBy = ref('');
+const orderBy = ref("");
 const orderDirection = ref(ORDER_DIRECTION_DESC);
 
 const accounts = reactive([]);
@@ -175,7 +235,7 @@ async function goNext() {
 }
 
 const handleIconClick = (id: string) => {
-  const account = accounts.find(x => x.id === id);
+  const account = accounts.find((x) => x.id === id);
   if (account) account.isSpinning = true;
 };
 
@@ -190,7 +250,10 @@ const handleInputSearch = async (event) => {
 };
 
 const handleOrderByAndDirection = async (value) => {
-  orderDirection.value = orderDirection.value === ORDER_DIRECTION_ASC ? ORDER_DIRECTION_DESC : ORDER_DIRECTION_ASC;
+  orderDirection.value =
+    orderDirection.value === ORDER_DIRECTION_ASC
+      ? ORDER_DIRECTION_DESC
+      : ORDER_DIRECTION_ASC;
   orderBy.value = value;
   await loadData();
 };
@@ -207,7 +270,10 @@ const loadData = async () => {
   perPage.value = response.data.data.per_page;
   currentPage.value = response.data.data.current_page;
   total.value = response.data.data.total;
-  const accountsData = response.data.data.data.map(x => { x.isSpinning = false; return x; });
+  const accountsData = response.data.data.data.map((x) => {
+    x.isSpinning = false;
+    return x;
+  });
   accounts.splice(0, accounts.length, ...accountsData);
 };
 
@@ -216,7 +282,10 @@ const loadData = async () => {
 const { openModal } = inject("modalControl") as { openModal: Function };
 // const { closeModal } = inject("modalControl") as { closeModal: Function };
 
-const handleClickCreateNewAccount = () => openModal(AccountsCreateNew, { title: "Open new account" });
+const handleClickCreateNewAccount = () =>
+  openModal(AccountsCreateNew, {
+    title: t("cabinet.accounts.accounts-form.title"),
+  });
 
 onMounted(async () => {
   await loadData();
@@ -286,7 +355,6 @@ onMounted(async () => {
   }
 
   &__content {
-
     &__nothing-to-show {
       height: 40vh;
       display: flex;
@@ -310,7 +378,7 @@ onMounted(async () => {
       padding: 20px;
       width: 100%;
 
-      &> div:last-child {
+      & > div:last-child {
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -374,7 +442,8 @@ onMounted(async () => {
       justify-content: center;
       gap: 8px;
 
-      .page-btn, .page-link {
+      .page-btn,
+      .page-link {
         padding: 6px 12px;
         border: 1px solid var(--color-ui-border);
         background: var(--color-ui-background);

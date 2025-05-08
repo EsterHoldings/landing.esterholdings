@@ -18,7 +18,7 @@
 
       <tbody class="table__body">
         <tr v-if="!isLoading && data.length === 0">
-          <td>Nothing to show... =(</td>
+          <td>{{ t("ui-components.tables.table-default") }}</td>
         </tr>
 
         <tr
@@ -121,8 +121,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
 import UiLoaderPlaceholder from "~/components/ui/UiLoaderPlaceholder.vue";
 
+const { t } = useI18n();
 const props = defineProps({
   columns: {
     type: Array as () => {

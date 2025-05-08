@@ -6,14 +6,16 @@
     >
       <div class="forex__content">
         <UiTextH3 class="forex__title">
-          {{ t("landing.wide_range_tabs.Forex.title") }}</UiTextH3
+          {{ t("landing.sections.wide_range_tabs.Forex.title") }}</UiTextH3
         >
         <UiTextH5 class="forex__text">
-          {{ t("landing.wide_range_tabs.Forex.description") }}
+          {{ t("landing.sections.wide_range_tabs.Forex.description") }}
         </UiTextH5>
         <div>
           <UiButtonDefault state="primary">
-            {{ t("landing.wide_range_tabs.Forex.btn") }}</UiButtonDefault
+            {{
+              t("landing.sections.wide_range_tabs.Forex.btn")
+            }}</UiButtonDefault
           >
         </div>
       </div>

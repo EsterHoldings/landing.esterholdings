@@ -8,11 +8,11 @@
       >
         <div class="advantage_item">
           <UiTextH3 class="bold">
-            {{ t(`landing.advantages[${index}].value`) }}
+            {{ t(`landing.sections.advantages[${index}].value`) }}
           </UiTextH3>
 
           <UiTextH6 class="advantage_item_subtitle">
-            {{ t(`landing.advantages[${index}].label`) }}
+            {{ t(`landing.sections.advantages[${index}].label`) }}
           </UiTextH6>
         </div>
 
@@ -29,7 +29,7 @@ import UiTextH3 from "~/components/ui/UiTextH3.vue";
 import UiTextH6 from "~/components/ui/UiTextH6.vue";
 
 const { tm, t } = useI18n();
-const advantages = tm("landing.advantages");
+const advantages = tm("landing.sections.advantages");
 </script>
 
 <style lang="scss" scoped>

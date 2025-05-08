@@ -24,11 +24,11 @@ export const currentTabContent = {
 export function useTabs() {
   const { tm, t } = useI18n();
 
-  const raw = tm("landing.wide_range__categories");
+  const raw = tm("landing.sections.wide_range__categories");
   const tabs = ref(
     Array.isArray(raw)
       ? raw.map((item: any, index: number) => {
-          const key = `landing.wide_range__categories[${index}]`;
+          const key = `landing.sections.wide_range__categories[${index}]`;
 
           return {
             id: t(`${key}.id`),
