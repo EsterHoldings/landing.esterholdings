@@ -48,13 +48,24 @@ import {
   useRolesColumns,
 } from "~/pages/admin/clients/composables";
 
-import {
+// import {
+//   handleInputSearch,
+//   handleChangePage,
+//   handleChangePerPage,
+//   loadData,
+//   handleClickDeleteIcon,
+// } from "~/pages/admin/clients/composables/setup";
+
+import { useClientsMethods } from "~/pages/admin/clients/composables/setup";
+
+const {
   handleInputSearch,
   handleChangePage,
   handleChangePerPage,
   loadData,
   handleClickDeleteIcon,
-} from "~/pages/admin/clients/composables/setup";
+} = useClientsMethods();
+
 import ClientsPanelEdit from "~/pages/admin/clients/components/ClientsPanelEdit.vue";
 import ClientsPanelAddNew from "~/pages/admin/clients/components/ClientsPanelAddNew.vue";
 import UiIconEdit from "~/components/ui/UiIconEdit.vue";
