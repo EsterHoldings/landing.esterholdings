@@ -60,15 +60,6 @@ const { openModal } = inject("modalControl") as { openModal: Function };
 const handleClickAddRole = () =>
   openModal(AdminsPanelAddNew, { title: "Add new Admin" });
 
-// const adminsColumns = reactive([
-//   { title: "Id", key: "id" },
-//   { title: "Nickname", key: "nickname" },
-//   { title: "Email", key: "email" },
-//   { title: "Roles", key: "roles" },
-//   { title: "CreatedAt", key: "created_at" },
-//   { title: "Options", key: "options" },
-// ]);
-
 const adminsColumns = reactive([
   { title: t("admin.access.components.admins-panel.columns.id"), key: "id" },
   {

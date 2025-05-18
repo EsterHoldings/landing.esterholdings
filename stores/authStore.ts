@@ -1,20 +1,19 @@
-import { defineStore } from 'pinia';
-import { ref, computed, watch } from 'vue';
-import useAppCore from '~/composables/useAppCore';
-import { navigateTo } from 'nuxt/app';
-import { ROUTE_ADMIN_AUTH_LOGIN } from '~/constants/routes';
+import { defineStore } from "pinia";
+import { ref, computed, watch } from "vue";
+import useAppCore from "~/composables/useAppCore";
+import { navigateTo } from "nuxt/app";
+import { ROUTE_ADMIN_AUTH_LOGIN } from "~/constants/routes";
 
-export const useAuthStore = defineStore('userAuth', () => {
-
-  const accessToken = ref<string>('');
-  const refreshToken = ref<string>('');
+export const useAuthStore = defineStore("userAuth", () => {
+  const accessToken = ref<string>("");
+  const refreshToken = ref<string>("");
 
   const user = ref<any>(null);
-  const photoUrl = ref<string>('');
+  const photoUrl = ref<string>("");
 
   if (process.client) {
-    const storedAccessToken = localStorage.getItem('user_access_token');
-    const storedRefreshToken = localStorage.getItem('user_refresh_token');
+    const storedAccessToken = localStorage.getItem("user_access_token");
+    const storedRefreshToken = localStorage.getItem("user_refresh_token");
 
     if (storedAccessToken) {
       accessToken.value = storedAccessToken;
@@ -25,17 +24,17 @@ export const useAuthStore = defineStore('userAuth', () => {
   }
 
   const isAuthenticated = computed<boolean>(() => {
-    return accessToken.value !== '';
+    return accessToken.value !== "";
   });
 
   watch(accessToken, (newValue: string) => {
     if (process.client) {
-      localStorage.setItem('user_access_token', newValue);
+      localStorage.setItem("user_access_token", newValue);
     }
   });
   watch(refreshToken, (newValue: string) => {
     if (process.client) {
-      localStorage.setItem('user_refresh_token', newValue);
+      localStorage.setItem("user_refresh_token", newValue);
     }
   });
 
@@ -48,7 +47,7 @@ export const useAuthStore = defineStore('userAuth', () => {
 
   function setUser(userData: any): void {
     user.value = userData;
-    photoUrl.value = userData.photo_url || '';
+    photoUrl.value = userData.photo_url || "";
   }
 
   function setPhotoUrl(url: string): void {
@@ -75,13 +74,13 @@ export const useAuthStore = defineStore('userAuth', () => {
 
   // Вихід (очищуємо токени, стан і повертаємо на сторінку логіну)
   async function authLogout(): Promise<void> {
-    setAccessToken('');
-    setRefreshToken('');
+    setAccessToken("");
+    setRefreshToken("");
     user.value = null;
-    photoUrl.value = '';
+    photoUrl.value = "";
     if (process.client) {
-      localStorage.removeItem('user_access_token');
-      localStorage.removeItem('user_refresh_token');
+      localStorage.removeItem("user_access_token");
+      localStorage.removeItem("user_refresh_token");
     }
     navigateTo(ROUTE_ADMIN_AUTH_LOGIN);
   }

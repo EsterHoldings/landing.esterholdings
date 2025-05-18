@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useThemeStore = defineStore("theme", () => {
-  const currentTheme = ref<"light" | "dark">("light");
+  const currentTheme = ref<"light" | "dark">("dark");
   const lightTheme = {
     "--ui-background": "#ffffff",
     "--ui-primary-main": "#ffffff",
@@ -50,7 +50,7 @@ export const useThemeStore = defineStore("theme", () => {
 
   function initTheme() {
     const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    currentTheme.value = saved || "light";
+    currentTheme.value = saved || currentTheme.value;
     const theme = currentTheme.value === "light" ? lightTheme : darkTheme;
     applyTheme(theme);
   }
