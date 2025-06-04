@@ -7,13 +7,8 @@ export class useApi {
 
   constructor(forClient = false) {
     this.api = axios.create({
-      // baseURL: "http://127.0.0.1:8000/api/",
-      // baseURL: "http://127.0.0.1:8000/api/",
-      // baseURL: "http://localhost:8000/api/",
-      baseURL: "https://esterholdings.website/api/",
-      headers: {
-        // 'Access-Control-Allow-Origin': '*'
-      }
+      baseURL: process.env.NUXT_PUBLIC_API_URL,
+      // baseURL: "https://esterholdings.website/api/",
     });
 
     this.api.interceptors.request.use((config) => {

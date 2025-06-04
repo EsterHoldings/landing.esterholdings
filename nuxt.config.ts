@@ -79,5 +79,11 @@ export default defineNuxtConfig({
         // якщо ваш бекенд живе не в /api, а десь по іншому URL — скоригуйте 'target'
       }
     }
+  },
+
+  runtimeConfig: {
+    public: {
+      apiUrl: process.env.NUXT_PUBLIC_API_URL,
+    }
   }
 });
