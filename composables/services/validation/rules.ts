@@ -9,10 +9,12 @@ export const isEmail = (value: any): Boolean => {
 };
 
 export const maxLength = (value: any, maxLengthValue: any): Boolean => {
+  if (!value) return false;
   return value.length > maxLengthValue;
 };
 
 export const minLength = (value: any, minLengthValue: any): Boolean => {
+  if (!value) return true;
   return value.length < minLengthValue;
 };
 

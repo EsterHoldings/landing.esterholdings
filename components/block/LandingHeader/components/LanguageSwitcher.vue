@@ -100,7 +100,7 @@ onBeforeUnmount(() => {
 
     &.top {
       top: auto;
-      bottom: 40px;
+      bottom: 0;
       left: 0;
     }
 

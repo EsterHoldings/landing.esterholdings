@@ -113,6 +113,10 @@ const doSendForm = async () => {
 
     const response = await appCore.auth.doLogin(props.formData);
 
+    console.log('-=-=-=- -=-=-=- -=-=-=-');
+    console.log(response.data);
+    console.log('-=-=-=- -=-=-=- -=-=-=-');
+
     const accessToken = response.data.data.access_token;
     const refreshToken = response.data.data.refresh_token;
 

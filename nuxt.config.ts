@@ -35,7 +35,7 @@ export default defineNuxtConfig({
         file: "ru.json",
       },
     ],
-
+    fallbackLocale: 'en',
     defaultLocale: "en",
     experimental: {
       jsTsFormatResource: false,
@@ -68,4 +68,16 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  nitro: {
+    devProxy: {
+      // будь-який запит, що починається з /api, піде не прямо в браузер,
+      // а до цього проксі, яке відправить його до Laravel
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        // якщо ваш бекенд живе не в /api, а десь по іншому URL — скоригуйте 'target'
+      }
+    }
+  }
 });

@@ -37,9 +37,7 @@ const resizeTextarea = () => {
 };
 
 onMounted(() => {
-  console.log("-=-=-=-=-=-=-");
-  console.log(resizeTextarea());
-  console.log("-=-=-=-=-=-=-");
+  resizeTextarea();
 });
 </script>
 
@@ -48,5 +46,13 @@ textarea {
   width: 100%;
   min-height: 150px;
   resize: vertical;
+
+  padding: 10px;
+
+  background-color: var(--ui-background);
+  border: 1px solid var(--color-stroke-ui-dark);
+  border-radius: 8px;
+
+  color: var(--ui-text-main);
 }
 </style>

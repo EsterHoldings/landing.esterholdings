@@ -151,18 +151,8 @@
               :isInvalid="
                 validatorUserDataForm.errorsFormData.birthdate.errors.length > 0
               "
-              @input="
-                validatorUserDataForm.doValidateField(
-                  'birthdate',
-                  $event.target.value
-                )
-              "
-              @blur="
-                validatorUserDataForm.doValidateField(
-                  'birthdate',
-                  $event.target.value
-                )
-              "
+              @input="handleInputBirthday"
+              @blur="handleInputBirthday"
             />
           </UiFormControl>
 
@@ -403,6 +393,13 @@ const { t } = useI18n();
 const toast = useToast();
 const appCore = useAppCore();
 const isLoading = ref(false);
+
+const handleInputBirthday = (value) => {
+  validatorUserDataForm.doValidateField(
+      'birthdate',
+      value
+  )
+}
 
 const handleSubmit = async () => {
   try {
