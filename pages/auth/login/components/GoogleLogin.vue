@@ -17,7 +17,7 @@ const isLoading = ref(false);
 
 const clientId =
   "351197430667-flnael7gi4buja9a203e7rgebc6ug5dq.apps.googleusercontent.com";
-const redirectUri = "https://client-esterholdings-5ojhpxqaa-rodevillows-projects.vercel.app/auth/callback";
+const redirectUri = "https://stage.esterholdings.website/auth/callback";
 const scope = "openid email profile";
 const responseType = "id_token";
 
