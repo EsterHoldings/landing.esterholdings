@@ -83,7 +83,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL,
+      // apiUrl: process.env.NUXT_PUBLIC_API_URL,
+      apiUrl: "https://esterholdings.website/api/",
     }
   }
 });

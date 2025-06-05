@@ -122,27 +122,32 @@ import {
   validatorRegistrationForm,
   resetValidationRegistrationForm,
 } from "../composables/validation";
-import { validatorLoginForm } from "~/pages/auth/login/composables/validation";
 import { useAppCore } from "~/composables/useAppCore";
 import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";
 import UiButtonPrimary from "~/components/ui/UiButtonPrimary.vue";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
-
 import UiIconGoogle from "~/components/ui/UiIconGoogleOauth.vue";
-// import { serverSideErrorsHandler } from "@/utils/validation/server-side-errors-handler.helper";
+import {navigateTo} from "nuxt/app";
+import {useToast} from "vue-toastification";
 
 const props = defineProps({ formData: { type: Object, required: true } });
 
 const isLoading = ref(false);
 const appCore = useAppCore();
+const toast = useToast();
 
 const doSendForm = async (): Promise<void> => {
   isLoading.value = true;
 
   try {
-    await appCore.auth.doRegistration(props.formData);
-    useRouter().push({ path: "/auth/login" });
+    await appCore.auth.doRegistration({
+      email: props.formData.email,
+      password: props.formData.password,
+      password_confirmation: props.formData.confirmPassword,
+    });
+    toast.success("Successfully registration!");
+    navigateTo("/auth/login")
   } catch (e: any) {
     const serverValidationErrors = e?.response?.data?.description;
     console.log("CATCH: ", serverValidationErrors);

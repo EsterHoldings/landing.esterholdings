@@ -1,14 +1,16 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useAdminAuthStore } from "~/stores/adminAuthStore";
 import { useAuthStore } from "~/stores/authStore";
+import * as process from "node:process";
 
 export class useApi {
   private api: AxiosInstance;
 
   constructor(forClient = false) {
+
     this.api = axios.create({
-      // baseURL: process.env.NUXT_PUBLIC_API_URL,
-      baseURL: "https://esterholdings.website/api/",
+      // baseURL: "https://esterholdings.website/api/",
+      baseURL: "http://127.0.0.1:8000/api/",
     });
 
     this.api.interceptors.request.use((config) => {
