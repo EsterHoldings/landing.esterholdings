@@ -11,7 +11,7 @@
         'is-valid': isDirty && !isInvalid,
         disabled: props.disabled,
       }"
-      :type="props.type"
+      :type="typeInput"
       :placeholder="props.placeholder"
       :value="props.value"
       :disabled="props.disabled"
@@ -21,13 +21,33 @@
       readonly
       onfocus="this.removeAttribute('readonly');"
     />
+
+    <transition name="fade">
+      <UiIconEye
+        v-if="props.type === 'password' && isPasswordVisible"
+        class="password-eye"
+        @click="togglePasswordVisibility"
+      />
+    </transition>
+
+    <transition name="fade">
+      <UiIconEyeClose
+        v-if="props.type === 'password' && !isPasswordVisible"
+        class="password-eye"
+        @click="togglePasswordVisibility"
+      />
+    </transition>
+
     <div v-if="isLoading" class="is-loading"><UiIconSpinnerDefault /></div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { ref, computed } from "vue";
 import { useSlots } from "vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import UiIconEye from "~/components/ui/UiIconEye.vue";
+import UiIconEyeClose from "~/components/ui/UiIconEyeClose.vue";
 
 const props = defineProps({
   type: {
@@ -77,9 +97,22 @@ const emit = defineEmits(["focus", "input", "blur"]);
 
 const slots = useSlots();
 
+const isPasswordVisible = ref(false);
+
+const typeInput = computed(() => {
+  if (props.type === "password") {
+    return isPasswordVisible.value ? "text" : "password";
+  }
+  return props.type;
+});
+
 const onFocus = (event: any): void => emit("focus", event);
 const onInput = (event: any): void => emit("input", event);
 const onBlur = (event: any): void => emit("blur", event);
+
+const togglePasswordVisibility = () => {
+  isPasswordVisible.value = !isPasswordVisible.value;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -93,6 +126,7 @@ input {
 }
 
 .input {
+  position: relative;
   box-sizing: border-box;
   width: 100%;
   height: var(--ui-input--height);
@@ -159,5 +193,21 @@ input {
   .disabled {
     background-color: #e5e5e5;
   }
+}
+
+.password-eye {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

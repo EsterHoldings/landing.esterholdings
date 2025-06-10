@@ -26,3 +26,11 @@ onMounted(async () => {
     <p v-else>Генерация QR-кода...</p>
   </div>
 </template>
+
+<style lang="scss" scoped>
+img {
+  width: 220px;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+</style>

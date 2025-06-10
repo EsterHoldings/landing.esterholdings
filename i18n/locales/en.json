@@ -536,6 +536,18 @@
           "submit": "Open new account"
         }
       }
+    },
+
+    "referrals": {
+      "components": {},
+      "index": {
+        "tabs": {
+          "general": "General",
+          "settings": "Settings",
+          "terms": "Terms"
+        },
+        "title": "Referral system"
+      }
     }
   },
 
