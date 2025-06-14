@@ -8,104 +8,90 @@
       <div class="payments__content">
         <div class="payments__content__options">
           <div class="payments__content__option">
-            <UiButtonDefault
-              state="success"
-              @click="handleClickCreateNewAccount"
-            >
-              {{ t("cabinet.billing.create") }}</UiButtonDefault
-            >
+            <NuxtLink to="/payments/create">
+              <UiButtonDefault state="success">{{ t("cabinet.billing.create") }}</UiButtonDefault>
+            </NuxtLink>
+
           </div>
         </div>
 
         <div class="payments__content__payment_item__options">
           <UiInput
-            @input="handleInputSearch"
-            :value="search"
-            :placeholder="t('cabinet.billing.search')"
+              @input="handleInputSearch"
+              :value="search"
+              :placeholder="t('cabinet.billing.search')"
           />
         </div>
 
         <div class="payments__content__payment_item__data-wrapper--header">
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('id')">{{
-              t("cabinet.billing.columns.id")
-            }}</span>
+            <span @click="handleOrderByAndDirection('id')">{{ t("cabinet.billing.columns.id") }}</span>
             <UiIconSort
-              :active="orderBy === 'id'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('id')"
+                :active="orderBy === 'id'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('id')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('payment_system')">{{
-              t("cabinet.billing.columns.paysystem")
-            }}</span>
+            <span @click="handleOrderByAndDirection('payment_system')">{{t("cabinet.billing.columns.paysystem") }}</span>
             <UiIconSort
-              :active="orderBy === 'payment_system'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('payment_system')"
+                :active="orderBy === 'payment_system'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('payment_system')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('status')">{{
-              t("cabinet.billing.columns.status")
-            }}</span>
+            <span @click="handleOrderByAndDirection('status')">{{t("cabinet.billing.columns.status") }}</span>
             <UiIconSort
-              :active="orderBy === 'status'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('status')"
+                :active="orderBy === 'status'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('status')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('currency')">{{
-              t("cabinet.billing.columns.currency")
-            }}</span>
+            <span @click="handleOrderByAndDirection('currency')">{{t("cabinet.billing.columns.currency") }}</span>
             <UiIconSort
-              :active="orderBy === 'currency'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('currency')"
+                :active="orderBy === 'currency'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('currency')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('amount')">{{
-              t("cabinet.billing.columns.amount")
-            }}</span>
+            <span @click="handleOrderByAndDirection('amount')">{{t("cabinet.billing.columns.amount") }}</span>
             <UiIconSort
-              :active="orderBy === 'amount'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('amount')"
+                :active="orderBy === 'amount'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('amount')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
-            <span @click="handleOrderByAndDirection('created_at')">{{
-              t("cabinet.billing.columns.createdAt")
-            }}</span>
+            <span @click="handleOrderByAndDirection('created_at')">{{ t("cabinet.billing.columns.createdAt") }}</span>
             <UiIconSort
-              :active="orderBy === 'created_at'"
-              :direction="orderDirection"
-              @click="handleOrderByAndDirection('created_at')"
+                :active="orderBy === 'created_at'"
+                :direction="orderDirection"
+                @click="handleOrderByAndDirection('created_at')"
             />
           </div>
 
           <div
-            class="payments__content__payment_item__data-wrapper--header__cell"
+              class="payments__content__payment_item__data-wrapper--header__cell"
           >
             <span @click="handleOrderByAndDirection('created_at')"></span>
           </div>
@@ -119,16 +105,14 @@
 
         <template v-if="payments.length > 0">
           <PanelDefault
-            class="payments__content__payment_item"
-            v-for="payment in payments"
-            :key="payment.id"
+              class="payments__content__payment_item"
+              v-for="payment in payments"
+              :key="payment.id"
           >
             <div class="payments__content__payment_item__data-wrapper">
               <div @click="copyToClipboard(payment.id)" style="display: flex">
-                <UiIconCopy />
-                <span style="margin-left: 5px; font-size: 12px">{{
-                  shortId(payment.id)
-                }}</span>
+                <UiIconCopy/>
+                <span style="margin-left: 5px; font-size: 12px">{{ shortId(payment.id) }}</span>
               </div>
               <div>{{ payment.payment_system }}</div>
               <div>{{ payment.status }}</div>
@@ -141,11 +125,11 @@
               </div>
               <div>
                 <UiIconUpdate
-                  class="icon-update"
-                  ref="iconUpdate"
-                  :class="{ spinning: spinIcon }"
-                  @click="handleIconClick(payment.id)"
-                  @animationend="onIconAnimationEnd"
+                    class="icon-update"
+                    ref="iconUpdate"
+                    :class="{ spinning: spinIcon }"
+                    @click="handleIconClick(payment.id)"
+                    @animationend="onIconAnimationEnd"
                 />
               </div>
             </div>
@@ -154,47 +138,47 @@
 
         <div class="payments__content__pagination">
           <button
-            class="page-btn"
-            v-if="currentPage !== 1 && total > perPage"
-            @click="goPrev"
+              class="page-btn"
+              v-if="currentPage !== 1 && total > perPage"
+              @click="goPrev"
           >
             {{ t("cabinet.billing.pagination.prev") }}
           </button>
 
           <button
-            v-if="visiblePages[0] > 1"
-            class="page-link"
-            @click="setPage(1)"
+              v-if="visiblePages[0] > 1"
+              class="page-link"
+              @click="setPage(1)"
           >
             1
           </button>
           <span v-if="visiblePages[0] > 2">...</span>
 
           <button
-            v-for="page in visiblePages"
-            :key="page"
-            class="page-link"
-            :class="{ active: currentPage === page }"
-            @click="setPage(page)"
+              v-for="page in visiblePages"
+              :key="page"
+              class="page-link"
+              :class="{ active: currentPage === page }"
+              @click="setPage(page)"
           >
             {{ page }}
           </button>
 
           <span v-if="visiblePages[visiblePages.length - 1] < totalPages"
-            >...</span
+          >...</span
           >
           <button
-            v-if="visiblePages[visiblePages.length - 1] < totalPages"
-            class="page-link"
-            @click="setPage(totalPages)"
+              v-if="visiblePages[visiblePages.length - 1] < totalPages"
+              class="page-link"
+              @click="setPage(totalPages)"
           >
             {{ totalPages }}
           </button>
 
           <button
-            class="page-btn"
-            v-if="currentPage !== totalPages && total > perPage"
-            @click="goNext"
+              class="page-btn"
+              v-if="currentPage !== totalPages && total > perPage"
+              @click="goNext"
           >
             {{ t("cabinet.billing.pagination.next") }}
           </button>
@@ -205,9 +189,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from "vue-i18n";
-import { computed, inject, onMounted, reactive, ref } from "vue";
-import { definePageMeta } from "~/.nuxt/imports";
+import {useI18n} from "vue-i18n";
+import {computed, onMounted, reactive, ref} from "vue";
+import {definePageMeta} from "~/.nuxt/imports";
 
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
@@ -217,15 +201,15 @@ import UiInput from "~/components/ui/UiInput.vue";
 import UiIconSort from "~/components/ui/UiIconSort.vue";
 import useAppCore from "~/composables/useAppCore";
 import UiIconCopy from "~/components/ui/UiIconCopy.vue";
-import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
+
 
 definePageMeta({
   layout: "cabinet",
   middleware: ["auth-client"],
 });
 
-const { t } = useI18n({ useScope: "global" });
+const {t} = useI18n({useScope: "global"});
 const appCore = useAppCore();
 
 const ORDER_DIRECTION_ASC = "asc";
@@ -300,9 +284,9 @@ const handleInputSearch = async (event) => {
 
 const handleOrderByAndDirection = async (value) => {
   orderDirection.value =
-    orderDirection.value === ORDER_DIRECTION_ASC
-      ? ORDER_DIRECTION_DESC
-      : ORDER_DIRECTION_ASC;
+      orderDirection.value === ORDER_DIRECTION_ASC
+          ? ORDER_DIRECTION_DESC
+          : ORDER_DIRECTION_ASC;
   orderBy.value = value;
   await loadData();
 };
@@ -335,14 +319,6 @@ const copyToClipboard = (paymentId) => {
   const id = shortId(paymentId);
   navigator.clipboard.writeText(id);
 };
-
-// --- --- ---
-
-// const { closeModal } = inject("modalControl") as { closeModal: Function };
-const { openModal } = inject("modalControl") as { openModal: Function };
-
-const handleClickCreateNewAccount = () =>
-  openModal(AdminsPanelAddNew, { title: t("cabinet.billing.panel-title") });
 
 onMounted(async () => {
   await loadData();
