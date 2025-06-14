@@ -107,6 +107,9 @@
     </div>
 
     <div class="registration-form__social-links">
+      <GoogleLogin />
+      <FacebookLogin />
+
       <div class="registration-form__social-link">
         <UiIconGoogle @click="loginWithGoogle" />
       </div>
@@ -122,14 +125,19 @@ import {
   validatorRegistrationForm,
   resetValidationRegistrationForm,
 } from "../composables/validation";
+import {useToast} from "vue-toastification";
+import {navigateTo} from "nuxt/app";
 import { useAppCore } from "~/composables/useAppCore";
 import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";
 import UiButtonPrimary from "~/components/ui/UiButtonPrimary.vue";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
 import UiIconGoogle from "~/components/ui/UiIconGoogleOauth.vue";
-import {navigateTo} from "nuxt/app";
-import {useToast} from "vue-toastification";
+
+import GoogleLogin from "./GoogleLogin.vue";
+import FacebookLogin from "./FacebookLogin.vue";
+
+// import { serverSideErrorsHandler } from "@/utils/validation/server-side-errors-handler.helper";
 
 const props = defineProps({ formData: { type: Object, required: true } });
 
@@ -190,21 +198,29 @@ onUnmounted(() => resetValidationRegistrationForm());
     }
   }
 
-  &__social-links {
+  &__links {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  &__social-links {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
   }
 
   &__social-link {
     display: flex;
     place-content: center;
-    padding: 10px;
+    padding: 3px;
     background: white;
 
-    border-radius: 5px;
+    border-radius: 100%;
   }
-
   &__title {
     text-align: center;
     margin-bottom: 30px;
