@@ -30,7 +30,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { computed, ref } from "vue";
-import { useTabs } from "./composables/index";
 const { t } = useI18n();
 
 import UiTextH3 from "~/components/ui/UiTextH3.vue";

@@ -16,15 +16,7 @@ import GeneralSlide from "./slides/GeneralSlide.vue";
 import TenYearsSlide from "./slides/TenYearsSlide.vue";
 import TopTradersSlide from "./slides/TopTradersSlide.vue";
 
-import UiTextH1 from "~/components/ui/UiTextH1.vue";
-import UiTextH5 from "~/components/ui/UiTextH5.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import RunningLineDefault from "~/components/block/lines/RunningLineDefault.vue";
-import UiImage from "~/components/ui/UiImage.vue";
-import TheSlider from "~/components/block/slider/TheSlider.vue";
 import SliderDefault from "~/components/block/sliders/SliderDefaultTest.vue";
-import UiContainer from "~/components/ui/UiContainer.vue";
-import UiQRCode from "~/components/ui/UiQRCode.vue";
 
 const items = ref([
   { name: "EURUSD", price: 1.04282, change: 0.00014 },

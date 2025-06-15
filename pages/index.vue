@@ -33,10 +33,7 @@ import TradingPlatformSection from "~/pages/landing/sections/TradingPlatformSect
 import LatestUpdatesSection from "~/pages/landing/sections/LatestUpdatesSection.vue";
 import CookieModal from "~/components/block/modals/CookieModal.vue";
 
-import UiQRCode from "~/components/ui/UiQRCode.vue";
-
 definePageMeta({
-  // middleware: ["not-auth-client"],
   layout: "main",
 });
 
