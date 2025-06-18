@@ -2,14 +2,13 @@
   <div class="panel-search">
     <UiInput
       class="panel-search__input"
-      :placeholder="
-        t('admin.clients.components.clients-panel-search.placeholder')
-      "
-      @input="handleInputSearch"
+      :placeholder="t('admin.clients.components.clients-panel-search.placeholder')"
       :borderNone="true"
+      :borderForSearch="true"
       :paddingNone="true"
       :isLoading="isLoadingSearch"
       :value="searchFilter"
+      @input="handleInputSearch"
     >
       <template #icon-left>
         <UiIconSearch />
@@ -40,13 +39,13 @@ const handleInputSearch = (event) => emit("input", event);
 
 <style lang="scss" scoped>
 .panel-search {
-  border: none;
-  border-radius: 0;
-  border-top: 1px solid var(--color-secondary);
-  margin-bottom: 0;
+  border: 1px solid var(--color-secondary);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  width: 400px;
 
-  &__input {
-    border: none;
+  & .input {
+      border: none;
   }
 }
 </style>

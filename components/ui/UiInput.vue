@@ -6,12 +6,13 @@
 
     <input
         :class="{
-        border: !props.borderNone,
-        padding: !props.paddingNone,
-        'is-invalid': props.isDirty && props.isInvalid,
-        'is-valid': props.isDirty && !props.isInvalid,
-        disabled: props.disabled
-      }"
+          border: !props.borderNone,
+          'border-search': props.borderForSearch,
+          padding: !props.paddingNone,
+          'is-invalid': props.isDirty && props.isInvalid,
+          'is-valid': props.isDirty && !props.isInvalid,
+          disabled: props.disabled
+        }"
         :type="typeInput"
         :placeholder="props.placeholder"
         :value="props.value"
@@ -57,6 +58,7 @@ const props = defineProps({
   isInvalid: {type: Boolean, default: false},
   isLoading: {type: Boolean, default: false},
   borderNone: {type: Boolean, default: false},
+  borderForSearch: {type: Boolean, default: false},
   paddingNone: {type: Boolean, default: false},
   disabled: {type: Boolean, default: false},
 })
@@ -98,10 +100,20 @@ function onBlur(e: Event) {
 input {
   width: 100%;
   height: var(--ui-input--height);
+  border: none;
   outline: none;
   background-color: var(--ui-background);
-  border: 1px solid var(--color-stroke-ui-dark);
   color: var(--color-ui-text);
+}
+
+.border {
+  border: 1px solid var(--color-stroke-ui-dark);
+}
+
+.border-search {
+  border-radius: 0 10px 10px 0;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .input {

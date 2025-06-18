@@ -9,7 +9,7 @@ export const validatorUsdtErcDataForm: any = useValidation(formData, {
 
 export const validateUsdtErcDataForm = (doSendFormCallback: any): void =>
     validatorUsdtErcDataForm.doValidate() && doSendFormCallback();
-export const resetValidationUserDataForm = (): void =>
+export const resetValidationUsdtErcDataForm = (): void =>
     validatorUsdtErcDataForm.clearFieldsErrors() && resetFormData();
 
 export const resetFormData = (): void => {

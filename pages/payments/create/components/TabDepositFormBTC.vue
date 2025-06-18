@@ -45,8 +45,11 @@
 </template>
 
 <script lang="ts" setup>
+import {onMounted} from "vue";
 import {formData} from "~/pages/payments/create/composables/TabDepositFormBTC";
 import {
+  resetFormData,
+  resetValidationBTCDataForm,
   validateBTCDataForm,
   validatorBTCDataForm
 } from "~/pages/payments/create/composables/TabDepositFormBTC/validation";
@@ -60,6 +63,11 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 const handleSubmit = () => {
   console.log('BTC');
 }
+
+onMounted(() => {
+  resetFormData();
+  resetValidationBTCDataForm();
+})
 </script>
 
 <style lang="scss" scoped>

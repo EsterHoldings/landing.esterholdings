@@ -1,7 +1,7 @@
 <template>
-  <PanelDefault :title="t('admin.clients.components.clients-panel.title')">
+  <PanelDefault class="clients-wrapper">
     <template #title-extra>
-      <div class="add-btn" @click="handleClickAddRole">+</div>
+<!--      <div class="add-btn" @click="handleClickAddRole">+</div>-->
     </template>
 
     <ClientsPanelSearch
@@ -119,6 +119,13 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+
+.clients {
+  &-wrapper {
+    padding: 20px;
+  }
+}
+
 .add-btn {
   background-color: var(--color-secondary);
   height: 30px;

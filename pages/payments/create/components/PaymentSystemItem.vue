@@ -34,9 +34,10 @@ const handleSelect = () => emit('select');
 .payment-system-item {
   padding: 20px;
   border-radius: 10px;
-  min-height: 160px;
+  height: 160px;
   width: 100%;
   border: 1px solid var(--color-stroke-ui-dark);
+  font-size: 12px;
 
   &.active {
     background-color: var(--ui-background-secondary);

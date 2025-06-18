@@ -34,7 +34,8 @@
         />
       </UiFormControl>
 
-      <UiButtonDefault state="info--outline" @click="validateUsdtErcDataForm(handleSubmit)">Создать депозит</UiButtonDefault>
+      <UiButtonDefault state="info--outline" @click="validateUsdtErcDataForm(handleSubmit)">Создать депозит
+      </UiButtonDefault>
     </div>
   </div>
 </template>
@@ -42,6 +43,8 @@
 <script lang="ts" setup>
 import {formData} from "~/pages/payments/create/composables/TabDepositFormUsdtErc20";
 import {
+  resetFormData,
+  resetValidationUsdtErcDataForm,
   validateUsdtErcDataForm,
   validatorUsdtErcDataForm
 } from "~/pages/payments/create/composables/TabDepositFormUsdtErc20/validation";
@@ -51,10 +54,16 @@ import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";
 import UiTextarea from "~/components/ui/UiTextarea.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import {onMounted} from "vue";
 
 const handleSubmit = () => {
   console.log('USDT ERC-20');
 }
+
+onMounted(() => {
+  resetFormData();
+  resetValidationUsdtErcDataForm();
+})
 </script>
 
 <style lang="scss" scoped>

@@ -9,7 +9,7 @@ export const validatorBTCDataForm: any = useValidation(formData, {
 
 export const validateBTCDataForm = (doSendFormCallback: any): void =>
     validatorBTCDataForm.doValidate() && doSendFormCallback();
-export const resetValidationUserDataForm = (): void =>
+export const resetValidationBTCDataForm = (): void =>
     validatorBTCDataForm.clearFieldsErrors() && resetFormData();
 
 export const resetFormData = (): void => {

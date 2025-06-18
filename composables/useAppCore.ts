@@ -1,16 +1,17 @@
+import AccountsModule from "~/composables/core/modules/accounts/accounts.module";
 import AdminAuthModule from "~/composables/core/modules/adminAuth/adminAuth.module";
 import AdminsModule from "~/composables/core/modules/admins/admins.module";
-import AccountsModule from "~/composables/core/modules/accounts/accounts.module";
 import AuthModule from "~/composables/core/modules/clients/auth.module"; // TODO :: Fix it
-import ItemsModule from "~/composables/core/modules/items/items.module";
-import RolesModule from "~/composables/core/modules/roles/roles.module";
-import PermissionsModule from "~/composables/core/modules/permissions/permissions.module";
-import UsersModule from "~/composables/core/modules/users/users.module";
-import HelperModule from "~/composables/core/modules/helper/helper.module";
-import PasswordModule from "~/composables/core/modules/password/password.module";
-import S3Module from "~/composables/core/modules/s3/s3.module";
-import PaymentsModule from "~/composables/core/modules/payments/payments.module";
 import DocumentsModule from "~/composables/core/modules/documents/documents.module";
+import HelperModule from "~/composables/core/modules/helper/helper.module";
+import ItemsModule from "~/composables/core/modules/items/items.module";
+import PasswordModule from "~/composables/core/modules/password/password.module";
+import PaymentsModule from "~/composables/core/modules/payments/payments.module";
+import PermissionsModule from "~/composables/core/modules/permissions/permissions.module";
+import RolesModule from "~/composables/core/modules/roles/roles.module";
+import S3Module from "~/composables/core/modules/s3/s3.module";
+import UsersModule from "~/composables/core/modules/users/users.module";
+import PaymentSystemsModule from "~/composables/core/modules/paymentSystems/paymentSystems.module";
 
 export interface ICoreModules {
     adminAuth : AdminAuthModule;
@@ -22,6 +23,7 @@ export interface ICoreModules {
     items: ItemsModule;
     roles: RolesModule;
     payments: PaymentsModule;
+    paymentSystems: PaymentSystemsModule;
     permissions: PermissionsModule;
     users: UsersModule;
     helper: HelperModule;
@@ -41,6 +43,7 @@ export const useAppCore = (): ICoreModules => {
         roles: new RolesModule(),
         permissions: new PermissionsModule(),
         payments: new PaymentsModule(),
+        paymentSystems: new PaymentSystemsModule(),
         users: new UsersModule(),
         helper: new HelperModule(),
         password: new PasswordModule(),
