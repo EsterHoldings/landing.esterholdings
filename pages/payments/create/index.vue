@@ -4,7 +4,6 @@
       <UiTextH4 class="payment-create__title">Створити новий платіж</UiTextH4>
       <div class="payment-create__content">
 
-        <!-- Ліва частина: вибір способу -->
         <PanelDefault class="payment-create__content__left">
           <UiTextH5 class="payment-create__content__left_title">
             # Вибір платіжного способу
@@ -26,11 +25,7 @@
           />
         </PanelDefault>
 
-        <!-- Права частина: форма -->
         <PanelDefault class="payment-create__content__right">
-          <!-- для відладки -->
-          <!-- <pre>{{ paymentSystems }}</pre> -->
-
           <component :is="activePaymentSystem.componentForm" />
         </PanelDefault>
 

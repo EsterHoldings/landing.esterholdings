@@ -244,8 +244,8 @@ const onIconAnimationEnd = () => {
   spinIcon.value = false;
 };
 
-const handleInputSearch = async (event) => {
-  search.value = event.target.value;
+const handleInputSearch = async (value) => {
+  search.value = value;
   currentPage.value = 1;
   await loadData();
 };

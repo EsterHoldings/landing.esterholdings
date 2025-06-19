@@ -13,6 +13,8 @@ import S3Module from "~/composables/core/modules/s3/s3.module";
 import UsersModule from "~/composables/core/modules/users/users.module";
 import PaymentSystemsModule from "~/composables/core/modules/paymentSystems/paymentSystems.module";
 
+import AdminClientsModule from "~/composables/core/modules/adminModules/clients/clients.module";
+
 export interface ICoreModules {
     adminAuth : AdminAuthModule;
     admins : AdminsModule;
@@ -29,25 +31,33 @@ export interface ICoreModules {
     helper: HelperModule;
     password: PasswordModule;
     s3: S3Module;
+
+    adminModules: {
+        clients: AdminClientsModule,
+    }
 }
 
 export const useAppCore = (): ICoreModules => {
     return {
-        adminAuth: new AdminAuthModule(),
-        admins: new AdminsModule(),
+        adminAuth: new AdminAuthModule(), // TODO :: Move to adminModules
+        admins: new AdminsModule(), // TODO :: Move to adminModules
         accounts: new AccountsModule(),
         auth: new AuthModule(),
-        clients: new AuthModule(), // TODO :: Fix
+        clients: new AuthModule(), // TODO :: Fix (Or remove)
         documents: new DocumentsModule(),
         items: new ItemsModule(),
-        roles: new RolesModule(),
-        permissions: new PermissionsModule(),
+        roles: new RolesModule(), // TODO :: Move to adminModules
+        permissions: new PermissionsModule(), // TODO :: Move to adminModules
         payments: new PaymentsModule(),
         paymentSystems: new PaymentSystemsModule(),
-        users: new UsersModule(),
+        users: new UsersModule(), // TODO :: Move to adminModules or remove
         helper: new HelperModule(),
         password: new PasswordModule(),
         s3: new S3Module(),
+
+        adminModules: {
+            clients: new AdminClientsModule(),
+        },
     };
 };
 

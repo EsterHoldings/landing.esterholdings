@@ -7,7 +7,6 @@
     <input
         :class="{
           border: !props.borderNone,
-          'border-search': props.borderForSearch,
           padding: !props.paddingNone,
           'is-invalid': props.isDirty && props.isInvalid,
           'is-valid': props.isDirty && !props.isInvalid,
@@ -85,9 +84,6 @@ function onFocus(e: Event) {
 
 function onInput(e: Event) {
   const val = (e.target as HTMLInputElement).value
-
-  console.log('ASJDASIDUASIUDASD', val);
-
   emit('input', val)
 }
 
@@ -104,16 +100,11 @@ input {
   outline: none;
   background-color: var(--ui-background);
   color: var(--color-ui-text);
+  padding: 0 10px;
 }
 
 .border {
   border: 1px solid var(--color-stroke-ui-dark);
-}
-
-.border-search {
-  border-radius: 0 10px 10px 0;
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 .input {
@@ -142,6 +133,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent;
 }
 
 .input > .padding {

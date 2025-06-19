@@ -142,10 +142,10 @@ const handleChangePage = async (value: number) => {
   await loadData();
 };
 
-const handleInputSearch = debounce(async (event: any) => {
+const handleInputSearch = debounce(async (value: any) => {
   try {
     isLoadingSearch.value = true;
-    searchFilter.value = event.target.value;
+    searchFilter.value = value;
     await loadData(true);
   } finally {
     isLoadingSearch.value = false;

@@ -1,6 +1,6 @@
-import useValidation from "../../../../../composables/useValidation";
+import useValidation from "~/composables/useValidation";
 
-import { formData } from "./index";
+import { formData } from ".";
 
 export const validatorRoleForm: any = useValidation(formData, {
     name: ["required", "min:3", "max:20"],
