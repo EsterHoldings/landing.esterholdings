@@ -3,14 +3,15 @@
     <div v-if="slots['icon-left']" class="input-icon--left">
       <slot name="icon-left"/>
     </div>
+
     <input
         :class="{
-        border: !borderNone,
-        padding: !paddingNone,
-        'is-invalid': isDirty && isInvalid,
-        'is-valid': isDirty && !isInvalid,
-        disabled: props.disabled,
-      }"
+          border: !props.borderNone,
+          padding: !props.paddingNone,
+          'is-invalid': props.isDirty && props.isInvalid,
+          'is-valid': props.isDirty && !props.isInvalid,
+          disabled: props.disabled
+        }"
         :type="typeInput"
         :placeholder="props.placeholder"
         :value="props.value"
@@ -18,9 +19,11 @@
         @focus="onFocus"
         @input="onInput"
         @blur="onBlur"
-        readonly
-        onfocus="this.removeAttribute('readonly');"
     />
+
+    <div v-if="props.isLoading" class="is-loading">
+      <UiIconSpinnerDefault/>
+    </div>
 
     <transition name="fade">
       <UiIconEye
@@ -45,160 +48,120 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed} from "vue";
-import {useSlots} from "vue";
-import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
-import UiIconEye from "~/components/ui/UiIconEye.vue";
-import UiIconEyeClose from "~/components/ui/UiIconEyeClose.vue";
+import {useSlots, computed, ref} from 'vue'
+import UiIconSpinnerDefault from '~/components/ui/UiIconSpinnerDefault.vue'
+import UiIconEye from '~/components/ui/UiIconEye.vue'
+import UiIconEyeClose from '~/components/ui/UiIconEyeClose.vue'
 
 const props = defineProps({
-  modelValue: {
-    type: [String, Boolean, Number],
-    default: "",
-  },
-  type: {
-    type: String,
-    default: "text",
-  },
-  placeholder: {
-    type: String,
-    default: "",
-  },
-  value: {
-    type: String,
-    default: "",
-  },
-  // Deperecated
-  errorObject: {
-    type: Object,
-    default: {},
-  },
-  isDirty: {
-    type: Boolean,
-    default: false,
-  },
-  isInvalid: {
-    type: Boolean,
-    default: false,
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-  borderNone: {
-    type: Boolean,
-    default: false,
-  },
-  paddingNone: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-});
+  value: {type: String, default: ''},
+  type: {type: String, default: 'text'},
+  placeholder: {type: String, default: ''},
+  isDirty: {type: Boolean, default: false},
+  isInvalid: {type: Boolean, default: false},
+  isLoading: {type: Boolean, default: false},
+  borderNone: {type: Boolean, default: false},
+  borderForSearch: {type: Boolean, default: false},
+  paddingNone: {type: Boolean, default: false},
+  disabled: {type: Boolean, default: false},
+})
 
-const emit = defineEmits(["focus", "input", "blur"]);
+const emit = defineEmits(['input', 'focus', 'blur'])
 
-const slots = useSlots();
+const slots = useSlots()
 
-const isPasswordVisible = ref(false);
+const isPasswordVisible = ref(false)
+const togglePasswordVisibility = () => {
+  isPasswordVisible.value = !isPasswordVisible.value
+}
 
 const typeInput = computed(() => {
-  if (props.type === "password") {
-    return isPasswordVisible.value ? "text" : "password";
+  if (props.type === 'password') {
+    return isPasswordVisible.value ? 'text' : 'password'
   }
-  return props.type;
-});
+  return props.type
+})
 
-const onFocus = (event: any): void => emit("focus", event);
-const onInput = (event: any): void => emit("input", event);
-const onBlur = (event: any): void => emit("blur", event);
+function onFocus(e: Event) {
+  emit('focus', e)
+}
 
-const togglePasswordVisibility = () => {
-  isPasswordVisible.value = !isPasswordVisible.value;
-};
+function onInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value
+  emit('input', val)
+}
+
+function onBlur(e: Event) {
+  emit('blur', e)
+}
 </script>
 
 <style lang="scss" scoped>
 input {
   width: 100%;
   height: var(--ui-input--height);
+  border: none;
   outline: none;
   background-color: var(--ui-background);
-  border: 1px solid var(--color-stroke-ui-dark);
   color: var(--color-ui-text);
+  padding: 0 10px;
+}
+
+.border {
+  border: 1px solid var(--color-stroke-ui-dark);
 }
 
 .input {
   position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  height: var(--ui-input--height);
-  margin: 0;
-  background-color: transparent;
-  outline: none;
-  // TODO :: Add disable color
-  color: var(--ui-text-main);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 17px;
-  letter-spacing: 0;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: var(--ui-input--height);
+  background: transparent;
+  color: var(--ui-text-main);
+  font-size: 14px;
+  line-height: 17px;
+}
 
-  .is-loading {
-    height: 10px;
-    width: 10px;
-    margin-right: 10px;
+.input .is-loading {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.input-icon--left {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
 
-  &-icon--left {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.input > .padding {
+  padding: 15px;
+}
 
-    height: 40px;
-    width: 40px;
-  }
+.input > .border {
+  border-radius: 10px;
+}
 
-  & > .padding {
-    padding: 15px;
-  }
+.input::placeholder {
+  color: var(--color-text-muted);
+}
 
-  & > .border {
-    border: 1px solid var(--color-stroke-ui-dark);
-    //border-radius: var(--ui-input--border-radius);
-    border-radius: 10px;
-  }
+.input .is-invalid {
+  border-color: red;
+}
 
-  &::placeholder {
-    // TODO :: Add disable color
-    color: var(--color-text-muted);
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
-    letter-spacing: 0em;
-  }
+.input .is-valid {
+  border-color: green;
+}
 
-  .is-invalid {
-    border-color: red;
-  }
-
-  .is-valid {
-    border-color: green;
-  }
-
-  .disabled {
-    background-color: #e5e5e5;
-  }
+.input .disabled {
+  background-color: #e5e5e5;
 }
 
 .password-eye {

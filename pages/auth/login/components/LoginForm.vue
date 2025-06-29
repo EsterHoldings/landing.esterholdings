@@ -42,6 +42,22 @@
       />
     </UiFormControl>
 
+    <UiFormControl
+        class="login-form__field"
+        label="2Fa code"
+        :errors="twoFaErrors"
+        v-if="twoFaEnabled"
+    >
+      <UiInput
+          type="text"
+          placeholder="********"
+          :value="props.formData.twoFaCode"
+          :isDirty="twoFaErrors.length > 0"
+          :isInvalid="twoFaErrors.length > 0"
+          @input="handleTwoFaCodeInput"
+      />
+    </UiFormControl>
+
     <UiButtonDefault
         type="submit"
         state="primary"
@@ -71,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import {navigateTo} from "nuxt/app";
 import {useAuthStore} from "~/stores/authStore";
 import {useAppCore} from "~/composables/useAppCore";
@@ -92,6 +108,7 @@ import {
   validateLoginForm,
   resetValidationLoginForm,
 } from "@/pages/auth/login/composables/validation";
+import {formData} from "~/pages/auth/login/composables";
 import UiButtonPrimary from "~/components/ui/UiButtonPrimary.vue";
 
 const props = defineProps({
@@ -101,33 +118,44 @@ const props = defineProps({
   },
 });
 
-const {$recaptcha} = useNuxtApp()
+// const {$recaptcha} = useNuxtApp()
 const isRecaptchaValid = ref(false)
 const isLoading = ref(false);
+const twoFaEnabled = ref(false);
 const appCore = useAppCore();
 const toast = useToast();
+const emit = defineEmits(['input2Fa'])
+
+let twoFaErrors = reactive([])
+
+const handleTwoFaCodeInput = (value: string) => {
+  emit('input2Fa', value);
+}
 
 const doSendForm = async () => {
   try {
     isLoading.value = true;
     const authStore = useAuthStore();
-
     const response = await appCore.auth.doLogin(props.formData);
-
-    const accessToken = response.data.data.access_token;
-    const refreshToken = response.data.data.refresh_token;
-
-    localStorage.setItem("user_access_token", accessToken);
-    localStorage.setItem("user_refresh_token", refreshToken);
-
+    const accessToken = response.data.access_token;
     authStore.setAccessToken(accessToken);
-    authStore.setRefreshToken(refreshToken);
-
+    toast.success("Successfully!");
     navigateTo("/dashboard");
-    console.log("DO REDIRECT TO DASHBOARD");
   } catch (e: any) {
-    console.log("LoginForm -> doSendForm -> catch", e.message);
-    toast.error("Invalid credentials");
+    if (e.status === 401) {
+      if (e.response.data?.data?.two_fa_is_required) {
+        if (!twoFaEnabled.value) {
+          toast.info(e.response.data.message)
+          twoFaEnabled.value = true;
+        } else {
+          twoFaErrors = [e.response.data.message]
+        }
+      } else {
+        toast.error("Invalid credentials");
+      }
+    } else {
+      toast.error("Invalid credentials");
+    }
   } finally {
     resetValidationLoginForm();
     setTimeout(() => {

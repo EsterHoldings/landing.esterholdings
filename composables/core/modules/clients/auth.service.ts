@@ -27,6 +27,14 @@ export class AuthService {
   async postSocialLogin(data: Object): Promise<any> {
     return await this.useApi.post("/auth/social", data);
   }
+
+  async checkIsAuth(): Promise<any> {
+    return await this.useApi.get("/auth/isAuth");
+  }
+
+  async refresh(): Promise<any> {
+    return await this.useApi.post("/auth/refresh");
+  }
 }
 
 export default AuthService;

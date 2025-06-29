@@ -36,7 +36,7 @@ export default defineNuxtConfig({
                 file: "ru.json",
             },
         ],
-
+        fallbackLocale: 'en',
         defaultLocale: "en",
         experimental: {
             jsTsFormatResource: false,
@@ -48,6 +48,13 @@ export default defineNuxtConfig({
 
     vite: {
         server: {
+            proxy: {
+                "/api/": {
+                    target: "http://localhost:8000/",
+                    changeOrigin: true,
+                    secure: false,
+                },
+            },
             watch: {
                 usePolling: true,
             },
@@ -72,6 +79,7 @@ export default defineNuxtConfig({
         "/": {ssr: true} as any,
     },
 
+
     app: {
         head: {
             script: [
@@ -87,5 +95,24 @@ export default defineNuxtConfig({
                 // },
             ],
         },
+
     },
+  },
+
+    nitro: {
+        devProxy: {
+            '/api/': {
+                target: 'http://localhost:8000/',
+                changeOrigin: true,
+                secure: false
+            }
+        }
+    },
+
+    runtimeConfig: {
+        public: {
+            // apiUrl: process.env.NUXT_PUBLIC_API_URL,
+            apiUrl: "https://esterholdings.website/api/",
+        }
+    }
 });

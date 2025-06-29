@@ -30,7 +30,7 @@ export class AuthModule implements AuthModuleInterface {
   }
 
   doRegistration(data: any): Promise<any> {
-    return undefined;
+    return this.authService.registration(data);
   }
   async getAuthUser() {
     return await this.authService.authUser();
@@ -38,6 +38,14 @@ export class AuthModule implements AuthModuleInterface {
 
   doSocialLogin(data: any): Promise<any> {
     return this.authService.postSocialLogin(data);
+  }
+
+  async doCheckIsAuth(): Promise<any> {
+    return await this.authService.checkIsAuth()
+  }
+
+  async doRefresh(): Promise<any> {
+    return await this.authService.refresh()
   }
 }
 

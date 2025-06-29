@@ -143,6 +143,12 @@
       <GoogleLogin/>
       <FacebookLogin/>
       <LinkedInLogin/>
+      <GoogleLogin />
+      <FacebookLogin />
+
+      <div class="registration-form__social-link">
+        <UiIconGoogle @click="loginWithGoogle" />
+      </div>
     </div>
 
   </div>
@@ -156,6 +162,8 @@ import {
   validatorRegistrationForm,
   resetValidationRegistrationForm,
 } from "../composables/validation";
+import {useToast} from "vue-toastification";
+import {navigateTo} from "nuxt/app";
 import {validatorLoginForm} from "~/pages/auth/login/composables/validation";
 
 import {useAppCore} from "~/composables/useAppCore";
@@ -163,6 +171,7 @@ import UiFormControl from "~/components/ui/UiFormControl.vue";
 import UiInput from "~/components/ui/UiInput.vue";
 import UiButtonPrimary from "~/components/ui/UiButtonPrimary.vue";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
+import UiIconGoogle from "~/components/ui/UiIconGoogleOauth.vue";
 
 import GoogleLogin from "./GoogleLogin.vue";
 import FacebookLogin from "./FacebookLogin.vue";
@@ -179,6 +188,7 @@ const isLoading = ref(false);
 const isAgreeTerms = ref(false);
 const isAgreePrivacy = ref(false);
 const appCore = useAppCore();
+const toast = useToast();
 
 const isFormAgreementValid = computed(() => {
   return isAgreeTerms.value && isAgreePrivacy.value;
@@ -189,11 +199,16 @@ const doSendForm = async (): Promise<void> => {
   isLoading.value = true;
 
   try {
-    await appCore.auth.doRegistration(props.formData);
-    useRouter().push({path: "/auth/login"});
+    await appCore.auth.doRegistration({
+      email: props.formData.email,
+      password: props.formData.password,
+      password_confirmation: props.formData.confirmPassword,
+    });
+    toast.success("Successfully registration!");
+    navigateTo("/auth/login")
   } catch (e: any) {
     const serverValidationErrors = e?.response?.data?.description;
-
+    console.log("CATCH: ", serverValidationErrors);
   } finally {
     resetValidationRegistrationForm();
     isLoading.value = false;

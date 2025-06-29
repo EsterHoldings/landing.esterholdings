@@ -3,9 +3,8 @@
     <div class="side-bar-cabinet__top">
       <div class="side-bar-cabinet__top__logo">
         <NuxtLink to="/"
-        >
-          <UiIconLogo
-              :class="{
+          ><UiIconLogo
+            :class="{
               'svg-invert': isThemeLight,
             }"
           />
@@ -13,18 +12,18 @@
       </div>
 
       <div class="side-bar-cabinet__actions">
-        <LanguageSwitcher isSidebar :isInvert="isThemeLight" class="icon"/>
+        <LanguageSwitcher isSidebar :isInvert="isThemeLight" class="icon" />
 
         <transition name="fade" mode="out-in">
           <span
-              :key="themeStore.currentTheme"
-              @click="themeStore.toggleTheme()"
-              class="icon"
+            :key="themeStore.currentTheme"
+            @click="themeStore.toggleTheme()"
+            class="icon"
           >
-            <UiIconMoon v-if="themeStore.currentTheme === 'dark'"/>
+            <UiIconMoon v-if="themeStore.currentTheme === 'dark'" />
             <UiIconSun
-                v-else
-                :class="{
+              v-else
+              :class="{
                 'svg-invert': isThemeLight,
               }"
             />
@@ -33,7 +32,7 @@
       </div>
       <div class="side-bar-cabinet__top__profile">
         <UiImageCircle
-            :class="{
+          :class="{
             'svg-invert': isThemeLight,
           }"
         />
@@ -41,13 +40,13 @@
     </div>
 
     <div class="side-bar-cabinet__content">
-      <TheHeaderSideBarMenu/>
+      <TheHeaderSideBarMenu />
     </div>
 
     <div class="side-bar-cabinet__logout">
       <UiIconLogout
-          @click="handleClickLogout"
-          :class="{
+        @click="handleClickLogout"
+        :class="{
           'svg-invert': isThemeLight,
         }"
       />
@@ -56,11 +55,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from "vue";
-import {navigateTo} from "nuxt/app";
-import {useAuthStore} from "~/stores/authStore";
-import {useRoute} from "vue-router";
-import {useThemeStore} from "~/stores/themeStore.js";
+import { computed } from "vue";
+import { navigateTo } from "nuxt/app";
+import { useAuthStore } from "~/stores/authStore";
+import { useRoute } from "vue-router";
+import { useThemeStore } from "~/stores/themeStore.js";
 import {useLocalePath} from "~/.nuxt/imports";
 
 import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";

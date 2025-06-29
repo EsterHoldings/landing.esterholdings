@@ -18,37 +18,29 @@
                 </div>
               </div>
 
-              <UiButtonDefault state="primary">{{
-                t("cabinet.dashboard.accountVerification.profileButton")
-              }}</UiButtonDefault>
+              <NuxtLink to="/profile">
+                <UiButtonDefault state="primary">{{ t("cabinet.dashboard.accountVerification.profileButton") }}</UiButtonDefault>
+              </NuxtLink>
             </div>
             <ul class="card__list">
               <li>
                 <UiIconFailed />
-                <span>{{
-                  t("cabinet.dashboard.accountVerification.addressFailed")
-                }}</span>
+                <span>{{t("cabinet.dashboard.accountVerification.addressFailed") }}</span>
               </li>
 
               <li>
                 <UiIconSuccess />
-                <span>{{
-                  t("cabinet.dashboard.accountVerification.documentVerified")
-                }}</span>
+                <span>{{t("cabinet.dashboard.accountVerification.documentVerified") }}</span>
               </li>
 
               <li>
                 <UiIconWarning />
-                <span>{{
-                  t("cabinet.dashboard.accountVerification.paymentInProgress")
-                }}</span>
+                <span>{{t("cabinet.dashboard.accountVerification.paymentInProgress") }}</span>
               </li>
 
               <li>
                 <UiIconWarning />
-                <span>{{
-                  t("cabinet.dashboard.accountVerification.profileInProgress")
-                }}</span>
+                <span>{{t("cabinet.dashboard.accountVerification.profileInProgress") }}</span>
               </li>
             </ul>
           </div>
@@ -58,13 +50,13 @@
         <PanelDefault>
           <div class="card">
             <div class="card__actions">
-              <UiButtonDefault state="success">{{
-                t("cabinet.dashboard.actions.newDeposit")
-              }}</UiButtonDefault>
+              <NuxtLink to="/payments/create">
+                <UiButtonDefault state="success">{{t("cabinet.dashboard.actions.newDeposit")}}</UiButtonDefault>
+              </NuxtLink>
 
-              <UiButtonDefault state="primary">{{
-                t("cabinet.dashboard.actions.newWithdrawal")
-              }}</UiButtonDefault>
+              <NuxtLink to="/payments/create">
+                <UiButtonDefault state="primary">{{t("cabinet.dashboard.actions.newWithdrawal") }}</UiButtonDefault>
+              </NuxtLink>
             </div>
 
             <div class="chart-placeholder">
@@ -82,9 +74,9 @@
               </div>
 
               <div class="card__options">
-                <UiButtonDefault state="primary">{{
-                  t("cabinet.dashboard.mt4.openNewAccount")
-                }}</UiButtonDefault>
+                <NuxtLink to="/accounts">
+                  <UiButtonDefault state="primary">{{t("cabinet.dashboard.mt4.openNewAccount") }}</UiButtonDefault>
+                </NuxtLink>
               </div>
             </div>
             <table class="table">
@@ -103,9 +95,7 @@
                   <td>Real</td>
                   <td>$5,000.00</td>
                   <td>
-                    <span class="status status--active">{{
-                      t("cabinet.dashboard.mt4.table.active")
-                    }}</span>
+                    <span class="status status--active">{{t("cabinet.dashboard.mt4.table.active") }}</span>
                   </td>
                 </tr>
                 <tr>
@@ -113,9 +103,7 @@
                   <td>Real</td>
                   <td>$5,000.00</td>
                   <td>
-                    <span class="status status--active">{{
-                      t("cabinet.dashboard.mt4.table.active")
-                    }}</span>
+                    <span class="status status--active">{{t("cabinet.dashboard.mt4.table.active") }}</span>
                   </td>
                 </tr>
                 <tr>
@@ -123,9 +111,7 @@
                   <td>Demo</td>
                   <td>$10,000.00</td>
                   <td>
-                    <span class="status status--inactive">{{
-                      t("cabinet.dashboard.mt4.table.inactive")
-                    }}</span>
+                    <span class="status status--inactive">{{ t("cabinet.dashboard.mt4.table.inactive") }}</span>
                   </td>
                 </tr>
               </tbody>
@@ -145,7 +131,7 @@ import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconFailed from "~/components/ui/UiIconFailed.vue";
 import UiIconWarning from "~/components/ui/UiIconWarning.vue";
 
-definePageMeta({ layout: "cabinet", middleware: ["auth-client"] });
+definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
 
 import { useI18n } from "vue-i18n";
 import UiContainer from "~/components/ui/UiContainer.vue";
@@ -157,6 +143,7 @@ const { locale, t } = useI18n({ useScope: "global" });
 <style lang="scss" scoped>
 .dashboard {
   color: #ffffff;
+  padding-bottom: 40px;
 
   &__title {
     margin-bottom: 24px;

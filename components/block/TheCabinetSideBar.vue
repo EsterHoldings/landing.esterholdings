@@ -71,18 +71,16 @@ import {useRoute} from "vue-router";
 import {navigateTo} from "nuxt/app";
 import {computed} from "vue";
 
-import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
 import TheCabinetSideBarMenu from "~/components/block/TheCabinetSideBarMenu.vue";
+import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 import UiIconLogout from "~/components/ui/UiIconLogout.vue";
 import UiIconMoon from "~/components/ui/UiIconMoon.vue";
 import UiIconSun from "~/components/ui/UiIconSun.vue";
 import UiIconUser from "~/components/ui/UiIconUser.vue";
-import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
 
-const themeStore = useThemeStore();
-const uiStore = useUiStore();
 const authStore = useAuthStore();
-const router = useRoute();
+const themeStore = useThemeStore();
 
 if (!authStore.user) {
   authStore.initAuth();
@@ -90,7 +88,6 @@ if (!authStore.user) {
 
 const handleClickLogout = () => {
   authStore.setAccessToken("");
-  authStore.setRefreshToken("");
   navigateTo("/auth/login");
 };
 
@@ -109,7 +106,7 @@ const isProfileRoute = computed(() => {
 <style lang="scss" scoped>
 .side-bar-cabinet {
   position: fixed;
-  color: white;
+  color: var(--ui-text-main);
   height: 100vh;
   width: 6.4rem;
   display: flex;
@@ -152,7 +149,7 @@ const isProfileRoute = computed(() => {
         justify-content: center;
         height: 62px;
         width: 62px;
-        border: 3px solid var(--ui-primary-main);
+        border: 3px solid var(--ui-text-main);
         border-radius: 25%;
 
         img {
@@ -163,7 +160,7 @@ const isProfileRoute = computed(() => {
         }
 
         &.active {
-          border-color: var(--ui-primary-accent);
+          border-color: var(--ui-primary-main);
         }
       }
 

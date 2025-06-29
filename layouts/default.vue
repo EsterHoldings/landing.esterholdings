@@ -1,8 +1,8 @@
 <template>
   <div class="container-fluid">
     <div class="page-wrapper">
-      <TheHeaderSideBar />
-      <UiImage class="bg-image" src="/space.gif" />
+      <TheHeaderSideBar/>
+      <UiImage class="bg-image" src="/space.gif"/>
       <Transition name="fade" mode="out-in">
         <div class="page-content">
           <div class="page" :key="route.fullPath">

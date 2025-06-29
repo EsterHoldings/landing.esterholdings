@@ -30,11 +30,7 @@ import { useI18n } from "vue-i18n";
 
 import { ref, computed } from "vue";
 
-import { useTabs } from "./composables/index";
 import UiTextH3 from "~/components/ui/UiTextH3.vue";
-import UiTextH5 from "~/components/ui/UiTextH5.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import UiIconArrowRight from "~/components/ui/UiIconArrowRight.vue";
 
 import UiContainer from "~/components/ui/UiContainer.vue";
 import TabsDefault from "~/components/block/tabs/TabsDefault.vue";
