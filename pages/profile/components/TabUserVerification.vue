@@ -14,11 +14,60 @@
         </div>
         <div class="user-verification__left__verification-list_wrapper">
           <ul class="user-verification__left__verification-list">
-            <li><UiIconFailed/><span>Email is not verified!</span></li>
-            <li><UiIconFailed/><span>{{ t("cabinet.dashboard.accountVerification.addressFailed") }}</span></li>
-            <li><UiIconSuccess/><span>{{ t("cabinet.dashboard.accountVerification.documentVerified") }}</span></li>
-            <li><UiIconWarning/><span>{{ t("cabinet.dashboard.accountVerification.paymentInProgress") }}</span></li>
-            <li><UiIconWarning/><span>{{ t("cabinet.dashboard.accountVerification.profileInProgress") }}</span></li>
+            <li>
+              <span>Email</span>
+              <UiIconFailed v-if="emailStatus === 'rejected'"/>
+              <UiIconWarning v-if="emailStatus === 'pending'"/>
+              <UiIconSuccess v-if="emailStatus === 'approved'"/>
+              <span v-if="emailStatus === 'rejected'">Отклонен!</span>
+              <span v-if="emailStatus === 'pending'">В обработке!</span>
+              <span v-if="emailStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
+            <li>
+              <span>Фото</span>
+              <UiIconFailed v-if="photoStatus === 'rejected'"/>
+              <UiIconWarning v-if="photoStatus === 'pending'"/>
+              <UiIconSuccess v-if="photoStatus === 'approved'"/>
+              <span v-if="photoStatus === 'rejected'">Отклонен!</span>
+              <span v-if="photoStatus === 'pending'">В обработке!</span>
+              <span v-if="photoStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
+            <li>
+              <span>Адрес</span>
+              <UiIconFailed v-if="addressStatus === 'rejected'"/>
+              <UiIconWarning v-if="addressStatus === 'pending'"/>
+              <UiIconSuccess v-if="addressStatus === 'approved'"/>
+              <span v-if="addressStatus === 'rejected'">Отклонен!</span>
+              <span v-if="addressStatus === 'pending'">В обработке!</span>
+              <span v-if="addressStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
+            <li>
+              <span>Документы</span>
+              <UiIconFailed v-if="documentsStatus === 'rejected'"/>
+              <UiIconWarning v-if="documentsStatus === 'pending'"/>
+              <UiIconSuccess v-if="documentsStatus === 'approved'"/>
+              <span v-if="documentsStatus === 'rejected'">Отклонен!</span>
+              <span v-if="documentsStatus === 'pending'">В обработке!</span>
+              <span v-if="documentsStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
+            <li>
+              <span>1-й Депозит</span>
+              <UiIconFailed v-if="depositStatus === 'rejected'"/>
+              <UiIconWarning v-if="depositStatus === 'pending'"/>
+              <UiIconSuccess v-if="depositStatus === 'approved'"/>
+              <span v-if="depositStatus === 'rejected'">Отклонен!</span>
+              <span v-if="depositStatus === 'pending'">В обработке!</span>
+              <span v-if="depositStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
+            <li>
+              <span>Профиль</span>
+              <UiIconFailed v-if="infoStatus === 'rejected'"/>
+              <UiIconWarning v-if="infoStatus === 'pending'"/>
+              <UiIconSuccess v-if="infoStatus === 'approved'"/>
+              <span v-if="infoStatus === 'rejected'">Отклонен!</span>
+              <span v-if="infoStatus === 'pending'">В обработке!</span>
+              <span v-if="infoStatus === 'approved'">Успешно подтвержден!</span>
+            </li>
           </ul>
           <div class="user-verification__left__verification-list--is-loading" v-if="isLoading">
             <UiIconSpinnerDefault />
@@ -69,15 +118,37 @@ import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconFailed from "~/components/ui/UiIconFailed.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import useAppCore from "~/composables/useAppCore";
+import {accountsData} from "~/pages/admin/accounts/composables";
 
 const {locale, t} = useI18n({useScope: "global"});
 
+const appCore = useAppCore();
 const isLoading = ref(false);
+
+let verificationRequestData = reactive({});
+
+const addressStatus = ref('pending');
+const documentsStatus = ref('pending');
+const depositStatus = ref('pending');
+const emailStatus = ref('pending');
+const infoStatus = ref('pending');
+const photoStatus = ref('pending');
 
 const loadVerificationData = async () => {
   isLoading.value = true;
+
+  const response = await appCore.verifications.get();
+  Object.assign(verificationRequestData, response.data.data);
+
+  addressStatus.value = verificationRequestData['address']['verification_status'];
+  emailStatus.value = verificationRequestData['email']['verification_status'];
+  photoStatus.value = verificationRequestData['photo']['verification_status'];
+  infoStatus.value = verificationRequestData['info']['verification_status'];
+  documentsStatus.value = verificationRequestData['documents']['verification_status'];
+  depositStatus.value = verificationRequestData['deposit']['verification_status'];
 
   setTimeout(() => {
     isLoading.value = false;
@@ -104,6 +175,16 @@ onMounted(async () => {
 
 .rejected {
   color: var(--color-danger)
+}
+
+@media (max-width: 560px) {
+  .user-verification__left__verification-list li { grid-template-columns: 80px 24px 1fr !important; }
+}
+
+@media (max-width: 991px) {
+  .user-verification__wrapper { flex-direction: column }
+  .user-verification__left { width: 100% !important; }
+  .user-verification__right { width: 100% !important; }
 }
 
 .user {
@@ -157,18 +238,24 @@ onMounted(async () => {
         }
 
         li {
-          height: 50px;
-          display: flex;
+          height: 60px;
+          display: grid;
           align-items: center;
+          grid-template-columns: 140px 24px 1fr;
           border-bottom: 1px solid var(--color-stroke-ui-dark);
+          gap: 10px;
 
           svg {
             margin-left: 10px;
           }
 
           span {
-            margin-left: 40px;
+            margin-left: 10px;
             margin-right: 10px;
+          }
+
+          &:last-child {
+            border-bottom: none;
           }
         }
       }

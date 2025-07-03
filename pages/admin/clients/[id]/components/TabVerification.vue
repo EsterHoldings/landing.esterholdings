@@ -19,15 +19,23 @@
 
             <li>
               <span>Email</span>
-              <UiIconFailed/>
-              <span>Email не подтвержден!</span>
+              <UiIconSuccess v-if="emailStatus === 'approved'"/>
+              <UiIconWarning v-if="emailStatus === 'pending'"/>
+              <UiIconFailed v-if="emailStatus === 'rejected'"/>
+              <span v-if="emailStatus === 'approved'">{{ 'Успешно верифицирован!' }}</span>
+              <span v-if="emailStatus === 'pending'">{{ 'Ожидает подтверждения!' }}</span>
+              <span v-if="emailStatus === 'rejected'">{{ 'Отклонено!' }}</span>
               <span class="spacer"></span>
             </li>
 
             <li>
               <span>Фото профиля</span>
-              <UiIconFailed/>
-              <span>Не загружено!</span>
+              <UiIconSuccess v-if="photoStatus === 'approved'"/>
+              <UiIconWarning v-if="photoStatus === 'pending'"/>
+              <UiIconFailed v-if="photoStatus === 'rejected'"/>
+              <span v-if="photoStatus === 'approved'">{{ 'Успешно верифицирован!' }}</span>
+              <span v-if="photoStatus === 'pending'">{{ 'Не загружено!' }}</span>
+              <span v-if="photoStatus === 'rejected'">{{ 'Отклонено!' }}</span>
               <span class="spacer"></span>
             </li>
 
@@ -40,6 +48,8 @@
               <span v-if="addressStatus === 'pending'">{{ 'Ожидает верификации!' }}</span>
               <span v-if="addressStatus === 'rejected'">{{ 'Отклонено!' }}</span>
               <VerificationActions
+                  :enable-comment="true"
+                  :comment="addressComment"
                   :status="addressStatus"
                   @update-status="handleVerificationAddress"
               />
@@ -53,6 +63,8 @@
               <span v-if="documentsStatus === 'pending'">{{ 'Ожидает верификации!' }}</span>
               <span v-if="documentsStatus === 'rejected'">{{ 'Отклонено!' }}</span>
               <VerificationActions
+                  :enable-comment="true"
+                  :comment="documentsComment"
                   :status="documentsStatus"
                   @update-status="handleVerificationDocuments"
               />
@@ -90,6 +102,8 @@
         <UiTextH5 class="user-verification__right__panel__title">
           <span># Profile info</span>
           <VerificationActions
+              :enable-comment="true"
+              :comment="infoComment"
               :status="infoStatus"
               @update-status="handleVerificationProfile"
           />
@@ -316,38 +330,42 @@ const handleRefreshDocuments = async () => {
 }
 
 const handleVerificationAddress = async (value: any) => {
+  isLoading.value = true;
   await appCore.adminModules.verificationRequests.put(props.clientId, {
     type: 'address',
-    updatedStatus: value
+    updatedStatus: {status : value.status, comment: value.comment}
   })
   toast.success('Address status updated!')
   await loadVerificationData();
 }
 
 const handleVerificationDocuments = async (value: any) => {
+  isLoading.value = true;
   await appCore.adminModules.verificationRequests.put(props.clientId, {
     type: 'documents',
-    updatedStatus: value
+    updatedStatus: {status : value.status, comment: value.comment}
   })
   toast.success('Address status updated!')
   await loadVerificationData();
 }
 
 const handleVerificationDocument = async (value: any, docId: string = '') => {
+  isLoading.value = true;
   await appCore.adminModules.verificationRequests.put(props.clientId, {
     docId: docId,
     type: 'document',
-    updatedStatus: value
+    updatedStatus: {status : value.status, comment: value.comment}
   })
   toast.success('Document status updated!')
   await loadVerificationData();
 }
 
 const handleVerificationProfile = async (value: any) => {
+  isLoading.value = true;
   await appCore.adminModules.verificationRequests.put(props.clientId, {
     documentId: '',
     type: 'info',
-    updatedStatus: value
+    updatedStatus: {status : value.status, comment: value.comment}
   })
   toast.success('Address status updated!')
   await loadVerificationData();
@@ -381,6 +399,20 @@ onMounted(async () => {
   color: var(--color-danger)
 }
 
+@media (max-width: 991px) {
+  .user-verification__wrapper {
+    flex-direction: column;
+  }
+
+  .user-verification__left {
+    width: 100% !important;
+  }
+
+  .user-verification__right {
+    width: 100% !important;
+  }
+}
+
 .user {
   &-verification {
     &__wrapper {
@@ -389,18 +421,6 @@ onMounted(async () => {
       gap: 20px;
 
       color: var(--ui-text-main);
-
-      @media (max-width: 991px) {
-        flex-direction: column;
-
-        .user-verification__left {
-          width: 100%;
-        }
-
-        .user-verification__right {
-          width: 100%;
-        }
-      }
     }
 
     &__left {
@@ -450,7 +470,7 @@ onMounted(async () => {
           display: grid;
           align-items: center;
           border-bottom: 1px solid var(--color-stroke-ui-dark);
-          grid-template-columns: 1fr 40px 1fr 100px;
+          grid-template-columns: 110px 60px 1fr 140px;
           padding: 10px 20px;
 
           &:last-child {

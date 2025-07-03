@@ -9,6 +9,7 @@
       'btn--primary': props.state === 'primary',
       'btn--warning': props.state === 'warning',
       'btn--success': props.state === 'success',
+      'btn--info--outline--small': props.state === 'info--outline--small',
       'btn--info--outline': props.state === 'info--outline',
       'btn--success--outline': props.state === 'success--outline',
       'btn--danger--outline': props.state === 'danger--outline',
@@ -124,6 +125,15 @@ const handleClick = (): void => {
       border: 1px solid var(--color-ui-primary);
       background-color: transparent;
       color: var(--color-ui-primary);
+
+      &--small {
+        border: 1px solid var(--color-stroke-ui-dark);
+        background-color: transparent;
+        height: 32px;
+        width: 32px;
+        border-radius: 8px;
+        padding: 0;
+      }
 
       &:hover {
         background: var(--color-ui-primary) !important;
