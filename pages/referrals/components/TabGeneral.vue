@@ -50,10 +50,8 @@
     </PanelDefault>
     <PanelDefault class="referrals__tab--general__wrapper">
       <div class="referrals__tab--general_history">
-        <UiTextH4 class="referrals__tab--general_history-title"
-        >History
-        </UiTextH4
-        >
+        <UiTextH4 class="referrals__tab--general_history-title">History
+        </UiTextH4>
 
         <UiTextH5
             v-for="(item, index) in history"
@@ -144,7 +142,7 @@ const copyReferral = async () => {
       padding: 10px 30px 10px 10px;
       display: inline-flex;
       align-items: center;
-      width: 100;
+      width: 100%;
       background: var(--ui-background-sidebar);
       border-radius: 10px;
 
@@ -169,12 +167,14 @@ const copyReferral = async () => {
   }
 
   &_levels {
-    width: 260px;
+    width: 100%;
     padding: 20px;
 
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
-    gap: 40px;
+
+    gap: 20px;
 
     &-title {
       color: var(--ui-text-main);
@@ -190,17 +190,23 @@ const copyReferral = async () => {
 
   &_history {
     padding: 20px;
-
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
-    gap: 30px;
+    gap: 10px;
 
     &-title {
       color: var(--ui-text-main);
     }
 
     &-item {
+      display: flex;
+      align-items: center;
       color: var(--ui-text-main);
+      font-size: 14px;
+      height: 40px;
+      padding: 5px;
+      border-bottom: 1px solid var(--color-dark);
     }
   }
 

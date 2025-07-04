@@ -30,6 +30,7 @@ import UiIconPayment from "~/components/ui/UiIconPayment.vue";
 import {useI18n} from "vue-i18n";
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconCheck from "~/components/ui/UiIconCheck.vue";
+import {useLocalePath} from "~/.nuxt/imports";
 
 const {locale, t} = useI18n({useScope: "global"});
 const localePath = useLocalePath();
@@ -50,7 +51,7 @@ const menuItems = computed(() => {
     },
     {
       title: 'Verifications requests',
-      to: localePath("/admin/clients"),
+      to: localePath("/admin/verifications"),
       icon: UiIconCheck,
       displayIfHasPermission: "view-verifications",
     },
