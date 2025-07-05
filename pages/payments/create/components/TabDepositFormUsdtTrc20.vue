@@ -71,6 +71,7 @@ import UiSelect from "~/components/ui/UiSelect.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiTextarea from "~/components/ui/UiTextarea.vue";
 import {useToast} from "vue-toastification";
+import {navigateTo} from "nuxt/app";
 
 interface ResponseDTO {
   success: Boolean;
@@ -111,6 +112,7 @@ const handleSubmit = async () => {
     const response:any = await appCore.deposit.get(formData);
     const redirectUrl = response.data.data.redirectUrl;
     window.open(redirectUrl, '_blank', 'noopener');
+    navigateTo("/payments");
   } catch (e) {
     toast.error('Oops =( We have some problems.')
   }
