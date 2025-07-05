@@ -109,12 +109,11 @@ const handleSubmit = async () => {
   try {
     formData.paymentSystemId = props.paymentSystem.id;
     const response:any = await appCore.deposit.get(formData);
-    console.log('RESPONSE', response.data);
+    const redirectUrl = response.data.data.redirectUrl;
+    window.open(redirectUrl, '_blank', 'noopener');
   } catch (e) {
     toast.error('Oops =( We have some problems.')
   }
-  // const redirectUrl = response.data
-  // window.open('https://example.com', '_blank', 'noopener');
 }
 
 const handleChangeAccount = (value: any) => {
