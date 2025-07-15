@@ -68,16 +68,16 @@ const menuItems = computed(() => {
       displayIfHasPermission: "view-accounts",
     },
     {
-      title: t("admin.menu.referral"),
-      to: localePath("/admin/referral"),
-      icon: UiIconReferral,
-      displayIfHasPermission: "view-referrals",
-    },
-    {
       title: t("admin.menu.payments"),
       to: localePath("/admin/payments"),
       icon: UiIconProfile,
       displayIfHasPermission: "view-payments",
+    },
+    {
+      title: t("admin.menu.referral"),
+      to: localePath("/admin/referral"),
+      icon: UiIconReferral,
+      displayIfHasPermission: "view-referrals",
     },
     {
       title: t("admin.menu.settings"),
