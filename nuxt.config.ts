@@ -93,7 +93,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000',
+            hostBase: process.env.NUXT_PUBLIC_HOST_BASE || 'https://esterholdings.website',
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://esterholdings.website/api',
 
             // читаємо спочатку NUXT_PUBLIC_*, якщо немає — VITE_*
             reverbKey:    process.env.NUXT_PUBLIC_REVERB_KEY   || process.env.VITE_REVERB_APP_KEY   || '',

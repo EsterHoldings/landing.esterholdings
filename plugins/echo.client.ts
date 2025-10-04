@@ -9,6 +9,7 @@ declare global { interface Window { Pusher: any; Echo: EchoType<any> } }
 
 export default defineNuxtPlugin(() => {
     const cfg = useRuntimeConfig().public as {
+        hostBase?: string
         apiBase?: string
         reverbKey?: string
         reverbHost?: string
@@ -16,14 +17,18 @@ export default defineNuxtPlugin(() => {
         reverbScheme?: string
     }
 
+    console.table('--- --- ---');
     console.table({
+        hostBase: cfg.hostBase,
+        apiBase: cfg.apiBase,
         reverbKey: cfg.reverbKey,
         reverbHost: cfg.reverbHost,
         reverbPort: cfg.reverbPort,
         reverbScheme: cfg.reverbScheme,
     })
+    console.table('--- --- ---');
 
-    const apiBase = cfg.apiBase + '/api' || 'http://localhost:8000'
+    const apiBase = cfg.hostBase || 'http://localhost:8000'
     window.Pusher = Pusher
 
     const token = localStorage.getItem(USER_ACCESS_TOKEN) || ''
