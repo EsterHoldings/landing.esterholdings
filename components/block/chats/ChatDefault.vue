@@ -45,7 +45,7 @@
     </div>
 
     <!-- Messages -->
-    <div ref="listRef" class="messages flex-1 space-y-6 overflow-y-auto px-4 py-5">
+    <div ref="listRef" class="messages flex-1 space-y-6 overflow-y-auto no-scrollbar px-4 py-5">
       <div class="flex items-center gap-3 text-white/70" v-if="messages.length">
         <span class="h-px flex-1 bg-white/10"></span>
         <span class="text-sm">Today</span>
