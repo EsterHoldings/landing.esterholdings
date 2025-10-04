@@ -1,4 +1,6 @@
+// @ts-ignore
 import {defineNuxtConfig} from "nuxt/config";
+// @ts-ignore
 import * as process from "node:process";
 
 // @ts-ignore
