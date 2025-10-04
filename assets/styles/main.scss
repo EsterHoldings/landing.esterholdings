@@ -70,3 +70,14 @@ hr {
 .regular {
   font-weight: 400 !important;
 }
+
+@layer utilities {
+  /* Приховує вертикальну/горизонтальну смугу, але зберігає прокрутку */
+  .no-scrollbar {
+    -ms-overflow-style: none;     /* IE/старий Edge */
+    scrollbar-width: none;        /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;                /* Chrome/Safari/новий Edge */
+  }
+}
