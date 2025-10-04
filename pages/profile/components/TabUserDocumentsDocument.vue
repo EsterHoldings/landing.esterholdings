@@ -1,157 +1,122 @@
 <template>
-  <div class="document">
-    <div class="document__image">
-      <UiIconImage/>
+  <!-- рядок -->
+  <div
+      class="group grid items-center px-6 py-4 hover:bg-[var(--color-stroke-ui-dark)] transition
+           [grid-template-columns:47px_1fr_1fr_1fr_30px]"
+      role="row"
+  >
+    <!-- картинка/іконка -->
+    <div
+        class="h-10 w-10 rounded-xl overflow-hidden grid place-items-center
+             bg-[var(--ui-primary-main)]/15 ring-1 ring-[var(--ui-primary-main)]/30"
+    >
+      <template v-if="thumbUrl">
+        <img :src="thumbUrl" alt="" class="h-full w-full object-cover" />
+      </template>
+      <template v-else>
+        <UiIconImage class="w-6 h-6" />
+      </template>
     </div>
-    <div class="document__content">
-      <div class="document__content-left">
-        <div class="document__content-left__doc-name">
-          # {{ data.document_data.number }}
-        </div>
-        <div class="document__content-left__status">
-          <span>
-            <UiIconFailed v-if="data.state === 'rejected'"/>
-            <UiIconWarning v-if="data.state === 'pending'"/>
-            <UiIconSuccess v-if="data.state === 'approved'"/>
-          </span>
-          <span>{{ data.state }}</span>
-        </div>
-      </div>
-      <div class="document__content-right">
-        <span class="document__content-right__time">
-          <UiIconTime/>{{ data.created_at }}
-        </span>
-        <span class="document__content-right__options">
-          <UiIconTrash @click="handleRemoveDocument" />
-          <UiIconSpinnerDefault v-if="inProcessRemoving"/>
-        </span>
-      </div>
+
+    <!-- назва -->
+    <div class="truncate text-[var(--ui-text-main)] text-base">
+      {{ displayName }}
+    </div>
+
+    <!-- дата -->
+    <div class="truncate text-right whitespace-nowrap text-sm text-[var(--ui-text-main)]/80">
+      {{ data.created_at }}
+    </div>
+
+    <!-- статус -->
+    <div
+        class="truncate text-right text-sm font-medium"
+        :class="statusClass"
+    >
+      {{ statusText }}
+    </div>
+
+    <!-- дії -->
+    <div class="flex items-center justify-end">
+      <button
+          type="button"
+          :disabled="inProcessRemoving"
+          @click="handleRemoveDocument"
+          class="inline-flex items-center justify-center w-9 h-9 hover:bg-[var(--color-stroke-ui-light)]/70 disabled:opacity-60 transition"
+      >
+        <UiIconSpinnerDefault v-if="inProcessRemoving" />
+        <UiIconTrash v-else class="text-[var(--ui-text-main)]" />
+      </button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
+import { ref, computed } from "vue";
 import useAppCore from "~/composables/useAppCore";
-import UiIconTime from "~/components/ui/UiIconTime.vue";
+
 import UiIconImage from "~/components/ui/UiIconImage.vue";
 import UiIconTrash from "~/components/ui/UiIconTrash.vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
-import UiIconFailed from "~/components/ui/UiIconFailed.vue";
-import UiIconWarning from "~/components/ui/UiIconWarning.vue";
-import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 
-interface DocumentInterface {
-  document_data: object
-  document_type: string
-  created_at: string
+type State = "pending" | "approved" | "rejected";
+
+interface DocData {
+  id: string | number;
+  created_at: string;
+  state: State;
+  document_type?: string;
+  document_data?: { number?: string; [k: string]: any };
+  // можливі прев’ю-поля (опційно)
+  thumb_url?: string;
+  preview_url?: string;
+  url?: string;
 }
 
-const props = defineProps({
-  data: {
-    type: Object,
-    require: true
-  }
-});
-
-const emits = defineEmits(['documentWasRemoved']);
+const props = defineProps<{ data: DocData }>();
+const emits = defineEmits<{
+  (e: "documentWasRemoved"): void;
+}>();
 
 const appCore = useAppCore();
 const inProcessRemoving = ref(false);
 
+const displayName = computed(() =>
+    props.data?.document_data?.number
+        ? props.data.document_data.number
+        : (props.data.document_type ?? "Document")
+);
+
+const statusText = computed(() => {
+  switch (props.data.state) {
+    case "pending":
+      return "In progress";
+    case "approved":
+      return "Approved";
+    default:
+      return "Rejected";
+  }
+});
+
+const statusClass = computed(() => {
+  switch (props.data.state) {
+    case "pending":
+      return "text-[var(--color-warning)]";
+    case "approved":
+      return "text-[var(--color-success)]";
+    default:
+      return "text-[var(--color-danger)]";
+  }
+});
+
+const thumbUrl = computed(
+    () => props.data.thumb_url || props.data.preview_url || props.data.url || ""
+);
+
 const handleRemoveDocument = async () => {
   inProcessRemoving.value = true;
-  await appCore.documents.delete(props.data.id)
+  await appCore.documents.delete(props.data.id);
   inProcessRemoving.value = false;
-  emits('documentWasRemoved');
-}
+  emits("documentWasRemoved");
+};
 </script>
-
-<style lang="scss" scoped>
-.document {
-  height: 100px;
-  width: 100%;
-  display: flex;
-  gap: 20px;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  color: var(--ui-text-main);
-
-  &:hover {
-    background-color: var(--color-stroke-ui-dark);
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &__image {
-    height: 100%;
-    width: 100px;
-    border: 1px dashed var(--ui-text-main);
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-
-    &-left {
-      width: 100%;
-      position: relative;
-
-      &__doc-name {
-        margin-bottom: 10px;
-      }
-
-      &__status {
-        color: var(--color-warning);
-        white-space: pre;
-        display: flex;
-        gap: 10px;
-      }
-    }
-
-    &-right {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: flex-end;
-
-      &__time {
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        white-space: pre;
-
-        svg {
-          height: 20px;
-          width: 20px;
-          margin-right: 5px;
-        }
-      }
-
-      &__options {
-        display: flex;
-        justify-content: end;
-        width: 100%;
-
-        svg {
-          margin-right: 10px;
-          fill: var(--ui-text-main);
-
-          &:last-child {
-            margin-right: 0;
-          }
-        }
-      }
-    }
-  }
-}
-</style>

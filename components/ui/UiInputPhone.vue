@@ -131,9 +131,9 @@ function updateModel() {
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid var(--color-stroke-ui-dark);
+  border: 1px solid var(--color-stroke-ui-light);
   border-radius: 10px;
-  background: var(--ui-background);
+  background: var(--color-stroke-ui-dark);
   height: var(--ui-input--height);
 
   &.no-border {
@@ -173,8 +173,8 @@ function updateModel() {
     max-height: 140px;
     height: 150px;
     overflow-y: auto;
-    background: var(--ui-background);
-    border: 1px solid var(--color-stroke-ui-dark);
+    background: var(--color-stroke-ui-dark);
+    border: 1px solid var(--color-stroke-ui-light);
     border-radius: 4px;
     margin-top: 4px;
 

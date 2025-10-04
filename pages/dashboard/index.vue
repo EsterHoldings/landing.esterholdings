@@ -3,6 +3,13 @@
     <div class="dashboard">
       <div class="dashboard__title">
         <UiTextH4>{{ t("cabinet.dashboard.title") }}</UiTextH4>
+
+        <button
+            class="px-3 py-2 rounded bg-blue-600 text-white"
+            @click="() => $fetch(`${useRuntimeConfig().public.apiBase}/api/test-broadcast`, { method: 'POST', credentials: 'include' })"
+        >
+          Send test broadcast
+        </button>
       </div>
       <div class="dashboard__grid">
 
@@ -143,7 +150,26 @@ import { useI18n } from "vue-i18n";
 import UiContainer from "~/components/ui/UiContainer.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import {useNuxtApp, useRuntimeConfig} from "nuxt/app";
+import {onBeforeUnmount, onMounted} from "vue";
 const { locale, t } = useI18n({ useScope: "global" });
+
+const { $echo } = useNuxtApp();
+
+onMounted(() => {
+  // @ts-ignore
+  const sub = (window as any).Echo?.channel('test') ?? $echo.channel('test')
+  sub.listen('.Ping', (e: any) => {
+    console.log('[TEST] Ping received:', e)
+  })
+})
+
+onBeforeUnmount(() => {
+  try {
+    // @ts-ignore
+    $echo.leave('test')
+  } catch {}
+})
 </script>
 
 <style lang="scss" scoped>

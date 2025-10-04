@@ -20,18 +20,6 @@
             :key="activeTabIndex"
         />
       </transition>
-      <!--      <div class="access-page__content__top">-->
-      <!--        <div class="access-page__content__top__left">-->
-      <!--          <RolesPanel />-->
-      <!--        </div>-->
-      <!--        <div class="access-page__content__top__right">-->
-      <!--          <PermissionsPanel />-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <!--      <br />-->
-      <!--      <div class="access-page__content__bottom">-->
-      <!--        <AdminsPanel />-->
-      <!--      </div>-->
     </div>
   </div>
 </template>

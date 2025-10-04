@@ -1,134 +1,40 @@
-<!--<template>-->
-<!--  <div-->
-<!--      class="drag-and-drop"-->
-<!--      :class="{ 'drag-and-drop&#45;&#45;hover': isHover }"-->
-<!--      @click="onClick"-->
-<!--      @dragover.prevent="onDragOver"-->
-<!--      @dragleave.prevent="onDragLeave"-->
-<!--      @drop.prevent="onDrop"-->
-<!--  >-->
-<!--    <UiIconDocuments class="drag-and-drop__icon" />-->
-<!--    <span class="drag-and-drop__text">-->
-<!--      {{ isHover ? "Відпустіть файли, щоб завантажити" : "Перетягніть файли сюди або клікніть для вибору" }}-->
-<!--    </span>-->
-<!--    <input-->
-<!--        ref="fileInput"-->
-<!--        type="file"-->
-<!--        class="drag-and-drop__input"-->
-<!--        multiple-->
-<!--        @change="onFileSelect"-->
-<!--    />-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script lang="ts" setup>-->
-<!--import { ref } from "vue";-->
-<!--import UiIconDocuments from "~/components/ui/UiIconDocuments.vue";-->
-
-<!--const emit = defineEmits<{-->
-<!--  (e: "files", files: File[]): void;-->
-<!--}>();-->
-
-<!--const fileInput = ref<HTMLInputElement | null>(null);-->
-<!--const isHover = ref(false);-->
-
-<!--function onClick() {-->
-<!--  if (fileInput.value) {-->
-<!--    fileInput.value.value = ""; // очистити попередній вибір-->
-<!--    fileInput.value.click();-->
-<!--  }-->
-<!--}-->
-
-<!--function onFileSelect(event: Event) {-->
-<!--  const target = event.target as HTMLInputElement;-->
-<!--  if (target.files && target.files.length) {-->
-<!--    const selected: File[] = Array.from(target.files);-->
-<!--    emit("files", selected);-->
-<!--  }-->
-<!--}-->
-
-<!--function onDragOver() {-->
-<!--  isHover.value = true;-->
-<!--}-->
-
-<!--function onDragLeave() {-->
-<!--  isHover.value = false;-->
-<!--}-->
-
-<!--function onDrop(event: DragEvent) {-->
-<!--  isHover.value = false;-->
-<!--  if (event.dataTransfer && event.dataTransfer.files.length) {-->
-<!--    const dropped: File[] = Array.from(event.dataTransfer.files);-->
-<!--    emit("files", dropped);-->
-<!--  }-->
-<!--}-->
-<!--</script>-->
-
-<!--<style lang="scss" scoped>-->
-<!--.drag-and-drop {-->
-<!--  position: relative;-->
-<!--  min-height: 80px;-->
-<!--  width: 100%;-->
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--  justify-content: center;-->
-<!--  border: 1px dashed var(&#45;&#45;ui-text-main);-->
-<!--  border-radius: 8px;-->
-<!--  flex-direction: column;-->
-<!--  cursor: pointer;-->
-<!--  transition: background-color 0.2s ease;-->
-
-<!--  &&#45;&#45;hover {-->
-<!--    background-color: rgba(255, 255, 255, 0.05);-->
-<!--  }-->
-
-<!--  &__icon {-->
-<!--    margin-top: 10px;-->
-<!--    font-size: 24px;-->
-<!--  }-->
-
-<!--  &__text {-->
-<!--    margin: 10px 0;-->
-<!--    color: var(&#45;&#45;ui-text-secondary);-->
-<!--    font-size: 14px;-->
-<!--    text-align: center;-->
-<!--    padding: 10px;-->
-<!--  }-->
-
-<!--  &__input {-->
-<!--    position: absolute;-->
-<!--    top: 0;-->
-<!--    left: 0;-->
-<!--    opacity: 0;-->
-<!--    pointer-events: none;-->
-<!--    width: 100%;-->
-<!--    height: 100%;-->
-<!--  }-->
-<!--}-->
-<!--</style>-->
-
-
-
 <template>
   <div
-      class="drag-and-drop"
-      :class="{ 'drag-and-drop--hover': isHover }"
+      class="absolute w-full min-h-[100px] rounded-xl border-2 border-dashed border-[var(--ui-primary-main)]
+           flex flex-col items-center justify-center text-center select-none transition
+           hover:bg-white/5"
+      :class="{ 'bg-white/5 ring-1 ring-[var(--ui-primary-main)]/50': isHover }"
       @click="onClick"
       @dragover.prevent="onDragOver"
       @dragleave.prevent="onDragLeave"
       @drop.prevent="onDrop"
   >
-    <UiIconDocuments class="drag-and-drop__icon" />
-    <span class="drag-and-drop__text">
-      {{ isHover
-        ? "Відпустіть файли, щоб завантажити"
-        : "Перетягніть файли сюди або клікніть для вибору" }}
-    </span>
+    <UiIconDocuments class="w-6 h-6 mb-2 text-[var(--ui-text-main)]" />
+
+    <div class="text-base leading-tight">
+      <span class="opacity-90">Drag and Drop</span>
+      <span class="opacity-90"> or </span>
+      <button
+          type="button"
+          class="underline decoration-2 underline-offset-4 text-orange-500 hover:opacity-80"
+          @click.stop="onClick"
+      >
+        Click to upload
+      </button>
+    </div>
+
+    <!-- Підпис -->
+    <div class="text-xs mt-1 text-[var(--ui-text-secondary)]">
+      PNG, JPG or PDF, Max size of 2MB
+    </div>
+
+    <!-- Прихований інпут -->
     <input
         ref="fileInput"
         type="file"
-        class="drag-and-drop__input"
+        class="hidden"
         multiple
+        accept="image/png,image/jpeg,application/pdf,image/svg+xml"
         @change="onFileSelect"
     />
   </div>
@@ -138,87 +44,34 @@
 import { ref } from "vue";
 import UiIconDocuments from "~/components/ui/UiIconDocuments.vue";
 
-// Ми оголошуємо, що цей компонент эммітує подію "files" із масивом File[]
-const emit = defineEmits<{
-  (e: "files", files: File[]): void;
-}>();
+const emit = defineEmits<{ (e: "files", files: File[]): void }>();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isHover = ref(false);
 
 function onClick() {
-  if (fileInput.value) {
-    fileInput.value.value = ""; // Скидаємо старий вибір, щоб можна було вибрати ті самі файли вдруге
-    fileInput.value.click();
-  }
+  if (!fileInput.value) return;
+  fileInput.value.value = "";
+  fileInput.value.click();
 }
 
 function onFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files.length) {
-    // Перетворюємо FileList у звичайний масив File[]
-    const selected: File[] = Array.from(target.files);
-    // Виводимо у подію "files" саме масив File[]
-    emit("files", selected);
+    emit("files", Array.from(target.files));
   }
 }
 
 function onDragOver() {
   isHover.value = true;
 }
-
 function onDragLeave() {
   isHover.value = false;
 }
-
 function onDrop(event: DragEvent) {
   isHover.value = false;
   if (event.dataTransfer && event.dataTransfer.files.length) {
-    const dropped: File[] = Array.from(event.dataTransfer.files);
-    emit("files", dropped);
+    emit("files", Array.from(event.dataTransfer.files));
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.drag-and-drop {
-  position: relative;
-  min-height: 80px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed var(--ui-text-main);
-  border-radius: 8px;
-  flex-direction: column;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &--hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  &__icon {
-    margin-top: 10px;
-    font-size: 24px;
-  }
-
-  &__text {
-    margin: 10px 0;
-    color: var(--ui-text-secondary);
-    font-size: 14px;
-    text-align: center;
-    padding: 10px;
-  }
-
-  &__input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>

@@ -1,122 +1,46 @@
 <template>
-  <svg
-    width="24.000000"
-    height="24.000000"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-  >
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_441_2272)">
+      <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 1V3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 21V23" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4.21973 4.22021L5.63973 5.64021" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M18.3604 18.3599L19.7804 19.7799" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1 12H3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M21 12H23" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4.21973 19.7799L5.63973 18.3599" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M18.3604 5.64021L19.7804 4.22021" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
     <defs>
-      <clipPath id="clip172_1112">
-        <rect
-          id="sun"
-          rx="0.000000"
-          width="23.000000"
-          height="23.000000"
-          transform="translate(0.500000 0.500000)"
-          fill="white"
-          fill-opacity="0"
-        />
+      <clipPath id="clip0_441_2272">
+        <rect width="24" height="24" fill="white"/>
       </clipPath>
     </defs>
-    <rect
-      id="sun"
-      rx="0.000000"
-      width="23.000000"
-      height="23.000000"
-      transform="translate(0.500000 0.500000)"
-      fill="#FFFFFF"
-      fill-opacity="0"
-    />
-    <g clip-path="url(#clip172_1112)">
-      <path
-        id="Vector"
-        d="M12 17C9.23 17 7 14.76 7 12C7 9.23 9.23 7 12 7C14.76 7 17 9.23 17 12C17 14.76 14.76 17 12 17Z"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-      />
-      <path
-        id="Vector"
-        d="M12 1L12 3"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M12 21L12 23"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M4.21 4.22L5.63 5.64"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M18.36 18.35L19.78 19.77"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M1 12L3 12"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M21 12L23 12"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M4.21 19.77L5.63 18.35"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-      <path
-        id="Vector"
-        d="M18.36 5.64L19.78 4.22"
-        stroke="#FFFFFF"
-        stroke-opacity="1.000000"
-        stroke-width="1.500000"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-      />
-    </g>
   </svg>
+
 </template>
 
 <style lang="scss" scoped>
 svg {
   width: 24px;
   height: 24px;
+
+  defs {
+    clipPath {
+      rect {
+        fill: var(--ui-text-main) !important;
+      }
+    };
+  }
+
+  rect {
+    fill: var(--ui-text-main) !important;
+  }
+
+  g {
+    path {
+      stroke: var(--text-main) !important;
+    }
+  }
 }
 </style>

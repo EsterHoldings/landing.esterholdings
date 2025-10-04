@@ -5,6 +5,7 @@
       <component :is="modalContent" v-bind="modalProps" :key="modalKey"/>
     </ModalRightSideDefault>
 
+    <VitePwaManifest />
     <NuxtPage/>
 
   </NuxtLayout>

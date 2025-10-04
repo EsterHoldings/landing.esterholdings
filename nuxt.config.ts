@@ -9,8 +9,12 @@ export default defineNuxtConfig({
     compatibilityDate: "2024-04-03",
     devtools: {enabled: true},
     ssr: true,
+    routeRules: {
+        "/**": {ssr: false} as any,
+        "/": {ssr: true} as any,
+    },
     css: ["~/assets/styles/main.scss"],
-    modules: ["@pinia/nuxt", "@nuxtjs/i18n"],
+    modules: ["@pinia/nuxt", "@nuxtjs/i18n", "@nuxtjs/tailwindcss", "@vite-pwa/nuxt"],
     plugins: ["~/plugins/eventBus.ts"],
     imports: {
         dirs: ["stores"],
@@ -39,11 +43,34 @@ export default defineNuxtConfig({
         fallbackLocale: 'en',
         defaultLocale: "en",
         experimental: {
+            // @ts-ignore
             jsTsFormatResource: false,
         },
         escapeParameterHtml: false,
         runtimeOnly: false,
         compositionOnly: true,
+    },
+
+    pwa: {
+        registerType: 'autoUpdate',
+        manifest: {
+            name: 'My App',
+            short_name: 'MyApp',
+            start_url: '/',
+            display: 'standalone',
+            theme_color: '#0f172a',
+            background_color: '#0b1220',
+            icons: [
+                { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+                { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+                { src: '/pwa-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+            ]
+        },
+        workbox: {
+            globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+            navigateFallback: '/'
+        },
+        devOptions: { enabled: false }
     },
 
     vite: {
@@ -64,6 +91,14 @@ export default defineNuxtConfig({
     runtimeConfig: {
         recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
         public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000',
+
+            // читаємо спочатку NUXT_PUBLIC_*, якщо немає — VITE_*
+            reverbKey:    process.env.NUXT_PUBLIC_REVERB_KEY   || process.env.VITE_REVERB_APP_KEY   || '',
+            reverbHost:   process.env.NUXT_PUBLIC_REVERB_HOST  || process.env.VITE_REVERB_HOST      || 'localhost',
+            reverbPort:   process.env.NUXT_PUBLIC_REVERB_PORT  || process.env.VITE_REVERB_PORT      || '8080',
+            reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME|| process.env.VITE_REVERB_SCHEME    || 'http',
+
             baseApi: process.env.NUXT_PUBLIC_BASE_API || "https://esterholdings.website/api/",
             baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://stage.esterholdings.website/",
             cliFacebook: process.env.NUXT_PUBLIC_CLI_FACEBOOK || "1668019407177142",
@@ -71,11 +106,6 @@ export default defineNuxtConfig({
             cliLinkIdIn: process.env.NUXT_PUBLIC_CLI_LINK_ID_IN || "784gmiujlnm9h2",
             reCaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcxyW8rAAAAAB7veVQONzCAW9W1JBdWAXjHUg0P",
         }
-    },
-
-    routeRules: {
-        "/**": {ssr: false} as any,
-        "/": {ssr: true} as any,
     },
 
     app: {

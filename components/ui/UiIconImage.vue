@@ -21,8 +21,8 @@ svg {
   fill: none;
   stroke: var(--ui-text-main);
 
-  height: 32px;
-  width: 32px;
+  height: 20px;
+  width: 20px;
 
   g {
     stroke-width: 1px;

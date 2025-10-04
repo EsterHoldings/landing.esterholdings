@@ -1,42 +1,108 @@
 <template>
-  <div class="user-documents__wrapper">
+  <div class="user-docs-page text-[var(--ui-text-main)] space-y-6">
+    <UiTextH5>Upload Documents</UiTextH5>
 
-    <div class="user-documents__left">
-      <PanelDefault class="user-documents-uploader">
-        <UiTextH5 class="user-documents-uploader__title">
-          <span># Uploaded documents</span>
-          <div class="user-documents-uploader__title__options">
-            <span class="user-documents-uploader__title__options_reload"
-                  @click="handleRefreshDocuments"
-            >
-              <UiIconUpdate :class="{ spin: isLoading }"/>
-            </span>
+    <div class="relative min-h-[100px] grid place-items-center text-center" v-if="selectedFiles.length === 0">
+      <UiDragAndDrop
+          class="absolute top-0 bottom-0 left-0 right-0"
+          @files="handleFilesSelected"
+      />
+    </div>
+
+    <div
+        v-for="(file, index) in selectedFiles"
+        :key="file.name + `-${index}`"
+        class="mb-4 flex flex-col gap-1.5 p-2.5 border border-dashed border-[var(--color-ui-primary)] rounded-lg"
+    >
+      <div class="relative grid [grid-template-columns:70px_1fr] gap-5 justify-between">
+        <UiIconTrash
+            type="button"
+            class="absolute -top-1.5 -right-1.5 p-1 border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background)] rounded-full cursor-pointer flex items-center justify-center text-[14px] leading-none hover:bg-red-500 hover:text-white"
+            @click="removeFile(index)"
+        />
+        <div
+            class="w-[70px] h-[70px] border border-[var(--color-stroke-ui-dark)] rounded overflow-hidden flex items-center justify-center">
+          <UiImage :src="getPreviewUrl(file)"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <UiFormControl :label="file.name">
+            <UiInput
+                :value="docNumbers[index]"
+                @input="val => docNumbers[index] = val"
+                placeholder="Название (Адрес, Паспорт и так далее.)"
+                maxlength="100"
+            />
+          </UiFormControl>
+          <div v-if="docNumbers[index].length > 100" class="text-[var(--color-danger)] text-[12px] mt-0.5">
+            Поле не може містити більше ніж 100 символів.
           </div>
-        </UiTextH5>
+          <div v-if="isUploading" class="text-[13px] mt-1.5">Завантаження: {{ uploadProgress[index] }}%</div>
+        </div>
+      </div>
+    </div>
 
-        <UiAlert
-            v-if="verificationAddressComment?.length > 0"
-            state="warning"
-            :outline="true"
-            class="user-documents-uploader__documents_alert"
-            @click="handleRemoveAddressComment"
+    <div class="space-y-3">
+      <div class="flex items-center justify-between rounded-xl border border-[var(--color-stroke-ui-dark)] h-[40px] px-4">
+        <UiTextH6>Confirm your full name</UiTextH6>
+        <div class="flex items-center justify-between gap-1.5">
+          <UiIconWarningFull class="text-[var(--color-warning)]" v-if="verificationDocumentsStatus === 'pending'"/>
+          <UiIconSuccessFull class="text-[var(--color-success)]" v-if="verificationDocumentsStatus === 'approved'"/>
+          <UiIconDangerFull class="text-[var(--color-danger)]" v-if="verificationDocumentsStatus === 'rejected'"/>
+          <span class="text-[var(--color-warning)]" v-if="verificationDocumentsStatus === 'pending'">In progress</span>
+          <span class="text-[var(--color-success)]" v-if="verificationDocumentsStatus === 'approved'">Approved</span>
+          <span class="text-[var(--color-danger)]" v-if="verificationDocumentsStatus === 'rejected'">Rejected</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between rounded-xl border border-[var(--color-stroke-ui-dark)] h-[40px] px-4 mb-5">
+        <UiTextH6>Confirm your address (passport or receipt)</UiTextH6>
+        <div class="flex items-center justify-between gap-1.5">
+          <UiIconWarningFull class="text-[var(--color-warning)]" v-if="verificationAddressStatus === 'pending'"/>
+          <UiIconSuccessFull class="text-[var(--color-success)]" v-if="verificationAddressStatus === 'approved'"/>
+          <UiIconDangerFull class="text-[var(--color-danger)]" v-if="verificationAddressStatus === 'rejected'"/>
+          <span class="text-[var(--color-warning)]" v-if="verificationAddressStatus === 'pending'">In progress</span>
+          <span class="text-[var(--color-success)]" v-if="verificationAddressStatus === 'approved'">Approved</span>
+          <span class="text-[var(--color-danger)]" v-if="verificationAddressStatus === 'rejected'">Rejected</span>
+        </div>
+      </div>
+
+      <UiButtonDefault
+          state="info"
+          :disabled="isUploading || selectedFiles.length === 0"
+          class="!mt-5"
+          @click="uploadFiles"
+      >
+        {{ isUploading ? "Uploading..." : "Upload and Send to Verification" }}
+      </UiButtonDefault>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <UiTextH5>All Documents</UiTextH5>
+        <button
+            type="button"
+            @click="handleRefreshDocuments"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg ring-1 ring-[var(--ui-primary-main)] text-[var(--ui-primary-main)] hover:bg-[var(--ui-primary-main)]/10 transition"
         >
-          <UiIconWarning class="user-documents-uploader__documents_alert_icon"/>
-          <UiTextSmall>{{ verificationAddressComment }}</UiTextSmall>
-        </UiAlert>
+          <UiIconUpdate :class="{ 'animate-spin': isLoading }" />
+        </button>
+      </div>
 
-        <UiAlert
-            v-if="verificationDocumentsComment?.length > 0"
-            state="warning"
-            :outline="true"
-            class="user-documents-uploader__documents_alert"
-            @click="handleRemoveDocumentComment"
+
+      <div class="relative rounded-[22px] border border-[var(--color-ui-primary)] overflow-hidden shadow-[inset_0_1px_0_rgba(77,131,255,.45)]">
+        <!-- Header -->
+        <div
+            class="grid items-center px-6 py-3 bg-[var(--color-ui-primary)] text-sm text-[var(--ui-text-main)]/90 [grid-template-columns:47px_1fr_1fr_1fr_30px]"
         >
-          <UiIconWarning class="user-documents-uploader__documents_alert_icon"/>
-          <UiTextSmall>{{ verificationDocumentsComment }}</UiTextSmall>
-        </UiAlert>
+          <div></div>
+          <div>Name</div>
+          <div class="text-right">Date</div>
+          <div class="text-right">Status</div>
+          <div></div>
+        </div>
 
-        <div class="user-documents-uploader__documents">
+
+        <!-- Rows -->
+        <div class="divide-y divide-[var(--color-stroke-ui-dark)]">
           <TabUserDocumentsDocument
               v-for="document in documents"
               :data="document"
@@ -44,148 +110,53 @@
               @document-was-removed="handleRefreshDocuments"
           />
 
-          <div class="user-documents-uploader__documents--no-data" v-if="documents?.length === 0">
+
+          <div class="flex items-center justify-center p-10 min-h-[300px]" v-if="documents?.length === 0">
             У вас нет загруженных документов.
           </div>
-
-          <div class="user-documents-uploader__is-loading" v-if="isLoading">
-            <UiIconSpinnerDefault/>
-          </div>
-
         </div>
-      </PanelDefault>
-    </div>
 
-    <div class="user-documents__right">
-      <PanelDefault class="user-documents__right__panel">
 
-        <UiTextH5 class="user-documents__right__panel__title"># Upload new documents</UiTextH5>
-
-        <UiDragAndDrop
-            @files="handleFilesSelected"
-            v-if="selectedFiles.length === 0"
-        />
-
+        <!-- Loading overlay inside the table -->
         <div
-            class="user-documents__right__panel__upload-document-info"
-            v-if="selectedFiles.length === 0"
+            class="absolute inset-0 flex items-center justify-center rounded-[22px] bg-[var(--ui-background)]/30"
+            v-if="isLoading"
         >
-          Ви можете завантажити скани або фотографії документів загальним розміром до 2 МБ.
-          Підтримувані формати файлів: PNG, JPG, JPEG, PDF, SVG.
+          <UiIconSpinnerDefault />
         </div>
-
-        <div
-            v-for="(file, index) in selectedFiles"
-            :key="file.name + `-${index}`"
-            class="user-documents__right__panel__selected-file"
-        >
-          <div class="user-documents__right__panel__selected-file__wrapper">
-            <UiIconDelete
-                type="button"
-                class="btn-delete"
-                @click="removeFile(index)"
-            />
-
-            <div class="user-documents__right__panel__selected-file__wrapper__preview">
-              <UiImage :src="getPreviewUrl(file)"/>
-            </div>
-
-            <div class="user-documents__right__panel__selected-file__wrapper__content">
-              <UiFormControl :label="file.name">
-                <UiInput
-                    :value="docNumbers[index]"
-                    @input="val => docNumbers[index] = val"
-                    placeholder="Название (Адрес, Паспорт и так далее.)"
-                    maxlength="100"
-                />
-              </UiFormControl>
-
-              <div
-                  v-if="docNumbers[index].length > 100"
-                  class="validation-error"
-              >
-                Поле не може містити більше ніж 100 символів.
-              </div>
-
-              <div v-if="isUploading" class="upload-progress">
-                Завантаження: {{ uploadProgress[index] }}%
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="user-documents__right__panel__upload-document-info">
-          <div class="user-documents__right__panel__upload-document-info__verify-state">
-            <UiTextSmall>Подтвердите ваш Ф.И.О</UiTextSmall>
-            <UiBadge :outline="true">
-              <UiIconDelete class="rejected" v-if="verificationDocumentsStatus === 'rejected'" />
-              <UiIconWarning class="pending" v-if="verificationDocumentsStatus === 'pending'" />
-              <UiIconCheck class="approved" v-if="verificationDocumentsStatus === 'approved'" />
-              <span class="rejected" v-if="verificationDocumentsStatus === 'rejected'">Отклонено!</span>
-              <span class="pending" v-if="verificationDocumentsStatus === 'pending'">В ожидании!</span>
-              <span class="approved" v-if="verificationDocumentsStatus === 'approved'">Подтверждено!</span>
-            </UiBadge>
-          </div>
-          <div class="user-documents__right__panel__upload-document-info__verify-state">
-            <UiTextSmall>Подтвердите ваш адрес (паспорт или квитанция)</UiTextSmall>
-            <UiBadge :outline="true">
-              <UiIconDelete class="rejected" v-if="verificationAddressStatus === 'rejected'" />
-              <UiIconWarning class="pending" v-if="verificationAddressStatus === 'pending'" />
-              <UiIconCheck class="approved" v-if="verificationAddressStatus === 'approved'" />
-              <span class="rejected" v-if="verificationAddressStatus === 'rejected'">Отклонено!</span>
-              <span class="pending" v-if="verificationAddressStatus === 'pending'">В ожидании!</span>
-              <span class="approved" v-if="verificationAddressStatus === 'approved'">Подтверждено!</span>
-            </UiBadge>
-          </div>
-        </div>
-
-        <!--        <UiFormControl-->
-        <!--            label="Comment"-->
-        <!--            class="user-documents__right__panel__comment"-->
-        <!--        >-->
-        <!--          <UiTextarea v-model="comment" placeholder="Ваш коментар..."/>-->
-        <!--        </UiFormControl>-->
-
-        <UiButtonDefault
-            state="info--outline"
-            :disabled="isUploading || selectedFiles.length === 0"
-            @click="uploadFiles"
-        >
-          {{ isUploading ? "Uploading..." : "Upload and send to verification" }}
-        </UiButtonDefault>
-      </PanelDefault>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref, onBeforeUnmount, onMounted, computed} from "vue";
+import {reactive, ref, onBeforeUnmount, onMounted} from "vue";
 import useApi from "~/composables/useApi";
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 
-import UiTextH5 from "~/components/ui/UiTextH5.vue";
-import UiDragAndDrop from "~/components/ui/UiDragAndDrop.vue";
-import UiTextarea from "~/components/ui/UiTextarea.vue";
-import UiFormControl from "~/components/ui/UiFormControl.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import UiInput from "~/components/ui/UiInput.vue";
-import UiImage from "~/components/ui/UiImage.vue";
-import UiIconDelete from "~/components/ui/UiIconDelete.vue";
-import axios from "axios";
-import {useToast} from "vue-toastification";
 import TabUserDocumentsDocument from "~/pages/profile/components/TabUserDocumentsDocument.vue";
-import useAppCore from "~/composables/useAppCore";
+import UiBadge from "~/components/ui/UiBadge.vue";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import UiDragAndDrop from "~/components/ui/UiDragAndDrop.vue";
+import UiFormControl from "~/components/ui/UiFormControl.vue";
+import UiIconCheck from "~/components/ui/UiIconCheck.vue";
+import UiIconDelete from "~/components/ui/UiIconDelete.vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
 import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
-import UiAlert from "~/components/ui/UiAlert.vue";
 import UiIconWarning from "~/components/ui/UiIconWarning.vue";
+import UiImage from "~/components/ui/UiImage.vue";
+import UiInput from "~/components/ui/UiInput.vue";
+import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-import UiIconFailed from "~/components/ui/UiIconFailed.vue";
-import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
-import UiIconCheck from "~/components/ui/UiIconCheck.vue";
-import UiIconAlert from "~/components/ui/UiIconAlert.vue";
-import UiBadge from "~/components/ui/UiBadge.vue";
+
+import axios from "axios";
+import useAppCore from "~/composables/useAppCore";
+import {useToast} from "vue-toastification";
+import UiIconWarningFull from "~/components/ui/UiIconWarningFull.vue";
+import UiIconSuccessFull from "~/components/ui/UiIconSuccessFull.vue";
+import UiIconDangerFull from "~/components/ui/UiIconDangerFull.vue";
+import UiTextH4 from "~/components/ui/UiTextH4.vue";
+import UiTextH6 from "~/components/ui/UiTextH6.vue";
+import UiIconTrash from "~/components/ui/UiIconTrash.vue";
 
 interface FileWithPreview extends File {
   _previewUrl?: string;
@@ -201,14 +172,14 @@ const toast = useToast();
 const apiClient = new useApi(true);
 const appCore = useAppCore();
 
-const isLoading = ref(true)
-let documents = reactive([]);
+const isLoading = ref(true);
+let documents = reactive<any[]>([]);
 
-let verificationAddressStatus = ref('pending');
-let verificationDocumentsStatus = ref('pending');
+let verificationAddressStatus = ref<'pending' | 'approved' | 'rejected'>("pending");
+let verificationDocumentsStatus = ref<'pending' | 'approved' | 'rejected'>("pending");
 
-let verificationAddressComment = ref('');
-let verificationDocumentsComment = ref('');
+let verificationAddressComment = ref("");
+let verificationDocumentsComment = ref("");
 
 function isValidFormat(file: File): boolean {
   const allowed = ["image/png", "image/jpeg", "application/pdf"];
@@ -216,23 +187,17 @@ function isValidFormat(file: File): boolean {
 }
 
 function getPreviewUrl(file: FileWithPreview): string {
-  if (file._previewUrl) {
-    return file._previewUrl;
-  }
+  if (file._previewUrl) return file._previewUrl;
   const url = URL.createObjectURL(file);
   file._previewUrl = url;
   return url;
 }
 
 function handleFilesSelected(files: File[] | undefined) {
-  if (!files || !Array.isArray(files)) {
-    return;
-  }
+  if (!files || !Array.isArray(files)) return;
   const invalid = files.filter((f) => !isValidFormat(f)).map((f) => f.name);
   if (invalid.length > 0) {
-    toast.error(
-        `Неприпустимий формат файлу(ів): ${invalid.join(", ")}. Дозволені формати: PNG, JPG, JPEG, PDF.`
-    );
+    toast.error(`Неприпустимий формат файлу(ів): ${invalid.join(", ")}. Дозволені формати: PNG, JPG, JPEG, PDF, SVG.`);
   }
   const validFiles = files.filter((f) => isValidFormat(f));
   selectedFiles.forEach((f) => {
@@ -242,9 +207,7 @@ function handleFilesSelected(files: File[] | undefined) {
     }
   });
   selectedFiles.splice(0, selectedFiles.length);
-  validFiles.forEach((f) => {
-    selectedFiles.push(f as FileWithPreview);
-  });
+  validFiles.forEach((f) => selectedFiles.push(f as FileWithPreview));
   docNumbers.splice(0, docNumbers.length);
   uploadProgress.splice(0, uploadProgress.length);
   for (let i = 0; i < validFiles.length; i++) {
@@ -257,19 +220,17 @@ const handleRemoveAddressComment = async () => {
   await appCore.verifications.removeCommentForAddress();
   await loadVerificationData();
   await loadUploadedDocuments();
-}
+};
 
 const handleRemoveDocumentComment = async () => {
   await appCore.verifications.removeCommentForDocuments();
   await loadVerificationData();
   await loadUploadedDocuments();
-}
+};
 
 function removeFile(index: number) {
   const file = selectedFiles[index];
-  if (file && file._previewUrl) {
-    URL.revokeObjectURL(file._previewUrl);
-  }
+  if (file && file._previewUrl) URL.revokeObjectURL(file._previewUrl);
   selectedFiles.splice(index, 1);
   docNumbers.splice(index, 1);
   uploadProgress.splice(index, 1);
@@ -277,7 +238,7 @@ function removeFile(index: number) {
 
 async function uploadFiles() {
   if (selectedFiles.length === 0) {
-    toast.warning("Please select file(s).");
+    toast.warning("Будь ласка, виберіть файл(и).");
     return;
   }
   isUploading.value = true;
@@ -300,9 +261,7 @@ async function uploadFiles() {
       });
       const {url, key} = presignResp.data as { url: string; key: string };
       await axios.put(url, file, {
-        headers: {
-          "Content-Type": file.type
-        },
+        headers: {"Content-Type": file.type},
         onUploadProgress(event) {
           uploadProgress[i] = Math.round((event.loaded / (event.total || 1)) * 100);
         },
@@ -310,7 +269,7 @@ async function uploadFiles() {
       documentsPayload.push({
         name: file.name,
         path: key,
-        document_type: 'passport',
+        document_type: "passport",
         document_data: {number: docNumber},
       });
     } catch (err) {
@@ -348,33 +307,31 @@ async function uploadFiles() {
 }
 
 const loadUploadedDocuments = async () => {
+  console.log('---');
   isLoading.value = true;
   const response = await appCore.documents.get();
   documents.splice(0, documents.length, ...response.data.data.data);
-
+  console.log(documents);
   setTimeout(() => {
     isLoading.value = false;
-  }, 300)
-}
+  }, 300);
+};
 
 const loadVerificationData = async () => {
   isLoading.value = true;
-
   const response = await appCore.verifications.get();
-
-  verificationAddressStatus.value = response.data.data.address.verification_status;
-  verificationDocumentsStatus.value = response.data.data.documents.verification_status;
-
-  verificationAddressComment.value = response.data.data.address.comment;
-  verificationDocumentsComment.value = response.data.data.documents.comment;
-
+  console.log(response.data.data)
+  verificationAddressStatus.value = response.data.data.address?.verification_status;
+  verificationDocumentsStatus.value = response.data.data.documents?.verification_status;
+  verificationAddressComment.value = response.data.data.address?.comment;
+  verificationDocumentsComment.value = response.data.data.documents?.comment;
   isLoading.value = false;
-}
+};
 
 const handleRefreshDocuments = async () => {
   await loadVerificationData();
   await loadUploadedDocuments();
-}
+};
 
 onBeforeUnmount(() => {
   selectedFiles.forEach((f) => {
@@ -386,230 +343,10 @@ onBeforeUnmount(() => {
 });
 
 onMounted(async () => {
-  await loadVerificationData();
+  console.log('012');
   await loadUploadedDocuments();
-})
+  console.log('123');
+  await loadVerificationData();
+  console.log('234');
+});
 </script>
-
-<style lang="scss" scoped>
-
-@media (max-width: 991px) {
-  .user-documents__wrapper {
-    flex-direction: column;
-  }
-  .user-documents__left {
-    width: 100% !important;
-  }
-  .user-documents__right {
-    width: 100% !important;
-  }
-}
-
-.user-documents {
-  color: var(--ui-text-main);
-
-  &__wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  &__left {
-    width: 50%;
-
-    & > div {
-      padding: 20px;
-    }
-  }
-
-  &__right {
-    width: 50%;
-
-    & > div {
-      padding: 20px;
-    }
-
-    &__panel {
-      padding: 20px;
-      height: 100%;
-      width: 100%;
-      color: var(--ui-text-main);
-
-      &__title {
-        margin-bottom: 20px;
-      }
-
-      &__comment {
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-
-      &__upload-document-info {
-        margin-top: 10px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: var(--color-warning);
-
-        &__verify-state {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 5px;
-          border-radius: 10px;
-          background-color: var(--color-stroke-ui-dark);
-          padding: 10px;
-
-          & .rejected { fill: var(--color-danger) !important; color: var(--color-danger); }
-          & .pending { stroke: var(--color-warning) !important; color: var(--color-warning); }
-          & .approved { stroke: var(--color-success) !important; color: var(--color-success); }
-        }
-      }
-
-      &__selected-file {
-        margin-bottom: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        padding: 10px;
-        border: 1px dashed var(--ui-text-main);
-        border-radius: 8px;
-
-        &__wrapper {
-          position: relative;
-          display: grid;
-          grid-template-columns: 100px 1fr;
-          gap: 20px;
-          justify-content: space-between;
-        }
-
-        &__wrapper__preview {
-          width: 100px;
-          height: 100px;
-          border: 1px solid var(--color-stroke-ui-dark);
-          border-radius: 5px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-        }
-
-        &__wrapper__content {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        .validation-error {
-          color: var(--color-danger);
-          font-size: 12px;
-          margin-top: 2px;
-        }
-
-        .upload-progress {
-          font-size: 13px;
-          color: var(--ui-text-main);
-          margin-top: 5px;
-        }
-      }
-    }
-  }
-}
-
-.btn-delete {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--color-stroke-ui-dark);
-  background-color: var(--ui-background);
-  border-radius: 50%;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  line-height: 1;
-
-  &:before {
-    content: "×";
-    color: #000;
-  }
-
-  &:hover {
-    background: #ef4444;
-    color: #fff;
-  }
-}
-
-.user-documents-uploader {
-  color: var(--ui-text-main);
-  transition: .3s;
-
-  &__title {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    &__options {
-      &_reload {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        padding: 5px;
-
-        &:hover {
-          background-color: var(--color-stroke-ui-dark);
-        }
-      }
-    }
-  }
-
-  &__documents {
-    position: relative;
-
-    &_alert {
-      padding: 20px 40px 20px 45px;
-      margin-bottom: 20px;
-      position: relative;
-
-      &_icon {
-        position: absolute;
-        top: 15px;
-        left: 10px;
-      }
-    }
-
-    &--no-data {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 40px;
-    }
-  }
-
-  &__is-loading {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background-color: var(--ui-background);
-    opacity: .3;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-}
-</style>

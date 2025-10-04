@@ -3,17 +3,18 @@
     <div class="page-wrapper">
       <TheHeaderSideBar/>
 
-      <UiImage class="bg-image" src="/space.gif"/>
-
-      <Transition name="fade" mode="out-in">
-        <div class="page-content">
-          <div class="page" :key="route.fullPath">
-            <UiContainer>
-              <slot/>
-            </UiContainer>
+      <div class="page-content-wrapper">
+        <TheHeader />
+        <Transition name="fade" mode="out-in">
+          <div class="page-content">
+            <div class="page" :key="route.fullPath">
+              <UiContainer>
+                <slot/>
+              </UiContainer>
+            </div>
           </div>
-        </div>
-      </Transition>
+        </Transition>
+      </div>
 
     </div>
   </div>
@@ -27,6 +28,7 @@ import TheFooter from "@/components/block/TheFooter.vue";
 import HeaderMenu from "~/components/block/LandingHeader/components/HeaderMenu.vue";
 import {useRoute} from "vue-router";
 import UiContainer from "~/components/ui/UiContainer.vue";
+import TheHeader from "~/components/block/TheHeader.vue";
 
 const route = useRoute();
 </script>
@@ -45,7 +47,8 @@ const route = useRoute();
   overflow-y: auto;
 
   &-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: 264px 1fr;
     background-color: var(--ui-background-admin);
     color: #b0b0b0;
     overflow: hidden;
@@ -55,6 +58,10 @@ const route = useRoute();
     width: 100%;
     overflow-y: scroll;
     height: 100vh;
+
+    &-wrapper {
+
+    }
   }
 }
 

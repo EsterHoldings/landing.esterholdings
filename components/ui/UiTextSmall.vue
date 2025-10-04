@@ -14,6 +14,6 @@
   font-size: 12px;
   font-weight: 300;
   // line-height: 22px;
-  letter-spacing: 0em;
+  letter-spacing: 0;
 }
 </style>

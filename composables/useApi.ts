@@ -11,6 +11,7 @@ import { useRuntimeConfig } from "nuxt/app";
 import { ADMIN_REFRESH_TOKEN } from "~/constants/auth";
 import useAppCore from "~/composables/useAppCore";
 import { useErrorStack } from "~/stores/errors";
+import {RuntimeConfig} from "nuxt/schema";
 
 interface runtimeCfgInterface {
     baseApi: string
@@ -21,10 +22,11 @@ export class useApi {
 
     constructor(forClient = false) {
         const config = useRuntimeConfig()
-        const pub = config.public as { baseApi: string }
+        // @ts-ignore
+        const {baseApi} = config.public as { baseApi: string }
 
         this.api = axios.create({
-            baseURL: pub.baseApi,
+            baseURL: baseApi,
             // headers: {"Content-Type": "application/json"},
             withCredentials: true,
         });

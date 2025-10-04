@@ -53,8 +53,8 @@ textarea {
 
   padding: 10px;
 
-  background-color: var(--ui-background);
-  border: 1px solid var(--color-stroke-ui-dark);
+  background-color: var(--color-stroke-ui-dark);
+  border: 1px solid var(--color-stroke-ui-light);
   border-radius: 8px;
 
   color: var(--ui-text-main);

@@ -1,46 +1,50 @@
-import { useAdminAuthStore } from "~/stores/adminAuthStore";
+import {useAdminAuthStore} from "~/stores/adminAuthStore";
 import AdminAuthService from "~/composables/core/modules/adminModules/auth/adminAuth.service";
 
 interface ResponseDTO {
-  success: Boolean;
-  data: any;
-  errors: any;
+    success: Boolean;
+    data: any;
+    errors: any;
 }
 
 export class AuthModule {
-  private adminAuthService: AdminAuthService;
+    private adminAuthService: AdminAuthService;
 
-  constructor() {
-    this.adminAuthService = new AdminAuthService();
-  }
-
-  private get adminAuthStore() {
-    return useAdminAuthStore();
-  }
-
-  async doLogin(params: {}): Promise<any> {
-    const response = await this.adminAuthService.postLogin(params);
-
-    console.log("ADMIN AUTH DO LOGIN RESPONSE: ", response.data);
-
-    if (response?.data?.accessToken) {
-      this.adminAuthStore.setAccessToken(response.data.accessToken);
+    constructor() {
+        this.adminAuthService = new AdminAuthService();
     }
 
-    return response;
-  }
+    private get adminAuthStore() {
+        return useAdminAuthStore();
+    }
 
-  async doLogout(): Promise<any> {
-    return await this.adminAuthService.postLogout();
-  }
+    async doLogin(params: {}): Promise<any> {
+        const response = await this.adminAuthService.postLogin(params);
 
-  async doRefresh(): Promise<any> {
-    return await this.adminAuthService.postRefresh();
-  }
+        console.log("ADMIN AUTH DO LOGIN RESPONSE: ", response.data);
 
-  async getAvailablePermissions(): Promise<any> {
-    return await this.adminAuthService.getAvailablePermissions();
-  }
+        if (response?.data?.accessToken) {
+            this.adminAuthStore.setAccessToken(response.data.accessToken);
+        }
+
+        return response;
+    }
+
+    async doLogout(): Promise<any> {
+        return await this.adminAuthService.postLogout();
+    }
+
+    async doRefresh(): Promise<any> {
+        return await this.adminAuthService.postRefresh();
+    }
+
+    async getAvailablePermissions(): Promise<any> {
+        return await this.adminAuthService.getAvailablePermissions();
+    }
+
+    async getAuthUser() {
+        return await this.adminAuthService.getUser();
+    }
 }
 
 export default AuthModule;

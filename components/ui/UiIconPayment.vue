@@ -1,17 +1,30 @@
 <template>
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-linecap="round"
-          stroke-linejoin="round"/>
-    <path d="M3 10H20.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M7 15H9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M18.2406 13.2464H14.8672C13.2864 13.2464 11.9997 11.9605 11.9989 10.3805C11.9989 8.79885 13.2856 7.51219 14.8672 7.51135H18.2406C18.5856 7.51135 18.8656 7.79135 18.8656 8.13635C18.8656 8.48135 18.5856 8.76135 18.2406 8.76135H14.8672C13.9747 8.76219 13.2489 9.48802 13.2489 10.3797C13.2489 11.2705 13.9756 11.9964 14.8672 11.9964H18.2406C18.5856 11.9964 18.8656 12.2764 18.8656 12.6214C18.8656 12.9664 18.5856 13.2464 18.2406 13.2464Z"
+          fill="currentColor"/>
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M15.2486 10.953H14.9886C14.6436 10.953 14.3636 10.673 14.3636 10.328C14.3636 9.983 14.6436 9.703 14.9886 9.703H15.2486C15.5936 9.703 15.8736 9.983 15.8736 10.328C15.8736 10.673 15.5936 10.953 15.2486 10.953Z"
+          fill="currentColor"/>
+    <mask id="mask0_774_2080" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="1" y="2" width="18" height="17">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M1.66666 2.5H18.8655V18.4774H1.66666V2.5Z" fill="currentColor"/>
+    </mask>
+    <g mask="url(#mask0_774_2080)">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M6.66465 3.75C4.59799 3.75 2.91632 5.43167 2.91632 7.49833V13.4792C2.91632 15.5458 4.59799 17.2275 6.66465 17.2275H13.868C15.9347 17.2275 17.6155 15.5458 17.6155 13.4792V7.49833C17.6155 5.43167 15.9347 3.75 13.868 3.75H6.66465ZM13.868 18.4775H6.66465C3.90882 18.4775 1.66632 16.235 1.66632 13.4792V7.49833C1.66632 4.74167 3.90882 2.5 6.66465 2.5H13.868C16.6238 2.5 18.8655 4.74167 18.8655 7.49833V13.4792C18.8655 16.235 16.6238 18.4775 13.868 18.4775Z"
+            fill="currentColor"/>
+    </g>
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M10.5705 7.53174H6.07132C5.72632 7.53174 5.44632 7.25174 5.44632 6.90674C5.44632 6.56174 5.72632 6.28174 6.07132 6.28174H10.5705C10.9155 6.28174 11.1955 6.56174 11.1955 6.90674C11.1955 7.25174 10.9155 7.53174 10.5705 7.53174Z"
+          fill="currentColor"/>
   </svg>
+
 </template>
 
 <style lang="scss" scoped>
 svg {
   height: 24px;
   width: 24px;
-  stroke: var(--ui-text-main);
-  stroke-width: 2px;
+  fill: var(--ui-text-main);
 }
 </style>

@@ -31,6 +31,7 @@ import {useI18n} from "vue-i18n";
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconCheck from "~/components/ui/UiIconCheck.vue";
 import {useLocalePath} from "~/.nuxt/imports";
+import UiIconNews from "~/components/ui/UiIconNews.vue";
 
 const {locale, t} = useI18n({useScope: "global"});
 const localePath = useLocalePath();
@@ -50,7 +51,7 @@ const menuItems = computed(() => {
       displayIfHasPermission: "view-dashboard",
     },
     {
-      title: 'Verifications requests',
+      title: t("admin.menu.verificationRequests"),
       to: localePath("/admin/verifications"),
       icon: UiIconCheck,
       displayIfHasPermission: "view-verifications",
@@ -84,6 +85,18 @@ const menuItems = computed(() => {
       to: localePath("/admin/settings"),
       icon: UiIconSetting,
       displayIfHasPermission: "view-settings",
+    },
+    {
+      title: t("admin.menu.support"),
+      to: localePath("/admin/support"),
+      icon: UiIconSupport,
+      displayIfHasPermission: "view-support",
+    },
+    {
+      title: t("admin.menu.news"),
+      to: localePath("/admin/news"),
+      icon: UiIconNews,
+      displayIfHasPermission: "view-news",
     },
     {
       title: t("admin.menu.access"),

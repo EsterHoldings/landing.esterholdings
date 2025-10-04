@@ -105,8 +105,8 @@ function onNativeInput(e: Event) {
   width: 100%;
   height: var(--ui-input--height);
   outline: none;
-  background-color: var(--ui-background);
-  border: 1px solid var(--color-stroke-ui-dark);
+  background-color: var(--color-stroke-ui-dark);
+  border: 1px solid var(--color-stroke-ui-light);
   color: var(--color-ui-text);
   border-radius: 10px;
   padding: 0 20px;

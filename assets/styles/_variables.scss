@@ -5,20 +5,20 @@
   // ...
   --default-transition: all 0.2s ease;
   // ...
-  --color-background: #f7f7f7; // TODO :: Deprecated - will remove
-  --color-text: #101010; // TODO :: Deprecated - will remove
-  --color-text-muted: #9a9797; // TODO :: Deprecated - will remove
+  --color-background: #f7f7f7;
+  --color-text: #101010;
+  --color-text-muted: #9a9797;
   // ...
-  --color-secondary: #d1d1d1; // TODO :: Deprecated - will remove
-  --color-contrast: #3e3939; // TODO :: Deprecated - will remove
-  --color-default: gainsboro; // TODO :: Deprecated - will remove
-  --color-primary: blue; // TODO :: Deprecated - will remove
-  --color-info: #123e9c; // TODO :: Deprecated - will remove
-  --color-success: green; // TODO :: Deprecated - will remove
-  --color-warning: #da7a1c; // TODO :: Deprecated - will remove
-  --color-danger: #af160e; // TODO :: Deprecated - will remove
-  --color-dark: #7b7b81; // TODO :: Deprecated - will remove
-  --color-light: white; // TODO :: Deprecated - will remove
+  --color-secondary: #d1d1d1;
+  --color-contrast: #3e3939;
+  --color-default: gainsboro;
+  --color-primary: blue;
+  --color-info: #123e9c;
+  --color-success: green;
+  --color-warning: #da7a1c;
+  --color-danger: #af160e;
+  --color-dark: #7b7b81;
+  --color-light: white;
 
   //-------- UI -------- //
 
@@ -34,7 +34,7 @@
   --color-ui-warning: #f75709;
   --color-sticker-ui-success: #03c11f;
   --color-sticker-ui-danger: #d93025;
-  --color-stroke-ui-light: #1b63ff;
+  --color-stroke-ui-light: #002880;
   --color-stroke-ui-dark: #011644;
   // --color-stroke-ui: linear-gradient(
   //   137.67deg,
@@ -44,12 +44,12 @@
   --color-ui-grey: #b8b8c3;
 
   //MAIN COLOR VAR-----
-  --ui-primary-main: #0051ff;
+  --ui-primary-main: #0051FF;
   --ui-primary-accent: #f75709;
   --ui-primary-neutral: #ffffff;
 
   --ui-sticker-success: #008001;
-  --ui-sticker-danger: #f41112;
+  --ui-sticker-danger: rgba(244, 17, 18, 0.38);
 
   --ui-stroke: linear-gradient(137.67deg, #1b63ffff 2.397%, #011644ff 99.041%);
   --color-stroke-ui: linear-gradient(
@@ -67,17 +67,18 @@
   --ui-background-sidebar: rgba(0, 0, 40, 0.95);
   --ui-background-sidebar-link: #011644;
 
+  --ui-text-invert: #070707;
   --ui-text-main: #ffffff;
   --ui-text-secondary: rgb(147, 147, 148);
 
   //MAIN COLOR VAR-----
   // Ui elements settings
-  --ui-border--raduis: 10px;
+  --ui-border--raduis: 20px;
 
   // Blocks
   // Inputs
   --ui-input--border-radius: var(--ui-border--raduis);
-  --ui-input--height: 46px;
+  --ui-input--height: 40px;
   // Buttons
 }
 

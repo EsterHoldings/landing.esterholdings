@@ -1,21 +1,21 @@
 <template>
   <li
-    class="side-bar-cabinet__menu__item"
-    :class="{ active: isActive }"
-    @click="handleClickMenuItem($event)"
+      class="relative w-full mt-px h-[40px] flex flex-row items-center justify-between transition-colors duration-300 cursor-pointer rounded-md"
+      :class="isActive ? 'bg-[var(--color-ui-primary)]' : 'hover:bg-[var(--color-stroke-ui-dark)] hover:opacity-80'"
+      @click="handleClickMenuItem"
   >
-    <div
-      class="side-bar-cabinet__menu__item__indicator"
-      :class="{ active: isActive }"
-    ></div>
-
-    <div class="side-bar-cabinet__menu__item__icon">
-      <component :is="icon"></component>
+    <div class="text-[var(--ui-text-main)] flex items-center justify-center h-full w-[60px] relative">
+      <component :is="icon" />
+      <span class="absolute top-1 right-2 min-h-[16px] min-w-[16px] bg-[var(--ui-sticker-danger)] flex items-center justify-center rounded-full text-sm" v-if="notificationsCount > 0">
+        {{ notificationsCount }}
+      </span>
     </div>
 
     <div
-      class="side-bar-cabinet__menu__item__title"
-      :class="{ hide: !props.sideBarIsOpen }"
+        class="hidden lg:flex items-center justify-start w-full h-full
+             text-[var(--ui-text-main)] text-[14px] font-medium whitespace-pre-wrap
+             overflow-hidden transition-all duration-300"
+        :class="props.sideBarIsOpen ? 'opacity-100' : 'opacity-0 lg:w-0'"
     >
       {{ title }}
     </div>
@@ -27,107 +27,15 @@ import { useRoute } from "vue-router";
 import { computed } from "vue";
 
 const emit = defineEmits(["click"]);
-
 const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  to: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: Object,
-    default: "",
-  },
-  sideBarIsOpen: {
-    type: Boolean,
-    default: false,
-  },
+  title: { type: String, required: true },
+  to: { type: String, required: true },
+  icon: { type: Object, default: "" },
+  sideBarIsOpen: { type: Boolean, default: false },
+  notificationsCount: { type: Number, default: 0 },
 });
 
 const route = useRoute();
-
 const isActive = computed(() => route.path === props.to);
-
-const handleClickMenuItem = (event: Event) => emit("click", props.to);
+const handleClickMenuItem = () => emit("click", props.to);
 </script>
-
-<style lang="scss" scoped>
-.side-bar-cabinet__menu__item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-
-  margin-top: 1px;
-  height: 80px;
-
-  background-color: transparent;
-
-  transition: 0.3s;
-
-  &.active {
-    border-right: 3px solid var(--color-stroke-ui);
-  }
-
-  &:hover {
-    transition: 0.3s;
-    background-color: var(--color-stroke-ui-dark);
-    opacity: .8;
-  }
-
-  &.active {
-    background-color: var(--color-stroke-ui-dark);
-    border-right: 1px solid var(--color-primary);
-  }
-
-  &__indicator {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1px;
-    height: 100%;
-
-    background-color: var(--color-stroke-ui-dark);
-
-    &.active {
-      background-color: var(--color-ui-primary);
-    }
-  }
-
-  &__icon {
-    padding-top: 10px;
-    color: var(--ui-text-main);
-  }
-
-  &__title {
-    padding: 0 10px 10px;
-    width: 100%;
-    height: 100%;
-    transition: 3s;
-    opacity: 1;
-    white-space: pre-wrap;
-    text-align: center;
-    cursor: pointer;
-
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--ui-text-main);
-    font-size: 14px;
-    font-weight: 500;
-
-    &.hide {
-      transition: 0.1s;
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
-    }
-  }
-}
-</style>

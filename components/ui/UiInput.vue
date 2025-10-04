@@ -7,11 +7,11 @@
     <input
         v-if="props.type !== 'checkbox'"
         :class="{
-          border: !props.borderNone,
           padding: !props.paddingNone,
           'is-invalid': props.isDirty && props.isInvalid,
           'is-valid': props.isDirty && !props.isInvalid,
-          disabled: props.disabled
+          disabled: props.disabled,
+          'input-icon-left': !!slots['icon-left']
         }"
         :type="typeInput"
         :placeholder="props.placeholder"
@@ -113,15 +113,12 @@ function onChecked(e: Event) {
 input {
   width: 100%;
   height: var(--ui-input--height);
-  border: none;
-  outline: none;
-  background-color: var(--ui-background);
+  background-color: var(--color-stroke-ui-dark);
+  border: 1px solid var(--color-stroke-ui-light);
   color: var(--color-ui-text);
   padding: 0 10px;
-}
-
-.border {
-  border: 1px solid var(--color-stroke-ui-dark);
+  outline: none;
+  border-radius: 10px;
 }
 
 .input {
@@ -151,6 +148,7 @@ input {
   align-items: center;
   justify-content: center;
   background-color: transparent;
+  position: absolute;
 }
 
 .input > .padding {
@@ -163,6 +161,10 @@ input {
 
 .input::placeholder {
   color: var(--color-text-muted);
+}
+
+.input .input-icon-left {
+  padding-left: 40px;
 }
 
 .input .is-invalid {

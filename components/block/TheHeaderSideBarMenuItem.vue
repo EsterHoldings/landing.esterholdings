@@ -4,7 +4,6 @@
     :class="{ active: isActive }"
     @click="handleClickMenuItem($event)"
   >
-    <div class="item__indicator" :class="{ active: isActive }"></div>
     <div class="item__icon">
       <component :is="icon"></component>
     </div>
@@ -61,23 +60,12 @@ const handleClickMenuItem = (event: Event) => emit("click", props.to);
 
   &:hover {
     transition: 0.3s;
-    background-color: var(--ui-background-sidebar-link);
+    background-color: var(--color-stroke-ui-light);
+    opacity: .7;
   }
 
   &.active {
-    border-right: 1px solid var(--ui-stroke);
-  }
-
-  &__indicator {
-    position: absolute;
-    width: 8px;
-    height: 100%;
-
-    background-color: var(--ui-background-sidebar-link);
-
-    &.active {
-      background-color: var(--ui-primary-main);
-    }
+    background-color: var(--color-stroke-ui-light);
   }
 
   &__icon {

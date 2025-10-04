@@ -93,12 +93,13 @@ const doSendForm = async () => {
     const adminAuthStore = useAdminAuthStore();
 
     const response = await appCore.adminModules.auth.doLogin(props.formData);
-    const accessToken = response.data.data.access_token;
+
+    const accessToken = response.data.access_token;
     adminAuthStore.setAccessToken(accessToken);
 
-    await appCore.adminModules.auth.getAvailablePermissions();
-    adminAuthStore.setRoles(response.data.data.roles);
-    adminAuthStore.setPermissions(response.data.data.permissions);
+    // await appCore.adminModules.auth.getAvailablePermissions();
+    // adminAuthStore.setRoles(response.data.roles);
+    // adminAuthStore.setPermissions(response.data.permissions);
 
     navigateTo("/admin/access");
   } catch (e: any) {

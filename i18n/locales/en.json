@@ -356,7 +356,8 @@
       "accounts": "Accounts",
       "referral_system": "Referral system",
       "billing": "Billing",
-      "support": "Support"
+      "support": "Support",
+      "settings": "Settings"
     },
 
     "dashboard": {
@@ -521,16 +522,21 @@
     },
 
     "accounts": {
+      "account": {
+        "title": "Account"
+      },
       "title": "Accounts",
       "openNew": "Open new account",
       "search": "Search",
       "columns": {
         "type": "Account type",
+        "currency": "Currency",
         "leverage": "Leverage",
         "number": "Account number",
         "balance": "MT Balance"
       },
-      "nothingToShow": "Nothing to show =(",
+      "nothingToShow": "No active accounts to show!",
+      "openAccount": "Open new account!",
       "pagination": {
         "prev": "Prev",
         "next": "Next"
@@ -565,11 +571,15 @@
   "admin": {
     "menu": {
       "dashboard": "Dashboard",
+      "verificationRequests": "Verifications requests",
       "clients": "Clients",
       "accounts": "Accounts",
       "referral": "Referral system",
       "payments": "Payments",
       "settings": "Settings",
+      "support": "Support",
+      "news": "News",
+      "mail": "Mails",
       "access": "Access"
     },
 
@@ -843,6 +853,10 @@
           "button": "Upload"
         }
       }
+    },
+
+    "support": {
+      "title": "Support"
     }
   }
 }

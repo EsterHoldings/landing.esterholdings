@@ -1,169 +1,299 @@
 <template>
-  <PanelDefault class="accounts__panel">
-    <div class="accounts__panel__options">
-      <div class="accounts__panel__option">
+  <div>
+
+    <!-- Top options -->
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center justify-center gap-1 w-full max-w-60">
         <UiInput
-            class="accounts__panel__option__search"
+            class="w-full"
             @input="handleInputSearch"
             :value="search"
             :placeholder="t('cabinet.accounts.search')"
-        />
-      </div>
-      <div class="accounts__panel__option">
-        <UiButtonDefault
-            state="success--outline"
-            @click="handleClickCreateNewAccount"
         >
-          {{ t("cabinet.accounts.openNew") }}
-        </UiButtonDefault
+          <template #icon-left>
+            <UiIconSearch />
+          </template>
+        </UiInput>
+      </div>
+      <div class="flex items-center justify-center gap-1">
+
+        <UiButtonDefault state="info--small" class="mr-2" @click="handleClickUpdate">
+          <UiIconUpdate v-if="!isLoading"/>
+          <UiIconSpinnerDefault v-if="isLoading"/>
+        </UiButtonDefault>
+
+        <UiSelect
+            class="mr-2"
+            :value="orderBy"
+            :data="sortByFilterData"
+            :withoutNoSelect="true"
+            @change="handleChangeFilterSortBy"
         >
-      </div>
-    </div>
-
-    <div class="accounts__panel__account_item__data-wrapper--header">
-      <div
-          class="accounts__content__account_item__data-wrapper--header__cell"
-      >
-              <span @click="handleOrderByAndDirection('type')">{{
-                  t("cabinet.accounts.columns.type")
-                }}</span>
-        <UiIconSort
-            :active="orderBy === 'type'"
-            :direction="orderDirection"
-            @click="handleOrderByAndDirection('type')"
-        />
-      </div>
-
-      <div
-          class="accounts__content__account_item__data-wrapper--header__cell"
-      >
-              <span @click="handleOrderByAndDirection('leverage')">{{
-                  t("cabinet.accounts.columns.leverage")
-                }}</span>
-        <UiIconSort
-            :active="orderBy === 'leverage'"
-            :direction="orderDirection"
-            @click="handleOrderByAndDirection('leverage')"
-        />
-      </div>
-
-      <div
-          class="accounts__content__account_item__data-wrapper--header__cell"
-      >
-              <span @click="handleOrderByAndDirection('number')">{{
-                  t("cabinet.accounts.columns.number")
-                }}</span>
-        <UiIconSort
-            :active="orderBy === 'number'"
-            :direction="orderDirection"
-            @click="handleOrderByAndDirection('number')"
-        />
-      </div>
-
-      <div
-          class="accounts__content__account_item__data-wrapper--header__cell"
-      >
-              <span @click="handleOrderByAndDirection('balance')">{{
-                  t("cabinet.accounts.columns.balance")
-                }}</span>
-        <UiIconSort
-            :active="orderBy === 'balance'"
-            :direction="orderDirection"
-            @click="handleOrderByAndDirection('balance')"
-        />
-      </div>
-    </div>
-
-    <template v-if="accounts.length === 0">
-      <div class="accounts__panel__nothing-to-show">
-        {{ t("cabinet.accounts.nothingToShow") }}
-      </div>
-    </template>
-
-    <template v-if="accounts.length > 0">
-      <PanelDefault
-          class="accounts__panel__account_item"
-          v-for="account in accounts"
-          :key="account.id"
-      >
-        <div class="accounts__panel__account_item__data-wrapper">
-          <div>{{ account.account_type.name }}</div>
-          <div>{{ account.leverage }}</div>
-          <div>{{ account.number }}</div>
-          <div>
-            <UiIconUpdate
-                class="icon-update"
-                ref="iconUpdate"
-                :class="{ spinning: spinIcon }"
-                @click="handleIconClick(account.id)"
-                @animationend="onIconAnimationEnd"
+          <template #icon-left>
+            <UiIconSortBy
+                class="mr-2 !w-[16px] !h-[16px]"
+                :orderDirectionEnabled="true"
+                :orderDirection="orderDirection"
             />
-            <span class="balance-sum">{{ account.balance }}</span>
-          </div>
-        </div>
-      </PanelDefault>
-    </template>
+          </template>
+        </UiSelect>
 
-    <div class="accounts__panel__pagination">
-      <button
-          class="page-btn"
-          v-if="currentPage !== 1 && total > perPage"
-          @click="goPrev"
-      >
-        {{ t("cabinet.accounts.pagination.prev") }}
-      </button>
-
-      <button
-          v-if="visiblePages[0] > 1"
-          class="page-link"
-          @click="setPage(1)"
-      >
-        1
-      </button>
-      <span v-if="visiblePages[0] > 2">...</span>
-
-      <button
-          v-for="page in visiblePages"
-          :key="page"
-          class="page-link"
-          :class="{ active: currentPage === page }"
-          @click="setPage(page)"
-      >
-        {{ page }}
-      </button>
-
-      <span v-if="visiblePages[visiblePages.length - 1] < totalPages"
-      >...</span
-      >
-      <button
-          v-if="visiblePages[visiblePages.length - 1] < totalPages"
-          class="page-link"
-          @click="setPage(totalPages)"
-      >
-        {{ totalPages }}
-      </button>
-
-      <button
-          class="page-btn"
-          v-if="currentPage !== totalPages && total > perPage"
-          @click="goNext"
-      >
-        {{ t("cabinet.accounts.pagination.next") }}
-      </button>
+        <UiButtonDefault state="info--small">
+          <UiIconFilters class="mr-2"/>
+          <UiTextSmall>Filters</UiTextSmall>
+        </UiButtonDefault>
+      </div>
     </div>
-  </PanelDefault>
+
+    <PanelDefault class="relative overflow-hidden">
+      <!-- Header -->
+      <div
+          class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_50px] items-center text-[var(--ui-text-main)] gap-x-5 gap-y-2 h-[46px] px-5 bg-[var(--color-stroke-ui-light)] rounded-t-[10px] w-full">
+        <div class="flex items-center justify-start">
+          <UiTextSmall class="cursor-default mr-[10px]" @click="handleOrderByAndDirection('type')">
+            {{ t("cabinet.accounts.columns.type") }}
+          </UiTextSmall>
+        </div>
+
+        <div class="flex items-center justify-start">
+          <UiTextSmall class="cursor-default mr-[10px]" @click="handleOrderByAndDirection('number')">
+            {{ t("cabinet.accounts.columns.number") }}
+          </UiTextSmall>
+          <UiIconSort
+              :active="orderBy === 'number'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('number')"
+          />
+        </div>
+
+        <div class="flex items-center justify-start">
+          <UiTextSmall class="cursor-default mr-[10px]" @click="handleOrderByAndDirection('leverage')">
+            {{ t("cabinet.accounts.columns.leverage") }}
+          </UiTextSmall>
+        </div>
+
+        <div class="flex items-center justify-end">
+          <UiTextSmall class="cursor-default mr-[10px]" @click="handleOrderByAndDirection('balance')">
+            {{ t("cabinet.accounts.columns.balance") }}
+          </UiTextSmall>
+          <UiIconSort
+              :active="orderBy === 'balance'"
+              :direction="orderDirection"
+              @click="handleOrderByAndDirection('balance')"
+          />
+        </div>
+
+        <div class="w-[240px]"></div>
+      </div>
+
+      <!-- Empty state -->
+      <template v-if="!isLoading && accounts.length === 0">
+        <div class="flex items-center justify-center flex-col gap-5 h-[calc(100vh-370px)]">
+          <span>{{ t("cabinet.accounts.nothingToShow") }}</span>
+          <UiButtonDefault state="success--outline" @click="handleClickCreateNewAccount">
+            {{ t("cabinet.accounts.openAccount") }}
+            &nbsp;
+            <UiIconSuccess/>
+          </UiButtonDefault>
+        </div>
+      </template>
+
+      <!-- Loader -->
+      <template v-if="isLoading">
+        <div class="flex items-center justify-center h-[calc(100vh-370px)]">
+          <UiIconSpinnerDefault/>
+        </div>
+      </template>
+
+      <!-- Accounts list -->
+      <div
+          v-if="!isLoading && accounts.length > 0"
+          ref="scrollArea"
+          class="rounded-b-[10px]"
+      >
+        <PanelDefault
+            class="flex items-center h-[60px] px-5 w-full !border-none rounded-none border-b border-[var(--color-stroke-ui-light)] last:border-b-0 hover:bg-[var(--color-stroke-ui-dark)]"
+            v-for="(account, index) in accounts"
+            :key="account.id"
+        >
+          <div
+              class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_50px] gap-x-5 gap-y-2 items-center text-[var(--ui-text-main)] w-full">
+            <div class="text-[var(--color-ui-accent)] font-bold">{{ account.account_type.name }}</div>
+            <div>{{ account.number }}</div>
+            <div>1:50</div>
+            <div class="flex items-center justify-end gap-[10px] text-right text-[20px] font-bold">
+              <span class="cursor-pointer">$ {{ account.balance }}</span>
+              <UiIconUpdate
+                  class="h-[14px] w-[14px] mr-[10px] cursor-pointer transition-transform duration-200 hover:animate-[wiggle_0.2s_ease]"
+                  ref="iconUpdate"
+                  :class="{ spinning: spinIcon }"
+                  @click="handleIconClick(account.id)"
+                  @animationend="onIconAnimationEnd"
+              />
+            </div>
+
+            <div class="flex justify-end items-center gap-[5px] w-auto">
+              <span
+                  @click="toggleRowOptions(index)"
+                  class="relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity"
+                  :ref="el => (triggerRefs[index] = el as HTMLElement)"
+              >
+                <UiIconDotsVertical />
+
+                <div
+                    v-if="currentRowActiveOptions === index"
+                    :ref="el => (menuRefs[index] = el as HTMLElement)"
+                    :class="[
+                    'p-3 absolute right-3 min-w-[100px] border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] rounded-md z-10 flex flex-col gap-1',
+                    dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto' : 'top-10'
+                  ]"
+                >
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                    <UiIconPayment class="!w-[14px] !h-[14px] stroke-[var(--ui-sticker-success)]"/>
+                    <UiTextSmall class="whitespace-nowrap">Deposit</UiTextSmall>
+                  </div>
+
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                      :class="{'bg-[var(--color-stroke-ui-light)]': false}"
+                  >
+                    <UiIconWithdraw class="!w-[14px] !h-[14px]"/>
+                    <UiTextSmall class="whitespace-nowrap">Withdraw</UiTextSmall>
+                  </div>
+
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                      :class="{'bg-[var(--color-stroke-ui-light)]': false}"
+                      @click="handleClickTransfer(account.id)"
+                  >
+                    <UiIconTransfer class="!w-[14px] !h-[14px]"/>
+                    <UiTextSmall class="whitespace-nowrap">Transfer</UiTextSmall>
+                  </div>
+
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                      :class="{'bg-[var(--color-stroke-ui-light)]': false}"
+                      @click="handleClickHistory(account.id)"
+                  >
+                    <UiIconHistory class="!w-[14px] !h-[14px]"/>
+                    <UiTextSmall class="whitespace-nowrap">History</UiTextSmall>
+                  </div>
+
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                      :class="{'bg-[var(--color-stroke-ui-light)]': false}"
+                  >
+                    <UiIconUpdate class="!w-[14px] !h-[14px]"/>
+                    <UiTextSmall class="whitespace-nowrap">Change type</UiTextSmall>
+                  </div>
+
+                  <div
+                      class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                      :class="{'bg-[var(--color-stroke-ui-light)]': false}"
+                      @click="handleClickDelete(account.id)"
+                  >
+                    <UiIconTrash class="!w-[14px] !h-[14px] stroke-[var(--ui-sticker-danger)]"/>
+                    <UiTextSmall class="whitespace-nowrap">Remove</UiTextSmall>
+                  </div>
+                </div>
+              </span>
+            </div>
+          </div>
+        </PanelDefault>
+      </div>
+    </PanelDefault>
+
+    <div class="px-5 h-[50px] mt-2 flex items-center justify-between">
+      <div class="p-0 flex items-center justify-center [&>div]:h-[33px] [&>div]:w-[33px]">
+        <UiTextSmall class="mr-2">Per page:</UiTextSmall>
+        <UiSelect
+            class="!w-min flex items-center justify-center !h-[32px]"
+            :data="perPageList"
+            :value="perPage"
+            @change="handleChangePerPage"
+            :withoutNoSelect="true"
+        />
+      </div>
+
+      <UiTextSmall>{{ (currentPage * perPage) - perPage }}-{{ currentPage * perPage }} / {{ total }}</UiTextSmall>
+
+      <div class="flex items-center justify-center gap-2">
+        <UiTextSmall
+            class="px-3 py-1.5 h-[32px] border border-[--color-stroke-ui-dark] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+            v-if="currentPage !== 1 && total > perPage"
+            @click="goPrev"
+        >
+          {{ t("cabinet.accounts.pagination.prev") }}
+        </UiTextSmall>
+
+        <UiTextSmall
+            v-if="visiblePages[0] > 1"
+            class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+            @click="setPage(1)"
+        >
+          1
+        </UiTextSmall>
+
+        <UiTextSmall v-if="visiblePages[0] > 2">...</UiTextSmall>
+
+        <UiTextSmall
+            v-for="page in visiblePages"
+            :key="page"
+            class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+            :class="{ 'bg-[var(--color-ui-primary)] text-white': currentPage === page }"
+            @click="setPage(page)"
+        >
+          {{ page }}
+        </UiTextSmall>
+
+        <UiTextSmall v-if="visiblePages[visiblePages.length - 1] < totalPages">...</UiTextSmall>
+
+        <UiTextSmall
+            v-if="visiblePages[visiblePages.length - 1] < totalPages"
+            class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+            @click="setPage(totalPages)"
+        >{{ totalPages }}
+        </UiTextSmall>
+
+        <UiTextSmall
+            class="px-3 py-1.5 border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+            v-if="currentPage !== totalPages && total > perPage"
+            @click="goNext"
+        >
+          {{ t("cabinet.accounts.pagination.next") }}
+        </UiTextSmall>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
-import UiIconSort from "~/components/ui/UiIconSort.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import UiInput from "~/components/ui/UiInput.vue";
-import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
-import {useI18n} from "vue-i18n";
-import useAppCore from "~/composables/useAppCore";
-import {computed, inject, onMounted, reactive, ref} from "vue";
 import AccountsCreateNew from "~/pages/accounts/components/AccountsCreateNew.vue";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+import UiIconFilters from "~/components/ui/UiIconFilters.vue";
+import UiIconHistory from "~/components/ui/UiIconHistory.vue";
+import UiIconPayment from "~/components/ui/UiIconPayment.vue";
+import UiIconSort from "~/components/ui/UiIconSort.vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
+import UiIconTransfer from "~/components/ui/UiIconTransfer.vue";
+import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
+import UiInput from "~/components/ui/UiInput.vue";
+import UiSelect from "~/components/ui/UiSelect.vue";
+import useAppCore from "~/composables/useAppCore";
+import useEventBus from "~/composables/useEventBus";
+import {computed, inject, onMounted, reactive, ref, nextTick, onBeforeUnmount} from "vue";
+import {navigateTo} from "nuxt/app";
+import {useI18n} from "vue-i18n";
+import {useToast} from "vue-toastification";
+import UiIconSortBy from "~/components/ui/UiIconSortBy.vue";
+import UiTextSmall from "~/components/ui/UiTextSmall.vue";
+import UiIconSearch from "~/components/ui/UiIconSearch.vue";
+import UiIconDotsVertical from "~/components/ui/UiIconDotsVertical.vue";
+import UiIconWithdraw from "~/components/ui/UiIconWithdraw.vue";
+import UiIconTrash from "~/components/ui/UiIconTrash.vue";
 
 const {t} = useI18n({useScope: "global"});
 const appCore = useAppCore();
@@ -171,20 +301,59 @@ const appCore = useAppCore();
 const ORDER_DIRECTION_ASC = "asc";
 const ORDER_DIRECTION_DESC = "desc";
 
+const toast = useToast();
+
+const isLoading = ref(true);
+
 const search = ref("");
 const total = ref(0);
-const perPage = ref(6);
+const perPage = ref(7);
 const currentPage = ref(1);
-const orderBy = ref("");
+const orderBy = ref("balance");
 const orderDirection = ref(ORDER_DIRECTION_DESC);
+const currentRowActiveOptions = ref<number | null>(null);
 
-const accounts = reactive([]);
+const sortByFilterData = reactive(
+    [
+      {
+        id: 'number',
+        value: 'number',
+        text: 'Number'
+      },
+      {
+        id: 'balance',
+        value: 'balance',
+        text: 'Balance'
+      }
+    ]
+)
+
+const accounts = reactive<any[]>([]);
 const spinIcon = ref(false);
 
 const totalPages = computed(() => Math.ceil(total.value / perPage.value));
 
+const perPageList = reactive([
+  {id: 1, value: 1, text: "1"},
+  {id: 2, value: 2, text: "2"},
+  {id: 3, value: 3, text: "3"},
+  {id: 4, value: 4, text: "4"},
+  {id: 5, value: 5, text: "5"},
+  {id: 6, value: 6, text: "6"},
+  {id: 7, value: 7, text: "7"},
+  {id: 8, value: 8, text: "8"},
+  {id: 9, value: 9, text: "9"},
+  {id: 10, value: 10, text: "10"},
+  {id: 12, value: 12, text: "12"},
+  {id: 15, value: 15, text: "15"},
+  {id: 20, value: 20, text: "20"},
+  {id: 25, value: 25, text: "25"},
+  {id: 50, value: 50, text: "50"},
+  {id: 100, value: 100, text: "100"},
+]);
+
 const visiblePages = computed(() => {
-  const pages = [];
+  const pages: number[] = [];
   const maxPagesToShow = 5;
   const half = Math.floor(maxPagesToShow / 2);
 
@@ -224,7 +393,7 @@ async function goNext() {
 }
 
 const handleIconClick = (id: string) => {
-  const account = accounts.find((x) => x.id === id);
+  const account: any = accounts.find((x: any) => x.id === id);
   if (account) account.isSpinning = true;
 };
 
@@ -232,13 +401,13 @@ const onIconAnimationEnd = () => {
   spinIcon.value = false;
 };
 
-const handleInputSearch = async (value) => {
+const handleInputSearch = async (value: any) => {
   search.value = value;
   currentPage.value = 1;
   await loadData();
 };
 
-const handleOrderByAndDirection = async (value) => {
+const handleOrderByAndDirection = async (value: string) => {
   orderDirection.value =
       orderDirection.value === ORDER_DIRECTION_ASC
           ? ORDER_DIRECTION_DESC
@@ -247,7 +416,24 @@ const handleOrderByAndDirection = async (value) => {
   await loadData();
 };
 
+const handleChangePerPage = async (newPerPage: number) => {
+  perPage.value = newPerPage;
+  await loadData();
+};
+
+const handleChangeFilterSortBy = async (value: string) => {
+  if (orderBy.value === value)
+    orderDirection.value = orderDirection.value === ORDER_DIRECTION_DESC
+        ? ORDER_DIRECTION_ASC
+        : ORDER_DIRECTION_DESC;
+  else
+    orderBy.value = value;
+
+  await loadData();
+}
+
 const loadData = async () => {
+  isLoading.value = true;
   const response = await appCore.accounts.get({
     search: search.value,
     perPage: perPage.value,
@@ -259,55 +445,109 @@ const loadData = async () => {
   perPage.value = response.data.data.per_page;
   currentPage.value = response.data.data.current_page;
   total.value = response.data.data.total;
-  const accountsData = response.data.data.data.map((x) => {
+  const accountsData = response.data.data.data.map((x: any) => {
     x.isSpinning = false;
     return x;
   });
   accounts.splice(0, accounts.length, ...accountsData);
+
+  isLoading.value = false;
 };
 
-// --- --- ---
+// --- Dropdown flip logic ---
+const scrollArea = ref<HTMLElement | null>(null);
+const triggerRefs = ref<(HTMLElement | null)[]>([]);
+const menuRefs = ref<(HTMLElement | null)[]>([]);
+const dropUp = reactive<Record<number, boolean>>({});
+
+const toggleRowOptions = async (index: number) => {
+  currentRowActiveOptions.value =
+      currentRowActiveOptions.value === index ? null : index;
+  await nextTick();
+  if (currentRowActiveOptions.value === index) {
+    updateMenuPosition(index);
+  }
+};
+
+const updateMenuPosition = (index: number) => {
+  const trigger = triggerRefs.value[index];
+  const menu = menuRefs.value[index];
+  if (!trigger || !menu) return;
+
+  const offset = 8; // px
+  const menuHeight = menu.offsetHeight;
+  const triggerRect = trigger.getBoundingClientRect();
+  const containerRect =
+      (scrollArea.value ?? document.documentElement).getBoundingClientRect();
+
+  const fitsDown =
+      triggerRect.bottom + offset + menuHeight <= containerRect.bottom;
+
+  dropUp[index] = !fitsDown;
+};
+
+onMounted(async () => {
+  useEventBus.on("loadDataForAccounts", loadData);
+  await loadData();
+
+  const recalc = () => {
+    if (currentRowActiveOptions.value != null) {
+      updateMenuPosition(currentRowActiveOptions.value);
+    }
+  };
+  window.addEventListener("resize", recalc);
+  scrollArea.value?.addEventListener("scroll", recalc, {passive: true});
+
+  onBeforeUnmount(() => {
+    window.removeEventListener("resize", recalc);
+    scrollArea.value?.removeEventListener("scroll", recalc);
+  });
+});
+
+// --- ---
 
 const {openModal} = inject("modalControl") as { openModal: Function };
-// const { closeModal } = inject("modalControl") as { closeModal: Function };
+
+const handleClickUpdate = async () => {
+  await loadData();
+};
+
+const handleClickTransfer = async (accountId: string, tab: number | string = 0) => {
+
+  currentRowActiveOptions.value = null;
+
+  return navigateTo({
+    path: `/accounts/${encodeURIComponent(accountId)}`,
+    query: {tab: String(tab)},
+  });
+};
+
+const handleClickHistory = (accountId: string, tab: number | string = 1) => {
+
+  currentRowActiveOptions.value = null;
+
+  return navigateTo({
+    path: `/accounts/${encodeURIComponent(accountId)}`,
+    query: {tab: String(tab)},
+  });
+};
+
+const handleClickDelete = async (accountId: string) => {
+  if (confirm("Are you sure?")) {
+    await appCore.accounts.delete(accountId);
+    await loadData();
+    toast.success("Account deleted!");
+  }
+  currentRowActiveOptions.value = null;
+};
 
 const handleClickCreateNewAccount = () =>
     openModal(AccountsCreateNew, {
       title: t("cabinet.accounts.accounts-form.title"),
     });
-
-onMounted(async () => {
-  await loadData();
-});
 </script>
 
-<style lang="scss" scoped>
-.icon-update {
-  height: 14px;
-  width: 14px;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: transform 0.2s;
-
-  &:hover {
-    animation: wiggle 0.2s ease;
-  }
-}
-
-.icon-update.spinning {
-  animation: spin 0.5s linear;
-}
-
-.balance-sum {
-  cursor: pointer;
-}
-
-.wiggle:hover {
-  animation: wiggle 0.3s ease;
-}
-
-/* ========== KEYFRAMES ========== */
-
+<style lang="postcss" scoped>
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -338,122 +578,8 @@ onMounted(async () => {
   }
 }
 
-.accounts__panel {
-  padding: 20px;
-
-  &__nothing-to-show {
-    height: 40vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__option {
-    &s {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-
-    }
-
-    &__search {
-      width: 400px;
-    }
-  }
-
-  &__account_item__data-wrapper--header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    color: var(--ui-text-main);
-    column-gap: 20px;
-    row-gap: 10px;
-    padding: 20px;
-    width: 100%;
-
-    & > div:last-child {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    &__cell {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-
-      span {
-        cursor: default;
-
-        &:first-child {
-          margin-right: 10px;
-        }
-      }
-    }
-  }
-
-  &__account_item {
-    padding: 20px;
-    width: 100%;
-    margin-bottom: 10px;
-
-    &:hover {
-      background-color: var(--color-stroke-ui-dark);
-    }
-
-    &__options {
-      background-color: red;
-      // code...
-      &.input {
-        border-radius: 8px;
-      }
-    }
-
-    &__data-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      column-gap: 20px;
-      row-gap: 10px;
-      align-items: center;
-      color: var(--ui-text-main);
-
-      > div:first-child {
-        color: var(--color-ui-accent);
-        font-weight: bold;
-      }
-
-      > div:last-child {
-        text-align: right;
-        font-size: 20px;
-        font-weight: bold;
-      }
-    }
-  }
-
-  &__pagination {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-
-    .page-btn,
-    .page-link {
-      padding: 6px 12px;
-      border: 1px solid var(--color-ui-border);
-      background: var(--ui-background);
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
-      color: var(--ui-text-main);
-    }
-
-    .page-link.active {
-      background: var(--color-ui-accent);
-      color: #fff;
-      border-color: var(--color-ui-accent);
-    }
-  }
-
+/* Локальний клас без Tailwind layer */
+.spinning {
+  animation: spin 0.5s linear;
 }
 </style>

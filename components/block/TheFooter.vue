@@ -1,10 +1,8 @@
 <template>
   <div class="footer__wrapper">
-    <UiContainer>
       <footer class="footer">
           <UiTextSmall>Copyright © Ester Holdings Inc. All rights reserved</UiTextSmall>
       </footer>
-    </UiContainer>
   </div>
 </template>
 
@@ -19,14 +17,18 @@ import UiContainer from "~/components/ui/UiContainer.vue";
   padding: 0 20px;
 
   width: 100%;
-  height: 100px;
+  height: 55px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   &__wrapper {
-    padding-left: 100px;
+    padding-left: 170px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

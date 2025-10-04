@@ -1,22 +1,37 @@
 <template>
-  <div class="user-photo__wrapper">
-    <PanelDefault class="user-photo-uploader">
-      <div class="uploader-body">
-        <div v-if="previewUrl" class="avatar-preview">
-          <UiImage @click="clickSelectionFile" :src="previewUrl"/>
-          <div
-              v-if="previewUrl && !loading"
-              class="btn-delete"
+  <div class="text-[var(--ui-text-main)]">
+    <PanelDefault class="mx-auto text-center p-5 w-[350px]">
+      <div class="flex flex-col items-center gap-4">
+        <!-- AVATAR -->
+        <div v-if="previewUrl" class="relative w-[300px] h-[300px] rounded-[10px] bg-[var(--ui-background)] border border-[var(--color-stroke-ui-dark)] overflow-hidden">
+          <UiImage
+              :src="previewUrl"
+              class="w-full h-full object-cover cursor-pointer"
+              @click="clickSelectionFile"
+          />
+          <button
+              v-if="!loading"
+              class="absolute -right-2 -top-2 z-30 h-[30px] w-[30px] rounded-full border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background)] text-[var(--ui-text-main)] flex items-center justify-center hover:bg-red-500 transition"
               @click="remove"
-          ></div>
+              aria-label="Delete photo"
+              type="button"
+          >
+            ×
+          </button>
         </div>
-        <div v-else class="avatar-placeholder" @click="clickSelectionFile">
-          <span class="icon">👤</span>
-          <span class="avatar-placeholder__choose-file">
-            {{ t("cabinet.profile.components.tab-user-photo.buttons.choose") }}
-          </span>
+
+        <div v-else class="relative w-[300px] h-[300px] rounded-[10px] bg-[var(--ui-background)] border border-[var(--color-stroke-ui-dark)] flex items-center justify-center group cursor-pointer" @click="clickSelectionFile">
+          <span class="text-7xl text-gray-400">👤</span>
+
+          <div class="absolute left-0 right-0 bottom-0 h-[35%] w-full p-2.5 flex items-center justify-center bg-[var(--ui-background-secondary)] rounded-b-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="text-[var(--ui-text-main)]">
+              {{ t("cabinet.profile.components.tab-user-photo.buttons.choose") }}
+            </span>
+          </div>
         </div>
-        <div class="actions">
+
+        <!-- ACTIONS -->
+        <div class="flex flex-col gap-5 w-full">
           <input
               id="fileSelectionBtn"
               type="file"
@@ -24,8 +39,9 @@
               @change="onFileChange"
               hidden
           />
+
           <UiButtonDefault
-              class="btn-upload"
+              class="cursor-pointer text-[var(--ui-text-main)]"
               state="info--outline"
               :disabled="!file || loading || !!error"
               @click="upload"
@@ -33,46 +49,47 @@
             {{ loading ? uploadProgress + "%" : t("cabinet.profile.components.tab-user-photo.buttons.upload") }}
           </UiButtonDefault>
         </div>
-        <div v-if="loading" class="progress-bar">
-          <div class="progress" :style="{ width: uploadProgress + '%' }"/>
-        </div>
-        <p v-if="error" class="error">{{ error }}</p>
 
-        <UiTextSmall>Поддерживаемые форматы файлов: PNG, JPG, JPEG</UiTextSmall>
-        <UiTextSmall>Фото пользователя не должно превышать размер в 5Мб.</UiTextSmall>
+        <!-- PROGRESS -->
+        <div v-if="loading" class="w-full h-1.5 bg-[var(--color-ui-primary-defalt)] rounded-md overflow-hidden">
+          <div class="h-full bg-blue-500 transition-[width] duration-200" :style="{ width: uploadProgress + '%' }"></div>
+        </div>
+
+        <!-- ERROR -->
+        <p v-if="error" class="text-red-600 mt-2">{{ error }}</p>
+
+        <UiTextSmall>Підтримувані формати: PNG, JPG, JPEG</UiTextSmall>
+        <UiTextSmall>Фото не повинно перевищувати 5&nbsp;МБ.</UiTextSmall>
       </div>
 
-      <UiHorizontalLine/>
+      <UiHorizontalLine class="my-5" />
 
-      <UiTextH5 class="user-photo__panel__title"># Статус верификации</UiTextH5>
-      <div class="user-photo__panel__verification-status">
-          <span>
-            <UiIconSuccess/>
-          </span>
-        <UiTextSmall>Успешно верифицировано!</UiTextSmall>
+      <UiTextH5 class="mb-5"># Статус верифікації</UiTextH5>
+      <div class="flex items-center justify-center gap-2">
+        <span><UiIconSuccess /></span>
+        <UiTextSmall>Успішно верифіковано!</UiTextSmall>
       </div>
     </PanelDefault>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {useI18n} from "vue-i18n";
+import { useI18n } from "vue-i18n";
 import axios from "axios";
-import {ref, computed, onMounted} from "vue";
-import {useToast} from "vue-toastification";
+import { ref, computed, onMounted } from "vue";
+import { useToast } from "vue-toastification";
 
 import useApi from "~/composables/useApi";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import {useAuthStore} from "~/stores/authStore";
+import { useAuthStore } from "~/stores/authStore";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiHorizontalLine from "~/components/ui/UiHorizontalLine.vue";
 import UiImage from "~/components/ui/UiImage.vue";
 
-const {t} = useI18n();
+const { t } = useI18n();
 const toast = useToast();
 const api = new useApi(true);
 const authStore = useAuthStore();
@@ -117,30 +134,25 @@ async function upload() {
   error.value = "";
 
   try {
-    const {data} = await api.post("client/s3/presign", {
+    const { data } = await api.post("client/s3/presign", {
       filename: file.value.name,
       contentType: file.value.type,
     });
 
     await axios.put(data.url, file.value, {
-      headers: {"Content-Type": file.value.type},
+      headers: { "Content-Type": file.value.type },
       onUploadProgress: (e) => {
         uploadProgress.value = Math.round((e.loaded * 100) / (e.total || 1));
       },
     });
 
-    const res = await api.post("client/user/photo", {key: data.key});
-    // Оновлюємо як локально, так і в Pinia
+    const res = await api.post("client/user/photo", { key: data.key });
     previewUrl.value = res.data.photo_url;
     file.value = null;
 
-    toast.success(
-        t("cabinet.profile.components.tab-user-photo.messages.upload_success")
-    );
+    toast.success(t("cabinet.profile.components.tab-user-photo.messages.upload_success"));
   } catch {
-    error.value = t(
-        "cabinet.profile.components.tab-user-photo.messages.upload_error"
-    );
+    error.value = t("cabinet.profile.components.tab-user-photo.messages.upload_error");
   } finally {
     loading.value = false;
   }
@@ -153,198 +165,15 @@ async function remove() {
     await api.delete("client/user/photo");
     previewUrl.value = "";
     file.value = null;
-    toast.success(
-        t("cabinet.profile.components.tab-user-photo.messages.delete_success")
-    );
+    toast.success(t("cabinet.profile.components.tab-user-photo.messages.delete_success"));
   } catch {
-    error.value = t(
-        "cabinet.profile.components.tab-user-photo.messages.delete_error"
-    );
+    error.value = t("cabinet.profile.components.tab-user-photo.messages.delete_error");
   } finally {
     loading.value = false;
   }
 }
 
 onMounted(async () => {
-  // Підвантажуємо дані користувача разом з photoUrl
   await authStore.initAuth();
 });
 </script>
-
-<style lang="scss" scoped>
-.user-photo {
-  color: var(--ui-text-main);
-
-  &__wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    width: 350px;
-    margin: auto;
-  }
-
-  &__panel {
-    padding: 20px;
-    height: 100%;
-    width: 100%;
-    color: var(--ui-text-main);
-
-    &__title {
-      margin-bottom: 20px;
-    }
-
-    &__text {
-      margin-bottom: 20px;
-    }
-
-    &__verification-status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-  }
-}
-
-.btn-delete {
-  background: var(--ui-background);
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  position: absolute;
-  right: -10px;
-  top: -10px;
-  z-index: 3;
-  border: 1px solid var(--color-stroke-ui-dark);
-
-  &:hover {
-    background: #ef4444;
-  }
-
-  &::before {
-    content: "×";
-    display: flex;
-    justify-content: center;
-    font-size: 18px;
-    height: 30px;
-    align-items: center;
-    margin-top: -2px;
-    width: 30px;
-    text-align: center;
-    color: var(--ui-text-main);
-    border-radius: 50%;
-    transform: translate(-0.06rem, -0.06rem);
-  }
-}
-
-.user-photo-uploader {
-  margin: 0 auto;
-  text-align: center;
-  padding: 20px;
-
-  .title {
-    margin-bottom: 20px;
-  }
-
-  .uploader-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .avatar-preview,
-  .avatar-placeholder {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    border-radius: 10px;
-    background: var(--ui-background);
-    border: 1px solid var(--color-stroke-ui-dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    img {
-      border-radius: 10px;
-    }
-
-    &:hover .avatar-placeholder__choose-file {
-      visibility: visible;
-      transition: visibility 0.2s;
-    }
-
-    &__choose-file {
-      z-index: 3;
-
-      visibility: hidden;
-      transition: visibility 0.2s;
-
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-
-      height: 35%;
-      width: 100%;
-
-      padding: 10px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      cursor: pointer;
-
-      background-color: var(--ui-background-secondary);
-      border-radius: 0 0 10px 10px;
-    }
-  }
-
-  .avatar-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .icon {
-    font-size: 4.5rem;
-    color: #9ca3af;
-  }
-
-  .actions {
-    gap: 20px;
-    display: flex;
-    flex-direction: column;
-
-    .btn-select {
-      cursor: pointer;
-      color: var(--ui-text-main);
-    }
-
-    .btn-upload {
-      cursor: pointer;
-      color: var(--ui-text-main);
-    }
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: var(--color-ui-primary-defalt);
-    border-radius: 3px;
-    overflow: hidden;
-
-    .progress {
-      height: 100%;
-      background: #3b82f6;
-      transition: width 0.2s;
-    }
-  }
-
-  .error {
-    color: #dc2626;
-    margin-top: 8px;
-  }
-}
-</style>

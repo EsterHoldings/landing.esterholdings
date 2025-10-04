@@ -4,10 +4,6 @@
       :class="{ active: isActive }"
       @click="handleClickMenuItem($event)"
   >
-    <div
-        class="side-bar-cabinet__menu__item__indicator"
-        :class="{ active: isActive }"
-    ></div>
 
     <div class="side-bar-cabinet__menu__item__icon">
       <component :is="icon"></component>
@@ -59,43 +55,30 @@ const handleClickMenuItem = (event: Event) => emit("click", props.to);
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
   margin-top: 1px;
-  height: 80px;
+  height: 40px;
+  padding: 0 16px;
   background-color: transparent;
   transition: 0.3s;
+  margin-bottom: 5px;
+  border-radius: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   &.active {
-    background-color: var(--ui-background-sidebar-link);
-    border-right: 1px solid var(--color-stroke-ui);
+    background-color: var(--color-stroke-ui-light);
   }
 
   &:hover {
     transition: 0.3s;
-    background-color: var(--ui-background-sidebar-link);
-  }
-
-  &.active {
-    border-right: 1px solid var(--ui-stroke);
-  }
-
-  &__indicator {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1px;
-    height: 100%;
-
-    background-color: var(--ui-stroke);
-
-    &.active {
-      background-color: var(--color-ui-primary);
-    }
+    background-color: var(--color-stroke-ui-light);
   }
 
   &__icon {
-    padding-top: 10px;
     color: var(--ui-text-main);
 
     svg {
@@ -105,19 +88,18 @@ const handleClickMenuItem = (event: Event) => emit("click", props.to);
   }
 
   &__title {
-    padding: 0 10px 10px;
     width: 100%;
     height: 100%;
     transition: 3s;
     opacity: 1;
-    white-space: pre-wrap;
+    white-space: nowrap;
     text-align: center;
     cursor: pointer;
 
     z-index: 3;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
     color: var(--ui-text-main);
     font-size: 14px;

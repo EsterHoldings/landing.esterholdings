@@ -1,27 +1,65 @@
 <template>
-  <div :class="['select', { dropup }]" ref="wrapper">
-    <div
-      ref="body"
-      class="select__body"
-      :class="{ 'is-open': isOpen, 'is-invalid': props.isDirty && props.isInvalid }"
-      @click="toggle"
-      v-html="displayText"
-    ></div>
+  <div ref="wrapper" class="relative">
+    <button
+        ref="body"
+        type="button"
+        class="select outline-none inline-flex h-10 w-full items-center justify-start gap-2 rounded-xl border bg-[var(--color-stroke-ui-dark)] px-5 text-[var(--color-ui-text)] transition
+           border-[var(--color-stroke-ui-light)]
+        "
+        :data-open="isOpen || null"
+        :data-open-up="dropup || null"
+        :data-invalid="(props.isDirty && props.isInvalid) || null"
+        :aria-expanded="isOpen ? 'true' : 'false'"
+        aria-haspopup="listbox"
+        @click.stop="toggle"
+    >
+      <div v-if="slots['icon-left']" class="shrink-0">
+        <slot name="icon-left"/>
+      </div>
 
-    <div v-if="isOpen" class="select__options">
-      <div
-        class="select__option no-select"
-        :class="{ active: internalValue === null }"
-        @click="choose(null)"
-      >{{ t("ui-components.ui-select") }}</div>
-      <div
-        v-for="item in data"
-        :key="item.value"
-        class="select__option"
-        :class="{ active: internalValue === item.value }"
-        @click="choose(item)"
-        v-html="item.text"
-      ></div>
+      <UiTextSmall
+          class="block w-full text-left text-[0.875rem] font-medium"
+          v-html="displayText"
+      />
+
+      <div class="ml-2 shrink-0">
+        <UiIconArrowDown :rotate180="isOpen"/>
+      </div>
+    </button>
+
+    <div
+        v-if="isOpen"
+        ref="menu"
+        class="absolute left-0 z-50 w-full overflow-y-auto rounded border bg-[var(--color-stroke-ui-dark)] p-2 shadow-lg
+             border-[var(--color-stroke-ui-light)]
+             data-[down=true]:top-full data-[down=true]:mt-2
+             data-[up=true]:bottom-full data-[up=true]:mb-2"
+        role="listbox"
+        :data-down="(!dropup) || null"
+        :data-up="(dropup) || null"
+        :style="dropdownInlineStyle"
+        @click.stop
+    >
+      <UiTextSmall
+          v-if="!withoutNoSelect"
+          class="select__option block h-10 cursor-pointer rounded px-5 text-[var(--color-ui-text)] font-semibold text-[0.8125rem] hover:bg-[var(--color-stroke-ui-light)]"
+          :class="{ 'opacity-80': internalValue === null }"
+          role="option"
+          :aria-selected="internalValue === null ? 'true' : 'false'"
+          @click="choose(null)"
+      >{{ t('ui-components.ui-select') }}
+      </UiTextSmall>
+
+      <UiTextSmall
+          v-for="item in data"
+          :key="item.value"
+          class="select__option flex items-center justify-start mb-1 h-10 cursor-pointer rounded px-5 text-[var(--color-ui-text)] hover:bg-[var(--color-stroke-ui-light)] last:mb-0"
+          :class="{ 'font-semibold': internalValue === item.value }"
+          role="option"
+          :aria-selected="internalValue === item.value ? 'true' : 'false'"
+          v-html="item.text"
+          @click="choose(item)"
+      />
     </div>
 
     <select v-model="internalValue" hidden>
@@ -31,143 +69,133 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from "vue-i18n";
-import { ref, computed, watch, nextTick } from "vue";
+import {useI18n} from 'vue-i18n'
+import {useSlots, ref, computed, watch, nextTick, onMounted, onBeforeUnmount} from 'vue'
+import UiIconArrowDown from '~/components/ui/UiIconArrowDown.vue'
+import UiTextSmall from '~/components/ui/UiTextSmall.vue'
 
 interface Option {
-  id: string;
-  value: string;
-  text: string;
+  id: string
+  value: string
+  text: string
 }
-const { t } = useI18n({ useScope: "global" });
+
+const {t} = useI18n({useScope: 'global'})
+const slots = useSlots()
 
 interface Props {
   data: Option[]
   value?: string | null
   isDirty?: boolean
   isInvalid?: boolean
+  withoutNoSelect?: boolean
 }
 
-const props = withDefaults(
-    defineProps<Props>(),
-    {
-      isDirty: false,
-      isInvalid: false,
-    }
-)
-const emit = defineEmits(["change"]);
-const data = props.data;
+const props = withDefaults(defineProps<Props>(), {
+  isDirty: false,
+  isInvalid: false,
+  withoutNoSelect: false,
+})
+const emit = defineEmits<{
+  (e: 'change', v: string | null): void
+  (e: 'blur', v: string): void
+}>()
 
-const isOpen = ref(false);
-const dropup = ref(false);
-const body = ref<HTMLElement | null>(null);
+const data = props.data
+const isOpen = ref(false)
+const dropup = ref(false)
+const body = ref<HTMLElement | null>(null)
+const wrapper = ref<HTMLElement | null>(null)
+const menu = ref<HTMLElement | null>(null)
 
-const internalValue = ref<string | null>(props.value ?? null);
-watch(
-  () => props.value,
-  (v) => (internalValue.value = v ?? null)
-);
+const internalValue = ref<string | null>(props.value ?? null)
+watch(() => props.value, v => (internalValue.value = v ?? null))
 
 const displayText = computed(
-  () =>
-    data.find((i) => i.value === internalValue.value)?.text ||
-    t("ui-components.ui-select")
-);
+    () => data.find(i => i.value === internalValue.value)?.text || t('ui-components.ui-select')
+)
+
+const dropdownInlineStyle = ref<Record<string, string>>({})
 
 function toggle() {
-  isOpen.value = !isOpen.value;
-  if (isOpen.value) nextTick(calcDropup);
+  isOpen.value = !isOpen.value
+  if (isOpen.value) {
+    nextTick(() => {
+      calcPlacement()
+      addGlobalListeners()
+    })
+  } else {
+    emit('blur', internalValue.value ?? '')
+    removeGlobalListeners()
+  }
 }
 
-function calcDropup() {
-  if (!body.value) return;
-  const rect = body.value.getBoundingClientRect();
-  const spaceBelow = window.innerHeight - rect.bottom;
-  const optionHeight = 40; // px per option
-  const totalOptions = data.length + 1;
-  const dropdownHeight = Math.min(250, totalOptions * optionHeight);
-  dropup.value = spaceBelow < dropdownHeight;
+function calcPlacement() {
+  if (!body.value) return
+  const rect = body.value.getBoundingClientRect()
+  const margin = 8 // відступ від поля
+  const viewportH = window.innerHeight
+
+  const spaceBelow = viewportH - rect.bottom - margin
+  const spaceAbove = rect.top - margin
+
+  // орієнтація: якщо знизу не поміщається — відкриваємо вгору
+  dropup.value = spaceBelow < 160 && spaceAbove > spaceBelow
+
+  // динамічний max-height списку (щоб не “вилазив” за екран)
+  const maxH = Math.max(120, Math.min(250, dropup.value ? spaceAbove : spaceBelow))
+  dropdownInlineStyle.value = {
+    maxHeight: `${Math.floor(maxH)}px`,
+  }
 }
 
 function choose(item: Option | null) {
-  internalValue.value = item?.value ?? null;
-  console.log('-=-=-=-=-=-', item?.value, internalValue.value);
-  emit("change", internalValue.value);
-  isOpen.value = false;
+  isOpen.value = false
+  internalValue.value = item?.value ?? null
+  emit('change', internalValue.value)
+  emit('blur', internalValue.value ?? '')
+  removeGlobalListeners()
 }
+
+function onClickOutside(e: MouseEvent) {
+  const el = wrapper.value
+  if (!el) return
+  if (!el.contains(e.target as Node)) {
+    isOpen.value = false
+    emit('blur', internalValue.value ?? '')
+    removeGlobalListeners()
+  }
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (!isOpen.value) return
+  if (e.key === 'Escape') {
+    isOpen.value = false
+    emit('blur', internalValue.value ?? '')
+    removeGlobalListeners()
+  }
+}
+
+function onWindowChange() {
+  if (isOpen.value) calcPlacement()
+}
+
+function addGlobalListeners() {
+  document.addEventListener('click', onClickOutside, true)
+  window.addEventListener('resize', onWindowChange, {passive: true})
+  window.addEventListener('scroll', onWindowChange, {passive: true})
+  document.addEventListener('keydown', onKeydown)
+}
+
+function removeGlobalListeners() {
+  document.removeEventListener('click', onClickOutside, true)
+  window.removeEventListener('resize', onWindowChange)
+  window.removeEventListener('scroll', onWindowChange)
+  document.removeEventListener('keydown', onKeydown)
+}
+
+onMounted(() => {
+  calcPlacement()
+})
+onBeforeUnmount(removeGlobalListeners)
 </script>
-
-<style scoped lang="scss">
-.select {
-  position: relative;
-  &.dropup {
-    .select__options {
-      top: auto;
-      bottom: 100%;
-      border-bottom: none;
-      border-radius: 10px 10px 0 0;
-    }
-    .select__body.is-open {
-      border-top: none;
-      border-radius: 0 0 10px 10px;
-    }
-  }
-}
-
-.select__body {
-  box-sizing: border-box;
-  padding: 0 1.25rem;
-  height: 2.875rem;
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--color-stroke-ui-dark);
-  border-radius: 10px;
-  background: var(--ui-background);
-  color: var(--color-ui-text);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  &.is-open {
-    border-bottom: none;
-    border-radius: 10px 10px 0 0;
-  }
-  &.is-invalid {
-    border-color: var(--color-danger);
-  }
-}
-
-.select__options {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  max-height: 250px;
-  overflow-y: auto;
-  border: 1px solid var(--color-stroke-ui-dark);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  background: var(--ui-background);
-  z-index: 1;
-}
-
-.select__option {
-  padding: 0 1.25rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--color-stroke-ui-dark);
-  background: var(--ui-background);
-  color: var(--color-ui-text);
-  cursor: pointer;
-  &.active {
-    font-weight: 600;
-  }
-}
-
-.no-select {
-  border: none;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-</style>

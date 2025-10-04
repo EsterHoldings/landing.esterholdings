@@ -1,200 +1,294 @@
 <template>
   <UiContainer>
-    <div class="payments-details">
-      <div class="payments-details__title">
-        <UiTextH4>{{ t("cabinet.payments.title") }}</UiTextH4>
+    <div class="payments-details pb-10">
+      <!-- Title + Create -->
+      <div class="mt-5 mb-5 flex items-center justify-between">
+        <UiTextH4 class="text-[var(--ui-text-main)]">
+          {{ t("cabinet.payments.title") }}
+        </UiTextH4>
+
+        <UiButtonDefault state="info">
+          <UiIconPlus class="mr-2" />
+          <span>{{ t("cabinet.payments.create") }}</span>
+        </UiButtonDefault>
       </div>
 
-      <PanelDefault>
-        <div class="payments-details__content">
-          <div class="payments-details__content__payment_item__options">
-            <div
-              class="payments-details__content__payment_item__options__search"
-            >
-              <UiInput
+      <div>
+        <!-- Top options -->
+        <div class="mb-5 flex items-center justify-between">
+          <div class="lex items-center justify-center gap-1 w-full max-w-60">
+            <UiInput
+                class="w-full"
                 @input="handleInputSearch"
                 :value="search"
-                :placeholder="t('cabinet.payments.search')"
-              />
-            </div>
-            <div
-              class="payments-details__content__payment_item__options__actions"
+                :placeholder="t('cabinet.accounts.search')"
             >
-              <UiButtonDefault
-                state="success--outline"
-                @click="handleClickCreateNewAccount"
-              >
-                {{ t("cabinet.payments.create") }}
-              </UiButtonDefault>
-            </div>
+              <template #icon-left>
+                <UiIconSearch />
+              </template>
+            </UiInput>
           </div>
 
-          <div
-            class="payments-details__content__payment_item__data-wrapper--header"
-          >
-            <div
-              class="payments-details__content__payment_item__data-wrapper--header__cell"
+          <div class="flex items-center gap-2">
+            <UiButtonDefault state="info--small" class="mr-2" @click="handleClickUpdate">
+              <UiIconUpdate v-if="!isLoading"/>
+              <UiIconSpinnerDefault v-else/>
+            </UiButtonDefault>
+
+            <UiSelect
+                class="mr-2"
+                :value="orderBy"
+                :data="sortByFilterData"
+                :withoutNoSelect="true"
+                @change="handleChangeFilterSortBy"
             >
-              <span @click="handleOrderByAndDirection('id')">
-                {{ t("cabinet.payments.columns.title") }}
-              </span>
+              <template #icon-left>
+                <UiIconSortBy
+                    class="!h-4 !w-4"
+                    :orderDirectionEnabled="true"
+                    :orderDirection="orderDirection"
+                />
+              </template>
+            </UiSelect>
 
-              <UiIconSort
-                :active="orderBy === 'id'"
-                :direction="orderDirection"
-                @click="handleOrderByAndDirection('id')"
-              />
-            </div>
-
-            <div
-              class="payments-details__content__payment_item__data-wrapper--header__cell"
-            >
-              <span @click="handleOrderByAndDirection('payment_system')">
-                {{ t("cabinet.payments.columns.paysystem") }}
-              </span>
-              <UiIconSort
-                :active="orderBy === 'payment_system'"
-                :direction="orderDirection"
-                @click="handleOrderByAndDirection('payment_system')"
-              />
-            </div>
-
-            <div
-              class="payments-details__content__payment_item__data-wrapper--header__cell"
-            >
-              <span @click="handleOrderByAndDirection('currency')">
-                {{ t("cabinet.payments.columns.currency") }}
-              </span>
-              <UiIconSort
-                :active="orderBy === 'currency'"
-                :direction="orderDirection"
-                @click="handleOrderByAndDirection('currency')"
-              />
-            </div>
-
-            <div
-              class="payments-details__content__payment_item__data-wrapper--header__cell"
-            >
-              <span @click="handleOrderByAndDirection('created_at')">
-                {{ t("cabinet.payments.columns.createdAt") }}
-              </span>
-
-              <UiIconSort
-                :active="orderBy === 'created_at'"
-                :direction="orderDirection"
-                @click="handleOrderByAndDirection('created_at')"
-              />
-            </div>
-
-            <div
-              class="payments-details__content__payment_item__data-wrapper--header__cell"
-            >
-              <span @click="handleOrderByAndDirection('created_at')"></span>
-            </div>
-          </div>
-
-          <template v-if="payments.length === 0">
-            <div class="payments-details__content__nothing-to-show">
-              {{ t("cabinet.payments.nothingToShow") }}
-            </div>
-          </template>
-
-          <template v-if="payments.length > 0">
-            <div
-              class="payments-details__content__payment_item"
-              v-for="payment in payments"
-              :key="payment.id"
-            >
-              <div
-                class="payments-details__content__payment_item__data-wrapper"
-              >
-                <div>{{ payment.payment_system }}</div>
-                <div>{{ payment.status }}</div>
-                <div>{{ payment.currency }}</div>
-
-                <div class="date">
-                  {{ new Date(payment.created_at).toLocaleString() }}
-                </div>
-                <div>
-                  <UiIconUpdate
-                    class="icon-update"
-                    ref="iconUpdate"
-                    :class="{ spinning: spinIcon }"
-                    @click="handleIconClick(payment.id)"
-                    @animationend="onIconAnimationEnd"
-                  />
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <div class="payments-details__content__pagination">
-            <button
-              class="page-btn"
-              v-if="currentPage !== 1 && total > perPage"
-              @click="goPrev"
-            >
-              {{ t("cabinet.payments.pagination.prev") }}
-            </button>
-
-            <button
-              v-if="visiblePages[0] > 1"
-              class="page-link"
-              @click="setPage(1)"
-            >
-              1
-            </button>
-            <span v-if="visiblePages[0] > 2">...</span>
-
-            <button
-              v-for="page in visiblePages"
-              :key="page"
-              class="page-link"
-              :class="{ active: currentPage === page }"
-              @click="setPage(page)"
-            >
-              {{ page }}
-            </button>
-
-            <span v-if="visiblePages[visiblePages.length - 1] < totalPages"
-              >...</span
-            >
-            <button
-              v-if="visiblePages[visiblePages.length - 1] < totalPages"
-              class="page-link"
-              @click="setPage(totalPages)"
-            >
-              {{ totalPages }}
-            </button>
-
-            <button
-              class="page-btn"
-              v-if="currentPage !== totalPages && total > perPage"
-              @click="goNext"
-            >
-              {{ t("cabinet.payments.pagination.next") }}
-            </button>
+            <UiButtonDefault state="info--small">
+              <UiIconFilters class="mr-2" />
+              <UiTextSmall>Filters</UiTextSmall>
+              <UiIconArrowDown :rotate180="false" class="ml-2" />
+            </UiButtonDefault>
           </div>
         </div>
-      </PanelDefault>
+
+        <PanelDefault>
+          <!-- Горизонтальний скрол тільки для таблиці -->
+          <div class="relative overflow-x-auto overscroll-x-contain" ref="scrollArea">
+            <table class="w-full min-w-[1000px] table-auto whitespace-nowrap text-[var(--ui-text-main)]">
+              <colgroup>
+                <col class="w-[16rem]" /> <!-- Name -->
+                <col class="w-[12rem]" /> <!-- Payment system -->
+                <col class="w-[6rem]"  /> <!-- Currency -->
+                <col class="w-[8rem]"  /> <!-- Status -->
+                <col class="w-[14rem]" /> <!-- CreatedAt -->
+                <col class="w-[14rem]" /> <!-- UpdatedAt -->
+                <col class="w-[3rem]"  /> <!-- ... -->
+              </colgroup>
+
+              <thead class="bg-[var(--color-stroke-ui-light)]">
+              <tr class="h-[46px] first:rounded-t-[10px]">
+                <th class="px-5 text-left first:rounded-tl-[10px]">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('name')">
+                    <UiTextSmall>Name</UiTextSmall>
+                    <UiIconSort :active="orderBy === 'name'" :direction="orderDirection"/>
+                  </button>
+                </th>
+
+                <th class="px-5 text-left">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('payment_system')">
+                    <UiTextSmall>Payment system</UiTextSmall>
+                  </button>
+                </th>
+
+                <th class="px-5 text-left">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('currency')">
+                    <UiTextSmall>Currency</UiTextSmall>
+                  </button>
+                </th>
+
+                <th class="px-5 text-left">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('status')">
+                    <UiTextSmall>Status</UiTextSmall>
+                    <UiIconSort :active="orderBy === 'status'" :direction="orderDirection"/>
+                  </button>
+                </th>
+
+                <th class="px-5 text-left">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('created_at')">
+                    <UiTextSmall>CreatedAt</UiTextSmall>
+                    <UiIconSort :active="orderBy === 'created_at'" :direction="orderDirection"/>
+                  </button>
+                </th>
+
+                <th class="px-5 text-left">
+                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('updated_at')">
+                    <UiTextSmall>UpdatedAt</UiTextSmall>
+                    <UiIconSort :active="orderBy === 'updated_at'" :direction="orderDirection"/>
+                  </button>
+                </th>
+
+                <th class="px-5 text-right last:rounded-tr-[10px]"></th>
+              </tr>
+              </thead>
+
+              <tbody>
+              <tr v-if="paymentDetails.length === 0" class="h-[40vh]">
+                <td colspan="7" class="px-5 text-center align-middle">
+                  {{ t("cabinet.payments.nothingToShow") }}
+                </td>
+              </tr>
+
+              <tr
+                  v-else
+                  v-for="(paymentDetail, index) in paymentDetails"
+                  :key="paymentDetail.id"
+                  class="h-[60px] border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background-panel)] hover:bg-[var(--color-stroke-ui-dark)]"
+              >
+                <td class="px-5 align-middle font-bold text-[var(--color-ui-accent)] truncate" :title="paymentDetail?.name">
+                  {{ paymentDetail?.name }}
+                </td>
+
+                <td class="px-5 align-middle truncate" :title="paymentDetail.payment_system_name">
+                  {{ paymentDetail.payment_system_name }}
+                </td>
+
+                <td class="px-5 align-middle">
+                  {{ paymentDetail.currency ?? 'USD' }}
+                </td>
+
+                <td class="px-5 align-middle capitalize">
+                  {{ paymentDetail.status }}
+                </td>
+
+                <td class="px-5 align-middle">
+                  {{ new Date(paymentDetail.created_at).toLocaleString() }}
+                </td>
+
+                <td class="px-5 align-middle">
+                  {{ new Date(paymentDetail.updated_at).toLocaleString() }}
+                </td>
+
+                <td class="px-5 align-middle">
+                    <span
+                        @click="toggleRowOptions(index)"
+                        class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors"
+                        :ref="(el) => (triggerRefs[index] = el as HTMLElement | null)"
+                    >
+                      <UiIconDotsVertical />
+
+                      <!-- Меню опцій -->
+                      <div
+                          v-if="currentRowActiveOptions === index"
+                          :ref="(el) => (menuRefs[index] = el as HTMLElement | null)"
+                          :class="[
+                          'absolute right-3 z-10 flex min-w-[140px] max-w-[60vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-3 shadow-lg',
+                          dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto origin-bottom-right' : 'top-[calc(100%+8px)] bottom-auto origin-top-right'
+                        ]"
+                          class="max-h-[70vh] overflow-auto"
+                      >
+                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                          <UiIconEye class="!h-[14px] !w-[14px]"/>
+                          <UiTextSmall class="whitespace-nowrap">View</UiTextSmall>
+                        </div>
+
+                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                          <UiIconConfirm class="!h-[14px] !w-[14px]"/>
+                          <UiTextSmall class="whitespace-nowrap">Confirm</UiTextSmall>
+                        </div>
+
+                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                          <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]"/>
+                          <UiTextSmall class="whitespace-nowrap">Delete</UiTextSmall>
+                        </div>
+                      </div>
+                    </span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </PanelDefault>
+
+        <!-- Pagination -->
+        <div class="px-5 h-[50px] mt-2 flex items-center justify-between">
+          <div class="p-0 flex items-center justify-center [&>div]:h-[33px] [&>div]:w-[33px]">
+            <UiTextSmall class="mr-2">Per page:</UiTextSmall>
+            <UiSelect
+                class="!w-min flex items-center justify-center !h-[32px]"
+                :data="perPageList"
+                :value="perPage"
+                @change="handleChangePerPage"
+                :withoutNoSelect="true"
+            />
+          </div>
+
+          <UiTextSmall>{{ (currentPage * perPage) - perPage }}-{{ currentPage * perPage }} / {{ total }}</UiTextSmall>
+
+          <div class="flex items-center justify-center gap-2">
+            <UiTextSmall
+                class="px-3 py-1.5 h-[32px] border border-[--color-stroke-ui-dark] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+                v-if="currentPage !== 1 && total > perPage"
+                @click="goPrev"
+            >
+              {{ t("cabinet.accounts.pagination.prev") }}
+            </UiTextSmall>
+
+            <UiTextSmall
+                v-if="visiblePages[0] > 1"
+                class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+                @click="setPage(1)"
+            >
+              1
+            </UiTextSmall>
+
+            <UiTextSmall v-if="visiblePages[0] > 2">...</UiTextSmall>
+
+            <UiTextSmall
+                v-for="page in visiblePages"
+                :key="page"
+                class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+                :class="{ 'bg-[var(--color-ui-primary)] text-white': currentPage === page }"
+                @click="setPage(page)"
+            >
+              {{ page }}
+            </UiTextSmall>
+
+            <UiTextSmall v-if="visiblePages[visiblePages.length - 1] < totalPages">...</UiTextSmall>
+
+            <UiTextSmall
+                v-if="visiblePages[visiblePages.length - 1] < totalPages"
+                class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+                @click="setPage(totalPages)"
+            >{{ totalPages }}
+            </UiTextSmall>
+
+            <UiTextSmall
+                class="px-3 py-1.5 border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
+                v-if="currentPage !== totalPages && total > perPage"
+                @click="goNext"
+            >
+              {{ t("cabinet.accounts.pagination.next") }}
+            </UiTextSmall>
+          </div>
+        </div>
+      </div>
     </div>
   </UiContainer>
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from "vue-i18n";
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiContainer from "~/components/ui/UiContainer.vue";
-import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
-import UiInput from "~/components/ui/UiInput.vue";
+import UiIconArrowDown from "~/components/ui/UiIconArrowDown.vue";
+import UiIconFilters from "~/components/ui/UiIconFilters.vue";
+import UiIconPlus from "~/components/ui/UiIconPlus.vue";
 import UiIconSort from "~/components/ui/UiIconSort.vue";
-import useAppCore from "~/composables/useAppCore";
-import { computed, inject, onMounted, reactive, ref } from "vue";
-import { definePageMeta } from "~/.nuxt/imports";
-import UiIconCopy from "~/components/ui/UiIconCopy.vue";
-import AdminsPanelAddNew from "~/pages/admin/access/components/AdminsPanelAddNew.vue";
+import UiIconSortBy from "~/components/ui/UiIconSortBy.vue";
+import UiInput from "~/components/ui/UiInput.vue";
+import UiSelect from "~/components/ui/UiSelect.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
+import UiTextSmall from "~/components/ui/UiTextSmall.vue";
+import useAppCore from "~/composables/useAppCore";
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref} from "vue";
+import { definePageMeta } from "~/.nuxt/imports";
+import { useI18n } from "vue-i18n";
+import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import UiIconDotsVertical from "~/components/ui/UiIconDotsVertical.vue";
+import UiIconTrash from "~/components/ui/UiIconTrash.vue";
+import UiIconEye from "~/components/ui/UiIconEye.vue";
+import UiIconConfirm from "~/components/ui/UiIconConfirm.vue";
+import UiIconSearch from "~/components/ui/UiIconSearch.vue";
 
 const { t } = useI18n({ useScope: "global" });
 
@@ -208,34 +302,123 @@ const appCore = useAppCore();
 const ORDER_DIRECTION_ASC = "asc";
 const ORDER_DIRECTION_DESC = "desc";
 
+const isLoading = ref(false);
 const search = ref("");
 const total = ref(0);
-const perPage = ref(4);
+const perPage = ref(7);
 const currentPage = ref(1);
-const orderBy = ref("");
-const orderDirection = ref(ORDER_DIRECTION_DESC);
+const orderBy = ref("created_at");
+const orderDirection = ref<typeof ORDER_DIRECTION_ASC | typeof ORDER_DIRECTION_DESC>(ORDER_DIRECTION_DESC);
 
-const payments = reactive([]);
-const spinIcon = ref(false);
+const paymentDetails = reactive<any[]>([]);
+
+// --- dropdown state ---
+const currentRowActiveOptions = ref<number | null>(null);
+const scrollArea = ref<HTMLElement | null>(null);
+const triggerRefs = ref<(HTMLElement | null)[]>([]);
+const menuRefs = ref<(HTMLElement | null)[]>([]);
+const dropUp = reactive<Record<number, boolean>>({}); // true => відкривати вгору
+
+const perPageList = reactive([
+  {id: 1, value: 1, text: "1"},
+  {id: 2, value: 2, text: "2"},
+  {id: 3, value: 3, text: "3"},
+  {id: 4, value: 4, text: "4"},
+  {id: 5, value: 5, text: "5"},
+  {id: 6, value: 6, text: "6"},
+  {id: 7, value: 7, text: "7"},
+  {id: 8, value: 8, text: "8"},
+  {id: 9, value: 9, text: "9"},
+  {id: 10, value: 10, text: "10"},
+  {id: 12, value: 12, text: "12"},
+  {id: 15, value: 15, text: "15"},
+  {id: 20, value: 20, text: "20"},
+  {id: 25, value: 25, text: "25"},
+  {id: 50, value: 50, text: "50"},
+  {id: 100, value: 100, text: "100"},
+]);
+
+const toggleRowOptions = async (index: number) => {
+  currentRowActiveOptions.value =
+      currentRowActiveOptions.value === index ? null : index;
+  await nextTick();
+  if (currentRowActiveOptions.value === index) updateMenuPosition(index);
+};
+
+const updateMenuPosition = (index: number) => {
+  const trigger = triggerRefs.value[index];
+  const menu = menuRefs.value[index];
+  if (!trigger || !menu) return;
+
+  const offset = 8;
+  const menuHeight = menu.offsetHeight;
+
+  const triggerRect = trigger.getBoundingClientRect();
+  const container = scrollArea.value;
+  const containerRect = container
+      ? container.getBoundingClientRect()
+      : { top: 0, bottom: window.innerHeight };
+
+  const availableDown = container
+      ? containerRect.bottom - triggerRect.bottom
+      : window.innerHeight - triggerRect.bottom;
+
+  const availableUp = container
+      ? triggerRect.top - containerRect.top
+      : triggerRect.top;
+
+  let openUp = false;
+  if (availableDown >= menuHeight + offset) {
+    openUp = false;
+  } else if (availableUp >= menuHeight + offset) {
+    openUp = true;
+  } else {
+    openUp = availableUp > availableDown;
+  }
+
+  dropUp[index] = openUp;
+};
+
+const recalcActiveMenu = () => {
+  if (currentRowActiveOptions.value !== null) {
+    updateMenuPosition(currentRowActiveOptions.value);
+  }
+};
+
+const onClickOutside = (e: MouseEvent) => {
+  const i = currentRowActiveOptions.value;
+  if (i === null) return;
+  const t = triggerRefs.value[i];
+  const m = menuRefs.value[i];
+  const target = e.target as Node | null;
+  if (!target) return;
+  const inside = (!!t && t.contains(target)) || (!!m && m.contains(target));
+  if (!inside) currentRowActiveOptions.value = null;
+};
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") currentRowActiveOptions.value = null;
+};
+
+const sortByFilterData = reactive([
+  { id: "name",       value: "name",       text: "Name" },
+  { id: "status",     value: "status",     text: "Status" },
+  { id: "created_at", value: "created_at", text: "Created at" },
+  { id: "updated_at", value: "updated_at", text: "Updated at" },
+]);
 
 const totalPages = computed(() => Math.ceil(total.value / perPage.value));
 
 const visiblePages = computed(() => {
-  const pages = [];
+  const pages: number[] = [];
   const maxPagesToShow = 5;
   const half = Math.floor(maxPagesToShow / 2);
 
   let start = Math.max(1, currentPage.value - half);
   let end = Math.min(totalPages.value, start + maxPagesToShow - 1);
 
-  if (end - start < maxPagesToShow - 1) {
-    start = Math.max(1, end - maxPagesToShow + 1);
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-
+  if (end - start < maxPagesToShow - 1) start = Math.max(1, end - maxPagesToShow + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
   return pages;
 });
 
@@ -245,14 +428,12 @@ async function setPage(page: number) {
     await loadData();
   }
 }
-
 async function goPrev() {
   if (currentPage.value > 1) {
     currentPage.value--;
     await loadData();
   }
 }
-
 async function goNext() {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
@@ -260,32 +441,22 @@ async function goNext() {
   }
 }
 
-const handleIconClick = (id: string) => {
-  const payment = payments.find((x) => x.id === id);
-  if (payment) payment.isSpinning = true;
-};
-
-const onIconAnimationEnd = () => {
-  spinIcon.value = false;
-};
-
-const handleInputSearch = async (value) => {
+const handleInputSearch = async (value: string) => {
   search.value = value;
   currentPage.value = 1;
   await loadData();
 };
 
-const handleOrderByAndDirection = async (value) => {
+const handleOrderByAndDirection = async (value: string) => {
   orderDirection.value =
-    orderDirection.value === ORDER_DIRECTION_ASC
-      ? ORDER_DIRECTION_DESC
-      : ORDER_DIRECTION_ASC;
+      orderDirection.value === ORDER_DIRECTION_ASC ? ORDER_DIRECTION_DESC : ORDER_DIRECTION_ASC;
   orderBy.value = value;
   await loadData();
 };
 
 const loadData = async () => {
-  const response = await appCore.payments.get({
+  isLoading.value = true;
+  const response = await appCore.paymentDetails.get({
     search: search.value,
     perPage: perPage.value,
     page: currentPage.value,
@@ -297,239 +468,61 @@ const loadData = async () => {
   currentPage.value = response.data.data.current_page;
   total.value = response.data.data.total;
 
-  const paymentsData = response.data.data.data.map((x) => {
+  const paymentDetailsData = response.data.data.data.map((x: any) => {
     x.isSpinning = false;
     return x;
   });
-  payments.splice(0, payments.length, ...paymentsData);
+  paymentDetails.splice(0, paymentDetails.length, ...paymentDetailsData);
+  isLoading.value = false;
 };
 
-const shortId = (uuid: string) => {
-  return uuid.split("-").pop();
-};
-
-const copyToClipboard = (paymentId) => {
+const shortId = (uuid: string) => uuid.split("-").pop();
+const copyToClipboard = (paymentId: string) => {
   const id = shortId(paymentId);
-  navigator.clipboard.writeText(id);
+  if (id) navigator.clipboard.writeText(id);
 };
 
-// --- --- ---
-
-// const { closeModal } = inject("modalControl") as { closeModal: Function };
 const { openModal } = inject("modalControl") as { openModal: Function };
+// const handleClickCreateNewAccount = () => openModal(AdminsPanelAddNew, { title: "Add new Admin" });
 
-const handleClickCreateNewAccount = () =>
-  openModal(AdminsPanelAddNew, { title: "Add new Admin" });
+const handleChangePerPage = async (newPerPage: number) => {
+  perPage.value = newPerPage;
+  await loadData();
+};
+
+const handleChangeFilterSortBy = async (value: string) => {
+  if (orderBy.value === value) {
+    orderDirection.value =
+        orderDirection.value === ORDER_DIRECTION_DESC ? ORDER_DIRECTION_ASC : ORDER_DIRECTION_DESC;
+  } else {
+    orderBy.value = value;
+  }
+  await loadData();
+};
+
+const handleClickUpdate = async () => {
+  await loadData();
+};
 
 onMounted(async () => {
   await loadData();
+
+  // слухачі
+  window.addEventListener("resize", recalcActiveMenu, { passive: true });
+  window.addEventListener("scroll", recalcActiveMenu, { passive: true, capture: true });
+  // якщо скролимо сам контейнер таблиці
+  scrollArea.value?.addEventListener("scroll", recalcActiveMenu, { passive: true });
+
+  window.addEventListener("mousedown", onClickOutside, true);
+  window.addEventListener("keydown", onKeydown, true);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", recalcActiveMenu);
+  window.removeEventListener("scroll", recalcActiveMenu, true);
+  scrollArea.value?.removeEventListener("scroll", recalcActiveMenu);
+
+  window.removeEventListener("mousedown", onClickOutside, true);
+  window.removeEventListener("keydown", onKeydown, true);
 });
 </script>
-
-<style lang="scss" scoped>
-.date {
-  width: 140px;
-  font-size: 14px;
-}
-
-.withdrawal {
-  font-weight: bold;
-  color: var(--color-success);
-}
-
-.deposit {
-  font-weight: bold;
-  color: var(--color-danger);
-}
-
-.icon-update {
-  height: 14px;
-  width: 14px;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: transform 0.2s;
-
-  &:hover {
-    animation: wiggle 0.2s ease;
-  }
-}
-
-.icon-update.spinning {
-  animation: spin 0.5s linear;
-}
-
-.balance-sum {
-  cursor: pointer;
-}
-
-.wiggle:hover {
-  animation: wiggle 0.3s ease;
-}
-
-/* ========== KEYFRAMES ========== */
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes wiggle {
-  0% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-2px);
-  }
-  40% {
-    transform: translateX(2px);
-  }
-  60% {
-    transform: translateX(-2px);
-  }
-  80% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.payments-details {
-  padding-bottom: 40px;
-
-  &__title {
-    margin-bottom: 20px;
-
-    h4 {
-      color: var(--ui-text-main);
-    }
-  }
-
-  &__content {
-    padding: 20px;
-
-    &__nothing-to-show {
-      height: 40vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    &__payment_item__data-wrapper--header {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-      column-gap: 20px;
-      row-gap: 10px;
-      padding: 20px;
-      width: 100%;
-
-      & > div:last-child {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-      }
-
-      &__cell {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        color: var(--ui-text-main);
-
-        span {
-          cursor: default;
-
-          &:first-child {
-            margin-right: 10px;
-          }
-        }
-      }
-    }
-
-    &__payment_item {
-      padding: 20px;
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      background-color: var(--ui-background-panel);
-      border: 1px solid var(--color-stroke-ui-dark);
-
-      &:hover {
-        background-color: var(--color-stroke-ui-dark);
-      }
-
-      &__options {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-
-        &__search {
-          .input {
-            border-radius: var(--ui-border--raduis);
-            min-width: 400px;
-          }
-        }
-
-        &__actions {
-          // code...
-        }
-      }
-
-      &__data-wrapper {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-        column-gap: 20px;
-        row-gap: 10px;
-        align-items: center;
-        color: var(--ui-text-main);
-
-        > div:first-child {
-          color: var(--color-ui-accent);
-          font-weight: bold;
-        }
-
-        > div:last-child {
-          color: var(--ui-text-main);
-          text-align: right;
-          font-size: 20px;
-          font-weight: bold;
-        }
-      }
-    }
-
-    &__pagination {
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-
-      .page-btn,
-      .page-link {
-        border: 1px solid var(--color-ui-border);
-        background: var(--ui-background);
-        cursor: pointer;
-        font-size: 14px;
-        border-radius: 5px;
-        color: var(--ui-text-main);
-        padding: 0 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 30px;
-        min-width: 30px;
-      }
-
-      .page-link.active {
-        background: var(--color-ui-accent);
-        color: #fff;
-        border-color: var(--color-ui-accent);
-      }
-    }
-  }
-}
-</style>

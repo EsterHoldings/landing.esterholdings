@@ -10,36 +10,6 @@
           />
         </NuxtLink>
       </div>
-
-      <div class="side-bar-cabinet__actions">
-        <LanguageSwitcher isSidebar :isInvert="isThemeLight" class="icon"/>
-
-        <transition name="fade" mode="out-in">
-          <span
-              :key="themeStore.currentTheme"
-              @click="themeStore.toggleTheme()"
-              class="icon"
-          >
-            <UiIconMoon v-if="themeStore.currentTheme === 'dark'"/>
-            <UiIconSun
-                v-else
-                :class="{
-                'svg-invert': isThemeLight,
-              }"
-            />
-          </span>
-        </transition>
-      </div>
-
-      <div class="side-bar-cabinet__top__profile">
-        <NuxtLink to="/admin/profile">
-          <UiImageCircle
-              :class="{
-              'svg-invert': isThemeLight,
-            }"
-          />
-        </NuxtLink>
-      </div>
     </div>
 
     <div class="side-bar-cabinet__content">
@@ -108,7 +78,7 @@ const isProfileRoute = computed(() => {
 .side-bar-cabinet {
   color: white;
   height: 100vh;
-  width: 7.4rem;
+  width: 264px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,9 +108,11 @@ const isProfileRoute = computed(() => {
 
     &__logo {
       height: 100px;
+      width: 100%;
+      padding: 0 30px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     &__profile {
@@ -175,10 +147,13 @@ const isProfileRoute = computed(() => {
   }
 
   &__content {
-    padding: 1px;
+    padding: 10px;
     height: calc(100vh - 160px);
     overflow-y: scroll;
     width: 100%;
+
+    display: flex;
+    align-items: flex-start;
 
     scrollbar-width: none;
     -ms-overflow-style: none;

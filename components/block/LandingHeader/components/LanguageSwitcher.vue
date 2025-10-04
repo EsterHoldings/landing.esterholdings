@@ -92,14 +92,15 @@ onBeforeUnmount(() => {
     top: 40px;
     right: 0;
     width: fit-content;
-    background: white;
+    background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     padding: 8px 0;
     z-index: 11;
 
     &.top {
-      top: auto;
+      height: max-content;
+      top: 30px;
       bottom: 0;
       left: 0;
     }

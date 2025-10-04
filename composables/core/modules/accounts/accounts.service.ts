@@ -15,7 +15,7 @@ export class AccountsService {
   }
 
   async post(data:object = {}):Promise<any> {
-    console.log('ROLES SERVICE POST', data);
+    console.log('ACCOUNTS SERVICE POST', data);
     return await this.useApi.post("/client/accounts", data);
   }
 

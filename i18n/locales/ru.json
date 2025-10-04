@@ -366,7 +366,8 @@
       "accounts": "Аккаунты",
       "referral_system": "Реферальная система",
       "billing": "Оплата",
-      "support": "Поддержка"
+      "support": "Поддержка",
+      "settings": "Настройки"
     },
 
     "dashboard": {
@@ -470,15 +471,15 @@
           },
           "placeholders": {
             "email": "example1test.com",
-            "first_name": "Иван",
-            "last_name": "Иванов",
+            "first_name": "Іван",
+            "last_name": "Іванов",
             "mid_name": "Петрович",
             "birthdate": "",
-            "phone": "",
-            "country": "Россия",
-            "state": "Московская область",
-            "city": "Москва",
-            "address": "ул. Пример, д. 2Б, кв. 8",
+            "phone": "380881234567",
+            "country": "Україна",
+            "state": "Київська область",
+            "city": "Київ",
+            "address": "вул. Незалежності, буд. 2Б, кв. 8",
             "postal_code": "000000"
           },
           "button": "Сохранить и отправить на верификацию",
@@ -532,16 +533,21 @@
     },
 
     "accounts": {
+      "account": {
+        "title": "Счет"
+      },
       "title": "Счета",
       "openNew": "Открыть новый счёт",
       "search": "Поиск",
       "columns": {
         "type": "Тип счёта",
-        "leverage": "Кредитное плечо",
+        "currency": "Валюта",
+        "leverage": "Плечо",
         "number": "Номер счёта",
         "balance": "Баланс МТ"
       },
-      "nothingToShow": "Нет данных =(",
+      "nothingToShow": "У вас еще нет открытых счетов!",
+      "openAccount": "Открыть новый счет!",
       "pagination": {
         "prev": "Назад",
         "next": "Вперёд"
@@ -576,11 +582,15 @@
   "admin": {
     "menu": {
       "dashboard": "Главная",
+      "verificationRequests": "Запросы на верификацию",
       "clients": "Клиенты",
       "accounts": "Аккаунты",
       "referral": "Реферальная система",
       "payments": "Платежи",
       "settings": "Настройки",
+      "support": "Поддержка",
+      "news": "Новости",
+      "mail": "Почта",
       "access": "Доступ"
     },
 
@@ -849,6 +859,10 @@
           "button": "Загрузить"
         }
       }
+    },
+
+    "support": {
+      "title": "Поддержка"
     }
   }
 }

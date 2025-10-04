@@ -14,8 +14,8 @@
 
 <style lang="scss" scoped>
 svg {
-  height: 13px;
-  width: 13px;
+  height: 20px;
+  width: 20px;
   fill: currentColor;
 }
 </style>
