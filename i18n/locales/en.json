@@ -7,7 +7,6 @@
         "btn-negative": "Decline"
       }
     },
-
     "lines": {
       "running-line-btn": "Trade"
     },
@@ -31,7 +30,12 @@
         "Trading": [
           {
             "section": "Account overview",
-            "items": ["Standard", "Pro", "Islamic", "Demo"]
+            "items": [
+              "Standard",
+              "Pro",
+              "Islamic",
+              "Demo"
+            ]
           },
           {
             "section": "Market Instruments",
@@ -47,25 +51,41 @@
           },
           {
             "section": "Platform",
-            "items": ["MT4 Desktop", "MT 4 Mobile"]
+            "items": [
+              "MT4 Desktop",
+              "MT 4 Mobile"
+            ]
           },
           {
             "section": "Trading conditions",
-            "items": ["Account replenishment", "Withdrawal of funds"]
+            "items": [
+              "Account replenishment",
+              "Withdrawal of funds"
+            ]
           },
           {
             "section": "Trader's HUB",
-            "items": ["Trader's blog", "Economic calendar", "Market news"]
+            "items": [
+              "Trader's blog",
+              "Economic calendar",
+              "Market news"
+            ]
           },
           {
             "section": "TANDEM trading",
-            "items": ["For trader", "For investor"]
+            "items": [
+              "For trader",
+              "For investor"
+            ]
           }
         ],
         "Partnership": [
           {
             "section": "Partnership",
-            "items": ["Register IB/ Partnership", "How IB generate income"]
+            "items": [
+              "Register IB/ Partnership",
+              "How IB generate income"
+            ]
           }
         ],
         "Company": [
@@ -82,7 +102,6 @@
         ]
       }
     },
-
     "slider": {
       "general-slide": {
         "title": {
@@ -93,7 +112,6 @@
         "text": "Access global markets, including Forex, Stocks, and CFDs, with \nfast execution, low spreads, and real-time market analysis.",
         "btn": "Trade Now"
       },
-
       "top-trader-slide": {
         "title": {
           "before": "Copy Strategies",
@@ -103,7 +121,6 @@
         "text": "Gain access to real deals from professionals and improve your trading.",
         "btn": "Start"
       },
-
       "ten_years_slide": {
         "title": {
           "highlight": "Years",
@@ -113,7 +130,6 @@
         "btn": "Join in Us"
       }
     },
-
     "sections": {
       "advantages": [
         {
@@ -129,9 +145,7 @@
           "label": "Customer service"
         }
       ],
-
       "platform__title": "Legendary platform for successful\nForex and CFD trading",
-
       "platform__features": [
         {
           "title": "Trading Platform",
@@ -150,7 +164,6 @@
           "text": "Works even on weak PCs."
         }
       ],
-
       "feature__title": "Why Choose Us?",
       "features__items": [
         {
@@ -184,14 +197,24 @@
           "icon": "/static/L-Shield Done.png"
         }
       ],
-
       "account_types__categories": [
-        { "id": "Standard", "label": "Standard" },
-        { "id": "Pro", "label": "Pro" },
-        { "id": "Tandem", "label": "Tandem" },
-        { "id": "Islamic", "label": "Islamic" }
+        {
+          "id": "Standard",
+          "label": "Standard"
+        },
+        {
+          "id": "Pro",
+          "label": "Pro"
+        },
+        {
+          "id": "Tandem",
+          "label": "Tandem"
+        },
+        {
+          "id": "Islamic",
+          "label": "Islamic"
+        }
       ],
-
       "accounts__title": "Explore Our Trading Account Options",
       "accounts__btn": "Open Account",
       "accounts__options": [
@@ -220,16 +243,36 @@
           "description": "Test trading strategies risk-free."
         }
       ],
-
       "wide_range__title": "Wide Range of Products",
       "wide_range__categories": [
-        { "id": "forex", "label": "Forex" },
-        { "id": "metals", "label": "Metals" },
-        { "id": "cryptocurrency CDs", "label": "Cryptocurrency CDs" },
-        { "id": "indices", "label": "Indices" },
-        { "id": "shares", "label": "Shares" },
-        { "id": "energy", "label": "Energy" },
-        { "id": "ETFS", "label": "ETFS" }
+        {
+          "id": "forex",
+          "label": "Forex"
+        },
+        {
+          "id": "metals",
+          "label": "Metals"
+        },
+        {
+          "id": "cryptocurrency CDs",
+          "label": "Cryptocurrency CDs"
+        },
+        {
+          "id": "indices",
+          "label": "Indices"
+        },
+        {
+          "id": "shares",
+          "label": "Shares"
+        },
+        {
+          "id": "energy",
+          "label": "Energy"
+        },
+        {
+          "id": "ETFS",
+          "label": "ETFS"
+        }
       ],
       "wide_range_tabs": {
         "Forex": {
@@ -237,44 +280,37 @@
           "description": "Trade 70 major, minor & exotic currency pairs\n with competitive trading conditions.",
           "btn": "Trade Forex"
         },
-
         "Metals": {
           "title": "Metals",
           "description": "Trade metal commodities such as Gold,\n Silver & Platinum.",
           "btn": "Trade Metals"
         },
-
         "CryptocurrencyCDs": {
           "title": "Cryptocurrency CDs",
           "description": "Trade Bitcoin CFD, Ether CFD, Doge CFD\n & more crypto CDs & altcoin CFDs ",
           "btn": "Trade Cryptocurrency CFDs"
         },
-
         "Indices": {
           "title": "Indices",
           "description": "Trade major and minor Index CDs Spot and\nFutures from around the globe.",
           "btn": "Trade Indices"
         },
-
         "Shares": {
           "title": "Shares",
           "description": "Thousands of public companies from the US,\n UK & EU available to trade.",
           "btn": "Trade Shares"
         },
-
         "Energy": {
           "title": "Energy",
           "description": "Discover opportunities on UK & US Crude Oil\n and Natural Gas Spot and Future contracts.",
           "btn": "Trade Energy"
         },
-
         "ETFS": {
           "title": "ETFs",
           "description": "Access a World of Markets with ETF CFDs-From\n Bonds to Commodities, Real Estate to Volatility.",
           "btn": "Trade ETFs"
         }
       },
-
       "four_steps_section": {
         "title": {
           "before": "Open an account in",
@@ -300,17 +336,16 @@
           }
         ]
       },
-
       "banner_section": {
-        "title": "Trade the Markets Like a Pro!",
+        "title": "Trade the Markets",
+        "title_highlight": "Like a Pro!",
         "subtitle": "Whether you're a beginner or a pro, our advanced tools and resources help you make informed trading decisions.",
-        "button": "Start trading today!"
+        "button_primary": "Start trading",
+        "button_secondary": "Try Demo Account"
       },
-
       "helpSection": "Need Help? Visit our",
       "helpLinkText": "Help Section"
     },
-
     "footer": {
       "description": "The main goal of Ester is to create the best and most transparent conditions for retail and corporate traders.",
       "trading": {
@@ -325,7 +360,10 @@
       },
       "partnership": {
         "title": "Partnership",
-        "items": ["Register IB/ Partnership", "How IB generate income"]
+        "items": [
+          "Register IB/ Partnership",
+          "How IB generate income"
+        ]
       },
       "company": {
         "title": "Company",
@@ -348,7 +386,6 @@
       }
     }
   },
-
   "cabinet": {
     "menu": {
       "dashboard": "Dashboard",
@@ -359,7 +396,6 @@
       "support": "Support",
       "settings": "Settings"
     },
-
     "dashboard": {
       "title": "Dashboard",
       "accountVerification": {
@@ -389,7 +425,6 @@
         }
       }
     },
-
     "billing": {
       "title": "Billing",
       "create": "Create new payment",
@@ -409,7 +444,6 @@
       },
       "panel-title": "Add new Admin"
     },
-
     "payments": {
       "title": "Payment details",
       "search": "Search",
@@ -426,7 +460,6 @@
         "next": "Next"
       }
     },
-
     "profile": {
       "components": {
         "tab-change-password": {
@@ -443,7 +476,6 @@
           "button": "Save new password",
           "success": "Password was successfully updated!"
         },
-
         "tab-general": {
           "labels": {
             "email": "Email",
@@ -458,7 +490,6 @@
             "address": "Address",
             "postal_code": "Postal code"
           },
-
           "placeholders": {
             "email": "example1test.com",
             "first_name": "John",
@@ -475,7 +506,6 @@
           "button": "Save and send to verification",
           "success": "User data successfully updated and sent for verification!"
         },
-
         "tab-user-documents": {
           "buttons": {
             "choose": "Choose file",
@@ -491,7 +521,6 @@
             "size": "Max size is 2MB"
           }
         },
-
         "tab-user-photo": {
           "buttons": {
             "choose": "Choose file",
@@ -520,7 +549,6 @@
         "title": "Profile"
       }
     },
-
     "accounts": {
       "account": {
         "title": "Account"
@@ -541,7 +569,6 @@
         "prev": "Prev",
         "next": "Next"
       },
-
       "accounts-form": {
         "title": "Open new account",
         "fields": {
@@ -554,7 +581,6 @@
         }
       }
     },
-
     "referrals": {
       "components": {},
       "index": {
@@ -567,7 +593,6 @@
       }
     }
   },
-
   "admin": {
     "menu": {
       "dashboard": "Dashboard",
@@ -582,7 +607,6 @@
       "mail": "Mails",
       "access": "Access"
     },
-
     "access": {
       "components": {
         "admins-panel": {
@@ -687,7 +711,6 @@
         "subtitle": "( Roles and Permissions )"
       }
     },
-
     "accounts": {
       "components": {
         "accounts-panel": {
@@ -751,14 +774,12 @@
         "subtitle": "List of accounts"
       }
     },
-
     "clients": {
       "components": {
         "clients-panel": {
           "title": "# Clients",
           "addTitle": "Add new Client",
           "editTitle": "Edit Client",
-
           "columns": {
             "id": "ID",
             "email": "Email",
@@ -769,7 +790,6 @@
             "options": "Actions"
           }
         },
-
         "clients-panel-add-new": {
           "labels": {
             "email": "Email",
@@ -798,7 +818,6 @@
           },
           "submit": "Create new & Save"
         },
-
         "clients-panel-edit": {
           "labels": {
             "name": "Name",
@@ -810,24 +829,18 @@
           },
           "submit": "Update & Save"
         },
-
         "clients-panel-search": {
           "placeholder": "Search clients..."
         }
       },
-
       "index": {
         "title": "Clients",
         "subtitle": "List of clients"
       }
     },
-
     "dashboard": {},
-
     "profile": {},
-
     "referral": {},
-
     "settings": {
       "title": "Settings",
       "tabs": {
@@ -848,13 +861,11 @@
           "key": "Key",
           "value": "Value (Seconds)"
         },
-
         "general": {
           "button": "Upload"
         }
       }
     },
-
     "support": {
       "title": "Support"
     }
