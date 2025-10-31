@@ -14,15 +14,7 @@
         />
       </div>
 
-      <div class="help-block">
-        <UiTextH4>
-          {{ t("landing.sections.helpSection") }}
-          <br />
-          <a href="#" class="help-block__link">{{
-            t("landing.sections.helpLinkText")
-          }}</a>
-        </UiTextH4>
-      </div>
+    
     </UiContainer>
   </section>
 </template>
