@@ -6,7 +6,7 @@
       <div class="faqs-content">
         <!-- FAQ Accordion Column -->
         <div class="faq-column">
-          <FaqAccordion :items="faqData" />
+          <TheFaqAccordion :items="faqData" />
           <!-- Accordion not working -->
           <!-- <UiAccordion :data="faqData" /> -->
           <div class="help-link">
@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
-  import FaqAccordion from '~/components/block/FaqAccordion.vue';
+  import TheFaqAccordion from '~/components/block/TheFaqAccordion.vue';
   import UiInput from '~/components/ui/UiInput.vue';
   import UiTextarea from '~/components/ui/UiTextarea.vue';
   import UiDragAndDrop from '~/components/ui/UiDragAndDrop.vue';
