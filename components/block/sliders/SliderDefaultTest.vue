@@ -30,20 +30,20 @@
       </div>
     </div>
 
-    <div class="welcome__running-line-default">
-      <div class="flex items-center justify-center h-[40px]">
-        <ul class="list-none flex items-center justify-center text-[var(--ui-text-main)] gap-5">
+    <div class="welcome__running-line-default relative">
+<!--      <div class="flex items-center justify-center absolute top-[-40px] left-[50%]">-->
+<!--        <ul class="list-none flex items-center justify-center text-[var(&#45;&#45;ui-text-main)] gap-5">-->
 
-          <li
-              v-for="(item, key) in runningLinesList"
-              :key="item.id"
-              class="border-b-2 border-transparent pb-1 cursor-pointer"
-              :class="{
-                  'text-[var(--ui-primary-accent)] border-[var(--ui-primary-accent)]': key === runningLinesActiveItem
-              }"
-          >{{ item.title }}</li>
-        </ul>
-      </div>
+<!--          <li-->
+<!--              v-for="(item, key) in runningLinesList"-->
+<!--              :key="item.id"-->
+<!--              class="border-b-2 border-transparent pb-1 cursor-pointer"-->
+<!--              :class="{-->
+<!--                  'text-[var(&#45;&#45;ui-primary-accent)] border-[var(&#45;&#45;ui-primary-accent)]': key === runningLinesActiveItem-->
+<!--              }"-->
+<!--          >{{ item.title }}</li>-->
+<!--        </ul>-->
+<!--      </div>-->
       <RunningLineDefault :items="items"/>
     </div>
   </div>
@@ -157,7 +157,8 @@ onUnmounted(stopAutoPlay);
 .slider-default {
   position: relative;
   width: 100vw;
-  height: calc(100vh - 120px);
+  //height: calc(100vh - 120px);
+  height: calc(100vh - 80px);
   overflow: hidden;
 
   &__slides {

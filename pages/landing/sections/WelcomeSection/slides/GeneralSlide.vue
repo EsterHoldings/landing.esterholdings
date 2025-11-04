@@ -11,7 +11,7 @@
           <img class="rocket" src="/static/rocket.png" alt="Rocket" />
         </UiTextH1>
 
-        <UiTextH5 class="slide-welcome__text">
+        <UiTextH5 class="slide-welcome__text !max-w-[500px]">
           {{ $t("landing.slider.general-slide.text") }}
         </UiTextH5>
 
@@ -41,7 +41,8 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   align-items: center;
 
   &__content {
-    max-width: 500px;
+    max-width: 800px;
+    width: 100%;
     color: #fff;
     display: flex;
     flex-direction: column;

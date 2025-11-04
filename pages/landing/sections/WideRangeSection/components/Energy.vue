@@ -50,7 +50,6 @@ const themeStore = useThemeStore();
   &__img {
     position: absolute;
     right: -140px;
-    bottom: -30px;
     object-fit: contain;
     width: 575px;
     z-index: 10;
@@ -71,12 +70,15 @@ const themeStore = useThemeStore();
     padding: 98px 376px 99px 58px;
     display: flex;
     gap: 142px;
-    background: var(--ui-background);
-    border-radius: 15px;
-    border: 1px solid var(--ui-stroke);
     overflow: hidden;
     box-shadow: inset 0 -50px 50px -20px var(--ui-background),
       inset 0 50px 50px -20px var(--ui-background);
+
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background:
+        linear-gradient(#0b0f1a, #0b0f1a) padding-box,
+        linear-gradient(135deg, #1B63FF 0%, #011644 100%) border-box;
 
     &::after {
       content: "";

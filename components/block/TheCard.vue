@@ -15,7 +15,7 @@
     <!-- Blur layer -->
     <div
       class="blur-layer"
-      :class="type === 'demo' ? 'bg-[#F75709]' : 'bg-[#1B63FF]'" />
+      :class="type === 'demo' ? 'bg-[var(--ui-primary-accent)]' : 'bg-[var(--color-stroke-ui-light)]'" />
 
     <!-- Content -->
     <div class="card-content">
@@ -23,7 +23,7 @@
       <div class="title-section">
         <h2
           class="title"
-          :class="type === 'demo' ? 'text-[#F75709]' : 'text-white'">
+          :class="type === 'demo' ? 'text-[var(--ui-primary-accent)]' : 'text-[var(--ui-text-main)]'">
           {{ title }}
         </h2>
         <span class="subtitle">

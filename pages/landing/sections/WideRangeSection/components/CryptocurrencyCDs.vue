@@ -1,36 +1,24 @@
 <template>
-  <div class="cryptocurrency-CDs">
-    <UiContainer
-      class="wrapper"
-      :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
-    >
-      <div class="cryptocurrency-CDs__content">
-        <UiTextH3 class="cryptocurrency-CDs__title">
-          {{
-            t("landing.sections.wide_range_tabs.CryptocurrencyCDs.title")
-          }}</UiTextH3
-        >
-        <UiTextH5 class="cryptocurrency-CDs__text">
-          {{
-            t("landing.sections.wide_range_tabs.CryptocurrencyCDs.description")
-          }}
-        </UiTextH5>
+  <div class="cryptocurrency h-[366px]">
+    <UiContainer class="border !p-0 h-full">
+      <div
+          class="wrapper rounded-[10px] h-full"
+          :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
+      >
+        <div class="cryptocurrency__content p-10">
+          <UiTextH3 class="cryptocurrency__title">{{ t("landing.sections.wide_range_tabs.CryptocurrencyCDs.title") }}</UiTextH3>
+          <UiTextH5 class="cryptocurrency__text">{{ t("landing.sections.wide_range_tabs.CryptocurrencyCDs.description") }}</UiTextH5>
+          <div>
+            <Nuxt-Link to="market-instruments?index=0">
+              <UiButtonDefault state="primary">{{ t("landing.sections.wide_range_tabs.CryptocurrencyCDs.btn") }}</UiButtonDefault>
+            </Nuxt-Link>
+          </div>
+        </div>
 
-        <div>
-          <Nuxt-Link to="market-instruments?index=2">
-            <UiButtonDefault state="primary">
-              {{
-                t("landing.sections.wide_range_tabs.CryptocurrencyCDs.btn")
-              }}</UiButtonDefault
-            >
-          </Nuxt-Link>
+        <div class="cryptocurrency__img-wrapper">
+          <UiImage :fitContain="true" :fitPosition="'right'" src="/static/bitcion_image.webp" class="cryptocurrency__img" />
         </div>
       </div>
-
-      <UiImage
-        src="static/bitcion_image.webp"
-        class="cryptocurrency-CDs__img"
-      />
     </UiContainer>
   </div>
 </template>
@@ -50,17 +38,24 @@ const themeStore = useThemeStore();
 </script>
 
 <style lang="scss" scoped>
-.cryptocurrency-CDs {
+.cryptocurrency {
   padding: 10px;
-  width: 100vw;
+  width: 100%;
 
   &__img {
-    position: absolute;
+    position: relative;
+    top: 0;
+    left: 0;
     right: 0;
-    bottom: -30px;
+    bottom: 0;
     object-fit: contain;
-    width: 405px;
+    width: 585px;
     z-index: 10;
+    border-radius: 13px;
+
+    &-wrapper {
+      overflow: hidden;
+    }
   }
 
   &__content {
@@ -69,20 +64,25 @@ const themeStore = useThemeStore();
     display: flex;
     flex-direction: column;
     gap: 25px;
-    margin-left: 20px;
+  }
+
+  .border {
+    width: auto;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background:
+        linear-gradient(#0b0f1a, #0b0f1a) padding-box,
+        linear-gradient(135deg, #1B63FF 0%, #011644 100%) border-box;
   }
 
   .wrapper {
     position: relative;
-    padding: 98px 376px 99px 58px;
     display: flex;
-    gap: 142px;
-    background: var(--ui-background);
-    border-radius: 15px;
-    border: 1px solid var(--ui-stroke);
-    overflow: hidden;
-    box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-      inset 0 50px 50px -20px var(--ui-background);
+    justify-content: space-between;
+    gap: 20px;
+    background-color: var(--ui-background);
+    border: 2px solid transparent;
+    border-radius: 13px;
 
     &::after {
       content: "";
@@ -96,7 +96,7 @@ const themeStore = useThemeStore();
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
 
     &::before {
@@ -111,7 +111,7 @@ const themeStore = useThemeStore();
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
   }
 
@@ -125,44 +125,42 @@ const themeStore = useThemeStore();
   }
 }
 
-:deep(.light-theme.wrapper) {
-  background: var(--ui-background-card);
-
-  &::before,
-  &::after {
-    background: white;
-  }
-}
-
 @keyframes pulse {
   0% {
     transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.1;
   }
   100% {
     transform: scale(1.2);
-    opacity: 0.4;
+    opacity: 0.8;
   }
 }
 
 @media (max-width: 1199px) {
   .wrapper {
-    padding: 40px !important;
+    //padding: 40px !important;
   }
-  .cryptocurrency-CDs__img {
-    right: -50px;
+  .cryptocurrency__img {
+    //width: 68%;
+    //top: 0;
+    //right: -50px;
   }
 }
 
 @media (max-width: 991px) {
-  .cryptocurrency-CDs {
+  .cryptocurrency {
     padding: 0 !important;
   }
 
-  .cryptocurrency-CDs__title {
+  .cryptocurrency__title {
     font-size: 26px;
   }
 
+  .cryptocurrency__text {
+    br {
+      display: none;
+    }
+  }
   .wrapper {
     padding: 0 !important;
     display: flex;
@@ -182,14 +180,18 @@ const themeStore = useThemeStore();
     }
   }
 
-  .cryptocurrency-CDs__content {
+  .cryptocurrency__content {
     order: 2;
+    backdrop-filter: blur(3px);
   }
 
-  .cryptocurrency-CDs__img {
-    position: static;
-    order: 1;
+  .cryptocurrency__img {
+    z-index: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
     margin: 0 auto;
   }
 }
 </style>
+

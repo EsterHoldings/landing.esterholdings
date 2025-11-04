@@ -1,29 +1,24 @@
 <template>
-  <div class="shares">
-    <UiContainer
-      class="wrapper"
-      :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
-    >
-      <div class="shares__content">
-        <UiTextH3 class="forex__title">
-          {{ t("landing.sections.wide_range_tabs.Shares.title") }}</UiTextH3
-        >
-        <UiTextH5 class="shares__text">
-          {{ t("landing.sections.wide_range_tabs.Shares.description") }}
-        </UiTextH5>
+  <div class="shares h-[366px] w-full">
+    <UiContainer class="border !p-0 h-full">
+      <div
+          class="wrapper rounded-[10px] h-full"
+          :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
+      >
+        <div class="shares__content p-10 h-full">
+          <UiTextH3 class="shares__title">{{ t("landing.sections.wide_range_tabs.Shares.title") }}</UiTextH3>
+          <UiTextH5 class="shares__text">{{ t("landing.sections.wide_range_tabs.Shares.description") }}</UiTextH5>
+          <div>
+            <Nuxt-Link to="market-instruments?index=0">
+              <UiButtonDefault state="primary">{{ t("landing.sections.wide_range_tabs.Shares.btn") }}</UiButtonDefault>
+            </Nuxt-Link>
+          </div>
+        </div>
 
-        <div>
-          <Nuxt-Link to="market-instruments?index=4">
-            <UiButtonDefault state="primary">
-              {{
-                t("landing.sections.wide_range_tabs.Shares.btn")
-              }}</UiButtonDefault
-            >
-          </Nuxt-Link>
+        <div class="shares__img-wrapper">
+          <UiImage :fitContain="true" :fitPosition="'right'" src="/static/shares_image.webp" class="shares__img" />
         </div>
       </div>
-
-      <UiImage src="static/shares_image.webp" class="shares__img" />
     </UiContainer>
   </div>
 </template>
@@ -45,14 +40,23 @@ const themeStore = useThemeStore();
 <style lang="scss" scoped>
 .shares {
   padding: 10px;
-  width: 100vw;
+  width: 100%;
 
   &__img {
-    position: absolute;
-    right: -130px;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     object-fit: contain;
-    width: 643px;
-    z-index: 10;
+    width: 585px;
+    z-index: -1;
+    //transform: translate(0, 15px);
+    overflow: hidden;
+
+    &-wrapper {
+
+    }
   }
 
   &__content {
@@ -61,20 +65,25 @@ const themeStore = useThemeStore();
     display: flex;
     flex-direction: column;
     gap: 25px;
-    margin-left: 20px;
+  }
+
+  .border {
+    width: auto;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background:
+        linear-gradient(#0b0f1a, #0b0f1a) padding-box,
+        linear-gradient(135deg, #1B63FF 0%, #011644 100%) border-box;
   }
 
   .wrapper {
     position: relative;
-    padding: 98px 376px 99px 58px;
     display: flex;
-    gap: 142px;
-    background: var(--ui-background);
-    border-radius: 15px;
-    border: 1px solid var(--ui-stroke);
-    overflow: hidden;
-    box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-      inset 0 50px 50px -20px var(--ui-background);
+    justify-content: space-between;
+    gap: 20px;
+    background-color: var(--ui-background);
+    z-index: 0;
+    border-radius: 13px;
 
     &::after {
       content: "";
@@ -85,10 +94,10 @@ const themeStore = useThemeStore();
       filter: blur(100px);
       top: 270px;
       right: -200px;
-      z-index: 1;
+      z-index: -1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
 
     &::before {
@@ -100,10 +109,10 @@ const themeStore = useThemeStore();
       filter: blur(100px);
       top: 140px;
       right: 260px;
-      z-index: 1;
+      z-index: -1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
   }
 
@@ -117,29 +126,25 @@ const themeStore = useThemeStore();
   }
 }
 
-:deep(.light-theme.wrapper) {
-  background: var(--ui-background-card);
-
-  &::before,
-  &::after {
-    background: white;
-  }
-}
-
 @keyframes pulse {
   0% {
     transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.1;
   }
   100% {
     transform: scale(1.2);
-    opacity: 0.4;
+    opacity: 0.8;
   }
 }
 
 @media (max-width: 1199px) {
   .wrapper {
-    padding: 40px !important;
+    //padding: 40px !important;
+  }
+  .shares__img {
+    //width: 68%;
+    //top: 0;
+    //right: -50px;
   }
 }
 
@@ -178,13 +183,23 @@ const themeStore = useThemeStore();
 
   .shares__content {
     order: 2;
+    backdrop-filter: blur(3px);
   }
 
   .shares__img {
-    position: static;
     order: 1;
-    width: 100%;
-    margin: 0 auto;
+    width: auto;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    position: absolute;
+  }
+}
+
+@media (max-width: 575px) {
+  .wide_range_section__content {
+
   }
 }
 </style>

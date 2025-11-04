@@ -1,29 +1,24 @@
 <template>
-  <div class="indices">
-    <UiContainer
-      class="wrapper"
-      :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
-    >
-      <div class="indices__content">
-        <UiTextH3 class="indices__title">
-          {{ t("landing.sections.wide_range_tabs.Indices.title") }}</UiTextH3
-        >
-        <UiTextH5 class="indices__text">
-          {{ t("landing.sections.wide_range_tabs.Indices.description") }}
-        </UiTextH5>
+  <div class="indices h-[366px]">
+    <UiContainer class="border !p-0 h-full">
+      <div
+          class="wrapper rounded-[10px] h-full"
+          :class="{ 'light-theme': themeStore.currentTheme === 'light' }"
+      >
+        <div class="indices__content p-10">
+          <UiTextH3 class="indices__title">{{ t("landing.sections.wide_range_tabs.Indices.title") }}</UiTextH3>
+          <UiTextH5 class="indices__text">{{ t("landing.sections.wide_range_tabs.Indices.description") }}</UiTextH5>
+          <div>
+            <Nuxt-Link to="market-instruments?index=0">
+              <UiButtonDefault state="primary">{{ t("landing.sections.wide_range_tabs.Indices.btn") }}</UiButtonDefault>
+            </Nuxt-Link>
+          </div>
+        </div>
 
-        <div>
-          <Nuxt-Link to="market-instruments?index=3">
-            <UiButtonDefault state="primary">
-              {{
-                t("landing.sections.wide_range_tabs.Indices.btn")
-              }}</UiButtonDefault
-            >
-          </Nuxt-Link>
+        <div class="metals__img-wrapper">
+          <UiImage :fitContain="true" :fitPosition="'right'" src="/static/globe_image.webp" class="indices__img" />
         </div>
       </div>
-
-      <UiImage src="static/globe_image.webp" class="indices__img" />
     </UiContainer>
   </div>
 </template>
@@ -45,15 +40,23 @@ const themeStore = useThemeStore();
 <style lang="scss" scoped>
 .indices {
   padding: 10px;
-  width: 100vw;
+  width: 100%;
 
   &__img {
-    position: absolute;
+    position: relative;
+    top: 0;
+    left: 0;
     right: 0;
-    bottom: -30px;
+    bottom: 0;
     object-fit: contain;
-    width: 446px;
+    width: 585px;
     z-index: 10;
+    overflow: hidden;
+    border-radius: 10px;
+
+    &-wrapper {
+      margin-bottom: -10px;
+    }
   }
 
   &__content {
@@ -62,20 +65,25 @@ const themeStore = useThemeStore();
     display: flex;
     flex-direction: column;
     gap: 25px;
-    margin-left: 20px;
+  }
+
+  .border {
+    width: auto;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background:
+        linear-gradient(#0b0f1a, #0b0f1a) padding-box,
+        linear-gradient(135deg, #1B63FF 0%, #011644 100%) border-box;
   }
 
   .wrapper {
     position: relative;
-    padding: 98px 376px 99px 58px;
     display: flex;
-    gap: 142px;
-    background: var(--ui-background);
-    border-radius: 15px;
-    border: 1px solid var(--ui-stroke);
-    overflow: hidden;
-    box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-      inset 0 50px 50px -20px var(--ui-background);
+    justify-content: space-between;
+    gap: 20px;
+    background-color: var(--ui-background);
+    border: 2px solid transparent;
+    border-radius: 12px;
 
     &::after {
       content: "";
@@ -89,7 +97,7 @@ const themeStore = useThemeStore();
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
 
     &::before {
@@ -104,7 +112,7 @@ const themeStore = useThemeStore();
       z-index: 1;
       animation: pulse 3s infinite alternate ease-in-out;
       box-shadow: inset 0 -50px 50px -20px var(--ui-background),
-        inset 0 50px 50px -20px var(--ui-background);
+      inset 0 50px 50px -20px var(--ui-background);
     }
   }
 
@@ -118,32 +126,25 @@ const themeStore = useThemeStore();
   }
 }
 
-:deep(.light-theme.wrapper) {
-  background: var(--ui-background-card);
-
-  &::before,
-  &::after {
-    background: white;
-  }
-}
-
 @keyframes pulse {
   0% {
     transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.1;
   }
   100% {
     transform: scale(1.2);
-    opacity: 0.4;
+    opacity: 0.8;
   }
 }
 
 @media (max-width: 1199px) {
   .wrapper {
-    padding: 40px !important;
+    //padding: 40px !important;
   }
   .indices__img {
-    right: -60px;
+    width: 68%;
+    top: 0;
+    right: -50px;
   }
 }
 
@@ -156,6 +157,11 @@ const themeStore = useThemeStore();
     font-size: 26px;
   }
 
+  .indices__text {
+    br {
+      display: none;
+    }
+  }
   .wrapper {
     padding: 0 !important;
     display: flex;
@@ -177,13 +183,15 @@ const themeStore = useThemeStore();
 
   .indices__content {
     order: 2;
+    backdrop-filter: blur(3px);
   }
 
   .indices__img {
-    position: static;
-    order: 1;
+    position: absolute;
     width: 100%;
+    height: 100%;
     margin: 0 auto;
+    z-index: 0;
   }
 }
 </style>

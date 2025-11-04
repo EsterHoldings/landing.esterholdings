@@ -3,12 +3,6 @@
     <UiTextH3>{{ t('landing.sections.wide_range__title') }}</UiTextH3>
 
     <div class="wide_range_section__tabs">
-      <!-- <UiTabs
-        :tabs="tabsList.tabs.value"
-        @active-tab="setActiveTab"
-        class="tabs"
-      /> -->
-
       <TabsDefault
         :tabsList="tabsList"
         @selectTab="handleActiveTab"
@@ -162,6 +156,12 @@
       &__content {
         margin-top: 20px;
       }
+    }
+  }
+
+  @media (max-width: 575px) {
+    .wide_range_section__content {
+      padding: 10px;
     }
   }
 

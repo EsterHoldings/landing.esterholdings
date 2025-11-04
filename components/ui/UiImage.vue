@@ -4,6 +4,10 @@
       <UiLoaderPlaceholder />
     </div>
     <img
+        :class="{
+          '!object-contain !h-full':fitContain,
+          '!object-right' : fitPosition,
+        }"
         @click="handleClick"
         v-show="loaded"
         @load="onLoad"
@@ -31,6 +35,14 @@ const props = defineProps({
   alt: {
     type: String,
     default: '',
+  },
+  fitContain: {
+    type: Boolean,
+    default: false,
+  },
+  fitPosition: {
+    type: String,
+    default: 'left',
   },
 })
 
@@ -60,7 +72,7 @@ function handleClick() {
   display: block;
   cursor: pointer;
   overflow: hidden;
-  background-color: var(--color-stroke-ui-dark);
+  //background-color: var(--color-stroke-ui-dark);
   width: 100%;
   height: 100%;
 

@@ -44,8 +44,8 @@
 
 <style lang="scss" scoped>
 svg {
-  height: 20px;
-  width: 20px;
+  height: 23px;
+  width: 23px;
 
   defs {
     clipPath {

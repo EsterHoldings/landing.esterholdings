@@ -147,9 +147,6 @@ export default defineNuxtConfig({
     },
 
     vite: {
-        build: {
-            chunkSizeWarningLimit: 2500,
-        },
         server: {
             proxy: {
                 '/api/': {
