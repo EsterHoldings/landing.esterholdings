@@ -110,7 +110,6 @@
                 :key="`${link.key}-${activeLink}`"
                 :name="link.name"
                 :linkKey="link.key"
-                :path="link.path"
                 :headerItems="headerItems"
                 :activeLink="activeLink"
                 @click="handleClick(link.key)" />
@@ -205,6 +204,13 @@
 
   const activeLink = ref("");
   provide("stateLink", activeLink);
+  const closeMobileMenu = () => {
+    isMobileMenuOpen.value = false;
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  };
+  provide("closeMobileMenu", closeMobileMenu);
   const headerItems = ref();
   const isMobileMenuOpen = ref(false);
   const menuRef = ref(null);
@@ -304,6 +310,10 @@
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.width = "";
+    }
+    if (width <= 991 && activeLink.value) {
+      activeLink.value = "";
+      uiStore.showMenu = false;
     }
   });
 </script>
@@ -536,9 +546,10 @@
       display: flex;
     }
 
-    .login {
-      display: none;
-      padding: 0;
+    .actions {
+      > a {
+        display: none;
+      }
     }
 
     .actions-wrapper {
@@ -550,7 +561,8 @@
     }
 
     .is-menu-open {
-      padding-left: 15px;
+      // padding-left: 15px;
+      margin-left: 15px;
       border-left: 1px solid var(--ui-gray);
 
       .actions {
@@ -564,12 +576,27 @@
       justify-content: unset !important;
       transition: all 0.2s ease;
     }
+
+    .logo {
+      margin-right: 15px;
+      margin-bottom: 15px;
+      // padding-left: 25px;
+
+      svg {
+        width: auto;
+        height: 40px;
+      }
+    }
+
+    .register {
+      padding: 15px;
+    }
   }
 
   @media (max-width: 575px) {
     .logo {
       margin-right: 15px;
-      padding-left: 25px;
+      // padding-left: 25px;
 
       svg {
         width: auto;
