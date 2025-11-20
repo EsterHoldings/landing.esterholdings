@@ -6,97 +6,100 @@
     <div
       :class="{ blurred: isBlurred, 'nav--open': isMobileMenuOpen }"
       class="header__wrapper">
-      <header
-        class="header"
-        :class="{ 'header-is-open-menu ': isMobileMenuOpen }">
-        <div class="logo">
-          <NuxtLink to="/">
-            <UiIconLogo
-              :class="{
+
+      <UiContainer>
+        <header
+            class="header"
+            :class="{ 'header-is-open-menu ': isMobileMenuOpen }">
+          <div class="logo">
+            <NuxtLink to="/">
+              <UiIconLogo
+                  :class="{
                 'svg-invert': isThemeLight || isWithPicture || forceSvgInvert,
               }" />
-          </NuxtLink>
-        </div>
+            </NuxtLink>
+          </div>
 
-        <div
-          class="burger-menu"
-          :class="{
+          <div
+              class="burger-menu"
+              :class="{
             'burger-menu--open': isMobileMenuOpen,
             'is-theme-light': isThemeLight || isWithPicture || forceSvgInvert,
           }"
-          @click="toggleMenu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+              @click="toggleMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
 
-        <nav
-          class="nav"
-          :class="{ 'nav--open': isMobileMenuOpen }">
-          <HeaderLink
-            v-for="link in linksList"
-            :key="link.key"
-            :name="link.name"
-            :path="link.path"
-            :activeLink="activeLink"
-            @click.stop="handleClick(link.key)"
-            :isInvertColor="isThemeLight || isWithPicture || forceSvgInvert" />
-        </nav>
+          <nav
+              class="nav"
+              :class="{ 'nav--open': isMobileMenuOpen }">
+            <HeaderLink
+                v-for="link in linksList"
+                :key="link.key"
+                :name="link.name"
+                :path="link.path"
+                :activeLink="activeLink"
+                @click.stop="handleClick(link.key)"
+                :isInvertColor="isThemeLight || isWithPicture || forceSvgInvert" />
+          </nav>
 
-        <div
-          class="actions-wrapper"
-          :class="{ 'is-menu-open': isMobileMenuOpen }">
-          <div class="actions">
-            <NuxtLink to="/auth/login">
-              <UiButtonDefault
-                state="link"
-                class="login"
-                :class="{
+          <div
+              class="actions-wrapper"
+              :class="{ 'is-menu-open': isMobileMenuOpen }">
+            <div class="actions">
+              <NuxtLink to="/auth/login">
+                <UiButtonDefault
+                    state="link"
+                    class="login"
+                    :class="{
                   'is-theme-light': isThemeLight || isWithPicture || forceSvgInvert,
                 }">
-                {{ t("landing.header.auth.login") }}
-              </UiButtonDefault>
-            </NuxtLink>
+                  {{ t("landing.header.auth.login") }}
+                </UiButtonDefault>
+              </NuxtLink>
 
-            <nuxt-link
-              to="/auth/registration"
-              class="register">
-              <UiButtonDefault
-                state="primary"
-                v-if="!isMobileMenuOpen">
-                {{ t("landing.header.auth.register") }}
-              </UiButtonDefault>
-            </nuxt-link>
+              <nuxt-link
+                  to="/auth/registration"
+                  class="register">
+                <UiButtonDefault
+                    state="primary"
+                    v-if="!isMobileMenuOpen">
+                  {{ t("landing.header.auth.register") }}
+                </UiButtonDefault>
+              </nuxt-link>
 
-            <div class="actions-icons">
-              <LanguageSwitcher
-                class="icon"
-                :isInvert="isThemeLight || isWithPicture || forceSvgInvert" />
+              <div class="actions-icons">
+                <LanguageSwitcher
+                    class="icon"
+                    :isInvert="isThemeLight || isWithPicture || forceSvgInvert" />
 
-              <transition
-                name="fade"
-                mode="out-in">
+                <transition
+                    name="fade"
+                    mode="out-in">
                 <span
-                  :key="themeStore.currentTheme"
-                  @click="themeStore.toggleTheme()"
-                  class="icon mt-[1px]">
+                    :key="themeStore.currentTheme"
+                    @click="themeStore.toggleTheme()"
+                    class="icon mt-[1px]">
                   <UiIconMoon
-                    v-if="themeStore.currentTheme === 'light'"
-                    :class="{
+                      v-if="themeStore.currentTheme === 'light'"
+                      :class="{
                       'svg-invert': !(isThemeLight || isWithPicture || forceSvgInvert),
                     }" />
 
                   <UiIconSun
-                    :class="{
+                      :class="{
                       'svg-invert': !(isThemeLight || isWithPicture || forceSvgInvert),
                     }"
-                    v-else />
+                      v-else />
                 </span>
-              </transition>
+                </transition>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </UiContainer>
 
       <transition name="fade">
         <div
@@ -330,11 +333,11 @@
   }
 
   .header__wrapper {
-    padding: 25px;
+    padding: 0 25px;
 
-    @media (max-width: 991px) {
-      padding: 25px 5px 30px 25px;
-    }
+    //@media (max-width: 991px) {
+    //  padding: 25px 5px 30px 25px;
+    //}
   }
 
   .header {
