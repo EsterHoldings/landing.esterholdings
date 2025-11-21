@@ -1,7 +1,7 @@
 <template>
   <li
     class="relative md:w-[120px] lg:w-full mt-px h-[40px] flex justify-center transition-colors duration-300 cursor-pointer rounded-md"
-    :class="isActive ? 'bg-[var(--color-ui-primary)]' : 'hover:bg-[var(--color-stroke-ui-dark)] hover:opacity-80'"
+    :class="isActive ? 'bg-[var(--ui-primary-main)]' : 'hover:bg-[var(--color-stroke-ui-dark)] hover:opacity-80'"
     @click="handleClickMenuItem">
     <div class="text-[var(--ui-text-main)] flex items-center justify-center h-full w-[60px] max-sm:w-[50px] relative">
       <component :class="{'text-[var(--ui-text-invert)]': isActive}" :is="icon" />

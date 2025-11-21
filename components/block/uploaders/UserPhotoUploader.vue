@@ -10,6 +10,7 @@ import { useAuthStore } from "~/stores/authStore";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 import UiImage from "~/components/ui/UiImage.vue";
 import UiIconUser from "~/components/ui/UiIconUser.vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -20,6 +21,8 @@ const file = ref<File | null>(null);
 const uploadProgress = ref<number>(0);
 const loading = ref<boolean>(false);
 const error = ref<string>("");
+
+const isLoadingAllComponentData = ref(false);
 
 const previewUrl = computed<string>({
   get: () => authStore.photoUrl,
@@ -95,7 +98,9 @@ async function remove() {
 }
 
 onMounted(async () => {
+  isLoadingAllComponentData.value = true;
   await authStore.initAuth();
+  isLoadingAllComponentData.value = false;
 });
 </script>
 
@@ -103,9 +108,10 @@ onMounted(async () => {
   <div class="text-[var(--ui-text-main)]">
 
       <div class="flex items-center gap-4">
-        <!-- AVATAR -->
         <div v-if="previewUrl" class="relative w-[80px] h-[80px] rounded-full bg-[var(--ui-background)] border border-[var(--color-stroke-ui-dark)] overflow-hidden">
+          <UiIconSpinnerDefault class="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]" v-if="!isLoadingAllComponentData" />
           <UiImage
+              v-if="!isLoadingAllComponentData"
               :src="previewUrl"
               class="w-full h-full object-cover cursor-pointer"
               @click="clickSelectionFile"
@@ -156,7 +162,7 @@ onMounted(async () => {
           </div>
 
           <!-- PROGRESS -->
-          <div v-if="loading" class="h-1.5 bg-[var(--color-ui-primary-defalt)] rounded-md overflow-hidden">
+          <div v-if="loading" class="h-1.5 bg-[var(--ui-primary-main-defalt)] rounded-md overflow-hidden">
             <div class="h-full bg-blue-500 transition-[width] duration-200" :style="{ width: uploadProgress + '%' }"></div>
           </div>
 

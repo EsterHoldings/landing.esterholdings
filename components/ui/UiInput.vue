@@ -31,7 +31,7 @@
     />
 
     <div v-if="props.isLoading" class="is-loading">
-      <UiIconSpinnerDefault/>
+      <UiIconSpinnerDefault class="absolute right-[20px] top-[50%] translate-y-[-50%] opacity-15" />
     </div>
 
     <transition name="fade">
@@ -49,10 +49,6 @@
           @click="togglePasswordVisibility"
       />
     </transition>
-
-    <div v-if="isLoading" class="is-loading">
-      <UiIconSpinnerDefault/>
-    </div>
   </div>
 </template>
 
@@ -135,10 +131,30 @@ input {
 }
 
 .input .is-loading {
-  margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+
+  /* как в .animated из примера */
+  background: linear-gradient(
+          to right,
+          rgba(243, 243, 243, 0.1) 5%,
+          rgba(238, 238, 238, 0.15) 20%,
+          rgba(243, 243, 243, 0.1) 35%
+  );
+  background-size: 1000px 100%; /* важно, чтобы было что двигать */
+
+  animation: placeholderShimmer 1.5s linear infinite;
+}
+
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -500px 0;
+  }
+  100% {
+    background-position: 500px 0;
+  }
 }
 
 .input-icon--left {

@@ -54,7 +54,7 @@
       }
 
       &.active {
-        background-color: var(--color-ui-primary);
+        background-color: var(--ui-primary-main);
       }
 
       @media (max-width: 1023px) {

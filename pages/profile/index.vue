@@ -10,7 +10,7 @@
       <PanelDefault>
         <div class="flex flex-row max-lg:flex-col">
           <div
-            class="w-[240px] max-lg:w-full border-r max-lg:border-r-0 max-lg:border-b border-[var(--ui-primary-main)] p-5 max-lg:p-2">
+            class="w-[240px] max-lg:w-full border-r max-lg:border-r-0 max-lg:border-b border-[var(--ui-primary-main)] p-2 max-lg:p-2">
             <TabsAsList
               :tabsList="tabsList"
               @selectTab="handleActiveTab"

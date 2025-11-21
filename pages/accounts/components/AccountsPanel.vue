@@ -236,7 +236,7 @@
           v-for="page in visiblePages"
           :key="page"
           class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
-          :class="{ 'bg-[var(--color-ui-primary)] text-white': currentPage === page }"
+          :class="{ 'bg-[var(--ui-primary-main)] text-white': currentPage === page }"
           @click="setPage(page)">
           {{ page }}
         </UiTextSmall>

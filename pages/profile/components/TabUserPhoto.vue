@@ -51,7 +51,7 @@
         </div>
 
         <!-- PROGRESS -->
-        <div v-if="loading" class="w-full h-1.5 bg-[var(--color-ui-primary-defalt)] rounded-md overflow-hidden">
+        <div v-if="loading" class="w-full h-1.5 bg-[var(--ui-primary-main-defalt)] rounded-md overflow-hidden">
           <div class="h-full bg-blue-500 transition-[width] duration-200" :style="{ width: uploadProgress + '%' }"></div>
         </div>
 

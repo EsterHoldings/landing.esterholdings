@@ -58,8 +58,8 @@ const props = defineProps({
 .order-asc {
   svg {
     path:first-child {
-      fill: var(--color-ui-primary);
-      stroke: var(--color-ui-primary);
+      fill: var(--ui-primary-main);
+      stroke: var(--ui-primary-main);
     }
   }
 }
@@ -67,8 +67,8 @@ const props = defineProps({
 .order-desc {
   svg {
     path:last-child {
-      fill: var(--color-ui-primary);
-      stroke: var(--color-ui-primary);
+      fill: var(--ui-primary-main);
+      stroke: var(--ui-primary-main);
     }
   }
 }

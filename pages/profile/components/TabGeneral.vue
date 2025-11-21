@@ -12,6 +12,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.email')"
             :errors="validatorUserDataForm.errorsFormData.email.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.email')"
               :value="formData.email"
@@ -26,6 +27,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.first_name')"
             :errors="validatorUserDataForm.errorsFormData.first_name.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.first_name')"
               :value="formData.first_name"
@@ -40,6 +42,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.last_name')"
             :errors="validatorUserDataForm.errorsFormData.last_name.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.last_name')"
               :value="formData.last_name"
@@ -54,6 +57,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.mid_name')"
             :errors="validatorUserDataForm.errorsFormData.mid_name.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.mid_name')"
               :value="formData.mid_name"
@@ -68,6 +72,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.birthdate')"
             :errors="validatorUserDataForm.errorsFormData.birthdate.errors">
             <UiInputDate
+              :isLoading="isLoadingAllComponentData"
               type="date"
               placeholder=""
               inputFormat="yyyy-MM-dd"
@@ -85,6 +90,7 @@
             :errors="validatorUserDataForm.errorsFormData.phone.errors">
             <UiInputPhone
               type="number"
+              :isLoading="isLoadingAllComponentData"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.phone')"
               v-model="formData.phone"
               :isDirty="validatorUserDataForm.errorsFormData.phone.isDirty"
@@ -102,6 +108,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.country')"
             :errors="validatorUserDataForm.errorsFormData.country.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.country')"
               :value="formData.country"
@@ -116,6 +123,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.state')"
             :errors="validatorUserDataForm.errorsFormData.state.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.state')"
               :value="formData.state"
@@ -130,6 +138,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.city')"
             :errors="validatorUserDataForm.errorsFormData.city.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.city')"
               :value="formData.city"
@@ -144,6 +153,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.address')"
             :errors="validatorUserDataForm.errorsFormData.address.errors">
             <UiInput
+              :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.address')"
               :value="formData.address"
@@ -158,6 +168,7 @@
             :label="t('cabinet.profile.components.tab-general.labels.postal_code')"
             :errors="validatorUserDataForm.errorsFormData.postal_code.errors">
             <UiInput
+                :isLoading="isLoadingAllComponentData"
               type="text"
               :placeholder="t('cabinet.profile.components.tab-general.placeholders.postal_code')"
               :value="formData.postal_code"
@@ -208,6 +219,7 @@
   const toast = useToast();
   const appCore = useAppCore();
   const isLoading = ref(false);
+  const isLoadingAllComponentData = ref(false);
 
   const handleInputBirthday = value => {
     validatorUserDataForm.doValidateField("birthdate", value);
@@ -230,6 +242,7 @@
   };
 
   onMounted(async () => {
+    isLoadingAllComponentData.value = true;
     const { data } = await appCore.auth.getAuthUser();
     formData.email = data.email;
     formData.first_name = data.first_name;
@@ -242,6 +255,7 @@
     formData.city = data.city;
     formData.address = data.address;
     formData.postal_code = data.postal_code;
+    isLoadingAllComponentData.value = false
   });
 </script>
 

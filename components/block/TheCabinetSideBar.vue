@@ -1,14 +1,10 @@
 <template>
-  <aside
-    class="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col items-center justify-between bg-[var(--ui-background-sidebar)]/82 backdrop-blur-md text-[var(--ui-text-main)] z-40 shadow-[0_0_5px_-1px_rgba(255,249,249,.1)] border-r border-r-[var(--color-stroke-ui-light)]">
-    <!-- Top -->
+  <aside class="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col items-center justify-between bg-[var(--ui-background-sidebar)]/82 backdrop-blur-md text-[var(--ui-text-main)] z-40 shadow-[0_0_5px_-1px_rgba(255,249,249,.1)] border-r border-r-[var(--color-stroke-ui-light)]">
     <div class="w-full flex flex-col items-start">
-      <div class="h-[60px] flex items-center justify-center pl-5 mb-10">
-        <!-- не працює на десктопі, іконка біла на білому фоні -->
-        <NuxtLink
-          to="/"
-          class="logo">
-          <UiIconLogo :lightTheme="isThemeLight" />
+      <div class="h-[60px] flex items-center justify-center pl-5 mb-8">
+        <NuxtLink to="/">
+          <UiIconLogoLight v-if="isThemeLight" />
+          <UiIconLogo v-else />
         </NuxtLink>
       </div>
     </div>
@@ -16,116 +12,8 @@
     <div class="flex-1 w-full flex items-start justify-center p-2">
       <TheCabinetSideBarMenu />
     </div>
-
-    <!-- <button
-        class="h-[52px] w-full flex items-center justify-center hover:bg-[var(--color-stroke-ui-dark)]/60"
-        @click="handleClickLogout"
-        aria-label="Logout"
-    >
-      <UiIconLogout />
-    </button> -->
   </aside>
 
-  <!-- =====
-  Немає сенсу в ще одному хедері для мобільної версії, тому що він дублює функціонал компонента TheCabinetHeader,
- можна зробити за допомогою компонента TheCabinetHeader звичайною адаптацією для мобільної версії і зберегти весь функціонал без дублів
- ===== -->
-
-  <!-- ===== Mobile header (lg-) ===== -->
-  <!-- <header
-    class="lg:hidden fixed top-0 inset-x-0 z-50 h-14 bg-[var(--ui-background-sidebar)]/78 backdrop-blur-xl text-[var(--ui-text-main)] shadow-[0_6px_24px_-12px_rgba(0,0,0,.6)]">
-    <div class="h-full px-4 flex items-center justify-between">
-      <NuxtLink
-        to="/"
-        class="logo"
-        aria-label="Home">
-        <UiIconLogo class="w-24 h-6" />
-      </NuxtLink>
-
-      <div class="flex items-center gap-3">
-        <LanguageSwitcher
-          isSidebar
-          :isInvert="isThemeLight"
-          class="icon" />
-        <transition
-          name="fade"
-          mode="out-in">
-          <button
-            :key="themeStore.currentTheme"
-            @click="themeStore.toggleTheme()"
-            class="icon"
-            aria-label="Toggle theme">
-            <UiIconMoon v-if="themeStore.currentTheme === 'dark'" />
-            <UiIconSun v-else />
-          </button>
-        </transition>
-
-        <div class="relative">
-          <button
-            class="relative"
-            @click="handleClickNotifications"
-            aria-label="Notifications">
-            <UiIconBell />
-            <span
-              class="absolute -top-2 -right-2 h-5 w-5 text-[10px] font-bold rounded-full bg-[var(--color-warning)] text-[var(--ui-text-main)] flex items-center justify-center"
-              >3</span
-            >
-          </button>
-
-          <PanelDefault
-            v-if="isOpen"
-            class="absolute right-0 mt-2 z-50 w-[92vw] max-w-[420px] min-h-[220px] max-h-[60vh] p-4 rounded-xl bg-[var(--ui-background)]/95 backdrop-blur-md border border-[var(--color-stroke-ui-dark)]/40">
-            <div class="mb-4 flex items-center justify-between">
-              <span>14 items</span>
-              <UiButtonDefault state="info--outline--small">Clean</UiButtonDefault>
-            </div>
-
-            <div
-              v-for="notification in notifications"
-              :key="notification.message"
-              :class="[
-                'relative mb-2.5 p-4 rounded-xl bg-[var(--color-stroke-ui-dark)]/60',
-                notification.type === 'info' ? 'text-[var(--color-info)]' : '',
-                notification.type === 'success' ? 'text-[var(--color-success)]' : '',
-                notification.type === 'warning' ? 'text-[var(--color-warning)]' : '',
-                notification.type === 'danger' ? 'text-[var(--color-danger)]' : '',
-                notification.wasRead ? 'opacity-30 hover:opacity-100' : '',
-              ]">
-              {{ notification.message }}
-              <UiIconDelete class="absolute top-2.5 right-2.5 opacity-50 hover:opacity-100" />
-            </div>
-          </PanelDefault>
-        </div>
-
-        <button
-          class="h-10 w-10 rounded-2xl flex items-center justify-center bg-[var(--color-stroke-ui-dark)]/60 hover:bg-[var(--color-stroke-ui-dark)] active:bg-[var(--ui-background-panel)]/80"
-          @click="handleClickLogout"
-          aria-label="Logout">
-          <UiIconLogout />
-        </button>
-
-        <NuxtLink
-          to="/ru/profile"
-          class="flex items-center"
-          aria-label="Profile">
-          <div
-            :class="[
-              'h-10 w-10 rounded-2xl flex items-center justify-center overflow-hidden',
-              isProfileRoute ? 'ring-2 ring-[var(--ui-primary-main)]' : 'ring-2 ring-[var(--ui-text-main)]',
-            ]">
-            <UiIconUser v-if="!authStore.photoUrl" />
-            <img
-              v-else
-              :src="authStore.photoUrl"
-              alt="User Photo"
-              class="h-full w-full object-cover" />
-          </div>
-        </NuxtLink>
-      </div>
-    </div>
-  </header> -->
-
-  <!-- ===== Mobile bottom nav (lg-) ===== -->
   <nav
     class="lg:hidden fixed bottom-0 inset-x-0 z-50 h-16 pb-[env(safe-area-inset-bottom)] bg-[var(--ui-background-sidebar)]/78 backdrop-blur-xl text-[var(--ui-text-main)] shadow-[0_-8px_24px_-16px_rgba(0,0,0,.6)]">
     <div class="h-full px-2 flex items-center justify-evenly gap-1 overflow-hidden">
@@ -153,6 +41,7 @@
   import PanelDefault from "~/components/block/panels/PanelDefault.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   import UiIconDelete from "~/components/ui/UiIconDelete.vue";
+  import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
 
   const authStore = useAuthStore();
   const themeStore = useThemeStore();
@@ -188,24 +77,11 @@
 </script>
 
 <style scoped>
-  /* fade */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.3s ease;
-  }
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
-
   .logo :deep(svg),
   .logo :deep(img) {
     display: block;
     width: 100%;
     height: 100%;
-    fill: currentColor;
-    filter: none !important;
-    background: transparent !important;
   }
 
   .mobile-bottom-menu :deep(nav),
@@ -226,12 +102,12 @@
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    flex: 0 0 56px; /* однакова ширина */
+    flex: 0 0 56px;
     width: 56px;
-    height: 48px; /* однакова висота */
+    height: 48px;
     border-radius: 14px;
     background: color-mix(in oklab, var(--color-stroke-ui-dark) 60%, transparent);
-    font-size: 0; /* приховати текст, навіть якщо немає окремого елемента */
+    font-size: 0;
     white-space: nowrap;
   }
 
@@ -245,13 +121,11 @@
     height: 22px;
   }
 
-  /* приховати UiSpacer на мобільній версії */
   .mobile-bottom-menu :deep(.w-full.flex.items-center.justify-center.h-\[40px\]),
   .mobile-bottom-menu :deep(.w-full.flex.items-center.justify-center.h-\[4px\]) {
     display: none !important;
   }
 
-  /* додатково: якщо в меню є підписи — ховаємо їх */
   .mobile-bottom-menu :deep(span),
   .mobile-bottom-menu :deep(.label),
   .mobile-bottom-menu :deep(.title),

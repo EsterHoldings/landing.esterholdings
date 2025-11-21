@@ -116,7 +116,7 @@
     }
 
     &--primary {
-      background: rgb(0, 81, 255);
+      background: var(--ui-primary-main);
       color: white;
     }
 
@@ -126,7 +126,7 @@
     }
 
     &--default {
-      background-color: var(--color-ui-primary);
+      background-color: var(--ui-primary-main);
       color: white;
 
       &--small {
@@ -144,9 +144,9 @@
       }
 
       &--outline {
-        border: 1px solid var(--color-ui-primary);
+        border: 1px solid var(--ui-primary-main);
         background-color: transparent;
-        color: var(--color-ui-primary);
+        color: var(--ui-primary-main);
 
         &--small {
           border: 1px solid var(--ui-primary-main);
@@ -168,13 +168,13 @@
         }
 
         &:hover {
-          background: var(--color-ui-primary) !important;
+          background: var(--ui-primary-main) !important;
         }
       }
     }
 
     &--info {
-      background-color: var(--color-ui-primary);
+      background-color: var(--ui-primary-main);
       color: white;
 
       &--small {
@@ -192,12 +192,12 @@
       }
 
       &--outline {
-        border: 1px solid var(--color-ui-primary);
+        border: 1px solid var(--ui-primary-main);
         background-color: transparent;
-        color: var(--color-ui-primary);
+        color: var(--ui-primary-main);
 
         &--small {
-          border: 1px solid var(--color-ui-primary);
+          border: 1px solid var(--ui-primary-main);
           background-color: transparent;
           height: 32px;
           min-width: 32px;
@@ -206,7 +206,7 @@
 
           &:hover {
             opacity: 0.7;
-            border-color: var(--color-ui-primary) !important;
+            border-color: var(--ui-primary-main) !important;
             background-color: transparent !important;
           }
 
@@ -217,7 +217,7 @@
         }
 
         &:hover {
-          background: var(--color-ui-primary) !important;
+          background: var(--ui-primary-main) !important;
         }
       }
     }

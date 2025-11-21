@@ -331,7 +331,7 @@ onMounted(async () => {
   .progress-bar {
     width: 100%;
     height: 6px;
-    background: var(--color-ui-primary-defalt);
+    background: var(--ui-primary-main-defalt);
     border-radius: 3px;
     overflow: hidden;
 

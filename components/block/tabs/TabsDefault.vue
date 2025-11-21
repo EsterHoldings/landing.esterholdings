@@ -44,11 +44,11 @@
       transition: border-color 0.3s ease;
 
       &:hover {
-        border-bottom: 2px solid var(--color-ui-primary);
+        border-bottom: 2px solid var(--ui-primary-main);
       }
 
       &.active {
-        border-bottom: 2px solid var(--color-ui-primary);
+        border-bottom: 2px solid var(--ui-primary-main);
       }
     }
   }

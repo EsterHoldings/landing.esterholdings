@@ -30,7 +30,7 @@
     />
 
     <div v-if="isLoading" class="is-loading">
-      <UiIconSpinnerDefault/>
+      <UiIconSpinnerDefault class="absolute right-[20px] top-[50%] translate-y-[-50%] opacity-15" />
     </div>
   </div>
 </template>
@@ -101,6 +101,49 @@ function onNativeInput(e: Event) {
   pointer-events: none;
 }
 
+.is-loading {
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: red;
+  border-radius: 10px;
+}
+
+.is-loading {
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+
+  /* как в .animated из примера */
+  background: linear-gradient(
+          to right,
+          rgba(243, 243, 243, 0.1) 5%,
+          rgba(238, 238, 238, 0.15) 20%,
+          rgba(243, 243, 243, 0.1) 35%
+  );
+  background-size: 1000px 100%; /* важно, чтобы было что двигать */
+
+  animation: placeholderShimmer 1.5s linear infinite;
+}
+
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -500px 0;
+  }
+  100% {
+    background-position: 500px 0;
+  }
+}
+
 .visible-input {
   width: 100%;
   height: var(--ui-input--height);
@@ -126,7 +169,6 @@ function onNativeInput(e: Event) {
 }
 
 .is-loading {
-  margin-right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;

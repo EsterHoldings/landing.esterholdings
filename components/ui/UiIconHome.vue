@@ -8,8 +8,8 @@
 
 <style lang="scss" scoped>
 svg {
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
   stroke: currentColor;
 }
 </style>

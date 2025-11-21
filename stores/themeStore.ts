@@ -5,14 +5,14 @@ export const useThemeStore = defineStore("theme", () => {
   const currentTheme = ref<"light" | "dark">("dark");
   const lightTheme = {
     "--ui-background": "#ffffff",
-    "--ui-background-secondary": "#0051FF",
+    "--ui-background-secondary": "#2a5bbd",
     "--ui-background-admin": "rgba(255, 255, 255, 0.95)",
     "--ui-background-card": "#F9F9F9",
     "--ui-background-panel": "#f9f9f9",
     "--ui-background-sidebar": "#f9f9f9",
     "--ui-background-sidebar-link": "#9CA9B3",
 
-    "--ui-primary-main": "#4b70c8",
+    "--ui-primary-main": "#5778c5",
     "--ui-primary-accent": "#f75709",
 
     "--ui-text-invert": "#faf9f9",

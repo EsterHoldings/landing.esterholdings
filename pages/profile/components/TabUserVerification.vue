@@ -74,7 +74,7 @@
 
         <div class="overflow-hidden rounded-lg">
           <table class="w-full text-sm">
-            <thead class="bg-[var(--color-ui-primary)]">
+            <thead class="bg-[var(--ui-primary-main)]">
             <tr class="text-left">
               <th class="px-4 py-3 font-semibold">Name</th>
               <th class="px-4 py-3 font-semibold">Date</th>

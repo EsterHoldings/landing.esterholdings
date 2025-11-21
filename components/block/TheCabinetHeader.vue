@@ -24,6 +24,7 @@
   import UiIconInfoFull from "~/components/ui/UiIconInfoFull.vue";
   import UiIconSupport from "~/components/ui/UiIconSupport.vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
 
   const authStore = useAuthStore();
   const themeStore = useThemeStore();
@@ -92,14 +93,15 @@
 <template>
   <header
     class="h-[60px] flex items-center justify-between lg:justify-end border-b border-[--color-stroke-ui-light] lg:ml-[240px] pl-5 pr-5 lg:gap-4">
-    <!-- Logo for mobile -->
 
-    <div class="lg:hidden">
+    <div class="lg:absolute lg:top-[-100px]">
       <NuxtLink to="/">
-        <UiIconLogo :lightTheme="isThemeLight" />
+        <UiIconLogo v-if="!isThemeLight" />
+        <UiIconLogoLight v-else />
       </NuxtLink>
     </div>
-    <div class="flex items-center justify-end gap-4">
+
+    <div class="flex items-center justify-end gap-2">
       <div class="h-[60px] flex items-center justify-center">
         <LanguageSwitcher
           isSidebar
@@ -181,7 +183,7 @@
 
       <div
         ref="profileContainerRef"
-        class="flex items-center justify-end gap-4 cursor-pointer"
+        class="flex items-center justify-end gap-4 cursor-pointer ml-5"
         @click="handleClickProfileMenu">
         <div
           :class="[

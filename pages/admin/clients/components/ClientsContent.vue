@@ -186,7 +186,7 @@ const getTwoCharsByFullName = (firstName: string, lastName: string): string => {
 
       & > .id {
         font-size: 13px;
-        color: var(--color-ui-primary)
+        color: var(--ui-primary-main)
       }
 
       & > .content {

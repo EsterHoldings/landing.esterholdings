@@ -103,7 +103,7 @@
       flex-direction: column;
 
       &__logo {
-        height: 100px;
+        height: 60px;
         width: 100%;
         padding: 0 30px;
         display: flex;

@@ -12,7 +12,7 @@
     <div
         v-for="(file, index) in selectedFiles"
         :key="file.name + `-${index}`"
-        class="mb-4 flex flex-col gap-1.5 p-2.5 border border-dashed border-[var(--color-ui-primary)] rounded-lg"
+        class="mb-4 flex flex-col gap-1.5 p-2.5 border border-dashed border-[var(--ui-primary-main)] rounded-lg"
     >
       <div class="relative grid [grid-template-columns:70px_1fr] gap-5 justify-between">
         <UiIconTrash
@@ -88,10 +88,10 @@
       </div>
 
 
-      <div class="relative rounded-[22px] border border-[var(--color-ui-primary)] overflow-hidden shadow-[inset_0_1px_0_rgba(77,131,255,.45)]">
+      <div class="relative rounded-[22px] border border-[var(--ui-primary-main)] overflow-hidden shadow-[inset_0_1px_0_rgba(77,131,255,.45)]">
         <!-- Header -->
         <div
-            class="grid items-center px-6 py-3 bg-[var(--color-ui-primary)] text-sm text-[var(--ui-text-main)]/90 [grid-template-columns:47px_1fr_1fr_1fr_30px]"
+            class="grid items-center px-6 py-3 bg-[var(--ui-primary-main)] text-sm text-[var(--ui-text-main)]/90 [grid-template-columns:47px_1fr_1fr_1fr_30px]"
         >
           <div></div>
           <div>Name</div>

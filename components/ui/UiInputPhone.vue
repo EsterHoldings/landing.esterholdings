@@ -7,6 +7,10 @@
       'disabled':     disabled
     }"
   >
+    <div v-if="props.isLoading" class="is-loading">
+      <UiIconSpinnerDefault class="absolute right-[20px] top-[50%] translate-y-[-50%] opacity-15" />
+    </div>
+
     <div class="input-icon--left country-select" @click="open = !open">
       <span class="flag">{{ selected.flag }}</span>
       <span class="dial">{{ selected.dialCode }}</span>
@@ -38,9 +42,6 @@
         @blur="e => emit('blur', e)"
     />
 
-    <div v-if="isLoading" class="is-loading">
-      <UiIconSpinnerDefault />
-    </div>
   </div>
 </template>
 
@@ -206,9 +207,32 @@ function updateModel() {
       padding: 0;
     }
   }
+}
 
-  .is-loading {
-    margin-right: 10px;
+.input .is-loading {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+
+  /* как в .animated из примера */
+  background: linear-gradient(
+          to right,
+          rgba(243, 243, 243, 0.1) 5%,
+          rgba(238, 238, 238, 0.15) 20%,
+          rgba(243, 243, 243, 0.1) 35%
+  );
+  background-size: 1000px 100%; /* важно, чтобы было что двигать */
+
+  animation: placeholderShimmer 1.5s linear infinite;
+}
+
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -500px 0;
+  }
+  100% {
+    background-position: 500px 0;
   }
 }
 </style>
