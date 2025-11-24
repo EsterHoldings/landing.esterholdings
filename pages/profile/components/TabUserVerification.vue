@@ -30,21 +30,18 @@
                 :key="item.key"
                 class="grid grid-cols-[1fr,auto] items-center gap-3 py-3"
             >
-              <div class="min-w-0">
-                <div class="flex items-center justify-between w-min">
+              <div class="min-w-0 w-full">
+                <div class="flex flex-col w-full">
                   <div class="font-medium truncate">{{ item.title }}</div>
-                  &nbsp;
                   <div class="text-sm text-[var(--ui-text-secondary)] truncate" v-if="item.subtitle">({{ item.subtitle }})</div>
                 </div>
 
-                <!-- comment -->
                 <div v-if="item.comment?.value" class="col-span-2 mt-2">
                   <div class="text-xs font-semibold mb-1 opacity-80">Comment</div>
                   <UiTextSmall class="!text-[var(--ui-primary-accent)]">{{ item.comment.value }}</UiTextSmall>
                 </div>
               </div>
 
-              <!-- right: status + icon -->
               <div class="flex items-center justify-end gap-1">
                 <component
                     :is="iconByStatus(item.status.value)"
