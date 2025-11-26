@@ -800,7 +800,10 @@
       },
       "details": {
         "createNew": {
-          "title": "创建新的支付详情"
+          "title": "创建新的付款详情",
+          "name": "付款详情名称",
+          "namePlaceholder": "付款详情名称",
+          "recipientAddress": "请选择一个支付系统。"
         }
       },
       "nothingToShow": "无数据显示 =(",

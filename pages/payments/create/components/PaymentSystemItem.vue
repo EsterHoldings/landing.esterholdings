@@ -4,9 +4,7 @@
     <span class="payment-system-item__logo">
       <component :is="props.icon" />
     </span>
-    <span class="payment-system-item__name">
-      {{ props.name }}
-    </span>
+    <span class="payment-system-item__name">{{ props.name }}</span>
   </div>
   <div class="flex items-center justify-center">
     <div

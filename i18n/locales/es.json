@@ -800,7 +800,10 @@
       },
       "details": {
         "createNew": {
-          "title": "Crear nuevo detalle de pago"
+          "title": "Crear nuevo detalle de pago",
+          "name": "Nombre del detalle de pago",
+          "namePlaceholder": "Nombre del detalle de pago",
+          "recipientAddress": "Por favor, selecciona un sistema de pago."
         }
       },
       "nothingToShow": "Nada que mostrar =(",

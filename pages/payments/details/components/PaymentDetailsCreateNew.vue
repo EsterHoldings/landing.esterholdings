@@ -7,11 +7,11 @@
     <div class="accounts__edit__content" :class="{ 'without-top': !props.title }">
       <div class="accounts__edit__content__fields">
         <UiFormControl
-            :label="'Payment detail name'"
+            :label="t('cabinet.payments.details.createNew.name')"
             :errors="validatorPaymentDetailForm?.errorsFormData?.name?.errors"
         >
           <UiInput
-              placeholder="Payment detail name"
+              :placeholder="t('cabinet.payments.details.createNew.namePlaceholder')"
               :value="formData.name"
               :isDirty="validatorPaymentDetailForm?.errorsFormData?.name?.isDirty"
               :isInvalid="validatorPaymentDetailForm?.errorsFormData?.name?.errors?.length > 0"
@@ -35,12 +35,23 @@
           />
         </UiFormControl>
 
-        <!-- ... -->
-
         <div v-if="hasSelectedPaymentSystem">
-          <pre>{{ selectedPaymentSystem }}</pre>
+          <UiFormControl
+              :label="'Recipient Wallet ID'"
+              :errors="[]"
+              v-for="field in selectedPaymentSystem['pdfc']"
+              :key="field.id"
+          >
+            <UiInput
+                :placeholder="field.placeholder"
+                :value="field.value"
+            />
+          </UiFormControl>
+
         </div>
-        <div v-else>HAVE NOT SELECTED</div>
+        <div v-else>
+          {{ t('cabinet.payments.details.createNew.recipientAddress') }}
+        </div>
       </div>
     </div>
   </div>
@@ -105,10 +116,7 @@ const handleChangeSelectPaymentType = (val) => {
   formData.paymentSystemId = val
 
   const ps = paymentSystems.find(x => x.id === val) || null
-
-  replaceReactiveObject(selectedPaymentSystem, ps)
-
-  console.log('selectedPaymentSystem', selectedPaymentSystem)
+  replaceReactiveObject(selectedPaymentSystem, ps);
 }
 
 const getPaymentTypes = async () => {
@@ -127,10 +135,6 @@ const getPaymentTypes = async () => {
         pdfc: pdfc,
       }))
   );
-
-  console.log('*** *** ***');
-  console.log(paymentSystems);
-  console.log('*** *** ***');
 };
 
 const handleSubmitForm = async () => {

@@ -800,7 +800,10 @@
       },
       "details": {
         "createNew": {
-          "title": "新しい支払い詳細を作成"
+          "title": "新しい支払い詳細を作成",
+          "name": "支払い詳細名",
+          "namePlaceholder": "支払い詳細名",
+          "recipientAddress": "決済システムを選択してください。"
         }
       },
       "nothingToShow": "表示するものがありません =(",

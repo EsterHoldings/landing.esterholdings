@@ -800,7 +800,10 @@
       },
       "details": {
         "createNew": {
-          "title": "Yeni ödeme detayı oluştur"
+          "title": "Yeni ödeme detayı oluştur",
+          "name": "Ödeme detayı adı",
+          "namePlaceholder": "Ödeme detayı adı",
+          "recipientAddress": "Lütfen bir ödeme sistemi seçin."
         }
       },
       "nothingToShow": "Gösterilecek bir şey yok =(",

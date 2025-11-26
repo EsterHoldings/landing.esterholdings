@@ -800,7 +800,10 @@
       },
       "details": {
         "createNew": {
-          "title": "צור פרטי תשלום חדשים"
+          "title": "יצירת פרטי תשלום חדשים",
+          "name": "שם פרטי התשלום",
+          "namePlaceholder": "שם פרטי התשלום",
+          "recipientAddress": "אנא בחרו מערכת תשלום."
         }
       },
       "nothingToShow": "אין מה להציג =(",
