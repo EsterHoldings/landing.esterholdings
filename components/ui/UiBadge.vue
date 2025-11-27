@@ -20,6 +20,8 @@
       'success--outline': props.state === 'success' && props.outline,
       'secondary--outline': props.state === 'secondary' && props.outline,
 
+      'small': props.state === 'small',
+
       'text-color-light': props.textLight,
     }"
   >
@@ -53,6 +55,14 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
+
+.small {
+  padding: 8px !important;
+  font-size: 10px;
+  border: 1px solid var(--color-stroke-ui-light);
+  text-transform: lowercase;
+}
+
 .badge {
   display: flex;
   align-items: center;

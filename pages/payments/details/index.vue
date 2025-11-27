@@ -8,7 +8,7 @@
         </UiTextH4>
 
         <UiButtonDefault state="info" @click="handleClickCreateNewPaymentDetail">
-          <UiIconPlus class="mr-2" />
+          <UiIconPlus class="mr-2"/>
           <span>{{ t("cabinet.payments.details.createNew.title") }}</span>
         </UiButtonDefault>
       </div>
@@ -24,7 +24,7 @@
                 :placeholder="t('cabinet.accounts.search')"
             >
               <template #icon-left>
-                <UiIconSearch />
+                <UiIconSearch/>
               </template>
             </UiInput>
           </div>
@@ -52,9 +52,9 @@
             </UiSelect>
 
             <UiButtonDefault state="info--small">
-              <UiIconFilters class="mr-2" />
+              <UiIconFilters class="mr-2"/>
               <UiTextSmall>Filters</UiTextSmall>
-              <UiIconArrowDown :rotate180="false" class="ml-2" />
+              <UiIconArrowDown :rotate180="false" class="ml-2"/>
             </UiButtonDefault>
           </div>
         </div>
@@ -64,13 +64,12 @@
           <div class="relative overflow-x-auto overscroll-x-contain" ref="scrollArea">
             <table class="w-full min-w-[1000px] table-auto whitespace-nowrap text-[var(--ui-text-main)]">
               <colgroup>
-                <col class="w-[16rem]" /> <!-- Name -->
-                <col class="w-[12rem]" /> <!-- Payment system -->
-                <col class="w-[6rem]"  /> <!-- Currency -->
-                <col class="w-[8rem]"  /> <!-- Status -->
-                <col class="w-[14rem]" /> <!-- CreatedAt -->
-                <col class="w-[14rem]" /> <!-- UpdatedAt -->
-                <col class="w-[3rem]"  /> <!-- ... -->
+                <col class="w-[16rem]"/> <!-- Name -->
+                <col class="w-[12rem]"/> <!-- Payment system -->
+                <col class="w-[6rem]"/> <!-- Currency -->
+                <col class="w-[8rem]"/> <!-- Status -->
+                <col class="w-[14rem]"/> <!-- UpdatedAt -->
+                <col class="w-[3rem]"/> <!-- ... -->
               </colgroup>
 
               <thead class="bg-[var(--color-stroke-ui-light)]">
@@ -83,7 +82,8 @@
                 </th>
 
                 <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('payment_system')">
+                  <button type="button" class="flex items-center gap-2"
+                          @click="handleOrderByAndDirection('payment_system')">
                     <UiTextSmall>Payment system</UiTextSmall>
                   </button>
                 </th>
@@ -102,14 +102,8 @@
                 </th>
 
                 <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('created_at')">
-                    <UiTextSmall>CreatedAt</UiTextSmall>
-                    <UiIconSort :active="orderBy === 'created_at'" :direction="orderDirection"/>
-                  </button>
-                </th>
-
-                <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('updated_at')">
+                  <button type="button" class="flex items-center gap-2"
+                          @click="handleOrderByAndDirection('updated_at')">
                     <UiTextSmall>UpdatedAt</UiTextSmall>
                     <UiIconSort :active="orderBy === 'updated_at'" :direction="orderDirection"/>
                   </button>
@@ -132,7 +126,8 @@
                   :key="paymentDetail.id"
                   class="h-[60px] border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background-panel)] hover:bg-[var(--color-stroke-ui-dark)]"
               >
-                <td class="px-5 align-middle font-bold text-[var(--color-ui-accent)] truncate" :title="paymentDetail?.name">
+                <td class="px-5 align-middle font-bold text-[var(--color-ui-accent)] truncate"
+                    :title="paymentDetail?.name">
                   {{ paymentDetail?.name }}
                 </td>
 
@@ -149,47 +144,46 @@
                 </td>
 
                 <td class="px-5 align-middle">
-                  {{ new Date(paymentDetail.created_at).toLocaleString() }}
-                </td>
-
-                <td class="px-5 align-middle">
                   {{ new Date(paymentDetail.updated_at).toLocaleString() }}
                 </td>
 
                 <td class="px-5 align-middle">
-                    <span
-                        @click="toggleRowOptions(index)"
-                        class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors"
-                        :ref="(el) => (triggerRefs[index] = el as HTMLElement | null)"
+                  <span
+                      @click="toggleRowOptions(index)"
+                      class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors"
+                      :ref="(el) => (triggerRefs[index] = el as HTMLElement | null)"
+                  >
+                    <UiIconDotsVertical/>
+
+                    <!-- Меню опцій -->
+                    <div
+                        v-if="currentRowActiveOptions === index"
+                        :ref="(el) => (menuRefs[index] = el as HTMLElement | null)"
+                        :class="[
+                        'absolute right-3 z-10 flex min-w-[140px] max-w-[60vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-3 shadow-lg',
+                        dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto origin-bottom-right' : 'top-[calc(100%+8px)] bottom-auto origin-top-right'
+                      ]"
+                        class="max-h-[70vh] overflow-auto"
                     >
-                      <UiIconDotsVertical />
-
-                      <!-- Меню опцій -->
                       <div
-                          v-if="currentRowActiveOptions === index"
-                          :ref="(el) => (menuRefs[index] = el as HTMLElement | null)"
-                          :class="[
-                          'absolute right-3 z-10 flex min-w-[140px] max-w-[60vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-3 shadow-lg',
-                          dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto origin-bottom-right' : 'top-[calc(100%+8px)] bottom-auto origin-top-right'
-                        ]"
-                          class="max-h-[70vh] overflow-auto"
-                      >
-                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                          <UiIconEye class="!h-[14px] !w-[14px]"/>
-                          <UiTextSmall class="whitespace-nowrap">View</UiTextSmall>
-                        </div>
-
-                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                          <UiIconConfirm class="!h-[14px] !w-[14px]"/>
-                          <UiTextSmall class="whitespace-nowrap">Confirm</UiTextSmall>
-                        </div>
-
-                        <div class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                          <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]"/>
-                          <UiTextSmall class="whitespace-nowrap">Delete</UiTextSmall>
-                        </div>
+                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                        <UiIconEye class="!h-[14px] !w-[14px]"/>
+                        <UiTextSmall class="whitespace-nowrap">View</UiTextSmall>
                       </div>
-                    </span>
+
+                      <div
+                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                        <UiIconConfirm class="!h-[14px] !w-[14px]"/>
+                        <UiTextSmall class="whitespace-nowrap">Confirm</UiTextSmall>
+                      </div>
+
+                      <div
+                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
+                        <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]"/>
+                        <UiTextSmall class="whitespace-nowrap">Delete</UiTextSmall>
+                      </div>
+                    </div>
+                  </span>
                 </td>
               </tr>
               </tbody>
@@ -279,8 +273,8 @@ import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 import useAppCore from "~/composables/useAppCore";
 import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref} from "vue";
-import { definePageMeta } from "~/.nuxt/imports";
-import { useI18n } from "vue-i18n";
+import {definePageMeta} from "~/.nuxt/imports";
+import {useI18n} from "vue-i18n";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
@@ -293,8 +287,8 @@ import CreateNewDeposit from "~/pages/payments/create/index.vue";
 import CreateNewPaymentDetail from "~/pages/payments/details/components/CreateNewPaymentDetail.vue";
 import PaymentDetailsCreateNew from "~/pages/payments/details/components/PaymentDetailsCreateNew.vue";
 
-const { t } = useI18n({ useScope: "global" });
-const { openModal } = inject("modalControl") as { openModal: Function };
+const {t} = useI18n({useScope: "global"});
+const {openModal} = inject("modalControl") as { openModal: Function };
 
 definePageMeta({
   layout: "cabinet",
@@ -361,7 +355,7 @@ const updateMenuPosition = (index: number) => {
   const container = scrollArea.value;
   const containerRect = container
       ? container.getBoundingClientRect()
-      : { top: 0, bottom: window.innerHeight };
+      : {top: 0, bottom: window.innerHeight};
 
   const availableDown = container
       ? containerRect.bottom - triggerRect.bottom
@@ -405,10 +399,10 @@ const onKeydown = (e: KeyboardEvent) => {
 };
 
 const sortByFilterData = reactive([
-  { id: "name",       value: "name",       text: "Name" },
-  { id: "status",     value: "status",     text: "Status" },
-  { id: "created_at", value: "created_at", text: "Created at" },
-  { id: "updated_at", value: "updated_at", text: "Updated at" },
+  {id: "name", value: "name", text: "Name"},
+  {id: "status", value: "status", text: "Status"},
+  {id: "created_at", value: "created_at", text: "Created at"},
+  {id: "updated_at", value: "updated_at", text: "Updated at"},
 ]);
 
 const totalPages = computed(() => Math.ceil(total.value / perPage.value));
@@ -432,12 +426,14 @@ async function setPage(page: number) {
     await loadData();
   }
 }
+
 async function goPrev() {
   if (currentPage.value > 1) {
     currentPage.value--;
     await loadData();
   }
 }
+
 async function goNext() {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
@@ -514,10 +510,10 @@ const handleClickCreateNewPaymentDetail = async () => {
 onMounted(async () => {
   await loadData();
 
-  window.addEventListener("resize", recalcActiveMenu, { passive: true });
-  window.addEventListener("scroll", recalcActiveMenu, { passive: true, capture: true });
+  window.addEventListener("resize", recalcActiveMenu, {passive: true});
+  window.addEventListener("scroll", recalcActiveMenu, {passive: true, capture: true});
 
-  scrollArea.value?.addEventListener("scroll", recalcActiveMenu, { passive: true });
+  scrollArea.value?.addEventListener("scroll", recalcActiveMenu, {passive: true});
 
   window.addEventListener("mousedown", onClickOutside, true);
   window.addEventListener("keydown", onKeydown, true);

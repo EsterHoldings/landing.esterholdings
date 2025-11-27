@@ -39,7 +39,7 @@
           <TableMain>
             <template #thead>
               <tr>
-                <th class="px-4 py-3 text-left font-normal">
+                <th class="px-2 py-1 text-left font-normal w-[60px]">
                   <div class="flex items-center">
                     <span
                         class="mr-2.5 cursor-pointer"
@@ -168,7 +168,7 @@
                     :key="payment.id"
                     class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)]"
                 >
-                  <td class="px-4 py-3 font-bold">
+                  <td class="px-2 py-3 font-bold flex justify-center items-center">
                     <button
                         @click="copyToClipboard(payment.id)"
                         class="cursor-pointer"
@@ -197,14 +197,14 @@
                       class="px-4 py-3 font-bold whitespace-nowrap"
                       :class="true ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'"
                   >
-                    {{ payment.amount }}
+                    <span>$</span> <span>{{ payment.amount }}</span>
                   </td>
 
                   <td
                       class="px-4 py-3 capitalize whitespace-nowrap"
                       :class="statusClass(payment.status)"
                   >
-                    {{ payment.status }}
+                    <UiBadge state="small">{{ payment.status }}</UiBadge>
                   </td>
 
                   <td class="px-4 py-3 text-xs whitespace-nowrap">
@@ -267,6 +267,7 @@ import useEventBus from "~/composables/useEventBus";
 import {definePageMeta} from '~/.nuxt/imports'
 import {useI18n} from 'vue-i18n'
 import {computed, inject, onMounted, reactive, ref} from 'vue'
+import UiBadge from "~/components/ui/UiBadge.vue";
 
 definePageMeta({
   layout: 'cabinet',
