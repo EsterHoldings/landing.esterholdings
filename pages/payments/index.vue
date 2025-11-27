@@ -39,7 +39,7 @@
           <TableMain>
             <template #thead>
               <tr>
-                <th class="px-2 py-1 text-left font-normal w-[60px]">
+                <th class="px-4 py-1 text-left font-normal w-[60px]">
                   <div class="flex items-center">
                     <span
                         class="mr-2.5 cursor-pointer"
