@@ -1,20 +1,18 @@
 <template>
   <UiContainer>
     <div class="payments-details pb-10">
-      <!-- Title + Create -->
       <div class="mt-5 mb-5 flex items-center justify-between">
         <UiTextH4 class="text-[var(--ui-text-main)]">
           {{ t("cabinet.payments.title") }}
         </UiTextH4>
 
         <UiButtonDefault state="info" @click="handleClickCreateNewPaymentDetail">
-          <UiIconPlus class="mr-2"/>
+          <UiIconPlus class="mr-2" />
           <span>{{ t("cabinet.payments.details.createNew.title") }}</span>
         </UiButtonDefault>
       </div>
 
       <div>
-        <!-- Top options -->
         <div class="mb-5 flex items-center justify-between">
           <div class="lex items-center justify-center gap-1 w-full max-w-60">
             <UiInput
@@ -24,15 +22,15 @@
                 :placeholder="t('cabinet.accounts.search')"
             >
               <template #icon-left>
-                <UiIconSearch/>
+                <UiIconSearch />
               </template>
             </UiInput>
           </div>
 
           <div class="flex items-center gap-2">
             <UiButtonDefault state="info--small" class="mr-2" @click="handleClickUpdate">
-              <UiIconUpdate v-if="!isLoading"/>
-              <UiIconSpinnerDefault v-else/>
+              <UiIconUpdate v-if="!isLoading" />
+              <UiIconSpinnerDefault v-else />
             </UiButtonDefault>
 
             <UiSelect
@@ -52,146 +50,170 @@
             </UiSelect>
 
             <UiButtonDefault state="info--small">
-              <UiIconFilters class="mr-2"/>
+              <UiIconFilters class="mr-2" />
               <UiTextSmall>Filters</UiTextSmall>
-              <UiIconArrowDown :rotate180="false" class="ml-2"/>
+              <UiIconArrowDown :rotate180="false" class="ml-2" />
             </UiButtonDefault>
           </div>
         </div>
 
-        <PanelDefault>
-          <!-- Горизонтальний скрол тільки для таблиці -->
-          <div class="relative overflow-x-auto overscroll-x-contain" ref="scrollArea">
-            <table class="w-full min-w-[1000px] table-auto whitespace-nowrap text-[var(--ui-text-main)]">
-              <colgroup>
-                <col class="w-[16rem]"/> <!-- Name -->
-                <col class="w-[12rem]"/> <!-- Payment system -->
-                <col class="w-[6rem]"/> <!-- Currency -->
-                <col class="w-[8rem]"/> <!-- Status -->
-                <col class="w-[14rem]"/> <!-- UpdatedAt -->
-                <col class="w-[3rem]"/> <!-- ... -->
-              </colgroup>
+        <div>
+          <div class="relative rounded-[10px]">
+            <div
+                class="pointer-events-none absolute inset-0 z-[1] rounded-[10px] ring-1 ring-[var(--color-stroke-ui-dark)]"
+            ></div>
 
-              <thead class="bg-[var(--color-stroke-ui-light)]">
-              <tr class="h-[46px] first:rounded-t-[10px]">
-                <th class="px-5 text-left first:rounded-tl-[10px]">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('name')">
-                    <UiTextSmall>Name</UiTextSmall>
-                    <UiIconSort :active="orderBy === 'name'" :direction="orderDirection"/>
-                  </button>
-                </th>
+            <div class="relative z-[0] overflow-x-auto overscroll-x-contain" ref="scrollArea">
+              <table class="w-full min-w-[1000px] table-auto whitespace-nowrap text-[var(--ui-text-main)]">
+                <colgroup>
+                  <col class="w-[16rem]" />
+                  <col class="w-[12rem]" />
+                  <col class="w-[6rem]" />
+                  <col class="w-[8rem]" />
+                  <col class="w-[14rem]" />
+                  <col class="w-[3rem]" />
+                </colgroup>
 
-                <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2"
-                          @click="handleOrderByAndDirection('payment_system')">
-                    <UiTextSmall>Payment system</UiTextSmall>
-                  </button>
-                </th>
+                <thead>
+                <tr class="h-[46px] !border-none">
+                  <th class="px-5 text-left !border-none bg-[var(--color-stroke-ui-light)] rounded-tl-[10px]">
+                    <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('name')">
+                      <UiTextSmall>Name</UiTextSmall>
+                      <UiIconSort :active="orderBy === 'name'" :direction="orderDirection" />
+                    </button>
+                  </th>
 
-                <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('currency')">
-                    <UiTextSmall>Currency</UiTextSmall>
-                  </button>
-                </th>
-
-                <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('status')">
-                    <UiTextSmall>Status</UiTextSmall>
-                    <UiIconSort :active="orderBy === 'status'" :direction="orderDirection"/>
-                  </button>
-                </th>
-
-                <th class="px-5 text-left">
-                  <button type="button" class="flex items-center gap-2"
-                          @click="handleOrderByAndDirection('updated_at')">
-                    <UiTextSmall>UpdatedAt</UiTextSmall>
-                    <UiIconSort :active="orderBy === 'updated_at'" :direction="orderDirection"/>
-                  </button>
-                </th>
-
-                <th class="px-5 text-right last:rounded-tr-[10px]"></th>
-              </tr>
-              </thead>
-
-              <tbody>
-              <tr v-if="paymentDetails.length === 0" class="h-[40vh]">
-                <td colspan="7" class="px-5 text-center align-middle">
-                  {{ t("cabinet.payments.nothingToShow") }}
-                </td>
-              </tr>
-
-              <tr
-                  v-else
-                  v-for="(paymentDetail, index) in paymentDetails"
-                  :key="paymentDetail.id"
-                  class="h-[60px] border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background-panel)] hover:bg-[var(--color-stroke-ui-dark)]"
-              >
-                <td class="px-5 align-middle font-bold text-[var(--color-ui-accent)] truncate"
-                    :title="paymentDetail?.name">
-                  {{ paymentDetail?.name }}
-                </td>
-
-                <td class="px-5 align-middle truncate" :title="paymentDetail.payment_system_name">
-                  {{ paymentDetail.payment_system_name }}
-                </td>
-
-                <td class="px-5 align-middle">
-                  {{ paymentDetail.currency ?? 'USD' }}
-                </td>
-
-                <td class="px-5 align-middle capitalize">
-                  {{ paymentDetail.status }}
-                </td>
-
-                <td class="px-5 align-middle">
-                  {{ new Date(paymentDetail.updated_at).toLocaleString() }}
-                </td>
-
-                <td class="px-5 align-middle">
-                  <span
-                      @click="toggleRowOptions(index)"
-                      class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors"
-                      :ref="(el) => (triggerRefs[index] = el as HTMLElement | null)"
-                  >
-                    <UiIconDotsVertical/>
-
-                    <!-- Меню опцій -->
-                    <div
-                        v-if="currentRowActiveOptions === index"
-                        :ref="(el) => (menuRefs[index] = el as HTMLElement | null)"
-                        :class="[
-                        'absolute right-3 z-10 flex min-w-[140px] max-w-[60vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-3 shadow-lg',
-                        dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto origin-bottom-right' : 'top-[calc(100%+8px)] bottom-auto origin-top-right'
-                      ]"
-                        class="max-h-[70vh] overflow-auto"
+                  <th class="px-5 text-left bg-[var(--color-stroke-ui-light)]">
+                    <button
+                        type="button"
+                        class="flex items-center gap-2"
+                        @click="handleOrderByAndDirection('payment_system')"
                     >
-                      <div
-                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                        <UiIconEye class="!h-[14px] !w-[14px]"/>
-                        <UiTextSmall class="whitespace-nowrap">View</UiTextSmall>
-                      </div>
+                      <UiTextSmall>Payment system</UiTextSmall>
+                    </button>
+                  </th>
 
-                      <div
-                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                        <UiIconConfirm class="!h-[14px] !w-[14px]"/>
-                        <UiTextSmall class="whitespace-nowrap">Confirm</UiTextSmall>
-                      </div>
+                  <th class="px-5 text-left bg-[var(--color-stroke-ui-light)]">
+                    <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('currency')">
+                      <UiTextSmall>Currency</UiTextSmall>
+                    </button>
+                  </th>
 
+                  <th class="px-5 text-left bg-[var(--color-stroke-ui-light)]">
+                    <button type="button" class="flex items-center gap-2" @click="handleOrderByAndDirection('status')">
+                      <UiTextSmall>Status</UiTextSmall>
+                      <UiIconSort :active="orderBy === 'status'" :direction="orderDirection" />
+                    </button>
+                  </th>
+
+                  <th class="px-5 text-left bg-[var(--color-stroke-ui-light)]">
+                    <button
+                        type="button"
+                        class="flex items-center gap-2"
+                        @click="handleOrderByAndDirection('updated_at')"
+                    >
+                      <UiTextSmall>UpdatedAt</UiTextSmall>
+                      <UiIconSort :active="orderBy === 'updated_at'" :direction="orderDirection" />
+                    </button>
+                  </th>
+
+                  <th class="px-5 text-right bg-[var(--color-stroke-ui-light)] rounded-tr-[10px]"></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr v-if="paymentDetails.length === 0" class="h-[40vh]">
+                  <td
+                      colspan="7"
+                      class="px-5 text-center align-middle bg-[var(--ui-background-panel)] rounded-b-[10px]"
+                  >
+                    {{ t("cabinet.payments.nothingToShow") }}
+                  </td>
+                </tr>
+
+                <tr
+                    v-else
+                    v-for="(paymentDetail, index) in paymentDetails"
+                    :key="paymentDetail.id"
+                    class="h-[60px] border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background-panel)] hover:bg-[var(--color-stroke-ui-dark)]"
+                >
+                  <td
+                      class="px-5 align-middle font-bold text-[var(--color-ui-accent)] truncate bg-inherit"
+                      :class="index === paymentDetails.length - 1 ? 'rounded-bl-[10px]' : ''"
+                      :title="paymentDetail?.name"
+                  >
+                    {{ paymentDetail?.name }}
+                  </td>
+
+                  <td class="px-5 align-middle truncate bg-inherit" :title="paymentDetail.payment_system_name">
+                    {{ paymentDetail.payment_system_name }}
+                  </td>
+
+                  <td class="px-5 align-middle bg-inherit">
+                    {{ paymentDetail.currency ?? 'USD' }}
+                  </td>
+
+                  <td class="px-5 align-middle capitalize bg-inherit">
+                    {{ paymentDetail.status }}
+                  </td>
+
+                  <td class="px-5 align-middle bg-inherit">
+                    {{ new Date(paymentDetail.updated_at).toLocaleString() }}
+                  </td>
+
+                  <td
+                      class="px-5 align-middle bg-inherit"
+                      :class="index === paymentDetails.length - 1 ? 'rounded-br-[10px]' : ''"
+                  >
+                      <span
+                          @click="toggleRowOptions(index)"
+                          class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors"
+                          :ref="(el) => (triggerRefs[index] = el as HTMLElement | null)"
+                      >
+                        <UiIconDotsVertical />
+                      </span>
+
+                    <Teleport to="body">
                       <div
-                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                        <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]"/>
-                        <UiTextSmall class="whitespace-nowrap">Delete</UiTextSmall>
+                          v-if="currentRowActiveOptions === index"
+                          :ref="(el) => (menuRefs[index] = el as HTMLElement | null)"
+                          class="fixed z-[9999] max-h-[70vh] overflow-auto text-[var(--ui-text-main)]"
+                          :class="[
+                            'flex min-w-[140px] max-w-[60vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-3 shadow-lg transition-opacity duration-100',
+                            menuReady[index] ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                          ]"
+                          :style="getMenuStyle(index)"
+                      >
+                        <div
+                            class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                        >
+                          <UiIconEye class="!h-[14px] !w-[14px]" />
+                          <UiTextSmall class="whitespace-nowrap">View</UiTextSmall>
+                        </div>
+
+                        <div
+                            class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                        >
+                          <UiIconConfirm class="!h-[14px] !w-[14px]" />
+                          <UiTextSmall class="whitespace-nowrap">Confirm</UiTextSmall>
+                        </div>
+
+                        <div
+                            class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                        >
+                          <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]" />
+                          <UiTextSmall class="whitespace-nowrap">Delete</UiTextSmall>
+                        </div>
                       </div>
-                    </div>
-                  </span>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+                    </Teleport>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </PanelDefault>
+        </div>
 
-        <!-- Pagination -->
         <div class="px-5 h-[50px] mt-2 flex items-center justify-between">
           <div class="p-0 flex items-center justify-center [&>div]:h-[33px] [&>div]:w-[33px]">
             <UiTextSmall class="mr-2">Per page:</UiTextSmall>
@@ -241,7 +263,8 @@
                 v-if="visiblePages[visiblePages.length - 1] < totalPages"
                 class="px-3 py-1.5 h-[32px] border border-[var(--color-stroke-ui-dark)] cursor-pointer text-[14px] rounded text-[var(--ui-text-main)]"
                 @click="setPage(totalPages)"
-            >{{ totalPages }}
+            >
+              {{ totalPages }}
             </UiTextSmall>
 
             <UiTextSmall
@@ -272,9 +295,9 @@ import UiSelect from "~/components/ui/UiSelect.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 import useAppCore from "~/composables/useAppCore";
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref} from "vue";
-import {definePageMeta} from "~/.nuxt/imports";
-import {useI18n} from "vue-i18n";
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { definePageMeta } from "~/.nuxt/imports";
+import { useI18n } from "vue-i18n";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
@@ -287,8 +310,8 @@ import CreateNewDeposit from "~/pages/payments/create/index.vue";
 import CreateNewPaymentDetail from "~/pages/payments/details/components/CreateNewPaymentDetail.vue";
 import PaymentDetailsCreateNew from "~/pages/payments/details/components/PaymentDetailsCreateNew.vue";
 
-const {t} = useI18n({useScope: "global"});
-const {openModal} = inject("modalControl") as { openModal: Function };
+const { t } = useI18n({ useScope: "global" });
+const { openModal } = inject("modalControl") as { openModal: Function };
 
 definePageMeta({
   layout: "cabinet",
@@ -310,37 +333,53 @@ const orderDirection = ref<typeof ORDER_DIRECTION_ASC | typeof ORDER_DIRECTION_D
 
 const paymentDetails = reactive<any[]>([]);
 
-// --- dropdown state ---
 const currentRowActiveOptions = ref<number | null>(null);
 const scrollArea = ref<HTMLElement | null>(null);
 const triggerRefs = ref<(HTMLElement | null)[]>([]);
 const menuRefs = ref<(HTMLElement | null)[]>([]);
-const dropUp = reactive<Record<number, boolean>>({}); // true => відкривати вгору
+const menuReady = reactive<Record<number, boolean>>({});
+const dropUp = reactive<Record<number, boolean>>({});
+const menuPosition = reactive<Record<number, { top: number; left: number }>>({});
 
 const perPageList = reactive([
-  {id: 1, value: 1, text: "1"},
-  {id: 2, value: 2, text: "2"},
-  {id: 3, value: 3, text: "3"},
-  {id: 4, value: 4, text: "4"},
-  {id: 5, value: 5, text: "5"},
-  {id: 6, value: 6, text: "6"},
-  {id: 7, value: 7, text: "7"},
-  {id: 8, value: 8, text: "8"},
-  {id: 9, value: 9, text: "9"},
-  {id: 10, value: 10, text: "10"},
-  {id: 12, value: 12, text: "12"},
-  {id: 15, value: 15, text: "15"},
-  {id: 20, value: 20, text: "20"},
-  {id: 25, value: 25, text: "25"},
-  {id: 50, value: 50, text: "50"},
-  {id: 100, value: 100, text: "100"},
+  { id: 1, value: 1, text: "1" },
+  { id: 2, value: 2, text: "2" },
+  { id: 3, value: 3, text: "3" },
+  { id: 4, value: 4, text: "4" },
+  { id: 5, value: 5, text: "5" },
+  { id: 6, value: 6, text: "6" },
+  { id: 7, value: 7, text: "7" },
+  { id: 8, value: 8, text: "8" },
+  { id: 9, value: 9, text: "9" },
+  { id: 10, value: 10, text: "10" },
+  { id: 12, value: 12, text: "12" },
+  { id: 15, value: 15, text: "15" },
+  { id: 20, value: 20, text: "20" },
+  { id: 25, value: 25, text: "25" },
+  { id: 50, value: 50, text: "50" },
+  { id: 100, value: 100, text: "100" },
 ]);
 
+const getMenuStyle = (index: number) => {
+  const pos = menuPosition[index];
+  if (!pos) return { top: "0px", left: "0px" };
+  return { top: `${pos.top}px`, left: `${pos.left}px` };
+};
+
 const toggleRowOptions = async (index: number) => {
-  currentRowActiveOptions.value =
-      currentRowActiveOptions.value === index ? null : index;
+  const next = currentRowActiveOptions.value === index ? null : index;
+  currentRowActiveOptions.value = next;
+
+  if (next === null) return;
+
+  menuReady[index] = false;
+
   await nextTick();
-  if (currentRowActiveOptions.value === index) updateMenuPosition(index);
+  updateMenuPosition(index);
+
+  requestAnimationFrame(() => {
+    menuReady[index] = true;
+  });
 };
 
 const updateMenuPosition = (index: number) => {
@@ -349,21 +388,13 @@ const updateMenuPosition = (index: number) => {
   if (!trigger || !menu) return;
 
   const offset = 8;
-  const menuHeight = menu.offsetHeight;
-
   const triggerRect = trigger.getBoundingClientRect();
-  const container = scrollArea.value;
-  const containerRect = container
-      ? container.getBoundingClientRect()
-      : {top: 0, bottom: window.innerHeight};
 
-  const availableDown = container
-      ? containerRect.bottom - triggerRect.bottom
-      : window.innerHeight - triggerRect.bottom;
+  const menuHeight = menu.offsetHeight;
+  const menuWidth = menu.offsetWidth;
 
-  const availableUp = container
-      ? triggerRect.top - containerRect.top
-      : triggerRect.top;
+  const availableDown = window.innerHeight - triggerRect.bottom;
+  const availableUp = triggerRect.top;
 
   let openUp = false;
   if (availableDown >= menuHeight + offset) {
@@ -375,6 +406,19 @@ const updateMenuPosition = (index: number) => {
   }
 
   dropUp[index] = openUp;
+
+  let top = openUp ? triggerRect.top - offset - menuHeight : triggerRect.bottom + offset;
+  let left = triggerRect.right - menuWidth - 12;
+
+  const minX = 8;
+  const maxX = Math.max(8, window.innerWidth - menuWidth - 8);
+  left = Math.min(Math.max(left, minX), maxX);
+
+  const minY = 8;
+  const maxY = Math.max(8, window.innerHeight - menuHeight - 8);
+  top = Math.min(Math.max(top, minY), maxY);
+
+  menuPosition[index] = { top, left };
 };
 
 const recalcActiveMenu = () => {
@@ -386,11 +430,13 @@ const recalcActiveMenu = () => {
 const onClickOutside = (e: MouseEvent) => {
   const i = currentRowActiveOptions.value;
   if (i === null) return;
-  const t = triggerRefs.value[i];
-  const m = menuRefs.value[i];
+
+  const tEl = triggerRefs.value[i];
+  const mEl = menuRefs.value[i];
   const target = e.target as Node | null;
   if (!target) return;
-  const inside = (!!t && t.contains(target)) || (!!m && m.contains(target));
+
+  const inside = (!!tEl && tEl.contains(target)) || (!!mEl && mEl.contains(target));
   if (!inside) currentRowActiveOptions.value = null;
 };
 
@@ -399,10 +445,10 @@ const onKeydown = (e: KeyboardEvent) => {
 };
 
 const sortByFilterData = reactive([
-  {id: "name", value: "name", text: "Name"},
-  {id: "status", value: "status", text: "Status"},
-  {id: "created_at", value: "created_at", text: "Created at"},
-  {id: "updated_at", value: "updated_at", text: "Updated at"},
+  { id: "name", value: "name", text: "Name" },
+  { id: "status", value: "status", text: "Status" },
+  { id: "created_at", value: "created_at", text: "Created at" },
+  { id: "updated_at", value: "updated_at", text: "Updated at" },
 ]);
 
 const totalPages = computed(() => Math.ceil(total.value / perPage.value));
@@ -448,8 +494,7 @@ const handleInputSearch = async (value: string) => {
 };
 
 const handleOrderByAndDirection = async (value: string) => {
-  orderDirection.value =
-      orderDirection.value === ORDER_DIRECTION_ASC ? ORDER_DIRECTION_DESC : ORDER_DIRECTION_ASC;
+  orderDirection.value = orderDirection.value === ORDER_DIRECTION_ASC ? ORDER_DIRECTION_DESC : ORDER_DIRECTION_ASC;
   orderBy.value = value;
   await loadData();
 };
@@ -472,6 +517,7 @@ const loadData = async () => {
     x.isSpinning = false;
     return x;
   });
+
   paymentDetails.splice(0, paymentDetails.length, ...paymentDetailsData);
   isLoading.value = false;
 };
@@ -489,8 +535,7 @@ const handleChangePerPage = async (newPerPage: number) => {
 
 const handleChangeFilterSortBy = async (value: string) => {
   if (orderBy.value === value) {
-    orderDirection.value =
-        orderDirection.value === ORDER_DIRECTION_DESC ? ORDER_DIRECTION_ASC : ORDER_DIRECTION_DESC;
+    orderDirection.value = orderDirection.value === ORDER_DIRECTION_DESC ? ORDER_DIRECTION_ASC : ORDER_DIRECTION_DESC;
   } else {
     orderBy.value = value;
   }
@@ -510,10 +555,10 @@ const handleClickCreateNewPaymentDetail = async () => {
 onMounted(async () => {
   await loadData();
 
-  window.addEventListener("resize", recalcActiveMenu, {passive: true});
-  window.addEventListener("scroll", recalcActiveMenu, {passive: true, capture: true});
+  window.addEventListener("resize", recalcActiveMenu, { passive: true });
+  window.addEventListener("scroll", recalcActiveMenu, { passive: true, capture: true });
 
-  scrollArea.value?.addEventListener("scroll", recalcActiveMenu, {passive: true});
+  scrollArea.value?.addEventListener("scroll", recalcActiveMenu, { passive: true });
 
   window.addEventListener("mousedown", onClickOutside, true);
   window.addEventListener("keydown", onKeydown, true);

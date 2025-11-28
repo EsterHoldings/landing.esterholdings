@@ -24,6 +24,12 @@ body {
   scroll-behavior: smooth;
 }
 
+table {
+  tr {
+    border: none;
+  }
+}
+
 // next-link navigation
 a {
   font-style: normal;
