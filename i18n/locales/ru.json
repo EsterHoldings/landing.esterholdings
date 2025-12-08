@@ -1281,7 +1281,15 @@
         }
       }
     },
-    "dashboard": {},
+    "dashboard": {
+      "title": "Админ-дэшборд",
+      "subtitle": "Обзор (демо-данные)",
+      "users": "Пользователи",
+      "deposits": "Депозиты",
+      "withdrawals": "Выводы",
+      "recentUsers": "Новые пользователи",
+      "recentPayments": "Недавние платежи"
+    },
     "profile": {},
     "referral": {},
     "settings": {

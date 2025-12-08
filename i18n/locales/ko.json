@@ -1281,7 +1281,15 @@
         "subtitle": "고객 목록"
       }
     },
-    "dashboard": {},
+    "dashboard": {
+      "title": "Admin dashboard",
+      "subtitle": "Overview with demo data",
+      "users": "Users",
+      "deposits": "Deposits",
+      "withdrawals": "Withdrawals",
+      "recentUsers": "Recent users",
+      "recentPayments": "Recent payments"
+    },
     "profile": {},
     "referral": {},
     "settings": {

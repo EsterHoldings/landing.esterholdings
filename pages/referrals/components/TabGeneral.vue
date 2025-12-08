@@ -137,7 +137,7 @@
           <div
             v-for="level in levels"
             :key="level.id"
-            class="flex items-center justify-between rounded-lg border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] px-3 py-2"
+            class="flex items-center justify-between rounded-lg bg-[var(--color-stroke-ui-dark)] px-3 py-2 shadow-sm"
           >
             <span class="text-[var(--ui-text-main)]">{{ level.label }}</span>
             <UiTextSmall class="text-[var(--ui-text-secondary)]">{{ level.percent }}%</UiTextSmall>
@@ -180,7 +180,7 @@
             <div
               v-for="referral in filteredReferrals"
               :key="referral.id"
-              class="flex flex-col gap-2 rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] px-3 py-3 md:flex-row md:items-center md:justify-between"
+              class="flex flex-col gap-2 rounded-xl bg-[var(--color-stroke-ui-dark)] px-3 py-3 shadow-sm md:flex-row md:items-center md:justify-between"
             >
               <div class="flex items-center gap-3">
                 <UiImageCircle :src="referral.avatar" alt="User" size="36" />
@@ -212,7 +212,7 @@
 
             <div
               v-if="filteredReferrals.length === 0"
-              class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] px-4 py-6 text-center text-[var(--ui-text-secondary)]"
+              class="rounded-xl bg-[var(--color-stroke-ui-dark)] px-4 py-6 text-center text-[var(--ui-text-secondary)] shadow-sm"
             >
               {{ t("cabinet.referrals.general.empty") }}
             </div>
@@ -383,10 +383,10 @@ const statusLabel = (status: string) => {
 
 <style scoped>
 .stat-card {
-  border: 1px solid var(--color-stroke-ui-light);
   border-radius: 10px;
   padding: 12px;
   background: var(--color-stroke-ui-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
 .pill {

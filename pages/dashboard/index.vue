@@ -18,7 +18,7 @@
             <ReferralTotalAmount />
           </div>
 
-          <!-- MT4 accounts -->
+          <!-- MT4 accounts as cards -->
           <PanelDefault>
             <div class="rounded-2xl p-2 sm:p-3">
               <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -33,62 +33,60 @@
                 </NuxtLink>
               </div>
 
-              <div
-                class="w-full overflow-x-auto rounded-xl p-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:p-3"
-              >
-                <div class="min-w-[560px] w-full text-sm text-white">
-                  <div class="mb-2 grid grid-cols-[28px_1.1fr_0.9fr_1fr_1fr] items-center px-1 text-[var(--ui-text-secondary)] sm:px-2">
-                    <span class="whitespace-nowrap"></span>
-                    <span class="whitespace-nowrap">
-                      {{ t("cabinet.dashboard.mt4.table.account") }}
-                    </span>
-                    <span class="whitespace-nowrap">
-                      {{ t("cabinet.dashboard.mt4.table.type") }}
-                    </span>
-                    <span class="whitespace-nowrap">
-                      {{ t("cabinet.dashboard.mt4.table.balance") }}
-                    </span>
-                    <span class="whitespace-nowrap">
-                      {{ t("cabinet.dashboard.mt4.table.status") }}
-                    </span>
-                  </div>
-
-                  <div class="space-y-[5px]">
-                    <div
-                      v-for="account in mt4Accounts"
-                      :key="account.id"
-                      class="row-item grid grid-cols-[28px_1.1fr_0.9fr_1fr_1fr] items-center gap-2 text-[var(--ui-text-secondary)]"
+              <div class="grid grid-cols-1 gap-2">
+                <div
+                  v-for="account in mt4Accounts"
+                  :key="account.id"
+                  class="mt4-card"
+                >
+                  <div class="flex flex-wrap items-center gap-4 text-sm text-[var(--ui-text-main)] sm:flex-nowrap sm:gap-5">
+                    <button
+                      type="button"
+                      class="flex h-8 w-8 items-center justify-center rounded-md transition hover:opacity-80"
+                      :aria-pressed="account.favorite"
+                      :title="account.favorite ? 'Remove from favorites' : 'Add to favorites'"
+                      @click="toggleFavorite(account.id)"
                     >
-                      <button
-                        type="button"
-                        class="flex h-8 w-8 items-center justify-center rounded-md transition hover:opacity-80"
-                        :aria-pressed="account.favorite"
-                        :title="account.favorite ? 'Remove from favorites' : 'Add to favorites'"
-                        @click="toggleFavorite(account.id)"
+                      <svg
+                        viewBox="0 0 24 24"
+                        class="h-4 w-4"
+                        :fill="account.favorite ? '#f5c542' : 'none'"
+                        :stroke="account.favorite ? '#f5c542' : 'var(--color-stroke-ui-light)'"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
                       >
-                        <svg
-                          viewBox="0 0 24 24"
-                          class="h-4 w-4"
-                          :fill="account.favorite ? '#f5c542' : 'none'"
-                          :stroke="account.favorite ? '#f5c542' : 'var(--color-stroke-ui-light)'"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                        </svg>
-                      </button>
-                      <span class="whitespace-nowrap">{{ account.id }}</span>
-                      <span class="whitespace-nowrap">{{ account.type }}</span>
-                      <span class="whitespace-nowrap">{{ account.balance }}</span>
-                      <span
-                        class="whitespace-nowrap font-medium"
-                        :class="account.status === 'active' ? 'text-[#1cbf73]' : 'text-[#a3aed0]'"
-                      >
-                        {{ statusText[account.status]() }}
-                      </span>
+                        <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    </button>
+                    <div class="min-w-0">
+                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                        {{ t("cabinet.dashboard.mt4.table.type") }}
+                      </UiTextSmall>
+                      <div class="truncate font-semibold">{{ account.type }}</div>
+                      <UiTextSmall class="text-[var(--ui-text-secondary)] truncate">
+                        {{ t("cabinet.accounts.columns.leverage") }}: {{ account.leverage }}
+                      </UiTextSmall>
                     </div>
+                    <div class="min-w-0">
+                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                        {{ t("cabinet.dashboard.mt4.table.account") }}
+                      </UiTextSmall>
+                      <UiTextSmall class="text-[var(--ui-text-main)] font-semibold truncate">MT4 {{ account.id }}</UiTextSmall>
+                    </div>
+                    <div class="min-w-0">
+                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                        {{ t("cabinet.dashboard.mt4.table.balance") }}
+                      </UiTextSmall>
+                      <div class="truncate font-semibold">
+                        {{ account.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                        {{ account.currency }}
+                      </div>
+                    </div>
+                    <UiTextSmall class="shrink-0 text-[var(--ui-text-secondary)]">
+                      {{ statusText[account.status]() }}
+                    </UiTextSmall>
                   </div>
                 </div>
               </div>
@@ -265,32 +263,40 @@ type Mt4Status = "active" | "inactive";
 type Mt4Account = {
   id: string;
   type: string;
-  balance: string;
+  leverage: string;
+  currency: string;
+  balance: number;
   status: Mt4Status;
   favorite: boolean;
 };
 
 const mt4Accounts = ref<Mt4Account[]>([
   {
-    id: "123456",
-    type: "Real",
-    balance: "$5,000.00",
+    id: "45003210",
+    type: "Raw Spread",
+    leverage: "1:500",
+    currency: "USD",
+    balance: 12450.75,
     status: "active",
     favorite: true,
   },
   {
-    id: "234567",
-    type: "Real",
-    balance: "$5,000.00",
+    id: "45008765",
+    type: "Standard",
+    leverage: "1:200",
+    currency: "EUR",
+    balance: 5420.1,
     status: "active",
     favorite: false,
   },
   {
-    id: "345678",
-    type: "Demo",
-    balance: "$10,000.00",
+    id: "45009934",
+    type: "Pro",
+    leverage: "1:100",
+    currency: "USD",
+    balance: 2150.0,
     status: "inactive",
-    favorite: true,
+    favorite: false,
   },
 ]);
 
@@ -317,5 +323,18 @@ const toggleFavorite = (id: string) => {
 
 .row-item:hover {
   opacity: 0.85;
+}
+
+.mt4-card {
+  background: var(--color-stroke-ui-dark);
+  border-bottom: 1px solid var(--color-stroke-ui-light);
+  border-radius: 8px;
+  padding: 12px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.mt4-card:hover {
+  background: var(--ui-background-sidebar);
+  opacity: 0.95;
 }
 </style>

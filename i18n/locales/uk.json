@@ -1281,7 +1281,15 @@
         "subtitle": "Список клієнтів"
       }
     },
-    "dashboard": {},
+    "dashboard": {
+      "title": "Адмін-дешборд",
+      "subtitle": "Огляд (демо-дані)",
+      "users": "Користувачі",
+      "deposits": "Депозити",
+      "withdrawals": "Виведення",
+      "recentUsers": "Нові користувачі",
+      "recentPayments": "Останні платежі"
+    },
     "profile": {},
     "referral": {},
     "settings": {
