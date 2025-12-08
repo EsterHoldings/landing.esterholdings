@@ -15,7 +15,7 @@
     </template>
 
     <template #content>
-      <PageStructureContent :plain="viewMode !== 'table'">
+      <PageStructureContent v-if="!isInitialLoading" :plain="viewMode !== 'table'">
         <template #top>
           <div class="relative w-full md:w-[420px]">
             <UiInput

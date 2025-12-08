@@ -1,7 +1,7 @@
 <!-- pages/accounts/components/AccountsPanel.vue -->
 <template>
   <div>
-    <PageStructureContent>
+    <PageStructureContent v-if="!isInitialLoading">
       <template #top>
         <div class="relative w-full md:w-[420px]">
           <UiInput class="w-full" @input="handleInputSearch" :value="search" :placeholder="t('cabinet.accounts.search')">

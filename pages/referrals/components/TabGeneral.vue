@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-5">
     <PanelDefault class="border-none bg-transparent shadow-none">
-      <div class="grid gap-3 p-4 lg:grid-cols-[2fr_1fr]">
-        <div class="flex min-w-0 flex-col gap-3 rounded-xl bg-[var(--color-stroke-ui-dark)] p-3">
+      <div class="referral-card">
+        <div class="flex min-w-0 flex-col gap-3">
           <UiTextH4 class="text-[var(--ui-text-main)]">
             {{ t("cabinet.referrals.general.linkTitle") }}
           </UiTextH4>
@@ -11,21 +11,22 @@
             {{ t("cabinet.referrals.general.linkHint") }}
           </UiTextSmall>
 
-          <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <UiTextSmall
-              ref="referralText"
-              class="inline-block w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-[var(--ui-background-sidebar)] px-3 py-2 text-[var(--ui-text-main)]"
+          <div class="mt-2 flex flex-col gap-2">
+            <div
+              class="relative flex w-full items-center gap-2 rounded-lg bg-[var(--ui-background-sidebar)] px-3 py-2 text-[var(--ui-text-main)]"
             >
-              {{ referralLink }}
-            </UiTextSmall>
-            <button
-              type="button"
-              class="flex h-[40px] w-[40px] items-center justify-center rounded-lg bg-[var(--ui-background-sidebar)] text-[var(--ui-text-main)] transition hover:bg-[var(--ui-text-main)] hover:text-[var(--ui-background)]"
-              :title="t('cabinet.referrals.general.copyButton')"
-              @click="copyReferral"
-            >
-              <UiIconCopy class="!h-4 !w-4" />
-            </button>
+              <span
+                ref="referralText"
+                class="flex-1 truncate text-sm"
+              >
+                {{ referralLink }}
+              </span>
+              <UiIconCopy
+                class="h-[18px] w-[18px] cursor-pointer text-[var(--ui-text-secondary)] transition hover:text-[var(--ui-text-main)]"
+                :title="t('cabinet.referrals.general.copyButton')"
+                @click="copyReferral"
+              />
+            </div>
           </div>
 
           <div class="mt-4 flex flex-col items-center gap-3">
@@ -85,13 +86,8 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-center rounded-xl bg-[var(--color-stroke-ui-dark)] p-3">
-          <div class="flex flex-col items-center gap-2">
-            <UiQRCode :link="referralLink" />
-            <UiTextSmall class="text-center text-[var(--ui-text-secondary)]">
-              {{ t("cabinet.referrals.general.qrHint") }}
-            </UiTextSmall>
-          </div>
+        <div class="referral-card__qr">
+          <UiQRCode :link="referralLink" />
         </div>
       </div>
     </PanelDefault>
@@ -224,7 +220,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
+import QRCode from "qrcode";
 import { useI18n } from "vue-i18n";
 import { useToast } from "vue-toastification";
 
@@ -246,6 +243,7 @@ const toast = useToast();
 
 const referralLink = "https://stage.esterholdings.website?ref=w23dhDf73l4fcs1";
 const referralText = ref<HTMLElement | null>(null);
+const qrDataUrl = ref<string | null>(null);
 
 const levels = reactive([
   { id: 1, label: t("cabinet.referrals.general.level", { level: 1 }), percent: 10 },
@@ -367,7 +365,31 @@ const mailShareLink = computed(() => {
   return `mailto:?subject=${subject}&body=${body}`;
 });
 
-const openShare = (link: string) => {
+const createQrFile = async () => {
+  if (!qrDataUrl.value) return null;
+  try {
+    const response = await fetch(qrDataUrl.value);
+    const blob = await response.blob();
+    return new File([blob], "referral-qr.png", { type: blob.type || "image/png" });
+  } catch (err) {
+    console.error("Cannot build QR file", err);
+    return null;
+  }
+};
+
+const openShare = async (link: string) => {
+  const text = `${t("cabinet.referrals.general.shareText")} ${referralLink}`;
+  const file = await createQrFile();
+
+  if (file && navigator.canShare?.({ files: [file], text })) {
+    try {
+      await navigator.share({ files: [file], text });
+      return;
+    } catch (err) {
+      console.warn("Share with QR failed, fallback to link", err);
+    }
+  }
+
   window.open(link, "_blank", "noopener,noreferrer");
 };
 
@@ -379,6 +401,14 @@ const statusLabel = (status: string) => {
   };
   return map[status] ?? status;
 };
+
+onMounted(async () => {
+  try {
+    qrDataUrl.value = await QRCode.toDataURL(referralLink);
+  } catch (err) {
+    console.error("QR generation failed", err);
+  }
+});
 </script>
 
 <style scoped>
@@ -420,5 +450,59 @@ const statusLabel = (status: string) => {
 .share-btn-lg {
   height: 44px;
   width: 44px;
+}
+
+.referral-card {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  background: var(--color-stroke-ui-dark);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+@media (min-width: 1024px) {
+  .referral-card {
+    grid-template-columns: 2fr auto auto;
+    align-items: center;
+  }
+}
+
+.referral-card__qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.referral-card__divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  color: var(--ui-text-secondary);
+  min-height: 120px;
+}
+
+.referral-card__divider::before {
+  content: "";
+  position: absolute;
+  inset: 12px auto 12px auto;
+  width: 1px;
+  background: var(--color-stroke-ui-light);
+}
+
+.divider-text {
+  position: relative;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 10px 4px;
+  border-radius: 10px;
+  background: var(--color-stroke-ui-dark);
+  z-index: 1;
 }
 </style>

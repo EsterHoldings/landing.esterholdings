@@ -1,6 +1,12 @@
 <template>
   <UiContainer>
-    <div class="space-y-5 text-[var(--ui-text-main)]">
+    <template v-if="isInitialLoading">
+      <div class="flex min-h-[55vh] w-full flex-col items-center justify-center text-[var(--ui-text-main)]">
+        <UiIconLogo class="mb-4 h-[44px] w-[44px]" />
+        <UiIconSpinnerDefault class="h-[44px] w-[44px]" />
+      </div>
+    </template>
+    <div v-else class="space-y-5 text-[var(--ui-text-main)]">
       <div class="my-5 flex items-center justify-between w-full text-[var(--ui-text-main)]">
         <UiTextH4>{{ t("support.page.title") }}</UiTextH4>
 
@@ -305,6 +311,7 @@ const {openModal} = inject("modalControl") as { openModal: Function };
 const appCore = useAppCore();
 
 const isLoading = ref(false)
+const isInitialLoading = ref(true)
 const search = ref("");
 const total = ref(0);
 const perPage = ref(7);
@@ -512,6 +519,7 @@ const loadData = async () => {
 
   tickets.splice(0, tickets.length, ...response.data.data);
   isLoading.value = false;
+  isInitialLoading.value = false;
 }
 
 const openChat = async () => {

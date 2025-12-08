@@ -1,13 +1,20 @@
 <template>
   <UiContainer>
-    <div class="text-white">
-      <div class="mb-6">
-        <UiTextH4 class="text-[var(--ui-text-main)]">
-          {{ t("cabinet.dashboard.title") }}
-        </UiTextH4>
+    <template v-if="isInitialLoading">
+      <div class="flex min-h-[55vh] w-full flex-col items-center justify-center text-white">
+        <UiIconLogo class="mb-4 h-[44px] w-[44px]" />
+        <UiIconSpinnerDefault class="h-[44px] w-[44px]" />
       </div>
+    </template>
+    <template v-else>
+      <div class="text-white">
+        <div class="mb-6">
+          <UiTextH4 class="text-[var(--ui-text-main)]">
+            {{ t("cabinet.dashboard.title") }}
+          </UiTextH4>
+        </div>
 
-      <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <!-- LEFT COLUMN: widgets + MT4 -->
         <div class="col-span-1 flex flex-col gap-5">
           <!-- 4 widgets -->
@@ -206,17 +213,18 @@
           </div>
         </PanelDefault>
 
-        <!-- FULL WIDTH: transactions -->
-        <TransactionsWidget class="col-span-1 lg:col-span-2" />
+          <!-- FULL WIDTH: transactions -->
+          <TransactionsWidget class="col-span-1 lg:col-span-2" />
+        </div>
       </div>
-    </div>
+    </template>
   </UiContainer>
 </template>
 
 <script lang="ts" setup>
 import { definePageMeta } from "~/.nuxt/imports";
 import { useI18n } from "vue-i18n";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, nextTick } from "vue";
 import { useNuxtApp } from "nuxt/app";
 
 import UiContainer from "~/components/ui/UiContainer.vue";
@@ -237,17 +245,24 @@ import UiImageCircle from "~/components/ui/UiImageCircle.vue";
 import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
+import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
 
 definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
 
 const { t } = useI18n({ useScope: "global" });
 const { $echo } = useNuxtApp();
+const isInitialLoading = ref(true);
 
 onMounted(() => {
   // @ts-ignore
   const sub = (window as any).Echo?.channel("test") ?? $echo.channel("test");
   sub.listen(".Ping", (e: any) => {
     console.log("[TEST] Ping received:", e);
+  });
+
+  nextTick(() => {
+    isInitialLoading.value = false;
   });
 });
 
