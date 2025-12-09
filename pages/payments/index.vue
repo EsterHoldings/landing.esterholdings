@@ -17,50 +17,58 @@
     <template #content>
       <PageStructureContent v-if="!isInitialLoading" :plain="viewMode !== 'table'">
         <template #top>
-          <div class="relative w-full md:w-[420px]">
-            <UiInput
-                class="w-full"
-                @input="handleInputSearch"
-                :value="search"
-                :placeholder="t('cabinet.accounts.search')"
-            >
-              <template #icon-left>
-                <UiIconSearch/>
-              </template>
-            </UiInput>
-          </div>
+          <div class="flex w-full flex-wrap items-center gap-2 md:flex-nowrap">
+            <div class="relative flex-1 min-w-[220px] sm:min-w-[320px] md:min-w-[360px] order-1 md:order-none flex justify-between items-center gap-2">
+              <div class="w-full">
+                <UiInput
+                    class="w-full"
+                    @input="handleInputSearch"
+                    :value="search"
+                    :placeholder="t('cabinet.accounts.search')"
+                >
+                  <template #icon-left>
+                    <UiIconSearch />
+                  </template>
+                </UiInput>
+              </div>
 
-          <div class="flex items-center gap-2">
+              <UiButtonDefault
+                  state="info--small"
+                  class="order-2 md:order-none !w-[40px]"
+                  @click="handleClickUpdate"
+              >
+                <UiIconUpdate :spinning="isLoading" />
+              </UiButtonDefault>
+            </div>
+
             <UiSelect
-                class="hidden sm:block min-w-[200px]"
-                :value="orderBy"
-                :data="sortByFilterData"
-                :withoutNoSelect="true"
-                @change="handleOrderByAndDirection"
+              class="order-4 md:order-none min-w-[150px] sm:min-w-[180px] sm:w-[200px]"
+              :value="orderBy"
+              :data="sortByFilterData"
+              :withoutNoSelect="true"
+              @change="handleOrderByAndDirection"
             >
               <template #icon-left>
                 <UiIconSortBy class="!h-4 !w-4" :orderDirectionEnabled="true" :orderDirection="orderDirection" />
               </template>
             </UiSelect>
 
-            <div class="hidden sm:flex items-center gap-2 rounded-lg bg-[var(--color-stroke-ui-dark)] p-1">
+            <div
+              class="!h-[40px] overflow-hidden order-3 md:order-none flex flex-wrap items-center justify-start rounded-2xl border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] sm:flex-nowrap sm:justify-center"
+            >
               <button
-                  v-for="option in viewOptions"
-                  :key="option.value"
-                  type="button"
-                  class="view-toggle"
-                  :class="viewMode === option.value ? 'active' : ''"
-                  :aria-label="option.label"
-                  :title="option.label"
-                  @click="viewMode = option.value"
+                v-for="option in viewOptions"
+                :key="option.value"
+                type="button"
+                class="view-toggle !h-[40px] !w-[40px] !rounded-none"
+                :class="viewMode === option.value ? 'active' : ''"
+                :aria-label="option.label"
+                :title="option.label"
+                @click="viewMode = option.value"
               >
                 <component :is="option.icon" class="h-4 w-4" />
               </button>
             </div>
-
-            <UiButtonDefault state="info--small" @click="handleClickUpdate">
-              <UiIconUpdate :spinning="isLoading"/>
-            </UiButtonDefault>
           </div>
         </template>
 
@@ -200,7 +208,7 @@
                 >
                   <td class="px-2 py-3 font-bold flex justify-center items-center">
                     <button class="cursor-pointer" aria-label="Copy id">
-                      <UiIconCopy :text="payment.id" />
+                      <UiIconCopy :text="payment.id"/>
                     </button>
                   </td>
 
@@ -262,9 +270,8 @@
                 <button
                     class="copy-btn"
                     aria-label="Copy id"
-                    @click="copyPaymentId(payment.id)"
                 >
-                  <UiIconCopy />
+                  <UiIconCopy :text="payment.id" />
                 </button>
 
                 <div class="payment-card__body" :class="viewMode === 'full' ? 'payment-card__body--row' : ''">
@@ -299,7 +306,10 @@
                     <UiBadge state="small" class="capitalize">{{ payment.status }}</UiBadge>
                   </div>
                   <div class="min-w-[140px]">
-                    <UiTextSmall class="text-[var(--ui-text-secondary)]">{{ t('cabinet.billing.columns.createdAt') }}</UiTextSmall>
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">{{
+                        t('cabinet.billing.columns.createdAt')
+                      }}
+                    </UiTextSmall>
                     <div class="footer-item__value">{{ new Date(payment.created_at).toLocaleString() }}</div>
                   </div>
                 </div>
@@ -311,8 +321,8 @@
 
       <template v-if="isInitialLoading">
         <div class="flex min-h-[55vh] w-full flex-col items-center justify-center">
-          <UiIconLogo class="mb-4 h-[44px] w-[44px]" />
-          <UiIconSpinnerDefault class="h-[44px] w-[44px]" />
+          <UiIconLogo class="mb-4 h-[44px] w-[44px]"/>
+          <UiIconSpinnerDefault class="h-[44px] w-[44px]"/>
         </div>
       </template>
 
@@ -396,10 +406,10 @@ const isLoading = ref(false)
 const isInitialLoading = ref(true)
 const viewMode = ref<'table' | 'cards' | 'full'>('table')
 const sortByFilterData = reactive([
-  { id: 'created_at', value: 'created_at', text: 'Created at' },
-  { id: 'amount', value: 'amount', text: 'Amount' },
-  { id: 'status', value: 'status', text: 'Status' },
-  { id: 'payment_system', value: 'payment_system', text: 'Payment system' },
+  {id: 'created_at', value: 'created_at', text: 'Created at'},
+  {id: 'amount', value: 'amount', text: 'Amount'},
+  {id: 'status', value: 'status', text: 'Status'},
+  {id: 'payment_system', value: 'payment_system', text: 'Payment system'},
 ])
 const viewOptions = [
   {
@@ -408,15 +418,22 @@ const viewOptions = [
     icon: {
       render() {
         return h('svg',
-          { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
-          [
-            h('line', { x1: '8', y1: '6', x2: '21', y2: '6' }),
-            h('line', { x1: '3', y1: '6', x2: '4', y2: '6' }),
-            h('line', { x1: '8', y1: '12', x2: '21', y2: '12' }),
-            h('line', { x1: '3', y1: '12', x2: '4', y2: '12' }),
-            h('line', { x1: '8', y1: '18', x2: '21', y2: '18' }),
-            h('line', { x1: '3', y1: '18', x2: '4', y2: '18' }),
-          ]);
+            {
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round'
+            },
+            [
+              h('line', {x1: '8', y1: '6', x2: '21', y2: '6'}),
+              h('line', {x1: '3', y1: '6', x2: '4', y2: '6'}),
+              h('line', {x1: '8', y1: '12', x2: '21', y2: '12'}),
+              h('line', {x1: '3', y1: '12', x2: '4', y2: '12'}),
+              h('line', {x1: '8', y1: '18', x2: '21', y2: '18'}),
+              h('line', {x1: '3', y1: '18', x2: '4', y2: '18'}),
+            ]);
       },
     },
   },
@@ -426,13 +443,20 @@ const viewOptions = [
     icon: {
       render() {
         return h('svg',
-          { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
-          [
-            h('rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' }),
-            h('rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' }),
-            h('rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' }),
-            h('rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' }),
-          ]);
+            {
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round'
+            },
+            [
+              h('rect', {x: '3', y: '3', width: '7', height: '7', rx: '1'}),
+              h('rect', {x: '14', y: '3', width: '7', height: '7', rx: '1'}),
+              h('rect', {x: '3', y: '14', width: '7', height: '7', rx: '1'}),
+              h('rect', {x: '14', y: '14', width: '7', height: '7', rx: '1'}),
+            ]);
       },
     },
   },
@@ -442,11 +466,18 @@ const viewOptions = [
     icon: {
       render() {
         return h('svg',
-          { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
-          [
-            h('rect', { x: '3', y: '6', width: '18', height: '4', rx: '1' }),
-            h('rect', { x: '3', y: '14', width: '18', height: '4', rx: '1' }),
-          ]);
+            {
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round'
+            },
+            [
+              h('rect', {x: '3', y: '6', width: '18', height: '4', rx: '1'}),
+              h('rect', {x: '3', y: '14', width: '18', height: '4', rx: '1'}),
+            ]);
       },
     },
   },
@@ -568,12 +599,6 @@ const handleClickUpdate = async () => {
   await loadData()
 }
 
-const copyPaymentId = async (id: string) => {
-  try {
-    await navigator.clipboard?.writeText(id);
-  } catch {}
-};
-
 const handleSetPerPage = async (value: number) => {
   perPage.value = value
   currentPage.value = 1
@@ -675,6 +700,7 @@ onMounted(async () => {
     flex-wrap: wrap;
   }
 }
+
 .card-with-copy {
   padding-right: 36px;
 }
