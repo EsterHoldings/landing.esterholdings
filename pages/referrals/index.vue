@@ -59,6 +59,9 @@ import UiContainer from "~/components/ui/UiContainer.vue";
 import UiTextH4 from "~/components/ui/UiTextH4.vue";
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import TabsAsList from "~/components/block/tabs/TabsAsList.vue";
+import UiIconSetting from "~/components/ui/UiIconSetting.vue";
+import UiIconDocuments from "~/components/ui/UiIconDocuments.vue";
+import UiIconUsers from "~/components/ui/UiIconUsers.vue";
 
 import TabGeneral from "./components/TabGeneral.vue";
 import TabSettings from "./components/TabSettings.vue";
@@ -75,14 +78,17 @@ const activeTabIndex = ref(0);
 const tabsList = computed(() => [
   {
     label: t("cabinet.referrals.index.tabs.general"),
+    icon: UiIconUsers,
     component: TabGeneral,
   },
   {
     label: t("cabinet.referrals.index.tabs.settings"),
+    icon: UiIconSetting,
     component: TabSettings,
   },
   {
     label: t("cabinet.referrals.index.tabs.terms"),
+    icon: UiIconDocuments,
     component: TabTerms,
   },
 ]);
