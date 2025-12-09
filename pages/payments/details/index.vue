@@ -335,7 +335,7 @@ import useAppCore from "~/composables/useAppCore";
 
 import { definePageMeta } from "~/.nuxt/imports";
 import { useI18n } from "vue-i18n";
-import { computed, h, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, h, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 
 definePageMeta({
   layout: "cabinet",
@@ -349,6 +349,7 @@ const appCore = useAppCore();
 
 const ORDER_DIRECTION_ASC = "asc";
 const ORDER_DIRECTION_DESC = "desc";
+const VIEW_MODE_STORAGE_KEY = "paymentDetailsViewMode";
 
 const isLoading = ref(false);
 const isInitialLoading = ref(true);
@@ -647,6 +648,19 @@ const handleClickUpdate = async () => {
   await loadData();
 };
 
+const initViewMode = () => {
+  if (typeof window === "undefined") return;
+  const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+  if (saved && ["table", "cards", "full"].includes(saved)) {
+    viewMode.value = saved as typeof viewMode.value;
+  }
+};
+
+watch(viewMode, mode => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+});
+
 const handleClickCreateNewPaymentDetail = async () => {
   openModal(PaymentDetailsCreateNew, {
     title: t("cabinet.payments.details.createNew.title"),
@@ -654,6 +668,7 @@ const handleClickCreateNewPaymentDetail = async () => {
 };
 
 onMounted(async () => {
+  initViewMode();
   await loadData();
 
   window.addEventListener("resize", recalcActiveMenu, { passive: true });

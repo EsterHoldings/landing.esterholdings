@@ -371,7 +371,7 @@ import useEventBus from "~/composables/useEventBus";
 
 import {definePageMeta} from '~/.nuxt/imports'
 import {useI18n} from 'vue-i18n'
-import {computed, h, inject, onMounted, reactive, ref} from 'vue'
+import {computed, h, inject, onMounted, reactive, ref, watch} from 'vue'
 import UiBadge from "~/components/ui/UiBadge.vue";
 import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 
@@ -387,6 +387,7 @@ const appCore = useAppCore()
 
 const ORDER_DIRECTION_ASC = 'asc'
 const ORDER_DIRECTION_DESC = 'desc'
+const VIEW_MODE_STORAGE_KEY = 'paymentsViewMode'
 
 const search = ref('')
 const total = ref(0)
@@ -597,7 +598,21 @@ const handleSetPerPage = async (value: number) => {
   await loadData()
 }
 
+const initViewMode = () => {
+  if (typeof window === 'undefined') return
+  const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY)
+  if (saved && ['table', 'cards', 'full'].includes(saved)) {
+    viewMode.value = saved as typeof viewMode.value
+  }
+}
+
+watch(viewMode, mode => {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode)
+})
+
 onMounted(async () => {
+  initViewMode()
   useEventBus.on("loadDataForPayments", loadData);
   await loadData()
 })
