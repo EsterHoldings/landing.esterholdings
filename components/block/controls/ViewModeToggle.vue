@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-10 flex-wrap items-center justify-start gap-1 bg-[var(--color-stroke-ui-dark)] px-1"
+    class="flex h-10 flex-wrap items-center justify-start gap-1 bg-[var(--color-stroke-ui-dark)] px-1 w-auto max-w-max"
     :class="bordered ? 'rounded-lg border border-[var(--color-stroke-ui-light)] sm:flex-nowrap sm:justify-center' : ''"
   >
     <button
