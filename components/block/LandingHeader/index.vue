@@ -178,7 +178,7 @@
 <script setup>
   import { useI18n } from "vue-i18n";
   import { ref, computed, onMounted, onBeforeUnmount, watch, provide } from "vue";
-  import { useRoute } from "vue-router";
+  import { useRoute, onBeforeRouteLeave } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
   import { useThemeStore } from "~/stores/themeStore.js";
   import useTrackScroll from "./composables/trackScroll";
@@ -297,6 +297,11 @@
       window.addEventListener("resize", updateWindowWidth);
     }
     document.addEventListener("click", handleClickOutside);
+    // Ensure scroll is unlocked when landing mounts (after coming back from cabinet/PWA)
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    isMobileMenuOpen.value = false;
   });
 
   onBeforeUnmount(() => {
@@ -304,6 +309,18 @@
       window.removeEventListener("resize", updateWindowWidth);
     }
     document.removeEventListener("click", handleClickOutside);
+    // Ensure scrolling is restored if the mobile menu was left open when unmounting
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  });
+
+  onBeforeRouteLeave(() => {
+    // Reset scroll/position locks when navigating away (e.g., into cabinet)
+    isMobileMenuOpen.value = false;
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
   });
 
   watch(windowWidth, width => {

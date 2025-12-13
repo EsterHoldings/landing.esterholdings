@@ -23,6 +23,15 @@ body,
   background-color: var(--color-background);
 }
 
+/* Force-unlock scroll when we explicitly add class from router hook */
+html.scroll-unlocked,
+body.scroll-unlocked {
+  overflow: auto !important;
+  overflow-y: auto !important;
+  position: static !important;
+  width: auto !important;
+}
+
 body {
   color: var(--color-text);
   background-color: var(--color-background);

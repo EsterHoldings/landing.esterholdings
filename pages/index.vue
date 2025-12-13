@@ -1,9 +1,6 @@
 <template>
   <main class="landing">
-    <div ref="welcomeRef">
-      <WelcomeSection />
-    </div>
-
+    <div ref="welcomeRef"><WelcomeSection /></div>
     <AdvantagesSection />
     <TradingPlatformSection />
     <FeaturesSection />
@@ -52,6 +49,19 @@
   };
 
   onMounted(() => {
+    const body = document.body;
+    const html = document.documentElement;
+    body.classList.add("scroll-unlocked");
+    html.classList.add("scroll-unlocked");
+    body.style.setProperty("overflow", "auto", "important");
+    body.style.setProperty("overflow-y", "auto", "important");
+    body.style.position = "";
+    body.style.width = "";
+    body.classList.remove("overflow-hidden", "fixed");
+    html.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow-y", "auto", "important");
+    html.classList.remove("overflow-hidden", "fixed");
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
   });
