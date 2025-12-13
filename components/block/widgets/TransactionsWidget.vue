@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiSelect from "~/components/ui/UiSelect.vue";

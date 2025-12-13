@@ -44,7 +44,7 @@
                 <div
                   v-for="account in mt4Accounts"
                   :key="account.id"
-                  class="mt4-card"
+                  class="mt4-card verification-item"
                 >
                   <div class="flex flex-wrap items-center gap-4 text-sm sm:flex-nowrap sm:gap-5">
                     <button
@@ -91,9 +91,9 @@
                         {{ account.currency }}
                       </div>
                     </div>
-                    <UiTextSmall class="shrink-0 text-[var(--ui-text-secondary)]">
+                    <UiBadge :state="mt4BadgeState(account.status)" outline class="shrink-0 border text-xs !px-3 !py-1 bg-[var(--color-stroke-ui-dark)]">
                       {{ statusText[account.status]() }}
-                    </UiTextSmall>
+                    </UiBadge>
                   </div>
                 </div>
               </div>
@@ -164,7 +164,9 @@
         </PanelDefault>
 
           <!-- FULL WIDTH: transactions -->
-          <TransactionsWidget class="col-span-1 lg:col-span-2" />
+          <div class="col-span-1 lg:col-span-2">
+            <TransactionsWidget />
+          </div>
         </div>
       </div>
     </template>
@@ -275,6 +277,10 @@ const toggleFavorite = (id: string) => {
   mt4Accounts.value = mt4Accounts.value.map((account) =>
     account.id === id ? { ...account, favorite: !account.favorite } : account,
   );
+};
+
+const mt4BadgeState = (status: Mt4Status) => {
+  return status === "active" ? "success" : "warning";
 };
 
 const verificationSteps = [
