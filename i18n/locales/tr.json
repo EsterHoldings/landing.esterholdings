@@ -759,7 +759,12 @@
         "profileRejected": "Profil reddedildi!",
         "profilePhotoVerified": "Profil fotoğrafı başarıyla doğrulandı!",
         "profilePhotoInProgress": "Profil fotoğrafı doğrulaması devam ediyor!",
-        "profilePhotoRejected": "Profil fotoğrafı reddedildi!"
+        "profilePhotoRejected": "Profil fotoğrafı reddedildi!",
+        "statuses": {
+          "required": "Gerekli",
+          "inProgress": "Devam ediyor",
+          "done": "Tamamlandı"
+        }
       },
       "actions": {
         "newDeposit": "Yeni Depozito",

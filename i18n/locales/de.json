@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "Kontoverifizierung",
         "subtitle": "Verifizierung läuft",
+        "statuses": {
+          "required": "Erforderlich",
+          "inProgress": "In Arbeit",
+          "done": "Abgeschlossen"
+        },
         "addressFailed": "Adressprüfung fehlgeschlagen!",
         "documentVerified": "Dokument erfolgreich verifiziert!",
         "paymentInProgress": "Zahlungsverifizierung läuft!",

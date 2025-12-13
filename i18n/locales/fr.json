@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "Vérification du compte",
         "subtitle": "Vérification en cours",
+        "statuses": {
+          "required": "Requis",
+          "inProgress": "En cours",
+          "done": "Terminé"
+        },
         "addressFailed": "La vérification de l'adresse a échoué",
         "documentVerified": "Document vérifié avec succès!",
         "paymentInProgress": "Vérification du paiement en cours!",

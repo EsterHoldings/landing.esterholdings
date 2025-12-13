@@ -759,7 +759,12 @@
         "profileRejected": "O perfil foi rejeitado!",
         "profilePhotoVerified": "Foto de perfil verificada com sucesso!",
         "profilePhotoInProgress": "Verificação da foto de perfil em andamento!",
-        "profilePhotoRejected": "A foto de perfil foi rejeitada!"
+        "profilePhotoRejected": "A foto de perfil foi rejeitada!",
+        "statuses": {
+          "required": "Obrigatório",
+          "inProgress": "Em andamento",
+          "done": "Concluído"
+        }
       },
       "actions": {
         "newDeposit": "Novo Depósito",

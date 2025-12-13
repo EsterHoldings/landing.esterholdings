@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "Verificación de Cuenta",
         "subtitle": "Verificación en progreso",
+        "statuses": {
+          "required": "Requerido",
+          "inProgress": "En proceso",
+          "done": "Completado"
+        },
         "addressFailed": "La verificación de la dirección falló",
         "documentVerified": "¡Documento verificado exitosamente!",
         "paymentInProgress": "¡Verificación de pago en progreso!",

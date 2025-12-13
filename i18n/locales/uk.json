@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "Перевірка рахунку",
         "subtitle": "Перевірка в процесі",
+        "statuses": {
+          "required": "Потрібно",
+          "inProgress": "В процесі",
+          "done": "Готово"
+        },
         "addressFailed": "Перевірка адреси не вдалася!",
         "documentVerified": "Документ успішно перевірено!",
         "paymentInProgress": "Перевірка платежу в процесі!",

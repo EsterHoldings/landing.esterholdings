@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "账户验证",
         "subtitle": "验证进行中",
+        "statuses": {
+          "required": "必需",
+          "inProgress": "进行中",
+          "done": "已完成"
+        },
         "addressFailed": "地址验证失败",
         "documentVerified": "文件已成功验证！",
         "paymentInProgress": "支付验证进行中！",

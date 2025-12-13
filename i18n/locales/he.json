@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "אימות חשבון",
         "subtitle": "אימות בתהליך",
+        "statuses": {
+          "required": "נדרש",
+          "inProgress": "בתהליך",
+          "done": "הושלם"
+        },
         "addressFailed": "אימות הכתובת נכשל!",
         "documentVerified": "מסמך אומת בהצלחה!",
         "paymentInProgress": "אימות תשלום בתהליך!",

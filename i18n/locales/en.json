@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "Account Verification",
         "subtitle": "Verification in progress",
+        "statuses": {
+          "required": "Required",
+          "inProgress": "In progress",
+          "done": "Done"
+        },
         "documentVerified": "Document successfully verified!",
         "documentInProgress": "Document in progress!",
         "documentRejected": "Document was rejected!",

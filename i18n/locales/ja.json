@@ -759,7 +759,12 @@
         "profileRejected": "プロフィールが拒否されました",
         "profilePhotoVerified": "プロフィール写真が正常に確認されました",
         "profilePhotoInProgress": "プロフィール写真の確認中です",
-        "profilePhotoRejected": "プロフィール写真が拒否されました"
+        "profilePhotoRejected": "プロフィール写真が拒否されました",
+        "statuses": {
+          "required": "必須",
+          "inProgress": "進行中",
+          "done": "完了"
+        }
       },
       "actions": {
         "newDeposit": "新規入金",

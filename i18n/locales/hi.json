@@ -745,6 +745,11 @@
       "accountVerification": {
         "title": "खाता सत्यापन",
         "subtitle": "सत्यापन प्रगति में",
+        "statuses": {
+          "required": "आवश्यक",
+          "inProgress": "प्रगति पर",
+          "done": "पूर्ण"
+        },
         "addressFailed": "पते का सत्यापन विफल हुआ!",
         "documentVerified": "दस्तावेज़ सफलतापूर्वक सत्यापित!",
         "paymentInProgress": "भुगतान सत्यापन प्रगति में!",

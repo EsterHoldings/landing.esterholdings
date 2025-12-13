@@ -759,7 +759,12 @@
         "profileRejected": "프로필이 거절되었습니다",
         "profilePhotoVerified": "프로필 사진이 성공적으로 확인되었습니다",
         "profilePhotoInProgress": "프로필 사진 확인 중입니다",
-        "profilePhotoRejected": "프로필 사진이 거절되었습니다"
+        "profilePhotoRejected": "프로필 사진이 거절되었습니다",
+        "statuses": {
+          "required": "필수",
+          "inProgress": "진행 중",
+          "done": "완료"
+        }
       },
       "actions": {
         "newDeposit": "신규 입금",

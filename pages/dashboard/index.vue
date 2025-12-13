@@ -104,112 +104,62 @@
         <!-- RIGHT COLUMN: verification -->
         <PanelDefault class="col-span-1 text-[var(--ui-text-main)]">
           <div class="rounded-2xl p-2 sm:p-3">
-            <div class="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div class="text-[18px] font-semibold text-[var(--ui-text-main)]">
-                  {{ t("cabinet.dashboard.accountVerification.title") }}
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-3 rounded-xl bg-[var(--color-stroke-ui-dark)]/70 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+                <div>
+                  <div class="text-[18px] font-semibold text-[var(--ui-text-main)]">
+                    {{ t("cabinet.dashboard.accountVerification.title") }}
+                  </div>
+                  <div class="text-sm text-[var(--ui-text-secondary)]">
+                    {{ t("cabinet.dashboard.accountVerification.subtitle") }}
+                  </div>
                 </div>
-                <div class="text-sm text-[var(--ui-text-secondary)]">
-                  {{ t("cabinet.dashboard.accountVerification.subtitle") }}
+
+                <div class="flex items-center gap-3">
+                  <div class="flex flex-col text-right">
+                    <UiTextH5 class="justify-end text-[var(--ui-text-main)]">Родіон Максименко</UiTextH5>
+                    <UiTextParagraph class="justify-end">
+                      <strong>test@gmail.com</strong>
+                    </UiTextParagraph>
+                    <UiTextSmall class="justify-end">{{ '10.05.1993' }}</UiTextSmall>
+                  </div>
+
+                  <NuxtLink to="/profile" class="shrink-0">
+                    <UiImageCircle :twoChars="'TU'" :src="''" />
+                  </NuxtLink>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between gap-3 sm:justify-end sm:gap-4">
-                <div class="flex flex-col text-left sm:mr-3 sm:text-right">
-                  <UiTextH5 class="flex items-center justify-start sm:justify-end">Родіон Максименко</UiTextH5>
-                  <UiTextParagraph class="flex items-center justify-start sm:justify-end">
-                    <strong>test@gmail.com</strong>
-                  </UiTextParagraph>
-                  <UiTextSmall class="flex items-center justify-start sm:justify-end">10.05.1993</UiTextSmall>
+              <div class="flex flex-col gap-2">
+                <div
+                  v-for="item in verificationSteps"
+                  :key="item.key"
+                  class="verification-item"
+                >
+                  <div class="flex items-start gap-3 sm:items-center">
+                    <div class="step-icon" :class="item.state">
+                      <component :is="item.icon" class="h-4 w-4" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
+                        <span class="text-sm font-semibold text-[var(--ui-text-main)] truncate" :title="item.title">
+                          {{ item.title }}
+                        </span>
+                        <UiBadge :state="badgeState(item.state)" outline class="!py-0.5 !px-2 text-xs">
+                          {{ item.statusLabel }}
+                        </UiBadge>
+                      </div>
+                      <UiTextSmall class="text-[var(--ui-text-secondary)] leading-snug">
+                        {{ item.statusText }}
+                      </UiTextSmall>
+                      <UiTextSmall v-if="item.hint" class="text-[var(--ui-primary-accent)] mt-1 leading-snug">
+                        {{ item.hint }}
+                      </UiTextSmall>
+                    </div>
+                  </div>
                 </div>
-
-                <NuxtLink to="/profile" class="shrink-0">
-                  <UiImageCircle :twoChars="'TU'" :src="''" />
-                </NuxtLink>
               </div>
             </div>
-
-            <ul class="mt-5 list-none p-0 text-sm text-[var(--ui-text-secondary)]">
-              <li
-                  class="mb-2 rounded-sm border-b border-b-[var(--color-stroke-ui-light)] bg-[--color-stroke-ui-dark] p-3 hover:opacity-75 sm:p-3"
-              >
-                <div class="flex min-h-[35px] items-start gap-3 sm:items-center">
-                  <span class="w-24 shrink-0 cursor-pointer truncate sm:w-28" title="Фото користувача">
-                    Фото користувача
-                  </span>
-                  <UiIconFailed />
-                  <span class="flex-1 min-w-0 leading-snug sm:ml-5 sm:truncate">
-                    {{ t("cabinet.dashboard.accountVerification.profilePhoto") }}
-                  </span>
-                </div>
-                <UiTextSmall class="mb-2 !text-[var(--ui-primary-accent)]">
-                  Загрузите фото пользователя, система в скоро времени проведет автоматическую ферификацию!
-                </UiTextSmall>
-              </li>
-
-              <li
-                  class="mb-2 rounded-sm border-b border-b-[var(--color-stroke-ui-light)] bg-[--color-stroke-ui-dark] p-2 hover:opacity-75 sm:p-3"
-              >
-                <div class="flex min-h-[35px] items-start gap-3 pb-2 sm:items-center sm:pb-3">
-                  <span class="w-24 shrink-0 cursor-pointer truncate sm:w-28" title="Дані користувача">
-                    Дані користувача
-                  </span>
-                  <UiIconWarning />
-                  <span class="flex-1 min-w-0 leading-snug sm:ml-5 sm:truncate">
-                    {{ t("cabinet.dashboard.accountVerification.profileInProgress") }}
-                  </span>
-                </div>
-                <UiTextSmall class="mb-2 !text-[var(--ui-primary-accent)]">
-                  Заповніть персональні дані в профілі — після цього система автоматично продовжить верифікацію.
-                </UiTextSmall>
-              </li>
-
-              <li
-                  class="mb-2 rounded-sm border-b border-b-[var(--color-stroke-ui-light)] bg-[--color-stroke-ui-dark] p-2 hover:opacity-75 sm:p-3"
-              >
-                <div class="flex min-h-[35px] items-start gap-3 pb-2 sm:items-center sm:pb-3">
-                  <span class="w-24 shrink-0 cursor-pointer truncate sm:w-28" title="Верифікація пошти">
-                    Верифікація пошти
-                  </span>
-                  <UiIconWarning />
-                  <span class="flex-1 min-w-0 leading-snug sm:ml-5 sm:truncate">
-                    {{ t("cabinet.dashboard.accountVerification.profileInProgress") }}
-                  </span>
-                </div>
-                <UiTextSmall class="mb-2 !text-[var(--ui-primary-accent)]">
-                  Підтвердіть email через лист — інколи він потрапляє в «Спам» або «Промоакції».
-                </UiTextSmall>
-              </li>
-
-              <li
-                  class="mb-2 rounded-sm border-b border-b-[var(--color-stroke-ui-light)] bg-[--color-stroke-ui-dark] p-2 hover:opacity-75 sm:p-3"
-              >
-                <div class="flex min-h-[35px] items-start gap-3 sm:items-center">
-                  <span class="w-24 shrink-0 cursor-pointer truncate sm:w-28" title="Документи">
-                    Документи
-                  </span>
-                  <UiIconSuccess />
-                  <span class="flex-1 min-w-0 leading-snug sm:ml-5 sm:truncate">
-                    {{ t("cabinet.dashboard.accountVerification.documentVerified") }}
-                  </span>
-                </div>
-              </li>
-
-              <li class="rounded-sm bg-[--color-stroke-ui-dark] p-2 hover:opacity-75 sm:p-3">
-                <div class="flex min-h-[35px] items-start gap-3 pb-2 sm:items-center sm:pb-3">
-                  <span class="w-24 shrink-0 cursor-pointer truncate sm:w-28" title="1-й депозит">
-                    1-й депозит
-                  </span>
-                  <UiIconWarning />
-                  <span class="flex-1 min-w-0 leading-snug sm:ml-5 sm:truncate">
-                    {{ t("cabinet.dashboard.accountVerification.paymentInProgress") }}
-                  </span>
-                </div>
-                <UiTextSmall class="mb-2 !text-[var(--ui-primary-accent)]">
-                  Зробіть перший депозит — після зарахування система автоматично оновить статус.
-                </UiTextSmall>
-              </li>
-            </ul>
           </div>
         </PanelDefault>
 
@@ -233,7 +183,6 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconFailed from "~/components/ui/UiIconFailed.vue";
-import UiIconWarning from "~/components/ui/UiIconWarning.vue";
 
 import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import TransactionsWidget from "~/components/block/widgets/TransactionsWidget.vue";
@@ -247,6 +196,8 @@ import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import UiIconWarning from "~/components/ui/UiIconWarning.vue";
+import UiBadge from "~/components/ui/UiBadge.vue";
 
 definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
 
@@ -325,6 +276,60 @@ const toggleFavorite = (id: string) => {
     account.id === id ? { ...account, favorite: !account.favorite } : account,
   );
 };
+
+const verificationSteps = [
+  {
+    key: "photo",
+    title: "Фото користувача",
+    statusText: t("cabinet.dashboard.accountVerification.profilePhoto"),
+    statusLabel: t("cabinet.dashboard.accountVerification.statuses.required") || "Потрібно",
+    hint: "Загрузите фото пользователя, система в скоро времени проведет автоматическую ферификацию!",
+    icon: UiIconFailed,
+    state: "error",
+  },
+  {
+    key: "profile",
+    title: "Дані користувача",
+    statusText: t("cabinet.dashboard.accountVerification.profileInProgress"),
+    statusLabel: t("cabinet.dashboard.accountVerification.statuses.inProgress") || "В процесі",
+    hint: "Заповніть персональні дані в профілі — після цього система автоматично продовжить верифікацію.",
+    icon: UiIconWarning,
+    state: "warn",
+  },
+  {
+    key: "email",
+    title: "Верифікація пошти",
+    statusText: t("cabinet.dashboard.accountVerification.profileInProgress"),
+    statusLabel: t("cabinet.dashboard.accountVerification.statuses.inProgress") || "В процесі",
+    hint: "Підтвердіть email через лист — інколи він потрапляє в «Спам» або «Промоакції».",
+    icon: UiIconWarning,
+    state: "warn",
+  },
+  {
+    key: "docs",
+    title: "Документи",
+    statusText: t("cabinet.dashboard.accountVerification.documentVerified"),
+    statusLabel: t("cabinet.dashboard.accountVerification.statuses.done") || "Готово",
+    hint: "",
+    icon: UiIconSuccess,
+    state: "success",
+  },
+  {
+    key: "deposit",
+    title: "1-й депозит",
+    statusText: t("cabinet.dashboard.accountVerification.paymentInProgress"),
+    statusLabel: t("cabinet.dashboard.accountVerification.statuses.inProgress") || "В процесі",
+    hint: "Зробіть перший депозит — після зарахування система автоматично оновить статус.",
+    icon: UiIconWarning,
+    state: "warn",
+  },
+];
+
+const badgeState = (state: "warn" | "error" | "success") => {
+  if (state === "success") return "success";
+  if (state === "error") return "danger";
+  return "warning";
+};
 </script>
 
 <style scoped>
@@ -350,5 +355,37 @@ const toggleFavorite = (id: string) => {
 .mt4-card:hover {
   background: var(--color-stroke-ui-dark);
   opacity: 0.95;
+}
+
+.verification-item {
+  border-radius: 12px;
+  background: rgba(1, 22, 68, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 14px 16px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.verification-item:hover {
+  background: rgba(1, 22, 68, 0.82);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.step-icon {
+  height: 32px;
+  width: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.step-icon.warn {
+  color: #f5a524;
+}
+.step-icon.error {
+  color: #f75555;
+}
+.step-icon.success {
+  color: #2ad177;
 }
 </style>
