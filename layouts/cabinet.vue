@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-dvh flex flex-col bg-[var(--ui-background)] bg-blend-multiply pb-safe-area">
+  <div class="cabinet-layout min-h-dvh flex flex-col bg-[var(--ui-background)] bg-blend-multiply pb-safe-area">
     <TheCabinetHeader class="shrink-0" />
 
     <div class="flex-1 min-h-0 flex">
@@ -42,6 +42,30 @@ html,
 body,
 #__nuxt {
   height: 100%;
+}
+
+.cabinet-layout {
+  position: relative;
+  isolation: isolate;
+}
+
+.cabinet-layout::before,
+.cabinet-layout::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cabinet-layout::before {
+  background: url("/static/mbg.gif") center/cover repeat;
+  z-index: -2;
+}
+
+.cabinet-layout::after {
+  background: var(--ui-background);
+  opacity: 0.97;
+  z-index: -1;
 }
 
 /* Optional: smoother scrolling on iOS */

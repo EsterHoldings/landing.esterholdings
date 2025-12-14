@@ -1057,7 +1057,7 @@
         "shareMail": "שלח באימייל",
         "shareOther": "שתף",
         "levelClients": "לקוחות ברמה",
-        "levelProgressLabel": "רמה נוכחית: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "עד {level}: {xp} XP",
         "badges": "סמלים",

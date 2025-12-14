@@ -1057,7 +1057,7 @@
         "shareMail": "通过邮箱发送",
         "shareOther": "分享",
         "levelClients": "该级别客户",
-        "levelProgressLabel": "当前级别: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "到 {level}: {xp} XP",
         "badges": "徽章",

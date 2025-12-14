@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-5 text-[var(--ui-text-main)]">
+  <div class="referrals-general flex flex-col gap-5 text-[var(--ui-text-main)]">
     <!-- Referral account summary -->
     <div class="panel account-panel">
       <div class="flex flex-col gap-4">
@@ -50,8 +50,8 @@
 
     <!-- Levels & 3-depth network -->
     <div class="grid gap-4 lg:grid-cols-2">
-      <div class="panel">
-        <div class="flex flex-col gap-[2.75rem]">
+    <div class="panel">
+      <div class="flex flex-col gap-[2.75rem]">
           <div class="flex items-center justify-between">
             <UiTextH5>{{ t("cabinet.referrals.general.levelsTitle") }}</UiTextH5>
             <UiBadge state="warning" outline>
@@ -120,7 +120,7 @@
         <div class="mt-2 flex flex-col gap-2">
           <div
             class="relative flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[var(--ui-text-main)]"
-            style="background: var(--ui-background-sidebar); border: 1px solid var(--color-stroke-ui-light);"
+            style="background: var(--referral-surface); border: 1px solid var(--color-stroke-ui-light);"
           >
             <input
               class="flex-1 bg-transparent text-sm outline-none text-[var(--ui-text-main)]"
@@ -167,20 +167,18 @@
     </div>
 
     <!-- Earnings chart -->
-    <div class="panel">
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <UiTextH5>{{ t("cabinet.referrals.general.earningsChartTitle") }}</UiTextH5>
-          <UiSelect
-            class="min-w-[160px] w-[200px]"
-            :data="chartRanges"
-            :value="selectedRange"
-            :withoutNoSelect="true"
-            @change="selectedRange = $event as string"
-          />
-        </div>
-        <SimpleChart :data="chartDataByRange" />
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <UiTextH5>{{ t("cabinet.referrals.general.earningsChartTitle") }}</UiTextH5>
+        <UiSelect
+          class="min-w-[160px] w-[200px]"
+          :data="chartRanges"
+          :value="selectedRange"
+          :withoutNoSelect="true"
+          @change="selectedRange = $event as string"
+        />
       </div>
+      <SimpleChart :data="chartDataByRange" />
     </div>
 
     <!-- Referrals list -->
@@ -554,19 +552,28 @@ const handlePerPageChange = (next: number) => {
 </script>
 
 <style scoped>
+.referrals-general {
+  --referral-surface: color-mix(in srgb, var(--ui-background) 98%, transparent);
+  --referral-panel: color-mix(in srgb, var(--ui-background-panel) 97%, transparent);
+}
+
 .panel {
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.03);
-  background: linear-gradient(145deg, rgba(1, 22, 68, 0.8), rgba(1, 12, 40, 0.7));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, rgba(1, 22, 68, 0.8) 96%, transparent),
+    color-mix(in srgb, rgba(1, 12, 40, 0.7) 96%, transparent)
+  );
   padding: 18px 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 .network-card {
   border-radius: 12px;
   padding: 14px;
-  background: var(--ui-background-panel);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--referral-panel);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--ui-text-main);
   height: 100%;
   display: flex;
@@ -651,7 +658,7 @@ const handlePerPageChange = (next: number) => {
 .referral-card-full {
   width: 100%;
   border-radius: 12px;
-  background: var(--ui-background-panel);
+  background: var(--referral-panel);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 12px 14px;
   transition: background-color 0.2s ease, transform 0.1s ease;

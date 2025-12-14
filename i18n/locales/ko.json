@@ -1057,7 +1057,7 @@
         "shareMail": "이메일로 보내기",
         "shareOther": "공유",
         "levelClients": "해당 레벨의 고객",
-        "levelProgressLabel": "현재 레벨: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "{level}까지: {xp} XP",
         "badges": "배지",

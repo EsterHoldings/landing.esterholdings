@@ -1060,7 +1060,7 @@
         "shareMail": "Отправить по email",
         "shareOther": "Поделиться",
         "levelClients": "клиентов на уровне",
-        "levelProgressLabel": "Текущий уровень: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "До {level}: {xp} XP",
         "badges": "Значки",

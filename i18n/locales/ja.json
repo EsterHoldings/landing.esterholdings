@@ -1057,7 +1057,7 @@
         "shareMail": "メールで共有",
         "shareOther": "共有",
         "levelClients": "このレベルのクライアント",
-        "levelProgressLabel": "現在のレベル: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "{level}まで: {xp} XP",
         "badges": "バッジ",

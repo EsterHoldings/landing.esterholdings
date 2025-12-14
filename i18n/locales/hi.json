@@ -1057,7 +1057,7 @@
         "shareMail": "ईमेल से भेजें",
         "shareOther": "साझा करें",
         "levelClients": "इस स्तर पर ग्राहक",
-        "levelProgressLabel": "वर्तमान स्तर: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "{level} तक: {xp} XP",
         "badges": "बैज",

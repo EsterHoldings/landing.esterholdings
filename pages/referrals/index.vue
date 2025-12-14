@@ -1,11 +1,12 @@
 <template>
-  <UiContainer>
+  <UiContainer class="referrals-page">
     <div>
       <PanelDefault class="!p-0 overflow-hidden">
         <div class="flex flex-row max-lg:flex-col min-w-0">
           <div
-            class="w-[240px] shrink-0 max-lg:w-full border-[var(--ui-primary-main)] p-2 max-lg:p-2 border-r max-lg:border-r-0 max-lg:border-b bg-[var(--ui-background)]"
+            class="w-[240px] shrink-0 max-lg:w-full border-[var(--ui-primary-main)] p-2 max-lg:p-2 border-r max-lg:border-r-0 max-lg:border-b"
           >
+<!--            :style="{ background: 'var(&#45;&#45;referral-surface)' }"-->
             <TabsAsList
               :tabsList="tabsList"
               @selectTab="handleActiveTab"
@@ -25,11 +26,15 @@
             >
               <div class="w-full min-w-0">
                 <div
-                  class="text-[--ui-text-main] h-[66px] w-full px-4 sm:px-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-start bg-[var(--ui-background)]"
+                  class="text-[--ui-text-main] h-[66px] w-full px-4 sm:px-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-start"
                 >
+<!--                  :style="{ background: 'var(&#45;&#45;referral-surface)' }"-->
                   {{ tabsList[activeTabIndex].label }}
                 </div>
-                <div class="p-3 sm:p-5 overflow-y-auto min-w-0 bg-[var(--ui-background)]">
+                <div
+                  class="p-3 sm:p-5 overflow-y-auto min-w-0"
+                >
+<!--                  :style="{ background: 'var(&#45;&#45;referral-surface)' }"-->
                   <component
                     :is="tabsList[activeTabIndex].component"
                     :key="activeTabIndex"
@@ -93,6 +98,15 @@ const handleActiveTab = (tabIndex: number) => {
 </script>
 
 <style scoped>
+.referrals-page {
+  --referral-surface: color-mix(in srgb, var(--ui-background) 98%, transparent);
+  --referral-panel: color-mix(in srgb, var(--ui-background-panel) 97%, transparent);
+}
+
+.referrals-page :deep(.bg-\[var\(--ui-background-panel\)\]) {
+  background: var(--referral-panel) !important;
+}
+
 .slide-short-enter-active,
 .slide-short-leave-active {
   transition: opacity 0.1s ease, transform 0.1s ease;

@@ -1057,7 +1057,7 @@
         "shareMail": "E-posta ile gönder",
         "shareOther": "Paylaş",
         "levelClients": "bu seviyedeki müşteriler",
-        "levelProgressLabel": "Güncel seviye: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "{level} için: {xp} XP",
         "badges": "Rozetler",

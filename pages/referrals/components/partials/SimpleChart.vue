@@ -34,6 +34,7 @@ const renderChart = () => {
   const labels = props.data.map(d => d.label);
   const values = props.data.map(d => d.value);
   chartInstance.setOption({
+    textStyle: { color: "var(--ui-text-main)" },
     grid: { left: 6, right: 6, top: 10, bottom: 20, containLabel: true },
     tooltip: {
       trigger: "axis",
@@ -46,14 +47,14 @@ const renderChart = () => {
       data: labels,
       boundaryGap: false,
       axisLine: { lineStyle: { color: "rgba(255,255,255,0.15)" } },
-      axisLabel: { color: "var(--ui-text-secondary)", fontSize: 10 },
+      axisLabel: { color: "var(--ui-text-main)", fontSize: 10 },
       axisTick: { show: false },
     },
     yAxis: {
       type: "value",
       axisLine: { show: false },
       splitLine: { lineStyle: { color: "rgba(255,255,255,0.06)" } },
-      axisLabel: { color: "var(--ui-text-secondary)", fontSize: 10 },
+      axisLabel: { color: "var(--ui-text-main)", fontSize: 10 },
     },
     series: [
       {

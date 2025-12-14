@@ -1057,7 +1057,7 @@
         "shareMail": "Per E-Mail senden",
         "shareOther": "Teilen",
         "levelClients": "Kunden auf diesem Level",
-        "levelProgressLabel": "Aktuelles Level: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "Bis {level}: {xp} XP",
         "badges": "Abzeichen",

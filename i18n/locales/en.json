@@ -1060,7 +1060,7 @@
         "shareMail": "Share by email",
         "shareOther": "Share",
         "levelClients": "clients on this level",
-        "levelProgressLabel": "Current: {level}",
+        "levelProgressLabel": "{level}",
         "xp": "XP",
         "nextLevelHint": "{level} in {xp} XP",
         "badges": "Badges",
