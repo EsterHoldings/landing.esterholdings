@@ -16,7 +16,7 @@
       >
         <main
           :key="route.fullPath"
-          class="flex-1 min-h-0 overflow-y-auto no-scrollbar box-border w-full p-1 lg:pl-[250px] text-white pb-safe-area"
+          class="flex-1 min-h-0 overflow-y-auto no-scrollbar box-border w-full p-1 lg:pl-[250px] text-white pb-safe-area mb-[90px] lg:mb-0"
         >
           <slot />
         </main>
