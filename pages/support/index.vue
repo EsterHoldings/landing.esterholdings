@@ -29,7 +29,7 @@
             </template>
           </UiInput>
         </div>
-        <div class="flex items-center justify-center gap-1">
+        <div class="flex items-center justify-center gap-2">
 
           <UiButtonDefault state="info--small" class="mr-2" @click="handleClickUpdate">
             <UiIconUpdate v-if="!isLoading"/>
@@ -52,6 +52,14 @@
             </template>
           </UiSelect>
 
+          <ViewModeToggle
+            class="w-full sm:w-auto"
+            bordered
+            :modelValue="viewMode"
+            :options="viewOptions"
+            @update:modelValue="viewMode = $event"
+          />
+
 <!--          <UiButtonDefault state="info&#45;&#45;small">-->
 <!--            <UiIconFilters class="mr-2"/>-->
 <!--            <UiTextSmall>Filters</UiTextSmall>-->
@@ -61,6 +69,7 @@
 
       <!-- Таблиця тікетів -->
       <PanelDefault
+          v-if="viewMode === 'table'"
           ref="panelRef"
           class="relative rounded-2xl border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background)]"
       >
@@ -143,6 +152,7 @@
                   <button
                       class="h-8 w-8 flex items-center justify-center rounded-md hover:bg-[var(--color-stroke-ui-light)] active:opacity-[.5]"
                       aria-label="More"
+                      @click.stop
                   >
                     <UiIconDotsVertical @click.stop/>
                   </button>
@@ -163,6 +173,68 @@
         </div>
 
       </PanelDefault>
+
+      <div v-else class="relative">
+        <div
+          class="absolute inset-0 backdrop-blur-sm rounded-lg flex items-center justify-center"
+          v-if="isLoading"
+        >
+          <UiIconSpinnerDefault/>
+        </div>
+
+        <div v-if="tickets.length === 0" class="w-full h-[50vh] flex items-center justify-center">
+          <UiButtonDefault state="info" @click="handleClickCreateNewTicket">
+            <UiIconPlus class="mr-2 fill-[var(--ui-text-main)]"/>
+            <span>{{ t("support.page.newTicket") }}</span>
+          </UiButtonDefault>
+        </div>
+
+        <div
+          v-else
+          class="grid gap-3"
+          :class="viewMode === 'full' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'"
+        >
+          <div
+            v-for="ticket in filtered"
+            :key="ticket.id"
+            class="ticket-card cursor-pointer rounded-xl border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background-panel)] p-4 transition hover:bg-[var(--color-stroke-ui-dark)]"
+            @click="handleClickRow(ticket.id)"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 text-xs text-[var(--ui-text-secondary)]">
+                  <span>#{{ ticket.id }}</span>
+                  <UiIconCopy @click.stop :text="ticket.id" />
+                </div>
+                <div class="truncate font-semibold">{{ ticket.subject }}</div>
+              </div>
+              <UiBadge :outline="true" state="info" class="whitespace-nowrap">{{ ticket.status }}</UiBadge>
+            </div>
+
+            <div class="mt-3 flex items-center justify-between text-sm text-[var(--ui-text-secondary)]">
+              <span>{{ t("support.page.lastUpdate") }}</span>
+              <span class="whitespace-nowrap">{{ ticket.last_message_at }}</span>
+            </div>
+
+            <div class="mt-3 flex items-center justify-end gap-2">
+              <button
+                class="h-[36px] w-[36px] flex items-center justify-center rounded-full hover:bg-[var(--color-stroke-ui-light)] active:bg-[var(--color-stroke-ui-dark)]"
+                @click.stop="() => currentTicketIdForChat = ticket.id"
+                aria-label="Open chat"
+              >
+                <UiIconChat class="!h-[20px] !w-[20px]"/>
+              </button>
+              <button
+                class="h-[36px] w-[36px] flex items-center justify-center rounded-md hover:bg-[var(--color-stroke-ui-light)] active:opacity-[.5]"
+                aria-label="More"
+                @click.stop
+              >
+                <UiIconDotsVertical/>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Пагінація -->
       <div class="px-5 h-[50px] mt-2 flex items-center justify-between">
@@ -258,11 +330,12 @@ import UiInput from '~/components/ui/UiInput.vue'
 import UiSelect from "~/components/ui/UiSelect.vue";
 import UiTextH4 from '~/components/ui/UiTextH4.vue'
 import UiTextSmall from "~/components/ui/UiTextSmall.vue";
+import ViewModeToggle from "~/components/block/controls/ViewModeToggle.vue";
 
 import useAppCore from "~/composables/useAppCore";
 import useEventBus from "~/composables/useEventBus";
 import {definePageMeta, useAuthStore} from '~/.nuxt/imports'
-import {ref, computed, nextTick, onMounted, onBeforeUnmount, computed as vComputed, reactive, inject} from 'vue'
+import {ref, computed, nextTick, onMounted, onBeforeUnmount, computed as vComputed, reactive, inject, watch, h} from 'vue'
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import UiIconLogo from "~/components/ui/UiIconLogo.vue";
@@ -315,6 +388,85 @@ const currentPage = ref(1);
 const orderBy = ref("last_message_at");
 const orderDirection = ref(ORDER_DIRECTION_DESC);
 const currentRowActiveOptions = ref<number | null>(null);
+const VIEW_MODE_STORAGE_KEY = "support_view_mode";
+const viewMode = ref<"table" | "cards" | "full">("table");
+const viewOptions = [
+  {
+    value: "table" as const,
+    label: t("cabinet.billing.view.list") || "List",
+    icon: {
+      render() {
+        return h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round",
+          },
+          [
+            h("line", { x1: "8", y1: "6", x2: "21", y2: "6" }),
+            h("line", { x1: "3", y1: "6", x2: "4", y2: "6" }),
+            h("line", { x1: "8", y1: "12", x2: "21", y2: "12" }),
+            h("line", { x1: "3", y1: "12", x2: "4", y2: "12" }),
+            h("line", { x1: "8", y1: "18", x2: "21", y2: "18" }),
+            h("line", { x1: "3", y1: "18", x2: "4", y2: "18" }),
+          ]
+        );
+      },
+    },
+  },
+  {
+    value: "cards" as const,
+    label: t("cabinet.billing.view.cards") || "Cards",
+    icon: {
+      render() {
+        return h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round",
+          },
+          [
+            h("rect", { x: "3", y: "3", width: "7", height: "7", rx: "1" }),
+            h("rect", { x: "14", y: "3", width: "7", height: "7", rx: "1" }),
+            h("rect", { x: "3", y: "14", width: "7", height: "7", rx: "1" }),
+            h("rect", { x: "14", y: "14", width: "7", height: "7", rx: "1" }),
+          ]
+        );
+      },
+    },
+  },
+  {
+    value: "full" as const,
+    label: t("cabinet.billing.view.full") || "Full width",
+    icon: {
+      render() {
+        return h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round",
+          },
+          [
+            h("rect", { x: "3", y: "6", width: "18", height: "4", rx: "1" }),
+            h("rect", { x: "3", y: "14", width: "18", height: "4", rx: "1" }),
+          ]
+        );
+      },
+    },
+  },
+];
 
 const perPageList = reactive([
   {id: 1, value: 1, text: "1"},
@@ -518,6 +670,19 @@ const loadData = async () => {
   isInitialLoading.value = false;
 }
 
+const initViewMode = () => {
+  if (typeof window === "undefined") return;
+  const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+  if (saved && ["table", "cards", "full"].includes(saved)) {
+    viewMode.value = saved as typeof viewMode.value;
+  }
+};
+
+watch(viewMode, mode => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+});
+
 const openChat = async () => {
   chatOpen.value = true
   await placeBottomLeft()
@@ -600,6 +765,8 @@ onMounted(async () => {
   const response = await appCore.auth.getAuthUser();
   currentUser.id = response.data.id;
   currentUser.name = response.data.first_name;
+
+  initViewMode()
 
   await nextTick()
   await placeBottomLeft()

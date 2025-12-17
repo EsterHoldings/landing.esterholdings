@@ -2,7 +2,7 @@
   <!-- РЕЖИМ БЛОЧНОГО КОМПОНЕНТА (asBlock === true) -->
   <div v-if="asBlockMode" class="w-full max-w-full">
     <!-- нет Teleport, нет fixed, нет draggable, и ВАЖНО: мы НЕ навешиваем attrs сюда -->
-    <div class="support-chat flex w-full max-w-full flex-col overflow-hidden rounded-[10px] border border-[var(--ui-primary-main)] bg-[var(--color-stroke-ui-dark)] shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
+    <div class="support-chat flex w-full max-w-full flex-col overflow-hidden rounded-[10px] border border-[var(--ui-primary-main)] bg-[var(--color-stroke-ui-dark)] shadow-none">
       <div class="drag-handle relative flex select-none items-center justify-between border-b border-[#2a3f73] px-4 py-3">
         <div class="flex items-center gap-3">
           <h3 class="text-lg font-semibold text-white/95">Support Chat</h3>
@@ -14,17 +14,7 @@
             <span>{{ isCounterpartyOnline ? 'Online' : 'Offline' }}</span>
           </div>
         </div>
-        <button
-            @click="emit('close')"
-            class="no-drag rounded-lg p-2 text-white/60 hover:bg-white/5 hover:text-white/90"
-            title="Close"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
-            <path
-                d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.41 6.29 6.29-6.3 6.3 1.41 1.4 6.3-6.29 6.29 6.3 1.41-1.41-6.3-6.3 6.3-6.29z"
-            />
-          </svg>
-        </button>
+        <div class="h-9 w-9"></div>
       </div>
 
       <div
