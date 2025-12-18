@@ -156,7 +156,7 @@ onBeforeUnmount(() => {});
 
 <template>
   <PanelDefault>
-    <div class="relative rounded-2xl p-3 sm:p-4">
+    <div class="relative rounded-2xl">
       <div class="flex flex-col gap-3">
         <div class="flex items-center justify-between gap-3">
           <UiTextH5 class="!text-[var(--ui-text-main)]">{{ t("cabinet.dashboard.transactions.title") }}</UiTextH5>

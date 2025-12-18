@@ -2,7 +2,7 @@
   <!-- РЕЖИМ БЛОЧНОГО КОМПОНЕНТА (asBlock === true) -->
   <div v-if="asBlockMode" class="w-full max-w-full">
     <!-- нет Teleport, нет fixed, нет draggable, и ВАЖНО: мы НЕ навешиваем attrs сюда -->
-    <div class="support-chat flex h-full w-full max-w-full flex-col overflow-hidden rounded-[10px] border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] shadow-none max-h-[calc(100vh-200px)]">
+    <div class="support-chat flex h-full w-full max-w-full flex-col overflow-hidden rounded-[10px] border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] shadow-none max-h-[calc(100vh-170px)]">
       <div class="drag-handle relative flex select-none items-center justify-between border-b border-[var(--color-stroke-ui-light)] px-4 py-3">
         <div class="flex items-center gap-3">
           <h3 class="text-lg font-semibold text-[var(--ui-text-main)]">Support Chat</h3>

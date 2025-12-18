@@ -346,7 +346,7 @@ onMounted(async () => {
 
 .support-side {
   color: var(--ui-text-main);
-  height: calc(100vh - 200px);
+  height: calc(100vh - 170px);
   overflow: scroll;
   display: flex;
   flex-direction: column;

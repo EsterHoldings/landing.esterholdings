@@ -26,142 +26,136 @@
           </div>
 
           <!-- MT4 accounts as cards -->
-          <PanelDefault>
-            <div class="rounded-2xl p-2 sm:p-3">
-              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div class="text-[18px] font-semibold">
-                  {{ t("cabinet.dashboard.mt4.title") }}
-                </div>
-
-                <NuxtLink to="/accounts" class="w-full sm:w-auto">
-                  <UiButtonDefault state="primary" class="w-full sm:w-auto">
-                    {{ t("cabinet.dashboard.mt4.openNewAccount") }}
-                  </UiButtonDefault>
-                </NuxtLink>
+          <div class="flex flex-col gap-4 mt-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div class="text-[18px] font-semibold">
+                {{ t("cabinet.dashboard.mt4.title") }}
               </div>
 
-              <div class="grid grid-cols-1 gap-2">
-                <div
-                  v-for="account in mt4Accounts"
-                  :key="account.id"
-                  class="mt4-card verification-item"
+              <NuxtLink to="/accounts" class="w-full sm:w-auto">
+                <UiButtonDefault state="primary" class="w-full sm:w-auto">
+                  {{ t("cabinet.dashboard.mt4.openNewAccount") }}
+                </UiButtonDefault>
+              </NuxtLink>
+            </div>
+
+            <div class="grid grid-cols-1 gap-2">
+              <div
+                v-for="account in mt4Accounts"
+                :key="account.id"
+                class="mt4-card verification-item mt4-grid"
+              >
+                <button
+                  class="mt4-star flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-[var(--ui-background-panel)] text-[var(--ui-text-secondary)]"
+                  type="button"
+                  :aria-pressed="account.favorite"
+                  :title="account.favorite ? 'Remove from favorites' : 'Add to favorites'"
+                  @click="toggleFavorite(account.id)"
                 >
-                  <div class="flex flex-wrap items-center gap-4 text-sm sm:flex-nowrap sm:gap-5">
-                    <button
-                      type="button"
-                      class="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-[var(--ui-background-panel)] text-[var(--ui-text-secondary)]"
-                      :aria-pressed="account.favorite"
-                      :title="account.favorite ? 'Remove from favorites' : 'Add to favorites'"
-                      @click="toggleFavorite(account.id)"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        class="h-4 w-4"
-                        :fill="account.favorite ? '#f5c542' : 'none'"
-                        :stroke="account.favorite ? '#f5c542' : 'var(--ui-text-secondary)'"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    </button>
-                    <div class="min-w-0 text-[var(--ui-text-main)]">
-                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                        {{ t("cabinet.dashboard.mt4.table.type") }}
-                      </UiTextSmall>
-                      <div class="truncate font-semibold">{{ account.type }}</div>
-                      <UiTextSmall class="text-[var(--ui-text-secondary)] truncate">
-                        {{ t("cabinet.accounts.columns.leverage") }}: {{ account.leverage }}
-                      </UiTextSmall>
-                    </div>
-                    <div class="min-w-0 text-[var(--ui-text-main)]">
-                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                        {{ t("cabinet.dashboard.mt4.table.account") }}
-                      </UiTextSmall>
-                      <UiTextSmall class="text-[var(--ui-text-main)] font-semibold truncate">MT4 {{ account.id }}</UiTextSmall>
-                    </div>
-                    <div class="min-w-0 text-[var(--ui-text-main)]">
-                      <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                        {{ t("cabinet.dashboard.mt4.table.balance") }}
-                      </UiTextSmall>
-                      <div class="truncate font-semibold">
-                        {{ account.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
-                        {{ account.currency }}
-                      </div>
-                    </div>
-                    <UiBadge :state="mt4BadgeState(account.status)" outline class="shrink-0 border text-xs !px-3 !py-1 bg-[var(--color-stroke-ui-dark)]">
-                      {{ statusText[account.status]() }}
-                    </UiBadge>
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="h-4 w-4"
+                    :fill="account.favorite ? '#f5c542' : 'none'"
+                    :stroke="account.favorite ? '#f5c542' : 'var(--ui-text-secondary)'"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </button>
+                <div class="mt4-type min-w-0 text-[var(--ui-text-main)]">
+                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                    {{ t("cabinet.dashboard.mt4.table.type") }}
+                  </UiTextSmall>
+                  <div class="truncate font-semibold">{{ account.type }}</div>
+                  <UiTextSmall class="text-[var(--ui-text-secondary)] truncate">
+                    {{ t("cabinet.accounts.columns.leverage") }}: {{ account.leverage }}
+                  </UiTextSmall>
+                </div>
+                <div class="mt4-account min-w-0 text-[var(--ui-text-main)]">
+                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                    {{ t("cabinet.dashboard.mt4.table.account") }}
+                  </UiTextSmall>
+                  <UiTextSmall class="text-[var(--ui-text-main)] font-semibold truncate">MT4 {{ account.id }}</UiTextSmall>
+                </div>
+                <div class="mt4-balance min-w-0 text-[var(--ui-text-main)]">
+                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                    {{ t("cabinet.dashboard.mt4.table.balance") }}
+                  </UiTextSmall>
+                  <div class="truncate font-semibold">
+                    {{ account.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    {{ account.currency }}
                   </div>
                 </div>
+                <UiBadge :state="mt4BadgeState(account.status)" outline class="mt4-badge border text-xs !px-3 !py-1 bg-[var(--color-stroke-ui-dark)]">
+                  {{ statusText[account.status]() }}
+                </UiBadge>
               </div>
             </div>
-          </PanelDefault>
+          </div>
         </div>
 
         <!-- RIGHT COLUMN: verification -->
-        <PanelDefault class="col-span-1 text-[var(--ui-text-main)]">
-          <div class="rounded-2xl p-2 sm:p-3">
-            <div class="flex flex-col gap-4">
-              <div class="flex flex-col gap-3 rounded-xl bg-[var(--color-stroke-ui-dark)]/70 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-                <div>
-                  <div class="text-[18px] font-semibold text-[var(--ui-text-main)]">
-                    {{ t("cabinet.dashboard.accountVerification.title") }}
-                  </div>
-                  <div class="text-sm text-[var(--ui-text-secondary)]">
-                    {{ t("cabinet.dashboard.accountVerification.subtitle") }}
-                  </div>
+        <div class="col-span-1 flex flex-col gap-3 text-[var(--ui-text-main)] mt-5 lg:mt-0">
+          <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3 rounded-xl bg-[var(--color-stroke-ui-dark)]/70 sm:flex-row sm:items-center sm:justify-between">
+              <div class="space-y-1">
+                <div class="text-[18px] font-semibold text-[var(--ui-text-main)]">
+                  {{ t("cabinet.dashboard.accountVerification.title") }}
                 </div>
-
-                <div class="flex items-center gap-3">
-                  <div class="flex flex-col text-right">
-                    <UiTextH5 class="justify-end text-[var(--ui-text-main)]">Родіон Максименко</UiTextH5>
-                    <UiTextParagraph class="justify-end">
-                      <strong>test@gmail.com</strong>
-                    </UiTextParagraph>
-                    <UiTextSmall class="justify-end">{{ '10.05.1993' }}</UiTextSmall>
-                  </div>
-
-                  <NuxtLink to="/profile" class="shrink-0">
-                    <UiImageCircle :twoChars="'TU'" :src="''" />
-                  </NuxtLink>
+                <div class="text-sm text-[var(--ui-text-secondary)]">
+                  {{ t("cabinet.dashboard.accountVerification.subtitle") }}
                 </div>
               </div>
 
-              <div class="flex flex-col gap-2">
-                <div
-                  v-for="item in verificationSteps"
-                  :key="item.key"
-                  class="verification-item"
-                >
-                  <div class="flex items-start gap-3 sm:items-center">
-                    <div class="step-icon" :class="item.state">
-                      <component :is="item.icon" class="h-4 w-4" />
+              <div class="flex items-center gap-3">
+                <div class="flex flex-col text-right">
+                  <UiTextH5 class="justify-end text-[var(--ui-text-main)]">Родіон Максименко</UiTextH5>
+                  <UiTextParagraph class="justify-end">
+                    <strong>test@gmail.com</strong>
+                  </UiTextParagraph>
+                  <UiTextSmall class="justify-end">{{ '10.05.1993' }}</UiTextSmall>
+                </div>
+
+                <NuxtLink to="/profile" class="shrink-0">
+                  <UiImageCircle :twoChars="'TU'" :src="''" />
+                </NuxtLink>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div
+                v-for="item in verificationSteps"
+                :key="item.key"
+                class="verification-item"
+              >
+                <div class="flex items-start gap-3 sm:items-center">
+                  <div class="step-icon" :class="item.state">
+                    <component :is="item.icon" class="h-4 w-4" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
+                      <span class="text-sm font-semibold text-[var(--ui-text-main)] truncate" :title="item.title">
+                        {{ item.title }}
+                      </span>
+                      <UiBadge :state="badgeState(item.state)" outline class="!py-0.5 !px-2 text-xs">
+                        {{ item.statusLabel }}
+                      </UiBadge>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
-                        <span class="text-sm font-semibold text-[var(--ui-text-main)] truncate" :title="item.title">
-                          {{ item.title }}
-                        </span>
-                        <UiBadge :state="badgeState(item.state)" outline class="!py-0.5 !px-2 text-xs">
-                          {{ item.statusLabel }}
-                        </UiBadge>
-                      </div>
-                      <UiTextSmall class="text-[var(--ui-text-secondary)] leading-snug">
-                        {{ item.statusText }}
-                      </UiTextSmall>
-                      <UiTextSmall v-if="item.hint" class="text-[var(--ui-primary-accent)] mt-1 leading-snug">
-                        {{ item.hint }}
-                      </UiTextSmall>
-                    </div>
+                    <UiTextSmall class="text-[var(--ui-text-secondary)] leading-snug">
+                      {{ item.statusText }}
+                    </UiTextSmall>
+                    <UiTextSmall v-if="item.hint" class="text-[var(--ui-primary-accent)] mt-1 leading-snug">
+                      {{ item.hint }}
+                    </UiTextSmall>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </PanelDefault>
+        </div>
 
           <!-- FULL WIDTH: transactions -->
           <div class="col-span-1 lg:col-span-2">
@@ -186,7 +180,6 @@ import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconFailed from "~/components/ui/UiIconFailed.vue";
 
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
 import TransactionsWidget from "~/components/block/widgets/TransactionsWidget.vue";
 import TotalAmountWidget from "~/components/block/widgets/TotalAmountWidget.vue";
 import PendingTransactionsWidget from "~/components/block/widgets/PendingTransactionsWidget.vue";
@@ -361,6 +354,47 @@ const badgeState = (state: "warn" | "error" | "success") => {
 .mt4-card:hover {
   background: var(--color-stroke-ui-dark);
   opacity: 0.95;
+}
+
+.mt4-grid {
+  display: grid;
+  grid-template-columns: 44px repeat(3, minmax(0, 1fr)) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  grid-template-areas: "star type account balance badge";
+}
+
+.mt4-grid > * {
+  min-width: 0;
+}
+
+.mt4-star {
+  grid-area: star;
+}
+.mt4-type {
+  grid-area: type;
+}
+.mt4-account {
+  grid-area: account;
+}
+.mt4-balance {
+  grid-area: balance;
+}
+.mt4-badge {
+  grid-area: badge;
+  justify-self: end;
+}
+
+@media (max-width: 767px) {
+  .mt4-grid {
+    grid-template-columns: 44px 1fr 1fr;
+    grid-template-areas:
+      "star type badge"
+      "star account badge"
+      "star balance badge";
+    gap: 10px 12px;
+    align-items: start;
+  }
 }
 
 .verification-item {
