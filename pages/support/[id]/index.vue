@@ -525,7 +525,7 @@ onMounted(async () => {
   border-radius: 14px;
   border: 1px solid var(--color-stroke-ui-dark);
   background: var(--ui-background-panel);
-  padding: 14px;
+  padding: 4px 14px;
 }
 
 .support-side__profile {
