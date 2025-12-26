@@ -8,7 +8,7 @@ export class Auth2FaService {
   async generate2fa(params: {}): Promise<any> {
     return await this.useApi.post('/auth/2fa/generate', params);
   }
-
+ с
   async verifyOtp(params: {}): Promise<any> {
     return await this.useApi.post('/auth/2fa/verify', params);
   }

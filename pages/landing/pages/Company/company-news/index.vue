@@ -12,39 +12,58 @@
           :message="card.subTitle"
           :date="card.time"
           :button-text="card.buttonText"
-          link="/news/trading-sessions-april-2023" />
+          :link="card.link" />
       </div>
     </div>
   </UiContainer>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { definePageMeta } from '~/.nuxt/imports';
   import { useI18n } from 'vue-i18n';
   import UiContainer from '~/components/ui/UiContainer.vue';
   import UiTextH3 from '~/components/ui/UiTextH3.vue';
   import NewsCard from './components/NewsCard.vue';
+  import useAppCore from '~/composables/useAppCore';
+  import type { NewsItem } from '~/composables/core/modules/news/news.types';
 
   definePageMeta({
     layout: 'main',
     alias: '/company-news',
   });
 
-  const { t, tm } = useI18n();
+  const { t } = useI18n();
+  const appCore = useAppCore();
+  const buttonText = t('landing.pages.company.news.button');
 
-  const newsItems = computed(() => {
-    const items = tm('landing.pages.company.news.items') as any[];
-    const buttonText = t('landing.pages.company.news.button');
-    return Array.isArray(items)
-      ? items.map((_, index) => ({
-          src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGiL_OXNaefDrdif97UBefC4OW4azk1cyOLQ&s',
-          title: t(`landing.pages.company.news.items[${index}].title`),
-          subTitle: t(`landing.pages.company.news.items[${index}].subtitle`),
-          time: t(`landing.pages.company.news.items[${index}].time`),
-          buttonText,
-        }))
-      : [];
+  const newsItems = ref<
+    {
+      src: string;
+      title: string;
+      subTitle: string;
+      time: string;
+      buttonText: string;
+      link: string;
+    }[]
+  >([]);
+
+  const mapToCard = (item: NewsItem) => ({
+    src: item.image,
+    title: item.title,
+    subTitle: item.subtitle,
+    time: item.publishedAt,
+    buttonText,
+    link: `/news/${item.slug}`,
+  });
+
+  const loadNews = async () => {
+    const response = await appCore.news.getList({ page: 1, perPage: 10 });
+    newsItems.value = response.data.data.map(mapToCard);
+  };
+
+  onMounted(() => {
+    loadNews();
   });
 </script>
 

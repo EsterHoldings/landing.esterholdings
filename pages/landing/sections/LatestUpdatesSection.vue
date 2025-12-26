@@ -17,24 +17,40 @@
 </template>
 
 <script setup lang="ts">
+  import { onMounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { computed } from 'vue';
   import UiTextH3 from '~/components/ui/UiTextH3.vue';
   import UiCard from '~/components/ui/UiCard.vue';
   import UiContainer from '~/components/ui/UiContainer.vue';
+  import useAppCore from '~/composables/useAppCore';
+  import type { NewsItem } from '~/composables/core/modules/news/news.types';
 
-  const { t, tm } = useI18n();
+  const { t } = useI18n();
+  const appCore = useAppCore();
 
-  const newsItems = computed(() => {
-    const items = tm('landing.sections.latest_updates__items') as any[];
-    return Array.isArray(items)
-      ? items.map((_, index) => ({
-          src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGiL_OXNaefDrdif97UBefC4OW4azk1cyOLQ&s',
-          title: t(`landing.sections.latest_updates__items[${index}].title`),
-          subTitle: t(`landing.sections.latest_updates__items[${index}].subtitle`),
-          time: t(`landing.sections.latest_updates__items[${index}].time`),
-        }))
-      : [];
+  const newsItems = ref<
+    {
+      src: string;
+      title: string;
+      subTitle: string;
+      time: string;
+    }[]
+  >([]);
+
+  const mapToCard = (item: NewsItem) => ({
+    src: item.image,
+    title: item.title,
+    subTitle: item.subtitle,
+    time: item.publishedAt,
+  });
+
+  const loadNews = async () => {
+    const response = await appCore.news.getLatest({ limit: 3 });
+    newsItems.value = response.data.data.map(mapToCard);
+  };
+
+  onMounted(() => {
+    loadNews();
   });
 </script>
 
