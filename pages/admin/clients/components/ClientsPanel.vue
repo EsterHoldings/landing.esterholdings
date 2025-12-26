@@ -1,54 +1,54 @@
 <template>
-  <PageStructureContent :plain="viewMode !== 'table'" class="text-[var(--ui-text-main)]">
-    <template #top>
-      <div class="flex w-full flex-col gap-2 md:flex-row md:items-center">
-        <div class="flex w-full flex-1 min-w-[260px] items-center gap-2">
-          <UiInput
-            class="w-full"
-            :placeholder="t('admin.access.components.admins-panel-search.placeholder')"
-            @input="handleInputSearch"
-            :value="searchFilter"
-          >
-            <template #icon-left>
-              <UiIconSearch />
-            </template>
-          </UiInput>
-          <UiButtonDefault state="info--small" class="!w-[44px]" @click="loadData">
-            <UiIconUpdate :spinning="isLoading" />
-          </UiButtonDefault>
+  <div class="flex w-full flex-col gap-3 text-[var(--ui-text-main)]">
+    <PageStructureContent :plain="viewMode !== 'table'">
+      <template #top>
+        <div class="flex w-full flex-col gap-2 md:flex-row md:items-center">
+          <div class="flex w-full flex-1 min-w-[260px] items-center gap-2">
+            <UiInput
+              class="w-full"
+              :placeholder="t('admin.access.components.admins-panel-search.placeholder')"
+              @input="handleInputSearch"
+              :value="searchFilter"
+            >
+              <template #icon-left>
+                <UiIconSearch />
+              </template>
+            </UiInput>
+            <UiButtonDefault state="info--small" class="!w-[44px]" @click="loadData">
+              <UiIconUpdate :spinning="isLoading" />
+            </UiButtonDefault>
+          </div>
+
+          <div class="flex w-full flex-1 items-center gap-2 md:w-auto md:flex-none md:justify-end">
+            <UiSelect
+              class="min-w-[180px] sm:w-[200px]"
+              :value="orderBy"
+              :data="sortByOptions"
+              :withoutNoSelect="true"
+              @change="handleOrderBy"
+            >
+              <template #icon-left>
+                <UiIconSortBy class="!h-4 !w-4" :orderDirectionEnabled="true" :orderDirection="orderDirection" />
+              </template>
+            </UiSelect>
+
+            <ViewModeToggle
+              class="w-full sm:w-auto"
+              bordered
+              :modelValue="viewMode"
+              :options="viewOptions"
+              @update:modelValue="viewMode = $event"
+            />
+          </div>
         </div>
+      </template>
 
-        <div class="flex w-full flex-1 items-center gap-2 md:w-auto md:flex-none md:justify-end">
-          <UiSelect
-            class="min-w-[180px] sm:w-[200px]"
-            :value="orderBy"
-            :data="sortByOptions"
-            :withoutNoSelect="true"
-            @change="handleOrderBy"
-          >
-            <template #icon-left>
-              <UiIconSortBy class="!h-4 !w-4" :orderDirectionEnabled="true" :orderDirection="orderDirection" />
-            </template>
-          </UiSelect>
-
-          <ViewModeToggle
-            class="w-full sm:w-auto"
-            bordered
-            :modelValue="viewMode"
-            :options="viewOptions"
-            @update:modelValue="viewMode = $event"
-          />
-        </div>
-      </div>
-    </template>
-
-    <template #content>
-      <div class="flex w-full flex-col gap-3">
+      <template #content>
         <div>
           <ClientsContent
             v-if="viewMode !== 'table'"
             :data="clientsData"
-            :layoutClass="viewMode === 'full' ? 'full' : ''"
+            :viewMode="viewMode"
             @click="handleOpenClientPage"
           />
 
@@ -115,22 +115,22 @@
             </div>
           </div>
         </div>
+      </template>
+    </PageStructureContent>
 
-        <PaginationDefault
-          :isLoading="isLoading"
-          :perPage="perPage"
-          :page="page"
-          :totalRows="totalRows"
-          @perPageChange="handleChangePerPage"
-          @pageChange="handleChangePage"
-        />
-      </div>
-    </template>
-  </PageStructureContent>
+    <PaginationDefault
+      :isLoading="isLoading"
+      :perPage="perPage"
+      :page="page"
+      :totalRows="totalRows"
+      @perPageChange="handleChangePerPage"
+      @pageChange="handleChangePage"
+    />
+  </div>
 </template>
 
 <script lang="ts" setup>
-import {h, onMounted, reactive, ref} from "vue";
+import {h, onMounted, reactive, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {debounce} from "~/utils/helper/debounce";
 import TableMain from "~/components/block/tables/TableMain.vue";
@@ -156,6 +156,7 @@ const appCore = useAppCore();
 
 const ORDER_DIRECTION_ASC = "asc";
 const ORDER_DIRECTION_DESC = "desc";
+const VIEW_MODE_STORAGE_KEY = "adminClientsViewMode";
 
 const isLoading = ref(false);
 const isInitialLoading = ref(true);
@@ -294,8 +295,22 @@ const formatDate = (date: string) => {
   return isNaN(d.getTime()) ? date : d.toLocaleString();
 };
 
+const initViewMode = () => {
+  if (typeof window === "undefined") return;
+  const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+  if (saved && ["table", "cards", "full"].includes(saved)) {
+    viewMode.value = saved as typeof viewMode.value;
+  }
+};
+
+watch(viewMode, (mode) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+});
+
 onMounted(async () => {
   isLoading.value = true;
+  initViewMode();
   await loadData();
   isInitialLoading.value = false;
   useEventBus.on("loadDataForAdmins", loadData);

@@ -55,6 +55,7 @@ watch(
 .page {
   height: 100vh;
   overflow-y: auto;
+  background-color: var(--ui-background-card);
 
   &-wrapper {
     display: grid;

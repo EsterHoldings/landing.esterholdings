@@ -1,66 +1,77 @@
 <template>
-  <div class="clients-panel__content" :class="layoutClass">
+  <div class="clients-panel__content" :class="viewMode">
     <div
-        v-for="item in props.data"
-        :key="item.id"
-        :class="['clients-panel__content_row', layoutClass === 'full' ? 'full' : '']"
+      v-for="item in props.data"
+      :key="item.id"
+      class="client-card card-with-action"
+      :class="viewMode === 'full' ? 'client-card--full' : ''"
     >
-      <div class="user-photo" @click="handleOpenClientPage(item.id)">
-        <UiImageCircle
-            :twoChars="getTwoCharsByFullName(item.first_name, item.last_name)"
-            :src="item.photo_url"
-        />
-      </div>
+      <button
+        class="action-btn"
+        aria-label="Open client"
+        @click="handleOpenClientPage(item.id)"
+      >
+        <UiIconUser />
+      </button>
 
-      <div class="row-block user-info">
-        <div class="clients-panel__content_row__column-wrapper user-name-and-id">
-          <div>{{ item.first_name }} {{ item.last_name }}</div>
-          <div class="id">{{ item.id }}</div>
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          <span class="content">{{ item.email }}</span>
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          <span class="content">{{ item.phone }}</span>
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          <span class="content">{{ item.birthdate }}</span>
-        </div>
-      </div>
-
-      <div class="row-block user-address">
-        <div class="clients-panel__content_row__column-wrapper">
-          {{ item.country }}
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          {{ item.city }}
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          {{ item.state }}
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          {{ item.address }}
-        </div>
-        <div class="clients-panel__content_row__column-wrapper">
-          {{ item.postal_code }}
-        </div>
-      </div>
-
-      <div class="row-block clients-panel__content_row__column-wrapper user-row-options">
-        <div class="user-options">
-          <div>
-            <UiIconUser @click="handleOpenClientPage(item.id)"/>
+      <div class="client-card__body" :class="viewMode === 'full' ? 'client-card__body--row' : ''">
+        <div class="client-card__user">
+          <UiTextSmall class="text-[var(--ui-text-secondary)]">
+            {{ t("admin.accounts.components.accounts-panel.columns.name") }}
+          </UiTextSmall>
+          <div class="client-card__user-row">
+            <div class="user-photo" @click="handleOpenClientPage(item.id)">
+              <UiImageCircle
+                :twoChars="getTwoCharsByFullName(item.first_name, item.last_name)"
+                :src="item.photo_url"
+              />
+            </div>
+            <div class="client-card__user-text">
+              <div class="truncate font-semibold">
+                {{ item.first_name }} {{ item.last_name }}
+              </div>
+              <div class="client-card__user-id">{{ item.id }}</div>
+            </div>
           </div>
         </div>
-        <div class="user-date">{{ item.created_at }}</div>
+
+        <div>
+          <UiTextSmall class="text-[var(--ui-text-secondary)]">
+            {{ t("admin.accounts.components.accounts-panel.columns.email") }}
+          </UiTextSmall>
+          <div class="truncate">{{ item.email || "-" }}</div>
+        </div>
+
+        <div>
+          <UiTextSmall class="text-[var(--ui-text-secondary)]">
+            {{ t("admin.accounts.components.accounts-panel.columns.phone") }}
+          </UiTextSmall>
+          <div class="truncate">{{ item.phone || "-" }}</div>
+        </div>
+
+        <div>
+          <UiTextSmall class="text-[var(--ui-text-secondary)]">
+            {{ t("admin.clients.columns.birthdate", "Birthdate") }}
+          </UiTextSmall>
+          <div class="truncate">{{ item.birthdate || "-" }}</div>
+        </div>
+
+        <div>
+          <UiTextSmall class="text-[var(--ui-text-secondary)]">
+            {{ t("admin.accounts.components.accounts-panel.columns.created_at") }}
+          </UiTextSmall>
+          <div class="client-card__meta">{{ formatDate(item.created_at) }}</div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import {useI18n} from "vue-i18n";
 import UiImageCircle from "~/components/ui/UiImageCircle.vue";
 import UiIconUser from "~/components/ui/UiIconUser.vue";
+import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 
 const emit = defineEmits(['click'])
 const props = defineProps({
@@ -68,12 +79,13 @@ const props = defineProps({
     type: Array,
     default: []
   },
-  layoutClass: {
+  viewMode: {
     type: String,
-    default: ""
+    default: "cards"
   }
 });
 
+const {t} = useI18n({useScope: "global"});
 const handleOpenClientPage = (id: string) => emit('click', id);
 
 const getTwoCharsByFullName = (firstName: string, lastName: string): string => {
@@ -81,133 +93,136 @@ const getTwoCharsByFullName = (firstName: string, lastName: string): string => {
   const lastInitial = lastName.charAt(0);
   return `${firstInitial}${lastInitial}`;
 }
+
+const formatDate = (date: string) => {
+  if (!date) return "-";
+  const d = new Date(date);
+  return isNaN(d.getTime()) ? date : d.toLocaleString();
+};
 </script>
 
 <style scoped lang="scss">
 .clients-panel__content {
   color: var(--ui-text-main);
 
-  .user-row-options {
-    display: flex;
-    justify-content: space-between;
-
-    .user-options {
-      height: 40px;
-      width: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--color-stroke-ui-dark);
-      border-radius: 6px;
-
-      &:hover {
-        background-color: var(--color-stroke-ui-dark);
-      }
-    }
-  }
-
-  @media (max-width: 800px) {
-    .user-info {
-      margin-top: 20px;
-      width: 100%;
-    }
-
-    .clients-panel__content_row .row-block {
-      padding: 0;
-    }
-
-    .user-row-options {
-      flex-direction: row-reverse !important;
-    }
-  }
-
-  @media (max-width: 1044px) {
-    .user-address {
-      margin-top: 20px;
-    }
-  }
-
-  &_row {
-    padding: 16px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    background: var(--ui-background-panel);
-    transition: background-color 0.2s ease, opacity 0.2s ease;
+  &.cards {
     display: grid;
-    grid-template-columns: 60px 1fr 1fr 200px;
-    border: 1px solid transparent;
-
-    @media (max-width: 800px) {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .user-photo {
-      padding-right: 20px;
-    }
-
-    .user-row-options {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      flex-direction: column;
-    }
-
-    .row-block {
-      padding: 0 10px;
-    }
-
-    .user-info {
-
-      & > div {
-        margin-bottom: 5px;
-      }
-
-      .user-name-and-id {
-        display: flex;
-        flex-direction: column;
-      }
-    }
-
-    .user-date {
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .user-address {
-      font-size: 13px;
-      font-weight: bold;
-
-      & > div {
-        margin-bottom: 5px;
-      }
-    }
-
-    &__column-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-
-      & > .id {
-        font-size: 13px;
-        color: var(--ui-primary-main)
-      }
-
-      & > .content {
-        font-size: 14px;
-      }
-    }
-
-    &:hover {
-      background: var(--color-stroke-ui-dark);
-      border-color: transparent;
-      opacity: 0.95;
-    }
-
-    &.full {
-      grid-template-columns: 60px 1fr;
-      row-gap: 10px;
-    }
+    gap: 8px;
+    grid-template-columns: 1fr;
   }
+
+  &.full {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .clients-panel__content.cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .clients-panel__content.cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.client-card {
+  position: relative;
+  background: var(--ui-background-panel);
+  border-bottom: 1px solid var(--color-stroke-ui-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.client-card--full {
+  padding: 8px 40px 8px 14px;
+}
+
+.client-card:hover {
+  opacity: 0.6;
+}
+
+.client-card__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  color: var(--ui-text-main);
+}
+
+.client-card__body > div {
+  flex: 1 1 140px;
+  min-width: 140px;
+}
+
+.client-card__body--row {
+  flex-wrap: nowrap;
+  gap: 6px 12px;
+  align-items: flex-start;
+}
+
+.client-card__user {
+  min-width: 180px;
+}
+
+.client-card__user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.client-card__user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.client-card__user-id {
+  font-size: 12px;
+  color: var(--ui-primary-main);
+}
+
+.client-card__meta {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1024px) {
+  .client-card__body--row {
+    flex-wrap: wrap;
+  }
+}
+
+.card-with-action {
+  padding-right: 36px;
+}
+
+.card-with-action .action-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 28px;
+  border-radius: 8px;
+  color: var(--ui-text-secondary);
+  background: transparent;
+  border: none;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.card-with-action .action-btn:hover {
+  color: var(--ui-text-main);
+  transform: translateY(-1px);
 }
 </style>
