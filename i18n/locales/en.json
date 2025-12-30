@@ -785,6 +785,7 @@
       "mt4": {
         "title": "MT4 Accounts",
         "openNewAccount": "Open new account",
+        "empty": "No accounts yet.",
         "table": {
           "account": "Account",
           "type": "Type",

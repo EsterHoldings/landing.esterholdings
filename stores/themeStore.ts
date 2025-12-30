@@ -53,8 +53,18 @@ export const useThemeStore = defineStore("theme", () => {
     "--color-ui-grey": "#b8b8c3",
   };
 
-  function applyTheme(theme: Record<string, string>) {
+  let transitionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function applyTheme(theme: Record<string, string>, withTransition = true) {
     const root = document.documentElement;
+    if (withTransition) {
+      root.classList.add("theme-transition");
+      if (transitionTimer) clearTimeout(transitionTimer);
+      transitionTimer = setTimeout(() => {
+        root.classList.remove("theme-transition");
+        transitionTimer = null;
+      }, 400);
+    }
     Object.entries(theme).forEach(([key, value]) => {
       root.style.setProperty(key, value);
     });
@@ -63,7 +73,7 @@ export const useThemeStore = defineStore("theme", () => {
   function toggleTheme() {
     currentTheme.value = currentTheme.value === "light" ? "dark" : "light";
     const theme = currentTheme.value === "light" ? lightTheme : darkTheme;
-    applyTheme(theme);
+    applyTheme(theme, true);
     localStorage.setItem("theme", currentTheme.value);
   }
 
@@ -71,7 +81,7 @@ export const useThemeStore = defineStore("theme", () => {
     const saved = localStorage.getItem("theme") as "light" | "dark" | null;
     currentTheme.value = saved || currentTheme.value;
     const theme = currentTheme.value === "light" ? lightTheme : darkTheme;
-    applyTheme(theme);
+    applyTheme(theme, false);
   }
 
   if (process.client) {

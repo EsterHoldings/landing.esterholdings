@@ -10,6 +10,7 @@
         class="native-date-input"
         :value="rawValue"
         :disabled="disabled"
+        autocomplete="bday"
         @input="onNativeInput"
     />
 
@@ -73,7 +74,16 @@ const placeholderText = computed(() => props.placeholder || props.displayFormat)
 // Открыть нативный пикер
 function openPicker() {
   if (props.disabled) return
-  nextTick(() => nativeInput.value?.showPicker?.())
+  nextTick(() => {
+    const el = nativeInput.value
+    if (!el) return
+    if (typeof el.showPicker === 'function') {
+      el.showPicker()
+      return
+    }
+    el.focus()
+    el.click()
+  })
 }
 
 // Обработка выбора даты в пикере
@@ -98,7 +108,8 @@ function onNativeInput(e: Event) {
   width: 100%;
   height: var(--ui-input--height);
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .is-loading {

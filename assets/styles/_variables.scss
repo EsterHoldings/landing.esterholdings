@@ -3,7 +3,12 @@
   // Space step (padding, margin )
   --spacer: 10px;
   // ...
-  --default-transition: all 0.2s ease;
+  --default-transition: color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    fill 0.2s ease,
+    stroke 0.2s ease;
   // ...
   --color-background: #f7f7f7;
   --color-text: #101010;

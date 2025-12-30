@@ -785,6 +785,7 @@
       "mt4": {
         "title": "Счета MT4",
         "openNewAccount": "Открыть новый счёт",
+        "empty": "Счетов пока нет.",
         "table": {
           "account": "Счёт",
           "type": "Тип",

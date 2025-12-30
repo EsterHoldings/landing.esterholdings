@@ -89,11 +89,15 @@
           </div>
 
           <Mt4AccountsWidget
+            v-if="mt4Accounts.length"
             :accounts="mt4Accounts"
             :is-loading="isMt4Refreshing"
             @toggle-favorite="toggleFavorite"
             class="mt-4"
           />
+          <div v-else class="mt-4 rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 text-sm text-[var(--ui-text-secondary)]">
+            {{ t("cabinet.dashboard.mt4.empty") }}
+          </div>
         </div>
 
         <!-- RIGHT COLUMN: verification -->
