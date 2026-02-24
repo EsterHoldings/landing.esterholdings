@@ -270,7 +270,11 @@
             <div
               v-for="account in accounts"
               :key="account.id"
-              :class="['account-card card-with-menu', cardMenuOpenId === account.id ? 'card-open' : '']">
+              :class="[
+                'account-card card-with-menu',
+                cardMenuOpenId === account.id ? 'card-open' : '',
+                viewMode === 'cards' ? 'account-card--compact' : '',
+              ]">
               <div class="card-menu-actions">
                 <button
                   type="button"
@@ -366,44 +370,74 @@
 
               <div
                 class="account-card__body"
-                :class="viewMode === 'full' ? 'account-card__body--row' : ''">
-                <div class="min-w-[140px]">
-                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                    {{ t("cabinet.accounts.columns.type") }}
-                  </UiTextSmall>
-                  <div class="font-semibold">{{ account.account_type.name }}</div>
-                </div>
-                <div class="min-w-[140px]">
-                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                    {{ t("cabinet.accounts.columns.number") }}
-                  </UiTextSmall>
-                  <div class="font-semibold">{{ account.number }}</div>
-                </div>
-                <div class="min-w-[120px]">
-                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                    {{ t("cabinet.accounts.columns.leverage") }}
-                  </UiTextSmall>
-                  <div class="font-semibold">1:50</div>
-                </div>
-                <div class="min-w-[140px]">
-                  <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                    {{ t("cabinet.accounts.columns.balance") }}
-                  </UiTextSmall>
-                  <div class="flex items-center gap-2 font-semibold text-[var(--ui-text-main)]">
-                    <span :class="getBalanceHighlightClass(account.id)">${{ account.balance }}</span>
-                    <button
-                      type="button"
-                      class="refresh-balance-btn"
-                      :class="getRefreshButtonClass(account.id)"
-                      @click.stop="refreshAccountBalance(account)"
-                      :disabled="isBalanceRefreshing(account.id)"
-                      title="Refresh balance">
-                      <UiIconUpdate
-                        class="h-[14px] w-[14px]"
-                        :spinning="isBalanceRefreshing(account.id)" />
-                    </button>
+                :class="viewMode === 'full' ? 'account-card__body--row' : 'account-card__body--compact'">
+                <template v-if="viewMode === 'full'">
+                  <div class="min-w-[140px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.type") }}
+                    </UiTextSmall>
+                    <div class="font-semibold">{{ account.account_type.name }}</div>
                   </div>
-                </div>
+                  <div class="min-w-[140px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.number") }}
+                    </UiTextSmall>
+                    <div class="font-semibold">{{ account.number }}</div>
+                  </div>
+                  <div class="min-w-[120px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.leverage") }}
+                    </UiTextSmall>
+                    <div class="font-semibold">1:50</div>
+                  </div>
+                  <div class="min-w-[140px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.balance") }}
+                    </UiTextSmall>
+                    <div class="flex items-center gap-2 font-semibold text-[var(--ui-text-main)]">
+                      <span :class="getBalanceHighlightClass(account.id)">${{ account.balance }}</span>
+                      <button
+                        type="button"
+                        class="refresh-balance-btn"
+                        :class="getRefreshButtonClass(account.id)"
+                        @click.stop="refreshAccountBalance(account)"
+                        :disabled="isBalanceRefreshing(account.id)"
+                        title="Refresh balance">
+                        <UiIconUpdate
+                          class="h-[14px] w-[14px]"
+                          :spinning="isBalanceRefreshing(account.id)" />
+                      </button>
+                    </div>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div class="account-card__compact-main">
+                    <div class="account-card__compact-type">{{ account.account_type.name }}</div>
+                    <div class="account-card__compact-number">#{{ account.number }}</div>
+                  </div>
+
+                  <div class="account-card__compact-side">
+                    <div class="account-card__compact-meta">
+                      <span>{{ t("cabinet.accounts.columns.leverage") }}</span>
+                      <strong>1:50</strong>
+                    </div>
+                    <div class="account-card__compact-balance">
+                      <span :class="getBalanceHighlightClass(account.id)">${{ account.balance }}</span>
+                      <button
+                        type="button"
+                        class="refresh-balance-btn"
+                        :class="getRefreshButtonClass(account.id)"
+                        @click.stop="refreshAccountBalance(account)"
+                        :disabled="isBalanceRefreshing(account.id)"
+                        title="Refresh balance">
+                        <UiIconUpdate
+                          class="h-[14px] w-[14px]"
+                          :spinning="isBalanceRefreshing(account.id)" />
+                      </button>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -1037,6 +1071,67 @@
     flex: 1 1 140px;
   }
 
+  .account-card__body--compact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .account-card__compact-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .account-card__compact-type {
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .account-card__compact-number {
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--ui-text-secondary);
+  }
+
+  .account-card__compact-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    min-width: 120px;
+  }
+
+  .account-card__compact-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.1;
+    color: var(--ui-text-secondary);
+  }
+
+  .account-card__compact-meta strong {
+    font-size: 13px;
+    line-height: 1.1;
+    color: var(--ui-text-main);
+  }
+
+  .account-card__compact-balance {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--ui-text-main);
+  }
+
   .account-card__body--row {
     flex-wrap: nowrap;
     gap: 10px 16px;
@@ -1046,10 +1141,49 @@
     .account-card__body--row {
       flex-wrap: wrap;
     }
+
+    .account-card__body--compact {
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      gap: 5px;
+    }
+
+    .account-card__compact-side {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 0;
+    }
   }
 
   .card-with-menu {
     padding-left: 110px;
+  }
+
+  .account-card--compact {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .account-card--compact.card-with-menu {
+    padding-left: 88px;
+  }
+
+  .account-card--compact .card-menu-actions {
+    top: 4px;
+    left: 4px;
+    gap: 4px;
+  }
+
+  .account-card--compact .card-menu-trigger {
+    top: 4px;
+    right: 4px;
+  }
+
+  .account-card--compact .menu-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
   }
 
   .card-menu-actions {
