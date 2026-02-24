@@ -190,70 +190,79 @@
 
                 <td class="px-5 py-3 align-middle">
                   <div class="flex justify-end items-center gap-[5px] w-auto">
-                    <span
-                      @click="toggleRowOptions(index)"
+                    <button
+                      type="button"
+                      @click.stop="toggleRowOptions(index)"
                       class="relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity cursor-pointer"
-                      :ref="el => (triggerRefs[index] = el as HTMLElement)">
+                      :ref="el => (triggerRefs[index] = el as HTMLElement)"
+                      aria-label="Open menu">
                       <UiIconDotsVertical />
-
-                      <div
-                        v-if="currentRowActiveOptions === index"
-                        :ref="el => (menuRefs[index] = el as HTMLElement)"
-                        :class="[
-                          'p-3 absolute right-3 min-w-[100px] border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] rounded-md z-10 flex flex-col gap-1 ',
-                          dropUp[index] ? 'bottom-[calc(100%+8px)] top-auto' : 'top-10',
-                        ]">
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70">
-                          <UiIconPayment class="!w-[14px] !h-[14px] stroke-[var(--ui-sticker-success)]" />
-                          <UiTextSmall class="whitespace-nowrap">Deposit</UiTextSmall>
-                        </div>
-
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          :class="{ 'bg-[var(--color-stroke-ui-light)]': false }">
-                          <UiIconWithdraw class="!w-[14px] !h-[14px]" />
-                          <UiTextSmall class="whitespace-nowrap">Withdraw</UiTextSmall>
-                        </div>
-
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          :class="{ 'bg-[var(--color-stroke-ui-light)]': false }"
-                          @click="handleClickTransfer(account.id)">
-                          <UiIconTransfer class="!w-[14px] !h-[14px]" />
-                          <UiTextSmall class="whitespace-nowrap">Transfer</UiTextSmall>
-                        </div>
-
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          :class="{ 'bg-[var(--color-stroke-ui-light)]': false }"
-                          @click="handleClickHistory(account.id)">
-                          <UiIconHistory class="!w-[14px] !h-[14px]" />
-                          <UiTextSmall class="whitespace-nowrap">History</UiTextSmall>
-                        </div>
-
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          :class="{ 'bg-[var(--color-stroke-ui-light)]': false }">
-                          <UiIconUpdate class="!w-[14px] !h-[14px]" />
-                          <UiTextSmall class="whitespace-nowrap">Change type</UiTextSmall>
-                        </div>
-
-                        <div
-                          class="cursor-pointer flex items-center justify-start gap-2 h-[32px] pl-2 pr-2 rounded-md hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          :class="{ 'bg-[var(--color-stroke-ui-light)]': false }"
-                          @click="handleClickDelete(account.id)">
-                          <UiIconTrash class="!w-[14px] !h-[14px] stroke-[var(--ui-sticker-danger)]" />
-                          <UiTextSmall class="whitespace-nowrap">Remove</UiTextSmall>
-                        </div>
-                      </div>
-                    </span>
+                    </button>
                   </div>
                 </td>
               </tr>
             </template>
           </template>
         </TableMain>
+        <Teleport to="body">
+          <div
+            v-if="viewMode === 'table' && activeTableAccount"
+            ref="tableMenuRef"
+            class="card-menu"
+            :style="tableMenuStyle">
+            <button
+              class="card-menu__item"
+              type="button">
+              <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.deposit") || "Deposit"
+              }}</UiTextSmall>
+            </button>
+            <button
+              class="card-menu__item"
+              type="button">
+              <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.withdraw") || "Withdraw"
+              }}</UiTextSmall>
+            </button>
+            <button
+              class="card-menu__item"
+              type="button"
+              @click="handleClickTransfer(activeTableAccount.id)">
+              <UiIconTransfer class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.transfer") || "Transfer"
+              }}</UiTextSmall>
+            </button>
+            <button
+              class="card-menu__item"
+              type="button"
+              @click="handleClickHistory(activeTableAccount.id)">
+              <UiIconHistory class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.history") || "History"
+              }}</UiTextSmall>
+            </button>
+            <button
+              class="card-menu__item"
+              type="button">
+              <UiIconUpdate class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.changeType") || "Change type"
+              }}</UiTextSmall>
+            </button>
+            <button
+              class="card-menu__item"
+              type="button"
+              @click="handleClickDelete(activeTableAccount.id)">
+              <UiIconTrash class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-danger)]" />
+              <UiTextSmall class="whitespace-nowrap">{{
+                t("cabinet.accounts.actions.remove") || "Remove"
+              }}</UiTextSmall>
+            </button>
+          </div>
+        </Teleport>
 
         <div
           v-else
@@ -303,6 +312,7 @@
                 <Teleport to="body">
                   <div
                     v-if="cardMenuOpenId === account.id"
+                    :ref="setCardMenuRef"
                     class="card-menu"
                     :style="cardMenuStyle">
                     <button
@@ -548,9 +558,15 @@
   const balanceHighlightById = reactive<Record<string, BalanceChangeDirection | undefined>>({});
   const refreshFeedbackTimers = new Map<string, ReturnType<typeof setTimeout>>();
   const balanceHighlightTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  const tableMenuStyle = ref<Record<string, string>>({});
+  const tableMenuRef = ref<HTMLElement | null>(null);
   const cardMenuOpenId = ref<string | number | null>(null);
   const cardMenuStyle = ref<Record<string, string>>({});
+  const cardMenuRef = ref<HTMLElement | null>(null);
   const cardMenuTriggerRefs = reactive<Record<string | number, HTMLElement | null>>({});
+  const activeTableAccount = computed(() =>
+    currentRowActiveOptions.value === null ? null : (accounts[currentRowActiveOptions.value] ?? null)
+  );
   const viewMode = ref<"table" | "cards" | "full">("table");
   const viewOptions = [
     {
@@ -815,6 +831,8 @@
 
   const loadData = async () => {
     isLoading.value = true;
+    closeOptions();
+    closeCardMenu();
 
     const response = await appCore.accounts.get({
       search: search.value,
@@ -857,55 +875,88 @@
   const tableRef = ref<any>(null);
 
   const triggerRefs = ref<(HTMLElement | null)[]>([]);
-  const menuRefs = ref<(HTMLElement | null)[]>([]);
-  const dropUp = reactive<Record<number, boolean>>({});
+  const MENU_WIDTH = 180;
+  const MENU_GAP = 8;
+  const VIEWPORT_OFFSET = 8;
+  const FALLBACK_MENU_HEIGHT = 260;
+
   const closeOptions = () => {
     currentRowActiveOptions.value = null;
+    tableMenuStyle.value = {};
   };
 
-  const updateMenuPosition = (index: number) => {
+  const closeCardMenu = () => {
+    cardMenuOpenId.value = null;
+    cardMenuStyle.value = {};
+  };
+
+  const buildFloatingMenuStyle = (trigger: HTMLElement, menuElement?: HTMLElement | null): Record<string, string> => {
+    const rect = trigger.getBoundingClientRect();
+    const menuHeight = menuElement?.offsetHeight ?? FALLBACK_MENU_HEIGHT;
+
+    const maxLeft = Math.max(VIEWPORT_OFFSET, window.innerWidth - MENU_WIDTH - VIEWPORT_OFFSET);
+    const left = Math.min(Math.max(rect.right - MENU_WIDTH, VIEWPORT_OFFSET), maxLeft);
+
+    const fitsBottom = rect.bottom + MENU_GAP + menuHeight <= window.innerHeight - VIEWPORT_OFFSET;
+    const top = fitsBottom ? rect.bottom + MENU_GAP : Math.max(VIEWPORT_OFFSET, rect.top - menuHeight - MENU_GAP);
+
+    return {
+      top: `${Math.round(top)}px`,
+      left: `${Math.round(left)}px`,
+      width: `${MENU_WIDTH}px`,
+    };
+  };
+
+  const updateTableMenuPosition = (index: number) => {
     const trigger = triggerRefs.value[index];
-    const menu = menuRefs.value[index];
-    if (!trigger || !menu) return;
+    if (!trigger) return;
 
-    const offset = 8;
-    const menuHeight = menu.offsetHeight;
-    const triggerRect = trigger.getBoundingClientRect();
-
-    const el = (tableRef.value?.$el ?? null) as HTMLElement | null;
-    const containerRect = (el ?? document.documentElement).getBoundingClientRect();
-
-    const fitsDown = triggerRect.bottom + offset + menuHeight <= containerRect.bottom;
-    dropUp[index] = !fitsDown;
+    tableMenuStyle.value = buildFloatingMenuStyle(trigger, tableMenuRef.value);
   };
 
   const toggleRowOptions = async (index: number) => {
-    currentRowActiveOptions.value = currentRowActiveOptions.value === index ? null : index;
+    const willOpen = currentRowActiveOptions.value !== index;
+    if (!willOpen) {
+      closeOptions();
+      return;
+    }
+
+    closeCardMenu();
+    currentRowActiveOptions.value = index;
+    tableMenuStyle.value = {};
+
     await nextTick();
-    if (currentRowActiveOptions.value === index) updateMenuPosition(index);
+    updateTableMenuPosition(index);
+    await nextTick();
+    updateTableMenuPosition(index);
   };
 
   const updateCardMenuPosition = (id: string | number) => {
     const trigger = cardMenuTriggerRefs[id];
     if (!trigger) return;
-    const rect = trigger.getBoundingClientRect();
-    const menuWidth = 180;
-    const gap = 8;
-    cardMenuStyle.value = {
-      top: `${rect.bottom + gap + window.scrollY}px`,
-      left: `${rect.right - menuWidth + window.scrollX}px`,
-      width: `${menuWidth}px`,
-    };
+
+    cardMenuStyle.value = buildFloatingMenuStyle(trigger, cardMenuRef.value);
+  };
+
+  const setCardMenuRef = (element: Element | null) => {
+    cardMenuRef.value = element as HTMLElement | null;
   };
 
   const toggleCardMenu = async (id: string | number) => {
     const willOpen = cardMenuOpenId.value !== id;
-    cardMenuOpenId.value = willOpen ? id : null;
-    cardMenuStyle.value = {};
-    if (willOpen) {
-      await nextTick();
-      updateCardMenuPosition(id);
+    if (!willOpen) {
+      closeCardMenu();
+      return;
     }
+
+    closeOptions();
+    cardMenuOpenId.value = id;
+    cardMenuStyle.value = {};
+
+    await nextTick();
+    updateCardMenuPosition(id);
+    await nextTick();
+    updateCardMenuPosition(id);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -915,25 +966,27 @@
     if (!target) return;
 
     const index = currentRowActiveOptions.value;
-    const menu = menuRefs.value[index];
     const trigger = triggerRefs.value[index];
 
-    if (menu?.contains(target) || trigger?.contains(target)) return;
+    if (tableMenuRef.value?.contains(target) || trigger?.contains(target)) return;
     closeOptions();
   };
 
   const handleOutsideCardMenu = (event: MouseEvent) => {
     if (!cardMenuOpenId.value) return;
-    const target = event.target as HTMLElement | null;
-    if (!target) return;
-    if (!target.closest(".card-menu-actions")) {
-      cardMenuOpenId.value = null;
-      cardMenuStyle.value = {};
-    }
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest(".card-menu") || target.closest(".card-menu-trigger")) return;
+    closeCardMenu();
   };
 
   const recalc = () => {
-    if (currentRowActiveOptions.value != null) updateMenuPosition(currentRowActiveOptions.value);
+    if (currentRowActiveOptions.value != null) {
+      updateTableMenuPosition(currentRowActiveOptions.value);
+    }
+    if (cardMenuOpenId.value != null) {
+      updateCardMenuPosition(cardMenuOpenId.value);
+    }
   };
 
   onMounted(async () => {
@@ -989,6 +1042,7 @@
 
   const handleClickTransfer = async (accountId: string, tab: number | string = 0) => {
     closeOptions();
+    closeCardMenu();
 
     return navigateTo({
       path: `/accounts/${encodeURIComponent(accountId)}`,
@@ -998,6 +1052,7 @@
 
   const handleClickHistory = (accountId: string, tab: number | string = 1) => {
     closeOptions();
+    closeCardMenu();
 
     return navigateTo({
       path: `/accounts/${encodeURIComponent(accountId)}`,
@@ -1012,6 +1067,7 @@
       toast.success("Account archived!");
     }
     closeOptions();
+    closeCardMenu();
   };
 
   const handleClickCreateNewAccount = () =>
