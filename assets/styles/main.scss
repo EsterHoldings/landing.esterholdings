@@ -14,7 +14,8 @@ html {
 
 :root.theme-transition,
 :root.theme-transition * {
-  transition: color 0.35s ease,
+  transition:
+    color 0.35s ease,
     background-color 0.35s ease,
     border-color 0.35s ease,
     box-shadow 0.35s ease,
@@ -25,10 +26,12 @@ html {
 html,
 body,
 #__nuxt {
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: auto; // allow scroll in PWA before reload
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
   background-color: var(--ui-background);
 }
@@ -38,6 +41,8 @@ html.scroll-unlocked,
 body.scroll-unlocked {
   overflow: auto !important;
   overflow-y: auto !important;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
   position: static !important;
   width: auto !important;
 }
@@ -73,7 +78,6 @@ a {
   font-size: 14px;
   line-height: 17px;
   text-decoration: none;
-
 
   //color: $text-color;
   transition: ease-in-out 0.1s !important;
@@ -121,10 +125,10 @@ hr {
 @layer utilities {
   /* Приховує вертикальну/горизонтальну смугу, але зберігає прокрутку */
   .no-scrollbar {
-    -ms-overflow-style: none;     /* IE/старий Edge */
-    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none; /* IE/старий Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .no-scrollbar::-webkit-scrollbar {
-    display: none;                /* Chrome/Safari/новий Edge */
+    display: none; /* Chrome/Safari/новий Edge */
   }
 }

@@ -58,211 +58,211 @@
       </template>
 
       <template #content>
-        <TableMain
-          ref="tableRef"
-          v-if="viewMode === 'table'">
-          <template #thead>
-            <tr>
-              <th class="px-4 py-2 text-left font-normal w-[56px]"></th>
-              <th class="px-5 py-2 text-left font-normal">
-                <div class="flex items-center justify-start">
-                  <UiTextSmall
-                    class="cursor-pointer mr-[10px]"
-                    @click="handleOrderByAndDirection('type')">
-                    {{ t("cabinet.accounts.columns.type") }}
-                  </UiTextSmall>
-                </div>
-              </th>
-
-              <th class="px-5 py-2 text-left font-normal">
-                <div class="flex items-center justify-start">
-                  <UiTextSmall
-                    class="cursor-pointer mr-[10px]"
-                    @click="handleOrderByAndDirection('number')">
-                    {{ t("cabinet.accounts.columns.number") }}
-                  </UiTextSmall>
-                  <UiIconSort
-                    :active="orderBy === 'number'"
-                    :direction="orderDirection"
-                    @click="handleOrderByAndDirection('number')" />
-                </div>
-              </th>
-
-              <th class="px-5 py-2 text-left font-normal">
-                <div class="flex items-center justify-start">
-                  <UiTextSmall
-                    class="cursor-pointer mr-[10px]"
-                    @click="handleOrderByAndDirection('leverage')">
-                    {{ t("cabinet.accounts.columns.leverage") }}
-                  </UiTextSmall>
-                </div>
-              </th>
-
-              <th class="px-5 py-2 text-right font-normal">
-                <div class="flex items-center justify-end">
-                  <UiTextSmall
-                    class="cursor-pointer mr-[10px]"
-                    @click="handleOrderByAndDirection('balance')">
-                    {{ t("cabinet.accounts.columns.balance") }}
-                  </UiTextSmall>
-                  <UiIconSort
-                    :active="orderBy === 'balance'"
-                    :direction="orderDirection"
-                    @click="handleOrderByAndDirection('balance')" />
-                </div>
-              </th>
-
-              <th class="px-5 py-2 text-right font-normal"></th>
-            </tr>
-          </template>
-
-          <template #tbody>
-            <div
-              v-if="isLoading"
-              class="backdrop-blur-[2px] w-full absolute bottom-0 top-[45px] flex items-center justify-center z-10">
-              <UiIconSpinnerDefault />
-            </div>
-
-            <template v-if="accounts.length > 0">
-              <tr
-                v-for="(account, index) in accounts"
-                :key="account.id"
-                class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)]">
-                <td class="px-4 py-3 align-middle">
-                  <div class="flex items-center gap-2">
-                    <button
-                      class="flex h-8 w-8 items-center justify-center rounded-md transition text-[var(--ui-text-secondary)]"
-                      type="button"
-                      :aria-pressed="account.is_favorite"
-                      :title="account.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
-                      @click.stop="handleToggleFavorite(account)">
-                      <svg
-                        viewBox="0 0 24 24"
-                        class="h-4 w-4"
-                        :fill="account.is_favorite ? 'var(--ui-primary-accent)' : 'none'"
-                        :stroke="account.is_favorite ? 'var(--ui-primary-accent)' : 'var(--ui-text-secondary)'"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true">
-                        <path
-                          d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    </button>
-                    <UiIconCopy :text="account.number" />
+        <template v-if="viewMode === 'table'">
+          <TableMain ref="tableRef">
+            <template #thead>
+              <tr>
+                <th class="px-4 py-2 text-left font-normal w-[56px]"></th>
+                <th class="px-5 py-2 text-left font-normal">
+                  <div class="flex items-center justify-start">
+                    <UiTextSmall
+                      class="cursor-pointer mr-[10px]"
+                      @click="handleOrderByAndDirection('type')">
+                      {{ t("cabinet.accounts.columns.type") }}
+                    </UiTextSmall>
                   </div>
-                </td>
-                <td class="px-5 py-3 align-middle">
-                  <div class="font-bold">
-                    {{ account.account_type.name }}
-                  </div>
-                </td>
+                </th>
 
-                <td class="px-5 py-3 align-middle">
-                  <div class="flex items-center gap-2">
-                    <span>{{ account.number }}</span>
-                    <UiIconCopy :text="account.number" />
+                <th class="px-5 py-2 text-left font-normal">
+                  <div class="flex items-center justify-start">
+                    <UiTextSmall
+                      class="cursor-pointer mr-[10px]"
+                      @click="handleOrderByAndDirection('number')">
+                      {{ t("cabinet.accounts.columns.number") }}
+                    </UiTextSmall>
+                    <UiIconSort
+                      :active="orderBy === 'number'"
+                      :direction="orderDirection"
+                      @click="handleOrderByAndDirection('number')" />
                   </div>
-                </td>
+                </th>
 
-                <td class="px-5 py-3 align-middle">{{ getLeverageDisplay(account) }}</td>
-
-                <td class="px-5 py-3 align-middle">
-                  <div class="flex items-center justify-end gap-[10px] text-right text-[20px] font-bold">
-                    <span
-                      class="cursor-pointer"
-                      :class="getBalanceHighlightClass(account.id)">
-                      $ {{ account.balance }}
-                    </span>
-                    <button
-                      type="button"
-                      class="refresh-balance-btn mr-[10px]"
-                      :class="getRefreshButtonClass(account.id)"
-                      :disabled="isBalanceRefreshing(account.id)"
-                      title="Refresh balance"
-                      @click.stop="refreshAccountBalance(account)">
-                      <UiIconUpdate
-                        class="h-[14px] w-[14px]"
-                        :spinning="isBalanceRefreshing(account.id)" />
-                    </button>
+                <th class="px-5 py-2 text-left font-normal">
+                  <div class="flex items-center justify-start">
+                    <UiTextSmall
+                      class="cursor-pointer mr-[10px]"
+                      @click="handleOrderByAndDirection('leverage')">
+                      {{ t("cabinet.accounts.columns.leverage") }}
+                    </UiTextSmall>
                   </div>
-                </td>
+                </th>
 
-                <td class="px-5 py-3 align-middle">
-                  <div class="flex justify-end items-center gap-[5px] w-auto">
-                    <button
-                      type="button"
-                      @click.stop="toggleRowOptions(index)"
-                      class="relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity cursor-pointer"
-                      :ref="el => (triggerRefs[index] = el as HTMLElement)"
-                      aria-label="Open menu">
-                      <UiIconDotsVertical />
-                    </button>
+                <th class="px-5 py-2 text-right font-normal">
+                  <div class="flex items-center justify-end">
+                    <UiTextSmall
+                      class="cursor-pointer mr-[10px]"
+                      @click="handleOrderByAndDirection('balance')">
+                      {{ t("cabinet.accounts.columns.balance") }}
+                    </UiTextSmall>
+                    <UiIconSort
+                      :active="orderBy === 'balance'"
+                      :direction="orderDirection"
+                      @click="handleOrderByAndDirection('balance')" />
                   </div>
-                </td>
+                </th>
+
+                <th class="px-5 py-2 text-right font-normal"></th>
               </tr>
             </template>
-          </template>
-        </TableMain>
-        <Teleport to="body">
-          <div
-            v-if="viewMode === 'table' && activeTableAccount"
-            ref="tableMenuRef"
-            class="card-menu"
-            :style="tableMenuStyle">
-            <button
-              class="card-menu__item"
-              type="button">
-              <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.deposit") || "Deposit"
-              }}</UiTextSmall>
-            </button>
-            <button
-              class="card-menu__item"
-              type="button">
-              <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.withdraw") || "Withdraw"
-              }}</UiTextSmall>
-            </button>
-            <button
-              class="card-menu__item"
-              type="button"
-              @click="handleClickTransfer(activeTableAccount.id)">
-              <UiIconTransfer class="!h-4 !w-4 text-[var(--ui-text-main)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.transfer") || "Transfer"
-              }}</UiTextSmall>
-            </button>
-            <button
-              class="card-menu__item"
-              type="button"
-              @click="handleClickHistory(activeTableAccount.id)">
-              <UiIconHistory class="!h-4 !w-4 text-[var(--ui-text-main)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.history") || "History"
-              }}</UiTextSmall>
-            </button>
-            <button
-              class="card-menu__item"
-              type="button">
-              <UiIconUpdate class="!h-4 !w-4 text-[var(--ui-text-main)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.changeType") || "Change type"
-              }}</UiTextSmall>
-            </button>
-            <button
-              class="card-menu__item"
-              type="button"
-              @click="handleClickDelete(activeTableAccount.id)">
-              <UiIconTrash class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-danger)]" />
-              <UiTextSmall class="whitespace-nowrap">{{
-                t("cabinet.accounts.actions.remove") || "Remove"
-              }}</UiTextSmall>
-            </button>
-          </div>
-        </Teleport>
+
+            <template #tbody>
+              <div
+                v-if="isLoading"
+                class="backdrop-blur-[2px] w-full absolute bottom-0 top-[45px] flex items-center justify-center z-10">
+                <UiIconSpinnerDefault />
+              </div>
+
+              <template v-if="accounts.length > 0">
+                <tr
+                  v-for="(account, index) in accounts"
+                  :key="account.id"
+                  class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)]">
+                  <td class="px-4 py-3 align-middle">
+                    <div class="flex items-center gap-2">
+                      <button
+                        class="flex h-8 w-8 items-center justify-center rounded-md transition text-[var(--ui-text-secondary)]"
+                        type="button"
+                        :aria-pressed="account.is_favorite"
+                        :title="account.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
+                        @click.stop="handleToggleFavorite(account)">
+                        <svg
+                          viewBox="0 0 24 24"
+                          class="h-4 w-4"
+                          :fill="account.is_favorite ? 'var(--ui-primary-accent)' : 'none'"
+                          :stroke="account.is_favorite ? 'var(--ui-primary-accent)' : 'var(--ui-text-secondary)'"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true">
+                          <path
+                            d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      </button>
+                      <UiIconCopy :text="account.number" />
+                    </div>
+                  </td>
+                  <td class="px-5 py-3 align-middle">
+                    <div class="font-bold">
+                      {{ account.account_type.name }}
+                    </div>
+                  </td>
+
+                  <td class="px-5 py-3 align-middle">
+                    <div class="flex items-center gap-2">
+                      <span>{{ account.number }}</span>
+                      <UiIconCopy :text="account.number" />
+                    </div>
+                  </td>
+
+                  <td class="px-5 py-3 align-middle">{{ getLeverageDisplay(account) }}</td>
+
+                  <td class="px-5 py-3 align-middle">
+                    <div class="flex items-center justify-end gap-[10px] text-right text-[20px] font-bold">
+                      <span
+                        class="cursor-pointer"
+                        :class="getBalanceHighlightClass(account.id)">
+                        $ {{ account.balance }}
+                      </span>
+                      <button
+                        type="button"
+                        class="refresh-balance-btn mr-[10px]"
+                        :class="getRefreshButtonClass(account.id)"
+                        :disabled="isBalanceRefreshing(account.id)"
+                        title="Refresh balance"
+                        @click.stop="refreshAccountBalance(account)">
+                        <UiIconUpdate
+                          class="h-[14px] w-[14px]"
+                          :spinning="isBalanceRefreshing(account.id)" />
+                      </button>
+                    </div>
+                  </td>
+
+                  <td class="px-5 py-3 align-middle">
+                    <div class="flex justify-end items-center gap-[5px] w-auto">
+                      <button
+                        type="button"
+                        @click.stop="toggleRowOptions(index)"
+                        class="relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity cursor-pointer"
+                        :ref="el => (triggerRefs[index] = el as HTMLElement)"
+                        aria-label="Open menu">
+                        <UiIconDotsVertical />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </template>
+          </TableMain>
+          <Teleport to="body">
+            <div
+              v-if="activeTableAccount"
+              ref="tableMenuRef"
+              class="card-menu"
+              :style="tableMenuStyle">
+              <button
+                class="card-menu__item"
+                type="button">
+                <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.deposit") || "Deposit"
+                }}</UiTextSmall>
+              </button>
+              <button
+                class="card-menu__item"
+                type="button">
+                <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.withdraw") || "Withdraw"
+                }}</UiTextSmall>
+              </button>
+              <button
+                class="card-menu__item"
+                type="button"
+                @click="handleClickTransfer(activeTableAccount.id)">
+                <UiIconTransfer class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.transfer") || "Transfer"
+                }}</UiTextSmall>
+              </button>
+              <button
+                class="card-menu__item"
+                type="button"
+                @click="handleClickHistory(activeTableAccount.id)">
+                <UiIconHistory class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.history") || "History"
+                }}</UiTextSmall>
+              </button>
+              <button
+                class="card-menu__item"
+                type="button">
+                <UiIconUpdate class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.changeType") || "Change type"
+                }}</UiTextSmall>
+              </button>
+              <button
+                class="card-menu__item"
+                type="button"
+                @click="handleClickDelete(activeTableAccount.id)">
+                <UiIconTrash class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-danger)]" />
+                <UiTextSmall class="whitespace-nowrap">{{
+                  t("cabinet.accounts.actions.remove") || "Remove"
+                }}</UiTextSmall>
+              </button>
+            </div>
+          </Teleport>
+        </template>
 
         <div
           v-else
