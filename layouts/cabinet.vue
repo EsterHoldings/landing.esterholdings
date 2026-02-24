@@ -1,5 +1,5 @@
 <template>
-  <div class="cabinet-layout min-h-dvh flex flex-col bg-[var(--ui-background)] bg-blend-multiply pb-safe-area">
+  <div class="cabinet-layout min-h-dvh flex flex-col bg-[var(--ui-background)] bg-blend-multiply">
     <CabinetHeader class="cabinet-header shrink-0" />
 
     <div class="flex-1 min-h-0 flex">
@@ -15,7 +15,7 @@
         leave-to-class="opacity-0">
         <main
           :key="route.fullPath"
-          class="cabinet-main flex-1 min-h-0 overflow-y-auto no-scrollbar box-border w-full p-1 lg:pl-[250px] text-white pb-safe-area mb-[90px] lg:mb-0">
+          class="cabinet-main flex-1 min-h-0 overflow-y-auto no-scrollbar box-border w-full p-1 lg:pl-[250px] text-white pb-[calc(90px+env(safe-area-inset-bottom,0px))] lg:pb-safe-area">
           <UiContainer>
             <div
               v-if="showBreadcrumbs && breadcrumbs.length"
@@ -133,7 +133,7 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    padding: 10px 0;
+    padding: 6px 0 2px;
   }
 
   .cabinet-header {
