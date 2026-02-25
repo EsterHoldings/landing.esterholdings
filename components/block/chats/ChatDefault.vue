@@ -96,8 +96,13 @@
               class="flex items-end gap-3"
               :data-mid="item.msg.id">
               <div
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ui-primary-main)] text-sm font-semibold text-[var(--ui-text-main)]">
-                S
+                class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ui-primary-main)] text-sm font-semibold text-[var(--ui-text-main)]">
+                <img
+                  v-if="getMessageAvatarUrl(item.msg)"
+                  :src="getMessageAvatarUrl(item.msg)"
+                  alt="Author avatar"
+                  class="h-full w-full object-cover" />
+                <span v-else>{{ getMessageAvatarFallback(item.msg) }}</span>
               </div>
               <div
                 class="max-w-[80%] rounded-[10px] bg-[var(--ui-background-card)] p-2 text-[15px] leading-6 text-[var(--ui-text-main)] ring-1 ring-[var(--color-stroke-ui-light)]">
@@ -274,8 +279,13 @@
                     class="flex items-end gap-3"
                     :data-mid="item.msg.id">
                     <div
-                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ui-primary-main)] text-sm font-semibold text-[var(--ui-text-main)]">
-                      S
+                      class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ui-primary-main)] text-sm font-semibold text-[var(--ui-text-main)]">
+                      <img
+                        v-if="getMessageAvatarUrl(item.msg)"
+                        :src="getMessageAvatarUrl(item.msg)"
+                        alt="Author avatar"
+                        class="h-full w-full object-cover" />
+                      <span v-else>{{ getMessageAvatarFallback(item.msg) }}</span>
                     </div>
                     <div
                       class="max-w-[80%] rounded-[10px] bg-[var(--ui-background-card)] p-2 text-[15px] leading-6 text-[var(--ui-text-main)] ring-1 ring-[var(--color-stroke-ui-light)]">
@@ -383,6 +393,12 @@
     userId: string;
     body: string;
     createdAt: number;
+    author?: string;
+    authorPhotoUrl?: string;
+    authorFirstName?: string;
+    authorLastName?: string;
+    authorEmail?: string;
+    authorInitials?: string;
   };
   type ApiMsg = {
     id: string;
@@ -392,6 +408,12 @@
     body: string | null;
     meta: any;
     created_at: string;
+    author?: string | null;
+    author_photo_url?: string | null;
+    author_first_name?: string | null;
+    author_last_name?: string | null;
+    author_email?: string | null;
+    author_initials?: string | null;
   };
   type RenderSep = { kind: "sep"; key: string; label: "today" | "yesterday" };
   type RenderMsg = { kind: "msg"; key: string; msg: ChatMessage };
@@ -701,23 +723,44 @@
     return String(value);
   };
   const normalizeText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
+  const normalizeOptionalText = (value: unknown): string | undefined => {
+    const text = normalizeText(value);
+    return text || undefined;
+  };
   const firstUpper = (value: string): string => value.charAt(0).toUpperCase();
-  const currentUserId = computed(() => normalizeUserId(props.currentUser.id));
-  const myAvatarUrl = computed(() => normalizeText(props.currentUser.photoUrl));
-  const myAvatarFallback = computed(() => {
-    const directFirstName = normalizeText(props.currentUser.firstName);
-    const directLastName = normalizeText(props.currentUser.lastName);
+  const buildAvatarFallback = ({
+    firstName,
+    lastName,
+    name,
+    email,
+    initials,
+    fallback,
+  }: {
+    firstName?: string | null;
+    lastName?: string | null;
+    name?: string | null;
+    email?: string | null;
+    initials?: string | null;
+    fallback: string;
+  }): string => {
+    const normalizedInitials = normalizeText(initials)
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 2)
+      .toUpperCase();
+    if (normalizedInitials.length === 2) return normalizedInitials;
 
+    const directFirstName = normalizeText(firstName);
+    const directLastName = normalizeText(lastName);
     if (directFirstName && directLastName) {
       return `${firstUpper(directFirstName)}${firstUpper(directLastName)}`;
     }
 
-    const fromName = normalizeText(props.currentUser.name).split(/\s+/).filter(Boolean);
+    const fromName = normalizeText(name).split(/\s+/).filter(Boolean);
     if (fromName.length >= 2) {
       return `${firstUpper(fromName[0])}${firstUpper(fromName[1])}`;
     }
 
-    const emailValue = normalizeText(props.currentUser.email);
+    const emailValue = normalizeText(email);
     if (emailValue) {
       const localPart = emailValue.split("@")[0] || emailValue;
       const normalizedEmail = localPart.replace(/[^a-zA-Z0-9]/g, "");
@@ -730,9 +773,36 @@
       return two.length === 2 ? two : `${two}${two}`.slice(0, 2);
     }
 
-    return "ME";
-  });
+    return fallback;
+  };
+
+  const currentUserId = computed(() => normalizeUserId(props.currentUser.id));
+  const myAvatarUrl = computed(() => normalizeText(props.currentUser.photoUrl));
   const isMe = (m: ChatMessage) => m.userId !== "" && m.userId === currentUserId.value;
+  const myAvatarFallback = computed(() => {
+    return buildAvatarFallback({
+      firstName: props.currentUser.firstName,
+      lastName: props.currentUser.lastName,
+      name: props.currentUser.name,
+      email: props.currentUser.email,
+      fallback: "ME",
+    });
+  });
+  const getMessageAvatarUrl = (message: ChatMessage): string => {
+    if (isMe(message)) return myAvatarUrl.value;
+    return normalizeText(message.authorPhotoUrl);
+  };
+  const getMessageAvatarFallback = (message: ChatMessage): string => {
+    if (isMe(message)) return myAvatarFallback.value;
+    return buildAvatarFallback({
+      firstName: message.authorFirstName,
+      lastName: message.authorLastName,
+      name: message.author,
+      email: message.authorEmail,
+      initials: message.authorInitials,
+      fallback: "US",
+    });
+  };
   const canSend = computed(() => draft.value.trim().length > 0);
 
   const preserveInputFocusOnMobile = () => {
@@ -888,6 +958,12 @@
       userId: normalizeUserId(m.user_id),
       body: m.body ?? "",
       createdAt: parseLocalMs(m.created_at),
+      author: normalizeOptionalText(m.author),
+      authorPhotoUrl: normalizeOptionalText(m.author_photo_url),
+      authorFirstName: normalizeOptionalText(m.author_first_name),
+      authorLastName: normalizeOptionalText(m.author_last_name),
+      authorEmail: normalizeOptionalText(m.author_email),
+      authorInitials: normalizeOptionalText(m.author_initials),
     };
   }
   function ensureAscOrder() {
@@ -962,6 +1038,12 @@
           body: e.body,
           meta: e.meta,
           created_at: e.created_at,
+          author: e.author,
+          author_photo_url: e.author_photo_url,
+          author_first_name: e.author_first_name,
+          author_last_name: e.author_last_name,
+          author_email: e.author_email,
+          author_initials: e.author_initials,
         })
       );
       ensureAscOrder();

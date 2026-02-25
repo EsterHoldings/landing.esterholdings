@@ -306,7 +306,6 @@
     return {
       height,
       minHeight: height,
-      marginBottom: "1rem",
     };
   });
 
@@ -675,7 +674,16 @@
   }
 
   .support-ticket-page {
+    height: 100%;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding-bottom: 1rem;
+  }
+
+  .support-ticket-header {
+    flex-shrink: 0;
   }
 
   .support-side {
@@ -708,6 +716,7 @@
   }
 
   .support-ticket-grid {
+    flex: 1 1 auto;
     min-height: 0;
     height: auto;
     grid-auto-rows: minmax(0, 1fr);
