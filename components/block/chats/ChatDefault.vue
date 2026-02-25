@@ -143,11 +143,6 @@
             rows="1"
             @keydown.enter.prevent="send"
             @keydown.shift.enter.stop
-            inputmode="text"
-            enterkeyhint="send"
-            autocapitalize="sentences"
-            autocorrect="on"
-            spellcheck="true"
             class="no-drag max-h-28 flex-1 resize-none bg-transparent py-2 text-[15px] text-[var(--ui-text-main)] placeholder:text-[var(--ui-text-secondary)] outline-none"
             placeholder="Write your message" />
           <button
@@ -306,11 +301,6 @@
                   rows="1"
                   @keydown.enter.prevent="send"
                   @keydown.shift.enter.stop
-                  inputmode="text"
-                  enterkeyhint="send"
-                  autocapitalize="sentences"
-                  autocorrect="on"
-                  spellcheck="true"
                   class="no-drag max-h-28 flex-1 resize-none bg-transparent py-2 text-[15px] text-[var(--ui-text-main)] placeholder:text-[var(--ui-text-secondary)] outline-none"
                   placeholder="Write your message" />
                 <button
