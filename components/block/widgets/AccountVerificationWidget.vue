@@ -22,12 +22,6 @@
     <div class="verification-progress-card">
       <div class="verification-progress-card__top">
         <span class="verification-progress-card__title">{{ progressTitle }}</span>
-        <UiBadge
-          state="info"
-          outline
-          class="!px-2.5 !py-0.5 text-xs">
-          {{ verifiedCountText }}
-        </UiBadge>
       </div>
 
       <div
@@ -38,6 +32,46 @@
           :key="`progress-${step.key}`"
           class="verification-step-progress__item"
           :class="`is-${step.status}`">
+          <span
+            class="verification-step-progress__icon"
+            aria-hidden="true">
+            <svg
+              v-if="step.status === 'approved'"
+              viewBox="0 0 16 16"
+              class="verification-step-progress__icon-svg"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M3.5 8.5l3 3 6-7" />
+            </svg>
+            <svg
+              v-else-if="step.status === 'rejected'"
+              viewBox="0 0 16 16"
+              class="verification-step-progress__icon-svg"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round">
+              <path d="M4 4l8 8M12 4l-8 8" />
+            </svg>
+            <svg
+              v-else
+              viewBox="0 0 16 16"
+              class="verification-step-progress__icon-svg"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle
+                cx="8"
+                cy="8"
+                r="5.5" />
+              <path d="M8 5.2v3.1l2.1 1.3" />
+            </svg>
+          </span>
           <span class="verification-step-progress__label">{{ step.title }}</span>
         </span>
       </div>
@@ -417,8 +451,25 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    gap: 6px;
     padding: 0 8px;
     min-width: 0;
+    color: var(--ui-text-main);
+  }
+
+  .verification-step-progress__icon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ui-text-secondary);
+  }
+
+  .verification-step-progress__icon-svg {
+    width: 12px;
+    height: 12px;
   }
 
   .verification-step-progress__label {
@@ -436,12 +487,24 @@
     background: color-mix(in srgb, var(--color-success, var(--ui-primary-accent)) 24%, transparent);
   }
 
+  .verification-step-progress__item.is-approved .verification-step-progress__icon {
+    color: var(--color-success);
+  }
+
   .verification-step-progress__item.is-pending {
     background: color-mix(in srgb, var(--color-ui-warning, var(--ui-primary-accent)) 22%, transparent);
   }
 
+  .verification-step-progress__item.is-pending .verification-step-progress__icon {
+    color: var(--color-ui-warning);
+  }
+
   .verification-step-progress__item.is-rejected {
     background: color-mix(in srgb, var(--color-danger, var(--ui-primary-accent)) 22%, transparent);
+  }
+
+  .verification-step-progress__item.is-rejected .verification-step-progress__icon {
+    color: var(--color-danger);
   }
 
   .verification-list-wrap {
@@ -487,7 +550,6 @@
     border: 0;
     background: transparent;
     padding: 10px 12px;
-    min-height: 0;
     transition: background-color 0.2s ease;
   }
 
