@@ -15,8 +15,10 @@
       </div>
 
       <div
+        ref="supportGridRef"
         class="support-ticket-grid grid gap-[20px] grid-cols-1 md:grid-cols-[1fr_2fr] items-stretch"
-        :class="{ 'is-collapsed': !isSideExpanded, 'is-mobile': isMobileViewport }">
+        :class="{ 'is-collapsed': !isSideExpanded, 'is-mobile': isMobileViewport }"
+        :style="supportGridStyle">
         <PanelDefault
           class="support-side p-2"
           :class="{
@@ -202,9 +204,9 @@
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
 
   import useAppCore from "~/composables/useAppCore";
-  import { definePageMeta, useAuthStore } from "~/.nuxt/imports";
+  import { definePageMeta, useAuthStore, useHead } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
-  import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+  import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
   import { useRoute } from "vue-router";
   import ChatDefault from "~/components/block/chats/ChatDefault.vue";
   import UiIconChevronDown from "~/components/ui/UiIconChevronDown.vue";
@@ -221,6 +223,8 @@
 
   const activeTabIndex = ref(0);
   const isLoading = ref(false);
+  const supportGridRef = ref<HTMLElement | null>(null);
+  const desktopGridHeight = ref<number | null>(null);
 
   const id: string = computed(() => String(route.params.id));
 
@@ -272,9 +276,50 @@
 
   const MOBILE_BREAKPOINT = 768;
   const SWIPE_THRESHOLD = 42;
+  const DESKTOP_GRID_BOTTOM_GAP = 8;
+  const MIN_DESKTOP_GRID_HEIGHT = 320;
   const sideTouchStartY = ref(0);
   const sideTouchDeltaY = ref(0);
   const sideTouchTracking = ref(false);
+  let desktopGridRafId: number | null = null;
+
+  const supportGridStyle = computed(() => {
+    if (isMobileViewport.value || desktopGridHeight.value === null) return undefined;
+
+    const height = `${desktopGridHeight.value}px`;
+    return {
+      height,
+      minHeight: height,
+    };
+  });
+
+  const measureDesktopGridHeight = () => {
+    if (typeof window === "undefined") return;
+    if (isMobileViewport.value) {
+      desktopGridHeight.value = null;
+      return;
+    }
+
+    const grid = supportGridRef.value;
+    if (!grid) return;
+
+    const top = grid.getBoundingClientRect().top;
+    const available = Math.floor(window.innerHeight - top - DESKTOP_GRID_BOTTOM_GAP);
+    desktopGridHeight.value = Math.max(MIN_DESKTOP_GRID_HEIGHT, available);
+  };
+
+  const scheduleDesktopGridMeasure = () => {
+    if (typeof window === "undefined") return;
+
+    if (desktopGridRafId !== null) {
+      window.cancelAnimationFrame(desktopGridRafId);
+    }
+
+    desktopGridRafId = window.requestAnimationFrame(() => {
+      desktopGridRafId = null;
+      measureDesktopGridHeight();
+    });
+  };
 
   const updateViewportState = () => {
     if (typeof window === "undefined") return;
@@ -292,12 +337,29 @@
       isSideSwipeDragging.value = false;
       sideTouchTracking.value = false;
       sideTouchDeltaY.value = 0;
+    } else {
+      desktopGridHeight.value = null;
     }
+
+    scheduleDesktopGridMeasure();
   };
 
   const toggleSideExpanded = () => {
     isSideExpanded.value = !isSideExpanded.value;
   };
+
+  useHead(() => ({
+    htmlAttrs: {
+      class: {
+        "support-chat-fullscreen": isMobileViewport.value,
+      },
+    },
+    bodyAttrs: {
+      class: {
+        "support-chat-fullscreen": isMobileViewport.value,
+      },
+    },
+  }));
 
   const handleSideTouchStart = (event: TouchEvent) => {
     if (!isMobileViewport.value) return;
@@ -337,19 +399,17 @@
   };
 
   const loadData = async () => {
-    console.log("run run run run run");
     isLoading.value = true;
 
     const response = await appCore.tickets.getById(route.params.id);
-
-    console.log("response");
-    console.log(response.data);
 
     lastMessageAt.value = response.data.last_message_at;
     status.value = response.data.status;
     subject.value = response.data.subject;
 
     isLoading.value = false;
+    await nextTick();
+    scheduleDesktopGridMeasure();
   };
 
   onMounted(async () => {
@@ -369,10 +429,15 @@
     }
 
     await loadData();
+    scheduleDesktopGridMeasure();
   });
 
   onBeforeUnmount(() => {
     window.removeEventListener("resize", updateViewportState);
+    if (desktopGridRafId !== null) {
+      window.cancelAnimationFrame(desktopGridRafId);
+      desktopGridRafId = null;
+    }
   });
 </script>
 
@@ -449,14 +514,19 @@
     }
   }
 
+  .support-ticket-page {
+    min-height: 0;
+  }
+
   .support-side {
     color: var(--ui-text-main);
-    height: calc(100dvh - 170px);
+    height: 100%;
+    min-height: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     transition:
       max-height 0.25s ease,
       background-color 0.2s ease,
@@ -478,8 +548,8 @@
   }
 
   .support-ticket-grid {
-    min-height: calc(100dvh - 160px);
-    height: calc(100dvh - 160px);
+    min-height: 0;
+    height: auto;
     grid-auto-rows: minmax(0, 1fr);
   }
 
@@ -508,7 +578,7 @@
     .support-ticket-grid.is-mobile {
       position: fixed;
       inset: 0;
-      z-index: 80;
+      z-index: 120;
       display: block;
       width: 100vw;
       height: 100dvh;

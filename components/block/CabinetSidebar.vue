@@ -16,7 +16,7 @@
   </aside>
 
   <nav
-    class="lg:hidden fixed bottom-0 inset-x-0 z-50 h-[74px] pb-[max(env(safe-area-inset-bottom,0px),8px)] bg-[var(--ui-background-sidebar)]/78 backdrop-blur-xl text-[var(--ui-text-main)] shadow-[0_-8px_24px_-16px_rgba(0,0,0,.6)]">
+    class="cabinet-mobile-nav lg:hidden fixed bottom-0 inset-x-0 z-50 h-[74px] pb-[max(env(safe-area-inset-bottom,0px),8px)] bg-[var(--ui-background-sidebar)]/78 backdrop-blur-xl text-[var(--ui-text-main)] shadow-[0_-8px_24px_-16px_rgba(0,0,0,.6)]">
     <div class="h-full px-2 flex items-center justify-evenly gap-1 overflow-hidden">
       <CabinetSidebarMenu class="mobile-bottom-menu flex-1" />
     </div>

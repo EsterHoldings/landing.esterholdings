@@ -159,6 +159,29 @@
     overflow-anchor: none;
   }
 
+  @media (max-width: 767px) {
+    html.support-chat-fullscreen .cabinet-header,
+    body.support-chat-fullscreen .cabinet-header {
+      display: none !important;
+    }
+
+    html.support-chat-fullscreen .cabinet-mobile-nav,
+    body.support-chat-fullscreen .cabinet-mobile-nav {
+      display: none !important;
+    }
+
+    html.support-chat-fullscreen .cabinet-main,
+    body.support-chat-fullscreen .cabinet-main {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    html.support-chat-fullscreen .cabinet-breadcrumbs,
+    body.support-chat-fullscreen .cabinet-breadcrumbs {
+      display: none !important;
+    }
+  }
+
   /* Optional: smoother scrolling on iOS */
   .no-scrollbar {
     -webkit-overflow-scrolling: touch;
