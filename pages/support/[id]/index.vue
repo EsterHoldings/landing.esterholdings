@@ -187,7 +187,9 @@
           </div>
         </PanelDefault>
 
-        <div class="support-chat-wrapper">
+        <div
+          class="support-chat-wrapper"
+          :style="supportChatWrapperStyle">
           <ChatDefault
             :as-block="true"
             :ticket-id="id"
@@ -276,8 +278,10 @@
 
   const MOBILE_BREAKPOINT = 768;
   const SWIPE_THRESHOLD = 42;
-  const DESKTOP_GRID_BOTTOM_GAP = 8;
+  const DESKTOP_GRID_BOTTOM_GAP = 16;
   const MIN_DESKTOP_GRID_HEIGHT = 320;
+  const MOBILE_CHAT_BOTTOM_GAP = 20;
+  const MOBILE_SIDE_COLLAPSED_HEIGHT = 72;
   const sideTouchStartY = ref(0);
   const sideTouchDeltaY = ref(0);
   const sideTouchTracking = ref(false);
@@ -290,7 +294,21 @@
     return {
       height,
       minHeight: height,
+      marginBottom: "1rem",
     };
+  });
+
+  const supportChatWrapperStyle = computed(() => {
+    if (!isMobileViewport.value) return undefined;
+
+    const bottom = `calc(${MOBILE_CHAT_BOTTOM_GAP}px + env(safe-area-inset-bottom, 0px))`;
+
+    if (isSideExpanded.value) {
+      return { bottom };
+    }
+
+    const top = `calc(max(8px, env(safe-area-inset-top, 0px)) + ${MOBILE_SIDE_COLLAPSED_HEIGHT}px + 8px)`;
+    return { top, bottom };
   });
 
   const measureDesktopGridHeight = () => {
