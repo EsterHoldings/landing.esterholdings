@@ -44,7 +44,7 @@ const formattedAmount = computed(() => {
 </script>
 
 <template>
-  <PanelDefault class="relative h-full min-h-[88px] p-3 sm:p-3.5">
+  <PanelDefault class="relative h-full min-h-[72px] p-2.5 sm:min-h-[88px] sm:p-3.5">
     <div class="summary-widget">
       <template v-if="props.isLoading">
         <span class="summary-skeleton summary-skeleton--title animate-pulse" />
@@ -69,8 +69,8 @@ const formattedAmount = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  min-height: 56px;
+  gap: 8px;
+  min-height: 42px;
 }
 
 .summary-title {
@@ -91,31 +91,40 @@ const formattedAmount = computed(() => {
 
 .summary-skeleton--title {
   width: 42%;
-  min-width: 120px;
-  height: 12px;
+  min-width: 76px;
+  height: 10px;
 }
 
 .summary-skeleton--value {
-  width: 32%;
-  min-width: 84px;
-  height: 26px;
+  width: 36%;
+  min-width: 68px;
+  height: 20px;
 }
 
 .amount-text {
-  font-size: clamp(20px, 4vw, 28px);
+  font-size: clamp(16px, 4.5vw, 22px);
   line-height: 1.1;
 }
 
-@media (max-width: 420px) {
+@media (min-width: 640px) {
   .summary-widget {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 8px;
+    gap: 12px;
+    min-height: 56px;
   }
 
-  .summary-value {
-    text-align: left;
+  .summary-skeleton--title {
+    min-width: 120px;
+    height: 12px;
+  }
+
+  .summary-skeleton--value {
+    width: 32%;
+    min-width: 84px;
+    height: 26px;
+  }
+
+  .amount-text {
+    font-size: clamp(20px, 4vw, 28px);
   }
 }
 </style>

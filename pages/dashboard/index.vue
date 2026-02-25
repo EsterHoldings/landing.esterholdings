@@ -444,14 +444,8 @@ const handleManualRefresh = () => {
 
 .dashboard-summary-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
-}
-
-@media (min-width: 768px) {
-  .dashboard-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (min-width: 1440px) {
