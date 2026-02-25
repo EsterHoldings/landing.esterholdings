@@ -65,6 +65,10 @@ const subject = ref("");
 const currentUser = reactive({
   id: null,
   name: null,
+  firstName: null,
+  lastName: null,
+  email: null,
+  photoUrl: null,
 });
 
 const loadData = async () => {
@@ -75,8 +79,13 @@ const loadData = async () => {
 
 onMounted(async () => {
   const response = await appCore.adminModules.auth.getAuthUser();
+  const photoUrl = response.data.photo_url ?? response.data.avatar_url ?? response.data.avatar ?? null;
   currentUser.id = response.data.id;
-  currentUser.name = response.data.nickname;
+  currentUser.name = response.data.nickname ?? response.data.first_name ?? null;
+  currentUser.firstName = response.data.first_name ?? null;
+  currentUser.lastName = response.data.last_name ?? null;
+  currentUser.email = response.data.email ?? null;
+  currentUser.photoUrl = typeof photoUrl === "string" ? photoUrl : null;
 
   await loadData();
 });

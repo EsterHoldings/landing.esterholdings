@@ -16,11 +16,13 @@ export default function useTrackScroll() {
   };
 
   onMounted(() => {
-    window.addEventListener("scroll", checkScroll);
+    checkScroll();
+    window.addEventListener("scroll", checkScroll, { passive: true });
   });
 
   onBeforeUnmount(() => {
     window.removeEventListener("scroll", checkScroll);
+    isBlurred.value = false;
   });
 
   return {

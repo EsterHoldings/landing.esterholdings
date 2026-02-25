@@ -164,8 +164,9 @@
     --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
     min-height: var(--dashboard-side-widget-height);
     height: var(--dashboard-side-widget-height);
+    overflow: hidden;
     border-radius: 14px;
-    border: 1px solid var(--color-stroke-ui-light);
+    border: 0;
     background: var(--ui-background-panel);
     padding: 12px;
   }
@@ -177,6 +178,8 @@
     gap: 10px;
     margin: -12px -12px 0;
     padding: 12px;
+    min-height: 64px;
+    box-sizing: border-box;
     border-radius: 0;
     background:
       linear-gradient(

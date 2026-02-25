@@ -6,94 +6,93 @@
     <div
       :class="{ blurred: isBlurred, 'nav--open': isMobileMenuOpen }"
       class="header__wrapper">
-
       <UiContainer class="!p-0">
         <header
-            class="header"
-            :class="{ 'header-is-open-menu ': isMobileMenuOpen }">
+          class="header"
+          :class="{ 'header-is-open-menu ': isMobileMenuOpen }">
           <div class="logo">
             <NuxtLink to="/">
               <UiIconLogo
-                  :class="{
-                'svg-invert': useDarkHeaderIcons,
-              }" />
+                :class="{
+                  'svg-invert': useDarkHeaderIcons,
+                }" />
             </NuxtLink>
           </div>
 
           <div
-              class="burger-menu"
-              :class="{
-            'burger-menu--open': isMobileMenuOpen,
-            'is-theme-light': useDarkHeaderIcons,
-          }"
-              @click="toggleMenu">
+            class="burger-menu"
+            :class="{
+              'burger-menu--open': isMobileMenuOpen,
+              'is-theme-light': useDarkHeaderIcons,
+            }"
+            @click="toggleMenu">
             <span></span>
             <span></span>
             <span></span>
           </div>
 
           <nav
-              class="nav"
-              :class="{ 'nav--open': isMobileMenuOpen }">
+            class="nav"
+            :class="{ 'nav--open': isMobileMenuOpen }">
             <HeaderLink
-                v-for="link in linksList"
-                :key="link.key"
-                :name="link.name"
-                :path="link.path"
-                :activeLink="activeLink"
-                @click.stop="handleClick(link.key)"
-                :isInvertColor="useDarkHeaderIcons" />
+              v-for="link in linksList"
+              :key="link.key"
+              :name="link.name"
+              :path="link.path"
+              :activeLink="activeLink"
+              @click.stop="handleClick(link.key)"
+              :isInvertColor="useDarkHeaderIcons" />
           </nav>
 
           <div
-              class="actions-wrapper"
-              :class="{ 'is-menu-open': isMobileMenuOpen }">
+            class="actions-wrapper"
+            :class="{ 'is-menu-open': isMobileMenuOpen }">
             <div class="actions">
               <NuxtLink to="/auth/login">
                 <UiButtonDefault
-                    state="link"
-                    class="login"
-                    :class="{
-                  'is-theme-light': useDarkHeaderIcons,
-                }">
+                  state="link"
+                  class="login"
+                  :class="{
+                    'is-theme-light': useDarkHeaderIcons,
+                  }">
                   {{ t("landing.header.auth.login") }}
                 </UiButtonDefault>
               </NuxtLink>
 
               <nuxt-link
-                  to="/auth/registration"
-                  class="register">
+                to="/auth/registration"
+                class="register">
                 <UiButtonDefault
-                    state="primary"
-                    v-if="!isMobileMenuOpen">
+                  state="primary"
+                  v-if="!isMobileMenuOpen">
                   {{ t("landing.header.auth.register") }}
                 </UiButtonDefault>
               </nuxt-link>
 
               <div class="actions-icons">
                 <LanguageSwitcher
-                    class="icon"
-                    :isInvert="useDarkHeaderIcons" />
+                  class="icon"
+                  :isInvert="useDarkHeaderIcons" />
 
                 <transition
-                    name="fade"
-                    mode="out-in">
-                <span
+                  name="fade"
+                  mode="out-in">
+                  <span
                     :key="themeStore.currentTheme"
                     @click="themeStore.toggleTheme()"
                     class="icon mt-[1px]">
-                  <UiIconMoon
+                    <UiIconMoon
                       v-if="themeStore.currentTheme === 'light'"
                       :class="{
-                      'svg-invert': useDarkHeaderIcons,
-                    }" />
+                        'svg-invert': useDarkHeaderIcons,
+                      }" />
 
-                  <UiIconSun
+                    <UiIconSun
                       :class="{
-                      'svg-invert': useDarkHeaderIcons,
-                    }"
+                        'svg-invert': useDarkHeaderIcons,
+                      }"
                       v-else />
-                </span>
+                  </span>
                 </transition>
               </div>
             </div>
@@ -181,8 +180,8 @@
   import { useRoute, onBeforeRouteLeave } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
   import { useThemeStore } from "~/stores/themeStore.js";
-import useTrackScroll from "./LandingHeader/composables/trackScroll";
-import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
+  import useTrackScroll from "./LandingHeader/composables/trackScroll";
+  import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
 
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
   import UiIconMoon from "~/components/ui/UiIconMoon.vue";
@@ -246,9 +245,7 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
     return themeStore.currentTheme === "light" && baseRouteName !== "index";
   });
 
-  const useDarkHeaderIcons = computed(
-    () => isThemeLight.value || isWithPicture.value || forceSvgInvert.value,
-  );
+  const useDarkHeaderIcons = computed(() => isThemeLight.value || isWithPicture.value || forceSvgInvert.value);
 
   const updateWindowWidth = () => {
     if (process.client) {
@@ -297,6 +294,8 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
     if (typeof window !== "undefined") {
       window.addEventListener("resize", updateWindowWidth);
     }
+    activeLink.value = "";
+    uiStore.showMenu = false;
     document.addEventListener("click", handleClickOutside);
     // Ensure scroll is unlocked when landing mounts (after coming back from cabinet/PWA)
     document.body.style.overflow = "";
@@ -318,6 +317,8 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
 
   onBeforeRouteLeave(() => {
     // Reset scroll/position locks when navigating away (e.g., into cabinet)
+    activeLink.value = "";
+    uiStore.showMenu = false;
     isMobileMenuOpen.value = false;
     document.body.style.overflow = "";
     document.body.style.position = "";
@@ -461,11 +462,13 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
     height: 100vh;
+    pointer-events: none;
   }
 
   .menu-content {
     max-width: 1200px;
     margin: 0 auto;
+    pointer-events: auto;
 
     &_is-partnership {
       max-width: 500px;

@@ -233,6 +233,10 @@
   const currentUser = reactive({
     id: null,
     name: null,
+    firstName: null,
+    lastName: null,
+    email: null,
+    photoUrl: null,
   });
   const authStore = useAuthStore();
 
@@ -282,8 +286,9 @@
   const MIN_DESKTOP_GRID_HEIGHT = 320;
   const MOBILE_CHAT_BOTTOM_GAP = 20;
   const MOBILE_PANEL_CLOSE_MIN_SWIPE = 42;
-  const MOBILE_PANEL_CLOSE_PROGRESS_THRESHOLD = 0.5;
+  const MOBILE_PANEL_CLOSE_BOTTOM_THRESHOLD = 0.4;
   const MOBILE_PANEL_HORIZONTAL_DRIFT_LIMIT = 52;
+  const MOBILE_PANEL_SNAP_MS = 280;
   const panelTouchStartY = ref<number | null>(null);
   const panelTouchStartX = ref<number | null>(null);
   const panelTouchDeltaY = ref(0);
@@ -291,6 +296,7 @@
   const panelDragOffset = ref(0);
   const panelDragMaxOffset = ref(0);
   const isPanelDragging = ref(false);
+  let panelCloseTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let desktopGridRafId: number | null = null;
 
   const supportGridStyle = computed(() => {
@@ -321,8 +327,8 @@
 
     return {
       transform: `translateY(${-panelDragOffset.value}px)`,
-      opacity: `${Math.max(0.35, 1 - panelDragProgress.value * 0.65)}`,
-      transition: isPanelDragging.value ? "none" : "opacity 0.24s ease, transform 0.24s ease, border-color 0.2s ease",
+      opacity: `${Math.max(0, 1 - panelDragProgress.value * 1.2)}`,
+      transition: isPanelDragging.value ? "none" : "opacity 0.28s ease, transform 0.28s ease, border-color 0.2s ease",
     } as const;
   });
 
@@ -384,6 +390,7 @@
       collapseSidePanel();
       return;
     }
+    clearSidePanelCloseTimer();
     panelDragOffset.value = 0;
     isPanelDragging.value = false;
     isSideExpanded.value = true;
@@ -393,6 +400,7 @@
     if (!isMobileViewport.value || !isMobileFullscreenChat.value) return;
 
     if (direction === "down") {
+      clearSidePanelCloseTimer();
       panelDragOffset.value = 0;
       isPanelDragging.value = false;
       isSideExpanded.value = true;
@@ -410,6 +418,20 @@
     return null;
   };
 
+  const clearSidePanelCloseTimer = () => {
+    if (panelCloseTimeoutId !== null) {
+      clearTimeout(panelCloseTimeoutId);
+      panelCloseTimeoutId = null;
+    }
+  };
+
+  const resolveSidePanelCloseThreshold = () => {
+    const viewportHeight = typeof window !== "undefined" ? window.innerHeight : panelDragMaxOffset.value;
+    const rawThreshold = viewportHeight * MOBILE_PANEL_CLOSE_BOTTOM_THRESHOLD - MOBILE_CHAT_BOTTOM_GAP;
+    const minThreshold = Math.max(MOBILE_PANEL_CLOSE_MIN_SWIPE, rawThreshold);
+    return Math.min(panelDragMaxOffset.value || minThreshold, minThreshold);
+  };
+
   const resetSidePanelTouch = () => {
     panelTouchStartY.value = null;
     panelTouchStartX.value = null;
@@ -420,10 +442,21 @@
   };
 
   const collapseSidePanel = () => {
+    clearSidePanelCloseTimer();
     isPanelDragging.value = false;
     isSideExpanded.value = false;
     panelDragOffset.value = 0;
     resetSidePanelTouch();
+  };
+
+  const animateSidePanelClose = () => {
+    clearSidePanelCloseTimer();
+    isPanelDragging.value = false;
+    panelDragOffset.value =
+      panelDragMaxOffset.value || Math.max(1, typeof window !== "undefined" ? window.innerHeight : 1);
+    panelCloseTimeoutId = setTimeout(() => {
+      collapseSidePanel();
+    }, MOBILE_PANEL_SNAP_MS);
   };
 
   const handleSidePanelTouchStart = (event: TouchEvent) => {
@@ -431,6 +464,7 @@
     const touch = event.touches?.[0];
     if (!touch) return;
 
+    clearSidePanelCloseTimer();
     panelTouchStartY.value = touch.clientY;
     panelTouchStartX.value = touch.clientX;
     panelTouchDeltaY.value = 0;
@@ -454,18 +488,17 @@
 
     const verticalSwipe = Math.abs(panelTouchDeltaY.value) > Math.abs(panelTouchDeltaX.value);
     const smallHorizontalDrift = Math.abs(panelTouchDeltaX.value) <= MOBILE_PANEL_HORIZONTAL_DRIFT_LIMIT;
-    const swipeUp = panelTouchDeltaY.value < 0;
+    const swipeUpDistance = Math.max(0, -panelTouchDeltaY.value);
+    const swipeUp = swipeUpDistance > 0;
 
-    if (verticalSwipe && smallHorizontalDrift && swipeUp) {
+    if (!isPanelDragging.value && verticalSwipe && smallHorizontalDrift && swipeUp && swipeUpDistance > 4) {
       isPanelDragging.value = true;
-      panelDragOffset.value = Math.min(panelDragMaxOffset.value || 1, Math.abs(panelTouchDeltaY.value));
-      event.preventDefault();
-      return;
     }
 
     if (isPanelDragging.value) {
+      panelDragOffset.value = Math.min(panelDragMaxOffset.value || 1, swipeUpDistance);
       event.preventDefault();
-      panelDragOffset.value = 0;
+      return;
     }
   };
 
@@ -479,22 +512,11 @@
       return;
     }
 
-    const closeThresholdByProgress = (panelDragMaxOffset.value || 1) * MOBILE_PANEL_CLOSE_PROGRESS_THRESHOLD;
-    const verticalSwipe = Math.abs(panelTouchDeltaY.value) > Math.abs(panelTouchDeltaX.value);
-    const smallHorizontalDrift = Math.abs(panelTouchDeltaX.value) <= MOBILE_PANEL_HORIZONTAL_DRIFT_LIMIT;
-    const closeThreshold = Math.max(MOBILE_PANEL_CLOSE_MIN_SWIPE, closeThresholdByProgress);
-    const shouldCloseByProgress = panelDragOffset.value >= closeThreshold;
-    const shouldCloseByDistance =
-      verticalSwipe && smallHorizontalDrift && panelTouchDeltaY.value <= -MOBILE_PANEL_CLOSE_MIN_SWIPE;
-    const shouldClose = shouldCloseByProgress || shouldCloseByDistance;
+    const closeThreshold = resolveSidePanelCloseThreshold();
+    const shouldClose = panelDragOffset.value >= closeThreshold;
 
     if (shouldClose) {
-      isPanelDragging.value = false;
-      panelDragOffset.value = Math.min(panelDragMaxOffset.value || 1, Math.max(panelDragOffset.value, closeThreshold));
-
-      requestAnimationFrame(() => {
-        collapseSidePanel();
-      });
+      animateSidePanelClose();
       return;
     }
 
@@ -513,6 +535,7 @@
     if (!isMobileViewport.value) return;
     if (isMobileFullscreenChat.value) return;
 
+    clearSidePanelCloseTimer();
     isMobileFullscreenChat.value = true;
     collapseSidePanel();
   };
@@ -551,6 +574,10 @@
     const response = await appCore.auth.getAuthUser();
     currentUser.id = response.data.id;
     currentUser.name = response.data.first_name;
+    currentUser.firstName = response.data.first_name ?? null;
+    currentUser.lastName = response.data.last_name ?? null;
+    currentUser.email = response.data.email ?? null;
+    currentUser.photoUrl = response.data.photo_url ?? null;
     authStore.setUser(response.data);
     const fullName = [response.data.first_name, response.data.last_name].filter(Boolean).join(" ").trim();
     userCard.name = fullName || response.data.first_name || userCard.name;
@@ -566,6 +593,7 @@
 
   onBeforeUnmount(() => {
     window.removeEventListener("resize", updateViewportState);
+    clearSidePanelCloseTimer();
     if (desktopGridRafId !== null) {
       window.cancelAnimationFrame(desktopGridRafId);
       desktopGridRafId = null;
@@ -832,8 +860,8 @@
       transform: translateY(0);
       overflow: hidden;
       transition:
-        opacity 0.24s ease,
-        transform 0.24s ease,
+        opacity 0.28s ease,
+        transform 0.28s ease,
         border-color 0.2s ease;
     }
 

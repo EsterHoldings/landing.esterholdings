@@ -390,6 +390,10 @@
   const currentUser = reactive({
     id: null,
     name: null,
+    firstName: null,
+    lastName: null,
+    email: null,
+    photoUrl: null,
   });
 
   const authStore = useAuthStore();
@@ -797,6 +801,10 @@
     const response = await appCore.auth.getAuthUser();
     currentUser.id = response.data.id;
     currentUser.name = response.data.first_name;
+    currentUser.firstName = response.data.first_name ?? null;
+    currentUser.lastName = response.data.last_name ?? null;
+    currentUser.email = response.data.email ?? null;
+    currentUser.photoUrl = response.data.photo_url ?? null;
 
     initViewMode();
 

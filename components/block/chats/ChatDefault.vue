@@ -120,8 +120,13 @@
                 </div>
               </div>
               <div
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ui-primary-accent)] text-sm font-semibold text-[var(--ui-text-main)]">
-                M
+                class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ui-primary-accent)] text-sm font-semibold text-[var(--ui-text-main)]">
+                <img
+                  v-if="myAvatarUrl"
+                  :src="myAvatarUrl"
+                  alt="My avatar"
+                  class="h-full w-full object-cover" />
+                <span v-else>{{ myAvatarFallback }}</span>
               </div>
             </div>
           </template>
@@ -161,7 +166,8 @@
             placeholder="Write your message" />
           <button
             :disabled="!canSend"
-            @click="send"
+            @pointerdown="handleSendPointerDown"
+            @click="handleSendClick"
             class="no-drag inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--ui-primary-main)] text-[var(--ui-text-main)] ring-1 ring-[var(--color-stroke-ui-light)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             title="Send">
             <svg
@@ -292,8 +298,13 @@
                       </div>
                     </div>
                     <div
-                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ui-primary-accent)] text-sm font-semibold text-[var(--ui-text-main)]">
-                      M
+                      class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--ui-primary-accent)] text-sm font-semibold text-[var(--ui-text-main)]">
+                      <img
+                        v-if="myAvatarUrl"
+                        :src="myAvatarUrl"
+                        alt="My avatar"
+                        class="h-full w-full object-cover" />
+                      <span v-else>{{ myAvatarFallback }}</span>
                     </div>
                   </div>
                 </template>
@@ -333,7 +344,8 @@
                   placeholder="Write your message" />
                 <button
                   :disabled="!canSend"
-                  @click="send"
+                  @pointerdown="handleSendPointerDown"
+                  @click="handleSendClick"
                   class="no-drag inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--ui-primary-main)] text-[var(--ui-text-main)] ring-1 ring-[var(--color-stroke-ui-light)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                   title="Send">
                   <svg
@@ -368,7 +380,7 @@
 
   type ChatMessage = {
     id: string;
-    author: "me" | "support" | "other";
+    userId: string;
     body: string;
     createdAt: number;
   };
@@ -385,12 +397,21 @@
   type RenderMsg = { kind: "msg"; key: string; msg: ChatMessage };
   type RenderItem = RenderSep | RenderMsg;
   type PresenceUser = { id: number; name: string; role?: string };
+  type ChatCurrentUser = {
+    id: number | string | null;
+    name?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string | null;
+    photoUrl?: string | null;
+    role?: string;
+  };
 
   const props = withDefaults(
     defineProps<{
       asBlock?: boolean;
       ticketId: string;
-      currentUser: { id: number; name: string; role?: string };
+      currentUser: ChatCurrentUser;
       adminChat?: boolean;
       mobileControls?: boolean;
       mobilePanelExpanded?: boolean;
@@ -675,8 +696,73 @@
   const STICKY_EPS = 16;
   const SCROLL_IDLE_MS = 200;
 
-  const isMe = (m: ChatMessage) => m.author === "me";
+  const normalizeUserId = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    return String(value);
+  };
+  const normalizeText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
+  const firstUpper = (value: string): string => value.charAt(0).toUpperCase();
+  const currentUserId = computed(() => normalizeUserId(props.currentUser.id));
+  const myAvatarUrl = computed(() => normalizeText(props.currentUser.photoUrl));
+  const myAvatarFallback = computed(() => {
+    const directFirstName = normalizeText(props.currentUser.firstName);
+    const directLastName = normalizeText(props.currentUser.lastName);
+
+    if (directFirstName && directLastName) {
+      return `${firstUpper(directFirstName)}${firstUpper(directLastName)}`;
+    }
+
+    const fromName = normalizeText(props.currentUser.name).split(/\s+/).filter(Boolean);
+    if (fromName.length >= 2) {
+      return `${firstUpper(fromName[0])}${firstUpper(fromName[1])}`;
+    }
+
+    const emailValue = normalizeText(props.currentUser.email);
+    if (emailValue) {
+      const localPart = emailValue.split("@")[0] || emailValue;
+      const normalizedEmail = localPart.replace(/[^a-zA-Z0-9]/g, "");
+      if (normalizedEmail.length >= 2) return normalizedEmail.slice(0, 2).toUpperCase();
+      if (normalizedEmail.length === 1) return `${normalizedEmail.toUpperCase()}${normalizedEmail.toUpperCase()}`;
+    }
+
+    if (directFirstName) {
+      const two = directFirstName.slice(0, 2).toUpperCase();
+      return two.length === 2 ? two : `${two}${two}`.slice(0, 2);
+    }
+
+    return "ME";
+  });
+  const isMe = (m: ChatMessage) => m.userId !== "" && m.userId === currentUserId.value;
   const canSend = computed(() => draft.value.trim().length > 0);
+
+  const preserveInputFocusOnMobile = () => {
+    if (!isMobileChatInteraction()) return;
+    const field = inputRef.value;
+    if (!field) return;
+
+    requestAnimationFrame(() => {
+      field.focus({ preventScroll: true });
+      if (typeof field.setSelectionRange === "function") {
+        const end = draft.value.length;
+        field.setSelectionRange(end, end);
+      }
+    });
+  };
+
+  const handleSendPointerDown = (event: PointerEvent) => {
+    if (!isMobileChatInteraction()) return;
+    if (!canSend.value) return;
+    event.preventDefault();
+    void send();
+  };
+
+  const handleSendClick = (event: MouseEvent) => {
+    if (isMobileChatInteraction()) {
+      event.preventDefault();
+      return;
+    }
+    void send();
+  };
 
   function pad(n: number) {
     return n < 10 ? `0${n}` : `${n}`;
@@ -777,7 +863,7 @@
   function mapApi(m: ApiMsg): ChatMessage {
     return {
       id: m.id,
-      author: m.user_id === props.currentUser.id ? "me" : "other",
+      userId: normalizeUserId(m.user_id),
       body: m.body ?? "",
       createdAt: parseLocalMs(m.created_at),
     };
@@ -869,7 +955,7 @@
   const isCounterpartyOnline = computed(() => {
     if (onlineMap.size === 0) return false;
     for (const u of Array.from(onlineMap.values())) {
-      if (u.id !== props.currentUser.id) {
+      if (normalizeUserId(u.id) !== currentUserId.value) {
         return true;
       }
     }
@@ -1006,6 +1092,8 @@
 
   async function send() {
     if (!canSend.value) return;
+    const shouldKeepKeyboardOpen =
+      isMobileChatInteraction() && (document.activeElement === inputRef.value || isKeyboardVisible());
     const body = draft.value.trim();
     draft.value = "";
     const el = listRef.value;
@@ -1026,6 +1114,7 @@
 
     await nextTick();
     if (shouldStick) scrollToBottom();
+    if (shouldKeepKeyboardOpen) preserveInputFocusOnMobile();
   }
 </script>
 

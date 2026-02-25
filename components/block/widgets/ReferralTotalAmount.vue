@@ -65,8 +65,9 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    gap: 4px;
+    justify-content: space-between;
+    gap: 8px;
+    height: 100%;
     min-height: 42px;
   }
 
@@ -114,14 +115,6 @@
   }
 
   @media (min-width: 640px) {
-    .summary-widget {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 56px;
-    }
-
     .summary-skeleton--title {
       min-width: 120px;
       height: 14px;
@@ -135,20 +128,6 @@
 
     .amount-text {
       font-size: clamp(20px, 4vw, 28px);
-    }
-
-    .summary-title {
-      flex: 1 1 auto;
-      width: auto;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .summary-value {
-      width: auto;
-      text-align: right;
     }
   }
 </style>

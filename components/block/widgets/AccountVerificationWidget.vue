@@ -328,7 +328,7 @@
     gap: 10px;
     overflow: hidden;
     border-radius: 14px;
-    border: 1px solid var(--color-stroke-ui-light);
+    border: 0;
     background: var(--ui-background-panel);
     padding: 12px;
   }
@@ -409,23 +409,27 @@
   }
 
   .verification-step-progress__item {
-    min-height: 60px;
-    height: auto;
-    max-height: none;
+    min-height: 30px;
+    height: 30px;
+    max-height: 30px;
     border-radius: 10px;
     background: var(--color-stroke-ui-light);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-start;
-    padding: 8px;
+    padding: 0 8px;
+    min-width: 0;
   }
 
   .verification-step-progress__label {
     font-size: 10px;
-    line-height: 1.2;
-    text-align: center;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    line-height: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    width: 100%;
   }
 
   .verification-step-progress__item.is-approved {
@@ -459,7 +463,6 @@
   }
 
   .verification-list {
-    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
