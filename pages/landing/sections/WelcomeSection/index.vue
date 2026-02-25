@@ -40,6 +40,8 @@ const components = [GeneralSlide, TenYearsSlide, TopTradersSlide];
   min-height: 100vh;
   height: 100%;
   width: 100vw;
+  position: relative;
+  overflow: hidden;
 
   &__slider {
     height: calc(100vh - 80px);

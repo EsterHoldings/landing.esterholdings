@@ -29,6 +29,7 @@ const linkClass = computed(() => ({
 const textClass = computed(() => ({
   "active-link": isActive.value,
   "is-theme-light": props.isInvertColor,
+  "is-theme-default": !props.isInvertColor,
 }));
 
 const iconUpClass = computed(() => ({
@@ -73,6 +74,10 @@ const iconDownClass = computed(() => ({
 }
 
 .is-theme-light {
-  color: var(--ui-text-main);
+  color: var(--ui-text-main) !important;
+}
+
+.is-theme-default {
+  color: var(--ui-text-invert) !important;
 }
 </style>

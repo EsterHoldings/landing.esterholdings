@@ -15,7 +15,7 @@
             <NuxtLink to="/">
               <UiIconLogo
                   :class="{
-                'svg-invert': isThemeLight || isWithPicture || forceSvgInvert,
+                'svg-invert': useDarkHeaderIcons,
               }" />
             </NuxtLink>
           </div>
@@ -24,7 +24,7 @@
               class="burger-menu"
               :class="{
             'burger-menu--open': isMobileMenuOpen,
-            'is-theme-light': isThemeLight || isWithPicture || forceSvgInvert,
+            'is-theme-light': useDarkHeaderIcons,
           }"
               @click="toggleMenu">
             <span></span>
@@ -42,7 +42,7 @@
                 :path="link.path"
                 :activeLink="activeLink"
                 @click.stop="handleClick(link.key)"
-                :isInvertColor="isThemeLight || isWithPicture || forceSvgInvert" />
+                :isInvertColor="useDarkHeaderIcons" />
           </nav>
 
           <div
@@ -54,7 +54,7 @@
                     state="link"
                     class="login"
                     :class="{
-                  'is-theme-light': isThemeLight || isWithPicture || forceSvgInvert,
+                  'is-theme-light': useDarkHeaderIcons,
                 }">
                   {{ t("landing.header.auth.login") }}
                 </UiButtonDefault>
@@ -73,7 +73,7 @@
               <div class="actions-icons">
                 <LanguageSwitcher
                     class="icon"
-                    :isInvert="isThemeLight || isWithPicture || forceSvgInvert" />
+                    :isInvert="useDarkHeaderIcons" />
 
                 <transition
                     name="fade"
@@ -85,12 +85,12 @@
                   <UiIconMoon
                       v-if="themeStore.currentTheme === 'light'"
                       :class="{
-                      'svg-invert': !(isThemeLight || isWithPicture || forceSvgInvert),
+                      'svg-invert': useDarkHeaderIcons,
                     }" />
 
                   <UiIconSun
                       :class="{
-                      'svg-invert': !(isThemeLight || isWithPicture || forceSvgInvert),
+                      'svg-invert': useDarkHeaderIcons,
                     }"
                       v-else />
                 </span>
@@ -234,9 +234,6 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
   });
 
   const isWithPicture = computed(() => {
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
-    console.log("IS WITH PICTURE", themeStore.currentTheme);
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
     if (themeStore.currentTheme === "dark") {
       return false;
     } else {
@@ -248,6 +245,10 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
     const baseRouteName = route.name?.toString().split("___")[0];
     return themeStore.currentTheme === "light" && baseRouteName !== "index";
   });
+
+  const useDarkHeaderIcons = computed(
+    () => isThemeLight.value || isWithPicture.value || forceSvgInvert.value,
+  );
 
   const updateWindowWidth = () => {
     if (process.client) {
@@ -540,6 +541,7 @@ import { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
       display: flex;
       align-items: center;
       justify-content: center;
+      color: var(--ui-text-invert);
 
       svg {
         width: 24px;

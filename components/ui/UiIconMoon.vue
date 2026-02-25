@@ -50,18 +50,18 @@ svg {
   defs {
     clipPath {
       rect {
-        fill: var(--ui-text-main);
+        fill: currentColor !important;
       }
     };
   }
 
   rect {
-    fill: var(--ui-text-main);
+    fill: currentColor !important;
   }
 
   g {
     path {
-      stroke: var(--ui-text-main);
+      stroke: currentColor !important;
     }
   }
 }

@@ -28,7 +28,7 @@ import LandingFooter from "~/components/block/LandingFooter";
 
   &-wrapper {
     display: flex;
-    overflow: hidden;
+    overflow: visible;
   }
 
   &-content {
