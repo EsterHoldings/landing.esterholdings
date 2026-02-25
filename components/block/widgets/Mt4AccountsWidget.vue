@@ -159,6 +159,10 @@ const visibleAccounts = computed(() => {
   --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
   min-height: var(--dashboard-side-widget-height);
   height: var(--dashboard-side-widget-height);
+  border-radius: 14px;
+  border: 1px solid var(--color-stroke-ui-light);
+  background: var(--ui-background-panel);
+  padding: 12px;
 }
 
 .mt4-list-wrap {
@@ -179,13 +183,12 @@ const visibleAccounts = computed(() => {
 .mt4-card {
   background: transparent;
   border-radius: 8px;
-  padding: 12px;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  padding: 10px 12px;
+  transition: background-color 0.2s ease;
 }
 
 .mt4-card:hover {
   background: var(--ui-background-card);
-  opacity: 0.95;
 }
 
 .mt4-grid {
@@ -222,16 +225,15 @@ const visibleAccounts = computed(() => {
 
 .verification-item {
   border-radius: 12px;
-  background: var(--ui-background-panel);
-  border: 1px solid var(--color-stroke-ui-light);
-  padding: 14px 16px;
+  background: transparent;
+  border: 0;
+  padding: 10px 12px;
   min-height: 92px;
-  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .verification-item:hover {
   background: var(--ui-background-card);
-  border-color: var(--color-stroke-ui-light);
 }
 
 @media (max-width: 767px) {

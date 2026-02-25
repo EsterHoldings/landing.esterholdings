@@ -781,6 +781,7 @@
         "progressTitle": "Прогресс верификации",
         "verifiedCount": "Проверено {done}/{total}",
         "stepsRemaining": "Осталось шагов: {count}",
+        "stepsProgress": "Проверено {done}/{total}. Осталось: {left}",
         "steps": {
           "photo": "Фото профиля",
           "profile": "Данные профиля",

@@ -30,6 +30,19 @@
         <span class="verification-progress-fill" :style="{ width: `${progressPercent}%` }"></span>
       </div>
 
+      <div class="verification-step-progress" :aria-label="stepsProgressText">
+        <span
+          v-for="step in verificationSteps"
+          :key="`progress-${step.key}`"
+          class="verification-step-progress__item"
+          :class="`is-${step.status}`"
+        ></span>
+      </div>
+
+      <div class="verification-step-progress__summary">
+        {{ stepsProgressText }}
+      </div>
+
       <div class="verification-progress-meta">
         <span class="verification-progress-meta__item is-success">
           {{ doneLabel }}: {{ approvedCount }}
@@ -68,6 +81,9 @@
             <div class="verification-step__status">
               <span class="verification-step__status-dot" :class="step.stateClass"></span>
               <span>{{ step.statusLabel }}</span>
+            </div>
+            <div v-if="step.comment" class="verification-step__comment">
+              {{ step.comment }}
             </div>
           </div>
 
@@ -155,6 +171,12 @@ const badgeState = (status: VerificationStatus): BadgeState => {
   return "warning";
 };
 
+const getComment = (key: string): string => {
+  const raw = verificationRequestData?.[key]?.comment;
+  if (typeof raw !== "string") return "";
+  return raw.trim();
+};
+
 const verificationSteps = computed(() => [
   {
     key: "photo",
@@ -163,6 +185,7 @@ const verificationSteps = computed(() => [
     statusLabel: statusLabel(photoStatus.value),
     stateClass: stateClass(photoStatus.value),
     badgeState: badgeState(photoStatus.value),
+    comment: getComment("photo"),
     icon: UiIconImage,
   },
   {
@@ -172,6 +195,7 @@ const verificationSteps = computed(() => [
     statusLabel: statusLabel(infoStatus.value),
     stateClass: stateClass(infoStatus.value),
     badgeState: badgeState(infoStatus.value),
+    comment: getComment("info"),
     icon: UiIconProfile,
   },
   {
@@ -181,6 +205,7 @@ const verificationSteps = computed(() => [
     statusLabel: statusLabel(emailStatus.value),
     stateClass: stateClass(emailStatus.value),
     badgeState: badgeState(emailStatus.value),
+    comment: getComment("email"),
     icon: UiIconMails,
   },
   {
@@ -190,6 +215,7 @@ const verificationSteps = computed(() => [
     statusLabel: statusLabel(documentsStatus.value),
     stateClass: stateClass(documentsStatus.value),
     badgeState: badgeState(documentsStatus.value),
+    comment: getComment("documents"),
     icon: UiIconDocuments,
   },
   {
@@ -199,6 +225,7 @@ const verificationSteps = computed(() => [
     statusLabel: statusLabel(depositStatus.value),
     stateClass: stateClass(depositStatus.value),
     badgeState: badgeState(depositStatus.value),
+    comment: getComment("deposit"),
     icon: UiIconPayment,
   },
 ]);
@@ -238,6 +265,16 @@ const summaryText = computed(() => {
 const stepsRemainingText = computed(() =>
   resolveText("cabinet.dashboard.accountVerification.stepsRemaining", "Remaining steps: {count}")
     .replace("{count}", String(remainingCount.value)),
+);
+
+const stepsProgressText = computed(() =>
+  resolveText(
+    "cabinet.dashboard.accountVerification.stepsProgress",
+    "Verified {done}/{total}. Remaining: {left}",
+  )
+    .replace("{done}", String(approvedCount.value))
+    .replace("{total}", String(totalCount.value))
+    .replace("{left}", String(remainingCount.value)),
 );
 
 const handleDashboardRefresh = () => {
@@ -280,6 +317,10 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 10px;
   overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--color-stroke-ui-light);
+  background: var(--ui-background-panel);
+  padding: 12px;
 }
 
 .dashboard-side-widget {
@@ -293,12 +334,11 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 8px 0;
   border-radius: 12px;
-  border: 1px solid var(--color-stroke-ui-light);
   background:
     linear-gradient(110deg, rgba(18, 179, 126, 0.14) 0%, transparent 52%),
-    var(--ui-background-panel);
+    transparent;
 }
 
 .verification-header-card__left {
@@ -336,9 +376,8 @@ onBeforeUnmount(() => {
 
 .verification-progress-card {
   border-radius: 12px;
-  border: 1px solid var(--color-stroke-ui-light);
-  background: var(--ui-background-panel);
-  padding: 10px 12px;
+  background: transparent;
+  padding: 8px 0 10px;
 }
 
 .verification-progress-card__top {
@@ -370,6 +409,37 @@ onBeforeUnmount(() => {
   transition: width 0.25s ease;
 }
 
+.verification-step-progress {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.verification-step-progress__item {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-stroke-ui-light);
+}
+
+.verification-step-progress__item.is-approved {
+  background: var(--color-success);
+}
+
+.verification-step-progress__item.is-pending {
+  background: var(--color-ui-warning);
+}
+
+.verification-step-progress__item.is-rejected {
+  background: var(--color-danger);
+}
+
+.verification-step-progress__summary {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ui-text-secondary);
+}
+
 .verification-progress-meta {
   margin-top: 8px;
   display: flex;
@@ -395,8 +465,21 @@ onBeforeUnmount(() => {
 }
 
 .verification-list-wrap {
+  position: relative;
   min-height: 0;
   flex: 1;
+}
+
+.verification-list-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 4px;
+  bottom: 0;
+  height: 28px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--ui-background-panel) 92%);
 }
 
 .verification-list {
@@ -408,20 +491,20 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 4px;
+  padding-bottom: 14px;
 }
 
 .verification-step {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px 12px;
   border-radius: 12px;
-  border: 1px solid var(--color-stroke-ui-light);
-  background: var(--ui-background-panel);
+  border: 0;
+  background: transparent;
   padding: 10px 12px;
   min-height: 64px;
-  overflow: hidden;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .verification-step:hover {
@@ -435,6 +518,7 @@ onBeforeUnmount(() => {
 .verification-step__icon {
   width: 32px;
   height: 32px;
+  margin-top: 1px;
   border-radius: 10px;
   display: grid;
   place-items: center;
@@ -481,9 +565,8 @@ onBeforeUnmount(() => {
 
 .verification-step__status > span:last-child {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .verification-step__status-dot {
@@ -505,9 +588,19 @@ onBeforeUnmount(() => {
 }
 
 .verification-step__badge {
+  align-self: flex-start;
   margin-left: auto;
   flex-shrink: 0;
   max-width: 100%;
+}
+
+.verification-step__comment {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ui-text-secondary);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1023px) {
@@ -520,6 +613,11 @@ onBeforeUnmount(() => {
     height: auto;
     overflow: visible;
     padding-right: 0;
+    padding-bottom: 0;
+  }
+
+  .verification-list-wrap::after {
+    display: none;
   }
 }
 </style>

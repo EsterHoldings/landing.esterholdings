@@ -71,13 +71,13 @@
 
                 <th class="px-5 py-2 text-right font-normal">
                   <div class="table-account-right-head">
-                    <UiTextSmall class="whitespace-nowrap">
+                    <UiTextSmall class="table-account-col table-account-col--type whitespace-nowrap">
                       {{ t("cabinet.accounts.columns.type") }}
                     </UiTextSmall>
-                    <UiTextSmall class="whitespace-nowrap">
+                    <UiTextSmall class="table-account-col table-account-col--leverage whitespace-nowrap">
                       {{ t("cabinet.accounts.columns.leverage") }}
                     </UiTextSmall>
-                    <div class="flex items-center gap-2">
+                    <div class="table-account-col table-account-col--balance table-account-balance-head">
                       <UiTextSmall
                         class="cursor-pointer whitespace-nowrap"
                         @click="handleOrderByAndDirection('balance')">
@@ -88,6 +88,7 @@
                         :direction="orderDirection"
                         @click="handleOrderByAndDirection('balance')" />
                     </div>
+                    <span class="table-account-col table-account-col--actions" aria-hidden="true"></span>
                   </div>
                 </th>
               </tr>
@@ -132,9 +133,9 @@
                   </td>
                   <td class="px-5 py-3 align-middle">
                     <div class="table-account-right-cell">
-                      <span class="table-account-type">{{ account.account_type.name }}</span>
-                      <span class="table-account-leverage">{{ getLeverageDisplay(account) }}</span>
-                      <div class="table-account-balance">
+                      <span class="table-account-col table-account-col--type table-account-type">{{ account.account_type.name }}</span>
+                      <span class="table-account-col table-account-col--leverage table-account-leverage">{{ getLeverageDisplay(account) }}</span>
+                      <div class="table-account-col table-account-col--balance table-account-balance">
                         <span
                           class="cursor-pointer"
                           :class="getBalanceHighlightClass(account.id)">
@@ -154,7 +155,7 @@
                       <button
                         type="button"
                         @click.stop="toggleRowOptions(index)"
-                        class="relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity cursor-pointer"
+                        class="table-account-col table-account-col--actions relative flex items-center justify-center h-[32px] w-[32px] rounded-md hover:border-[var(--color-stroke-ui-light)] border border-transparent transition-colors transition-opacity cursor-pointer"
                         :ref="el => (triggerRefs[index] = el as HTMLElement)"
                         aria-label="Open menu">
                         <UiIconDotsVertical />
@@ -1049,23 +1050,55 @@
   }
 
   .table-account-right-head {
-    display: inline-flex;
+    display: grid;
     align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
+    justify-content: end;
+    grid-template-columns: 150px 120px 190px 32px;
+    column-gap: 20px;
     width: 100%;
   }
 
   .table-account-right-cell {
+    display: grid;
+    align-items: center;
+    justify-content: end;
+    grid-template-columns: 150px 120px 190px 32px;
+    column-gap: 20px;
+    width: 100%;
+  }
+
+  .table-account-col {
+    min-width: 0;
+  }
+
+  .table-account-col--type,
+  .table-account-col--leverage {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .table-account-col--balance {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .table-account-col--actions {
+    justify-self: end;
+    width: 32px;
+    height: 32px;
+  }
+
+  .table-account-balance-head {
     display: inline-flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 24px;
-    width: 100%;
+    gap: 8px;
   }
 
   .table-account-type,
   .table-account-leverage {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--ui-text-secondary);
     font-size: 13px;
@@ -1155,7 +1188,8 @@
   @media (max-width: 1024px) {
     .table-account-right-head,
     .table-account-right-cell {
-      gap: 16px;
+      grid-template-columns: 130px 100px 170px 32px;
+      column-gap: 12px;
     }
 
     .account-card__body--row {

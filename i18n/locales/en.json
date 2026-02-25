@@ -781,6 +781,7 @@
         "progressTitle": "Verification progress",
         "verifiedCount": "Verified {done}/{total}",
         "stepsRemaining": "Remaining steps: {count}",
+        "stepsProgress": "Verified {done}/{total}. Remaining: {left}",
         "steps": {
           "photo": "Profile photo",
           "profile": "Profile data",
