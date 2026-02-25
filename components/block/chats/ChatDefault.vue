@@ -19,27 +19,27 @@
               class="inline-flex h-2.5 w-2.5 rounded-full"
               :class="isCounterpartyOnline ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'" />
             <span>{{ isCounterpartyOnline ? "Online" : "Offline" }}</span>
+
+            <button
+              v-if="showMobileControls"
+              type="button"
+              class="chat-mobile-toggle ml-3"
+              :class="{ 'is-expanded': props.mobilePanelExpanded }"
+              aria-label="Toggle details"
+              @click="emit('mobile-toggle-panel')">
+              <svg
+                viewBox="0 0 24 24"
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
           </div>
         </div>
-
-        <button
-          v-if="showMobileControls"
-          type="button"
-          class="chat-mobile-toggle"
-          :class="{ 'is-expanded': props.mobilePanelExpanded }"
-          aria-label="Toggle details"
-          @click="emit('mobile-toggle-panel')">
-          <svg
-            viewBox="0 0 24 24"
-            class="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </button>
 
         <button
           v-if="showMobileControls"
@@ -830,13 +830,10 @@
   }
 
   .chat-mobile-toggle {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
     height: 30px;
     width: 30px;
     display: inline-flex;
+    flex: 0 0 30px;
     align-items: center;
     justify-content: center;
     border-radius: 999px;

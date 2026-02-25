@@ -33,6 +33,18 @@
           @touchmove="handleSidePanelTouchMove"
           @touchend="handleSidePanelTouchEnd"
           @touchcancel="handleSidePanelTouchEnd">
+          <div
+            v-if="isMobileViewport && isMobileFullscreenChat"
+            class="support-side__mobile-header">
+            <button
+              type="button"
+              class="support-side__mobile-arrow"
+              aria-label="Close details"
+              @click="isSideExpanded = false">
+              <UiIconChevronUp />
+            </button>
+          </div>
+
           <div class="support-side__scroll flex flex-col gap-4">
             <div class="support-side__card support-side__profile">
               <div class="flex items-center gap-3">
@@ -663,6 +675,11 @@
     display: flex;
   }
 
+  .support-side__mobile-header,
+  .support-side__mobile-arrow {
+    display: none;
+  }
+
   .support-side__expand {
     display: flex;
     flex-direction: column;
@@ -696,16 +713,21 @@
   @media (max-width: 767px) {
     .support-ticket-grid.is-mobile.is-mobile-fullscreen .support-side.is-mobile {
       position: absolute;
-      top: max(8px, env(safe-area-inset-top, 0px));
-      left: 8px;
-      right: 8px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
       z-index: 4;
       margin: 0;
-      border-radius: 16px;
+      padding: 0 !important;
+      border-radius: 0;
+      border-top: 0;
+      border-left: 0;
+      border-right: 0;
       border: 1px solid var(--color-stroke-ui-light);
-      background: color-mix(in oklab, var(--ui-background-panel) 96%, transparent);
+      background: color-mix(in oklab, var(--ui-background-panel) 99%, transparent);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
-      max-height: calc(100dvh - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px) - 28px);
+      max-height: none;
       overflow: hidden;
       transition:
         max-height 0.25s ease,
@@ -722,8 +744,31 @@
     }
 
     .support-ticket-grid.is-mobile.is-mobile-fullscreen .support-side.is-mobile .support-side__scroll {
-      max-height: 100%;
-      padding-top: 8px;
+      max-height: none;
+      height: 100%;
+      padding: 8px;
+    }
+
+    .support-ticket-grid.is-mobile.is-mobile-fullscreen .support-side__mobile-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: calc(8px + env(safe-area-inset-top, 0px));
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-stroke-ui-light);
+      background: color-mix(in oklab, var(--ui-background-card) 96%, transparent);
+    }
+
+    .support-ticket-grid.is-mobile.is-mobile-fullscreen .support-side__mobile-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid var(--color-stroke-ui-light);
+      background: var(--ui-background-card);
+      color: var(--ui-text-main);
     }
 
     .support-ticket-grid.is-mobile.is-mobile-fullscreen .support-side.is-mobile.is-collapsed .support-side__scroll {
