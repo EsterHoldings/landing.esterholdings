@@ -1,116 +1,98 @@
 <template>
-  <div class="verification-widget flex flex-col gap-3 text-[var(--ui-text-main)]">
-    <div class="flex flex-col gap-3 rounded-xl bg-[var(--color-stroke-ui-dark)]/70 sm:flex-row sm:items-center sm:justify-between">
-      <div class="space-y-1">
-        <div class="text-[18px] font-semibold text-[var(--ui-text-main)]">
+  <div class="verification-widget dashboard-side-widget text-[var(--ui-text-main)]">
+    <div class="verification-hero">
+      <div class="verification-hero__titles">
+        <div class="verification-hero__title">
           {{ t("cabinet.dashboard.accountVerification.title") }}
         </div>
-        <div class="text-sm text-[var(--ui-text-secondary)]">
+        <div class="verification-hero__subtitle">
           {{ t("cabinet.dashboard.accountVerification.subtitle") }}
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="flex flex-col text-right">
-          <UiTextH5 class="justify-end text-[var(--ui-text-main)]">
+      <NuxtLink :to="profileLink" class="verification-profile">
+        <div class="verification-profile__meta">
+          <div class="verification-profile__name" :title="displayName">
             {{ displayName }}
-          </UiTextH5>
-          <UiTextParagraph class="justify-end">
-            <strong>{{ displayEmail }}</strong>
-          </UiTextParagraph>
-          <UiTextSmall class="justify-end">
-            {{ displayBirthdate }}
-          </UiTextSmall>
+          </div>
+          <div class="verification-profile__email" :title="displayEmail">
+            {{ displayEmail }}
+          </div>
         </div>
-
-        <NuxtLink :to="profileLink" class="shrink-0">
-          <UiImageCircle :twoChars="initials" :src="photoUrl" />
-        </NuxtLink>
-      </div>
+        <UiImageCircle :twoChars="initials" :src="photoUrl" />
+      </NuxtLink>
     </div>
 
-    <div class="relative">
-      <div v-if="isLoading" class="flex flex-col gap-2">
-        <div v-for="idx in 5" :key="idx" class="verification-item animate-pulse">
-          <div class="flex items-start gap-3 sm:items-center">
+    <div class="verification-list-wrap">
+      <div v-if="isLoading" class="verification-list">
+        <div v-for="idx in 5" :key="idx" class="verification-item verification-item--skeleton animate-pulse">
+          <div class="verification-item__row">
             <div class="h-8 w-8 rounded-lg bg-[var(--color-stroke-ui-light)]"></div>
             <div class="flex-1 min-w-0 space-y-2">
-              <div class="h-3 w-40 rounded bg-[var(--color-stroke-ui-light)]"></div>
-              <div class="h-3 w-56 rounded bg-[var(--color-stroke-ui-light)]"></div>
-              <div class="h-3 w-32 rounded bg-[var(--color-stroke-ui-light)]"></div>
+              <div class="h-3 w-28 rounded bg-[var(--color-stroke-ui-light)]"></div>
+              <div class="h-3 w-44 rounded bg-[var(--color-stroke-ui-light)]"></div>
             </div>
+            <div class="h-5 w-20 rounded bg-[var(--color-stroke-ui-light)]"></div>
           </div>
         </div>
       </div>
-      <div v-else class="flex flex-col gap-2">
-        <div
-          v-for="item in verificationSteps"
-          :key="item.key"
-          class="verification-item"
-        >
-          <div class="flex items-start gap-3 sm:items-center">
+
+      <div v-else class="verification-list">
+        <div v-for="item in verificationSteps" :key="item.key" class="verification-item">
+          <div class="verification-item__row">
             <div class="step-icon" :class="item.state">
               <component :is="item.icon" class="h-4 w-4" />
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
-                <span class="text-sm font-semibold text-[var(--ui-text-main)] truncate" :title="item.title">
+              <div class="verification-item__head">
+                <span class="verification-item__title" :title="item.title">
                   {{ item.title }}
                 </span>
-                <UiBadge :state="badgeState(item.state)" outline class="!py-0.5 !px-2 text-xs">
+                <UiBadge :state="badgeState(item.state)" outline class="verification-item__badge !py-0.5 !px-2 text-xs">
                   {{ item.statusLabel }}
                 </UiBadge>
               </div>
+
               <div class="verification-text-row">
                 <span
                   :ref="(el) => setLineRef(lineKey(item.key, 'status'), el as HTMLElement | null)"
-                  class="verification-text-line text-[var(--ui-text-secondary)] leading-snug"
+                  class="verification-text-line text-[var(--ui-text-secondary)]"
                   :class="{ 'is-expanded': isExpanded(lineKey(item.key, 'status')) }"
-                  :title="!isExpanded(lineKey(item.key, 'status')) ? item.statusText : undefined"
-                >
+                  :title="!isExpanded(lineKey(item.key, 'status')) ? item.statusText : undefined">
                   {{ item.statusText }}
                 </span>
                 <UiIconArrowDown
                   v-if="showArrow(lineKey(item.key, 'status'))"
                   class="verification-expand-icon ml-4"
-                  @click="expandLine(lineKey(item.key, 'status'))"
-                />
+                  @click="expandLine(lineKey(item.key, 'status'))" />
               </div>
-              <div
-                v-if="item.comment"
-                class="verification-text-row mt-1"
-              >
+
+              <div v-if="item.comment" class="verification-text-row mt-1">
                 <span
                   :ref="(el) => setLineRef(lineKey(item.key, 'comment'), el as HTMLElement | null)"
-                  class="verification-text-line is-accent leading-snug"
+                  class="verification-text-line is-accent"
                   :class="{ 'is-expanded': isExpanded(lineKey(item.key, 'comment')) }"
-                  :title="!isExpanded(lineKey(item.key, 'comment')) ? item.comment : undefined"
-                >
+                  :title="!isExpanded(lineKey(item.key, 'comment')) ? item.comment : undefined">
                   {{ item.comment }}
                 </span>
                 <UiIconArrowDown
                   v-if="showArrow(lineKey(item.key, 'comment'))"
                   class="verification-expand-icon ml-4"
-                  @click="expandLine(lineKey(item.key, 'comment'))"
-                />
+                  @click="expandLine(lineKey(item.key, 'comment'))" />
               </div>
-              <div
-                v-if="item.hint"
-                class="verification-text-row mt-1"
-              >
+
+              <div v-if="item.hint" class="verification-text-row mt-1">
                 <span
                   :ref="(el) => setLineRef(lineKey(item.key, 'hint'), el as HTMLElement | null)"
-                  class="verification-text-line text-[var(--ui-text-secondary)] leading-snug"
+                  class="verification-text-line text-[var(--ui-text-secondary)]"
                   :class="{ 'is-expanded': isExpanded(lineKey(item.key, 'hint')) }"
-                  :title="!isExpanded(lineKey(item.key, 'hint')) ? item.hint : undefined"
-                >
+                  :title="!isExpanded(lineKey(item.key, 'hint')) ? item.hint : undefined">
                   {{ item.hint }}
                 </span>
                 <UiIconArrowDown
                   v-if="showArrow(lineKey(item.key, 'hint'))"
                   class="verification-expand-icon ml-4"
-                  @click="expandLine(lineKey(item.key, 'hint'))"
-                />
+                  @click="expandLine(lineKey(item.key, 'hint'))" />
               </div>
             </div>
           </div>
@@ -126,9 +108,6 @@ import { useI18n } from "vue-i18n";
 import { useLocalePath } from "~/.nuxt/imports";
 
 import UiImageCircle from "~/components/ui/UiImageCircle.vue";
-import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
-import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-import UiTextH5 from "~/components/ui/UiTextH5.vue";
 import UiBadge from "~/components/ui/UiBadge.vue";
 import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
 import UiIconFailed from "~/components/ui/UiIconFailed.vue";
@@ -157,7 +136,6 @@ const displayName = computed(() => {
 });
 
 const displayEmail = computed(() => authStore.user?.email || "-");
-const displayBirthdate = computed(() => authStore.user?.birthdate || "-");
 const photoUrl = computed(() => authStore.photoUrl || "");
 const initials = computed(() => {
   const user = authStore.user;
@@ -369,18 +347,116 @@ watch(
 </script>
 
 <style scoped>
+.verification-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-side-widget {
+  --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
+  min-height: var(--dashboard-side-widget-height);
+  height: var(--dashboard-side-widget-height);
+}
+
+.verification-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-stroke-ui-light);
+  border-radius: 12px;
+  background:
+    linear-gradient(110deg, rgba(18, 179, 126, 0.14) 0%, transparent 45%),
+    var(--ui-background-panel);
+  padding: 10px 12px;
+}
+
+.verification-hero__titles {
+  min-width: 0;
+}
+
+.verification-hero__title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.verification-hero__subtitle {
+  margin-top: 4px;
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.verification-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.verification-profile__meta {
+  min-width: 0;
+  text-align: right;
+}
+
+.verification-profile__name {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.verification-profile__email {
+  margin-top: 2px;
+  color: var(--ui-text-secondary);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.verification-list-wrap {
+  min-height: 0;
+  flex: 1;
+}
+
+.verification-list {
+  height: 100%;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .verification-item {
   border-radius: 12px;
   background: var(--ui-background-panel);
   border: 1px solid var(--color-stroke-ui-light);
-  padding: 14px 16px;
-  min-height: 116px;
+  padding: 10px 12px;
+  min-height: 68px;
   transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.verification-item__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .verification-item:hover {
   background: var(--ui-background-card);
   border-color: var(--color-stroke-ui-light);
+}
+
+.verification-item--skeleton {
+  pointer-events: none;
 }
 
 .step-icon {
@@ -404,9 +480,33 @@ watch(
   color: var(--color-success);
 }
 
+.verification-item__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.verification-item__title {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verification-item__badge {
+  flex-shrink: 0;
+}
+
 .verification-text-line {
   display: inline-block;
   max-width: 100%;
+  font-size: 12px;
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -438,5 +538,23 @@ watch(
 
 .verification-expand-icon:hover {
   color: var(--ui-text-main);
+}
+
+@media (max-width: 1023px) {
+  .dashboard-side-widget {
+    min-height: 0;
+    height: auto;
+  }
+
+  .verification-list {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .verification-profile__name,
+  .verification-profile__email {
+    max-width: 122px;
+  }
 }
 </style>

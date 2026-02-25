@@ -823,6 +823,18 @@
     "billing": {
       "title": "Виставлення рахунків",
       "create": "Створити новий платіж",
+      "backToMethodSelection": "Повернутися до вибору способу оплати",
+      "backToList": "До списку платежів",
+      "openPayment": "Відкрити",
+      "deletePayment": "Видалити",
+      "deletePaymentConfirm": "Видалити платіж?",
+      "deletePaymentSuccess": "Платіж видалено.",
+      "deletePaymentError": "Не вдалося видалити платіж.",
+      "paymentNotFound": "Платіж не знайдено.",
+      "paymentLoadError": "Не вдалося завантажити платіж.",
+      "updatedAt": "Оновлено",
+      "comment": "Коментар",
+      "redirectLink": "Посилання оплати",
       "search": "Пошук",
       "view": {
         "list": "Список",

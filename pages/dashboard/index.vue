@@ -6,12 +6,9 @@
           {{ t("cabinet.dashboard.title") }}
         </UiTextH4>
         <div class="flex w-full items-center gap-2 sm:w-auto sm:ml-auto">
-          <div class="auto-refresh-field">
-            <span class="auto-refresh-field__label whitespace-nowrap">
-              {{ t("cabinet.accounts.autoRefresh.label") }}
-            </span>
+          <div class="auto-refresh-field auto-refresh-field--icon-only">
             <UiSelect
-              class="w-auto min-w-[120px] max-w-max"
+              class="auto-refresh-select"
               :value="autoRefreshInterval"
               :data="autoRefreshOptions"
               :withoutNoSelect="true"
@@ -97,20 +94,21 @@
         </div>
 
         <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <div class="col-span-1 flex flex-col gap-5 text-[var(--ui-text-main)]">
+          <div class="col-span-1 flex h-full flex-col gap-5 text-[var(--ui-text-main)]">
             <Mt4AccountsWidget
               v-if="mt4Accounts.length"
+              class="h-full"
               :accounts="mt4Accounts"
               :is-loading="isMt4Refreshing"
               @toggle-favorite="toggleFavorite"
             />
-            <div v-else class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 text-sm text-[var(--ui-text-secondary)]">
+            <div v-else class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 text-sm text-[var(--ui-text-secondary)] min-h-[300px]">
               {{ t("cabinet.dashboard.mt4.empty") }}
             </div>
           </div>
 
-          <div class="col-span-1 flex flex-col gap-3 text-[var(--ui-text-main)]">
-            <AccountVerificationWidget />
+          <div class="col-span-1 flex h-full flex-col gap-3 text-[var(--ui-text-main)]">
+            <AccountVerificationWidget class="h-full" />
           </div>
         </div>
 
@@ -506,7 +504,6 @@ const handleManualRefresh = () => {
 }
 
 .auto-refresh-field {
-  position: relative;
   display: inline-flex;
   width: auto;
   background-color: var(--color-stroke-ui-dark);
@@ -525,15 +522,31 @@ const handleManualRefresh = () => {
   white-space: nowrap;
 }
 
-.auto-refresh-field__label {
-  position: absolute;
-  top: -8px;
-  left: 10px;
-  background: var(--ui-background);
-  padding: 0 5px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--ui-text-secondary);
+.auto-refresh-field--icon-only {
+  flex-shrink: 0;
+}
+
+.auto-refresh-field--icon-only :deep(.select) {
+  width: 44px;
+  min-width: 44px;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+  gap: 4px;
+}
+
+.auto-refresh-field--icon-only :deep(.select > .block.w-full) {
+  display: none;
+}
+
+.auto-refresh-field--icon-only :deep(.select > .ml-2) {
+  margin-left: 0;
+}
+
+.auto-refresh-field--icon-only :deep([role="listbox"]) {
+  min-width: 136px;
+  left: auto;
+  right: 0;
 }
 
 /* MT4 and verification styles moved into widgets */

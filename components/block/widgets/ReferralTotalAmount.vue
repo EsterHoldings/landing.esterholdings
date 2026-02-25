@@ -76,6 +76,12 @@ const formattedAmount = computed(() => {
 .summary-title {
   flex: 1 1 auto;
   min-width: 0;
+  font-size: clamp(12px, 2.8vw, 15px);
+  line-height: 1.2;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-value {
@@ -92,7 +98,7 @@ const formattedAmount = computed(() => {
 .summary-skeleton--title {
   width: 42%;
   min-width: 76px;
-  height: 10px;
+  height: 12px;
 }
 
 .summary-skeleton--value {
@@ -114,7 +120,7 @@ const formattedAmount = computed(() => {
 
   .summary-skeleton--title {
     min-width: 120px;
-    height: 12px;
+    height: 14px;
   }
 
   .summary-skeleton--value {
@@ -125,6 +131,10 @@ const formattedAmount = computed(() => {
 
   .amount-text {
     font-size: clamp(20px, 4vw, 28px);
+  }
+
+  .summary-title {
+    font-size: 15px;
   }
 }
 </style>

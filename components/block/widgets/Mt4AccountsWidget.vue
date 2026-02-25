@@ -1,5 +1,5 @@
 <template>
-  <div class="mt4-widget flex flex-col gap-4 text-[var(--ui-text-main)]">
+  <div class="mt4-widget dashboard-side-widget flex flex-col gap-4 text-[var(--ui-text-main)]">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <div class="text-[18px] font-semibold">
         {{ t("cabinet.dashboard.mt4.title") }}
@@ -13,8 +13,8 @@
       </div>
     </div>
 
-    <div class="relative">
-      <div v-if="isLoading" class="grid grid-cols-1 gap-2">
+    <div class="mt4-list-wrap">
+      <div v-if="isLoading" class="mt4-list">
         <div v-for="idx in 3" :key="idx" class="verification-item mt4-card mt4-grid animate-pulse">
           <div class="mt4-star h-8 w-8 rounded-md bg-[var(--color-stroke-ui-light)]"></div>
           <div class="mt4-type space-y-2">
@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div v-else class="grid grid-cols-1 gap-2">
+      <div v-else class="mt4-list">
         <div
           v-for="account in visibleAccounts"
           :key="account.id"
@@ -155,6 +155,27 @@ const visibleAccounts = computed(() => {
 </script>
 
 <style scoped>
+.dashboard-side-widget {
+  --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
+  min-height: var(--dashboard-side-widget-height);
+  height: var(--dashboard-side-widget-height);
+}
+
+.mt4-list-wrap {
+  min-height: 0;
+  flex: 1;
+}
+
+.mt4-list {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-content: start;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .mt4-card {
   background: transparent;
   border-radius: 8px;
@@ -204,6 +225,7 @@ const visibleAccounts = computed(() => {
   background: var(--ui-background-panel);
   border: 1px solid var(--color-stroke-ui-light);
   padding: 14px 16px;
+  min-height: 92px;
   transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
@@ -221,6 +243,19 @@ const visibleAccounts = computed(() => {
       "star balance badge";
     gap: 10px 12px;
     align-items: start;
+  }
+}
+
+@media (max-width: 1023px) {
+  .dashboard-side-widget {
+    min-height: 0;
+    height: auto;
+  }
+
+  .mt4-list {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
   }
 }
 </style>

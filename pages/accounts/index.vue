@@ -2,18 +2,15 @@
 <template>
   <PageStructureDefault>
     <template #header>
-      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <UiTextH4 class="text-[var(--ui-text-main)]">
+      <div class="accounts-header">
+        <UiTextH4 class="accounts-header__title text-[var(--ui-text-main)]">
           {{ t("cabinet.accounts.title") }}
         </UiTextH4>
 
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
-          <div class="auto-refresh-field">
-            <span class="auto-refresh-field__label">
-              {{ t("cabinet.accounts.autoRefresh.label") }}
-            </span>
+        <div class="accounts-header__actions">
+          <div class="auto-refresh-field auto-refresh-field--icon-only">
             <UiSelect
-              class="w-auto min-w-[120px] max-w-max"
+              class="auto-refresh-select"
               :value="autoRefreshInterval"
               :data="autoRefreshOptions"
               :withoutNoSelect="true"
@@ -55,7 +52,7 @@
             </UiSelect>
           </div>
 
-          <UiButtonDefault state="info" class="w-full sm:w-auto" @click="handleClickCreateNewAccount">
+          <UiButtonDefault state="info--small" class="new-account-btn" @click="handleClickCreateNewAccount">
             <UiIconPlus class="mr-2 fill-[var(--ui-text-main)]" />
             <span class="whitespace-nowrap">New account</span>
           </UiButtonDefault>
@@ -73,7 +70,6 @@
 import AccountsCreateNew from "~/pages/accounts/components/AccountsCreateNew.vue";
 import AccountsPanel from "~/pages/accounts/components/AccountsPanel.vue";
 
-import PageStructureContent from "~/components/block/pages/PageStructureContent.vue";
 import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
 
 import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
@@ -238,8 +234,9 @@ const handleClickCreateNewAccount = () =>
 }
 
 .auto-refresh-field {
-  position: relative;
-  width: 100%;
+  display: inline-flex;
+  width: auto;
+  background-color: var(--color-stroke-ui-dark);
   border: 1px solid var(--color-stroke-ui-light);
   border-radius: 10px;
   padding: 6px;
@@ -254,52 +251,63 @@ const handleClickCreateNewAccount = () =>
   width: auto;
 }
 
-.auto-refresh-field__label {
-  position: absolute;
-  top: -8px;
-  left: 10px;
-  background: var(--ui-background);
-  padding: 0 5px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--ui-text-secondary);
+.auto-refresh-field--icon-only {
+  flex-shrink: 0;
 }
 
-.icon-update {
-  @apply h-[14px] w-[14px] mr-[10px] cursor-pointer transition-transform duration-200;
-}
-.icon-update:hover {
-  @apply animate-[wiggle_.2s_ease];
-}
-.icon-update.spinning {
-  @apply animate-spin;
-}
-
-.balance-sum {
-  @apply cursor-pointer;
-}
-.wiggle:hover {
-  @apply animate-[wiggle_.3s_ease];
+.auto-refresh-field--icon-only :deep(.select) {
+  width: 44px;
+  min-width: 44px;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+  gap: 4px;
 }
 
-@keyframes wiggle {
-  0% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-2px);
-  }
-  40% {
-    transform: translateX(2px);
-  }
-  60% {
-    transform: translateX(-2px);
-  }
-  80% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
+.auto-refresh-field--icon-only :deep(.select > .block.w-full) {
+  display: none;
+}
+
+.auto-refresh-field--icon-only :deep(.select > .ml-2) {
+  margin-left: 0;
+}
+
+.auto-refresh-field--icon-only :deep([role="listbox"]) {
+  min-width: 136px;
+  left: auto;
+  right: 0;
+}
+
+.accounts-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+}
+
+.accounts-header__title {
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.accounts-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.new-account-btn {
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .accounts-header {
+    padding: 0;
   }
 }
 </style>

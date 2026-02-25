@@ -108,25 +108,7 @@
     min-height: 100dvh;
     overflow: hidden;
     overscroll-behavior: none;
-  }
-
-  .cabinet-layout::before,
-  .cabinet-layout::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .cabinet-layout::before {
-    background: url("/static/mbg.gif") center/cover repeat;
-    z-index: -2;
-  }
-
-  .cabinet-layout::after {
     background: var(--ui-background);
-    opacity: 0.97;
-    z-index: -1;
   }
 
   .cabinet-breadcrumbs {

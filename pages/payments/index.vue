@@ -180,6 +180,8 @@
                     />
                   </div>
                 </th>
+
+                <th class="px-4 py-3 text-right font-normal w-[52px]"></th>
               </tr>
             </template>
 
@@ -235,6 +237,18 @@
                   <td class="px-4 py-3 text-xs whitespace-nowrap">
                     {{ new Date(payment.created_at).toLocaleString() }}
                   </td>
+
+                  <td class="px-2 py-3 text-right align-middle">
+                    <button
+                      type="button"
+                      class="action-btn"
+                      :aria-label="openMenuLabel"
+                      @click.stop="togglePaymentMenu(payment.id)"
+                      :ref="(el) => setPaymentMenuTriggerRef(payment.id, el as HTMLElement | null)"
+                    >
+                      <UiIconDotsVertical class="h-4 w-4" />
+                    </button>
+                  </td>
                 </tr>
               </template>
             </template>
@@ -255,15 +269,24 @@
               <div
                   v-for="payment in payments"
                   :key="payment.id"
-                  class="payment-card card-with-copy"
+                  class="payment-card card-with-actions"
                   :class="viewMode === 'full' ? 'payment-card--full' : ''"
               >
-                <button
-                    class="copy-btn"
-                    aria-label="Copy id"
-                >
-                  <UiIconCopy :text="payment.id" />
-                </button>
+                <div class="card-actions" aria-hidden="true">
+                  <button class="copy-btn" aria-label="Copy id">
+                    <UiIconCopy :text="payment.id" />
+                  </button>
+
+                  <button
+                    type="button"
+                    class="action-btn"
+                    :aria-label="openMenuLabel"
+                    @click.stop="togglePaymentMenu(payment.id)"
+                    :ref="(el) => setPaymentMenuTriggerRef(payment.id, el as HTMLElement | null)"
+                  >
+                    <UiIconDotsVertical class="h-4 w-4" />
+                  </button>
+                </div>
 
                 <div class="payment-card__body" :class="viewMode === 'full' ? 'payment-card__body--row' : ''">
                   <div class="min-w-[140px]">
@@ -306,6 +329,38 @@
                 </div>
               </div>
             </div>
+
+            <Teleport to="body">
+              <div
+                v-if="activePaymentMenuId !== null"
+                ref="paymentMenuRef"
+                class="fixed z-[9999] max-h-[70vh] overflow-auto text-[var(--ui-text-main)]"
+                :class="[
+                  'flex min-w-[150px] max-w-[70vw] flex-col gap-1 rounded-md border border-[var(--color-stroke-ui-light)] bg-[var(--color-stroke-ui-dark)] p-2 shadow-lg transition-opacity duration-100',
+                  paymentMenuReady ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                ]"
+                :style="paymentMenuStyle"
+              >
+                <button
+                  type="button"
+                  class="flex h-8 items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                  @click="handleOpenPayment(activePaymentMenuId)"
+                >
+                  <UiIconEye class="!h-[14px] !w-[14px]" />
+                  <UiTextSmall class="whitespace-nowrap">{{ openMenuLabel }}</UiTextSmall>
+                </button>
+
+                <button
+                  type="button"
+                  class="flex h-8 items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                  :disabled="deletingPaymentId === activePaymentMenuId"
+                  @click="handleDeletePayment(activePaymentMenuId)"
+                >
+                  <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]" />
+                  <UiTextSmall class="whitespace-nowrap">{{ deleteMenuLabel }}</UiTextSmall>
+                </button>
+              </div>
+            </Teleport>
           </div>
         </template>
       </PageStructureContent>
@@ -357,7 +412,6 @@ import UiIconSearch from '~/components/ui/UiIconSearch.vue'
 import UiIconSort from '~/components/ui/UiIconSort.vue'
 import UiIconDotsVertical from "~/components/ui/UiIconDotsVertical.vue";
 import UiIconEye from "~/components/ui/UiIconEye.vue";
-import UiIconConfirm from "~/components/ui/UiIconConfirm.vue";
 import UiIconTrash from "~/components/ui/UiIconTrash.vue";
 import UiIconSortBy from "~/components/ui/UiIconSortBy.vue";
 import UiIconSpinnerDefault from '~/components/ui/UiIconSpinnerDefault.vue'
@@ -369,12 +423,13 @@ import ViewModeToggle from "~/components/block/controls/ViewModeToggle.vue";
 import useAppCore from '~/composables/useAppCore'
 import useEventBus from "~/composables/useEventBus";
 
-import {definePageMeta} from '~/.nuxt/imports'
+import {definePageMeta, useLocalePath} from '~/.nuxt/imports'
 import {useI18n} from 'vue-i18n'
-import {computed, h, inject, onMounted, reactive, ref, watch, nextTick} from 'vue'
+import {computed, h, inject, onBeforeUnmount, onMounted, reactive, ref, watch, nextTick} from 'vue'
 import UiBadge from "~/components/ui/UiBadge.vue";
 import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 
 definePageMeta({
   layout: 'cabinet',
@@ -385,6 +440,8 @@ const {t} = useI18n({useScope: 'global'})
 const {openModal} = inject("modalControl") as { openModal: Function };
 const route = useRoute();
 const router = useRouter();
+const localePath = useLocalePath();
+const toast = useToast();
 
 const appCore = useAppCore()
 
@@ -481,6 +538,34 @@ const viewOptions = [
 
 const payments = reactive<any[]>([])
 const spinIcon = ref(false)
+const activePaymentMenuId = ref<string | null>(null)
+const deletingPaymentId = ref<string | null>(null)
+const paymentMenuReady = ref(false)
+const paymentMenuRef = ref<HTMLElement | null>(null)
+const paymentMenuTriggerRefs = ref<Record<string, HTMLElement | null>>({})
+const paymentMenuPosition = reactive({ top: 0, left: 0 })
+
+const resolveI18nValue = (key: string, fallback: string): string => {
+  const translated = t(key)
+  return translated === key ? fallback : translated
+}
+
+const openMenuLabel = computed(() => resolveI18nValue('cabinet.billing.openPayment', 'Открыть'))
+const deleteMenuLabel = computed(() => resolveI18nValue('cabinet.billing.deletePayment', 'Удалить'))
+const deletePaymentConfirmLabel = computed(() =>
+  resolveI18nValue('cabinet.billing.deletePaymentConfirm', 'Удалить платеж?'),
+)
+const deletePaymentSuccessLabel = computed(() =>
+  resolveI18nValue('cabinet.billing.deletePaymentSuccess', 'Платеж удален.'),
+)
+const deletePaymentErrorLabel = computed(() =>
+  resolveI18nValue('cabinet.billing.deletePaymentError', 'Не удалось удалить платеж.'),
+)
+
+const paymentMenuStyle = computed(() => ({
+  top: `${paymentMenuPosition.top}px`,
+  left: `${paymentMenuPosition.left}px`,
+}))
 
 const totalPages = computed(() => Math.ceil(total.value / perPage.value))
 
@@ -530,6 +615,136 @@ const statusClass = (status?: string) => {
   }
 
   return map[s] ?? 'text-[var(--ui-text-main)]'
+}
+
+const setPaymentMenuTriggerRef = (paymentId: string | number, el: HTMLElement | null) => {
+  const id = String(paymentId)
+  if (el) {
+    paymentMenuTriggerRefs.value[id] = el
+    return
+  }
+
+  delete paymentMenuTriggerRefs.value[id]
+}
+
+const closePaymentMenu = () => {
+  activePaymentMenuId.value = null
+  paymentMenuReady.value = false
+}
+
+const updatePaymentMenuPosition = () => {
+  const paymentId = activePaymentMenuId.value
+  if (paymentId === null) return
+
+  const trigger = paymentMenuTriggerRefs.value[paymentId]
+  const menu = paymentMenuRef.value
+  if (!trigger || !menu) return
+
+  const offset = 8
+  const triggerRect = trigger.getBoundingClientRect()
+  const menuWidth = menu.offsetWidth
+  const menuHeight = menu.offsetHeight
+
+  const availableDown = window.innerHeight - triggerRect.bottom
+  const availableUp = triggerRect.top
+  const openUp =
+    availableDown >= menuHeight + offset
+      ? false
+      : availableUp >= menuHeight + offset
+        ? true
+        : availableUp > availableDown
+
+  let top = openUp ? triggerRect.top - offset - menuHeight : triggerRect.bottom + offset
+  let left = triggerRect.right - menuWidth
+
+  const minX = 8
+  const maxX = Math.max(8, window.innerWidth - menuWidth - 8)
+  left = Math.min(Math.max(left, minX), maxX)
+
+  const minY = 8
+  const maxY = Math.max(8, window.innerHeight - menuHeight - 8)
+  top = Math.min(Math.max(top, minY), maxY)
+
+  paymentMenuPosition.top = top
+  paymentMenuPosition.left = left
+}
+
+const togglePaymentMenu = async (paymentId: string | number) => {
+  const id = String(paymentId)
+
+  if (activePaymentMenuId.value === id) {
+    closePaymentMenu()
+    return
+  }
+
+  activePaymentMenuId.value = id
+  paymentMenuReady.value = false
+
+  await nextTick()
+  updatePaymentMenuPosition()
+
+  requestAnimationFrame(() => {
+    paymentMenuReady.value = true
+  })
+}
+
+const handleOpenPayment = (paymentId: string | number | null) => {
+  if (paymentId === null) return
+
+  const id = String(paymentId)
+  closePaymentMenu()
+  router.push(localePath(`/payments/${id}`))
+}
+
+const handleDeletePayment = async (paymentId: string | number | null) => {
+  if (paymentId === null) return
+
+  const id = String(paymentId)
+  closePaymentMenu()
+
+  if (!window.confirm(deletePaymentConfirmLabel.value)) {
+    return
+  }
+
+  deletingPaymentId.value = id
+
+  try {
+    await appCore.payments.delete(id)
+    await loadData()
+    toast.success(deletePaymentSuccessLabel.value)
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message ?? deletePaymentErrorLabel.value)
+  } finally {
+    deletingPaymentId.value = null
+  }
+}
+
+const recalcPaymentMenu = () => {
+  if (activePaymentMenuId.value !== null) {
+    updatePaymentMenuPosition()
+  }
+}
+
+const handlePaymentMenuOutside = (event: MouseEvent) => {
+  const paymentId = activePaymentMenuId.value
+  if (paymentId === null) return
+
+  const target = event.target as Node | null
+  if (!target) return
+
+  const trigger = paymentMenuTriggerRefs.value[paymentId]
+  const insideTrigger = !!trigger && trigger.contains(target)
+  const insideMenu = !!paymentMenuRef.value && paymentMenuRef.value.contains(target)
+
+  if (!insideTrigger && !insideMenu) {
+    closePaymentMenu()
+  }
+}
+
+const handlePaymentMenuEscape = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    closePaymentMenu()
+  }
 }
 
 const handleIconClick = (id: string) => {
@@ -585,9 +800,10 @@ const copyToClipboard = (paymentId: string) => {
   if (id) navigator.clipboard.writeText(id)
 }
 
-const handleClickCreateNewDeposit = async () => {
+const handleClickCreateNewDeposit = async (initialTab: "deposit" | "withdrawal" = "deposit") => {
   openModal(CreateNewDeposit, {
-    title: t("cabinet.accounts.accounts-form.title"),
+    title: t("cabinet.billing.create"),
+    initialTab,
   });
 }
 
@@ -620,9 +836,26 @@ onMounted(async () => {
   await loadData()
   await nextTick();
   const openDeposit = route.query?.openDeposit;
-  if (openDeposit === "1" || openDeposit === "true" || openDeposit === "yes") {
-    handleClickCreateNewDeposit();
+  const openWithdrawal = route.query?.openWithdrawal;
+
+  if (openWithdrawal === "1" || openWithdrawal === "true" || openWithdrawal === "yes") {
+    handleClickCreateNewDeposit("withdrawal");
+  } else if (openDeposit === "1" || openDeposit === "true" || openDeposit === "yes") {
+    handleClickCreateNewDeposit("deposit");
   }
+
+  window.addEventListener('resize', recalcPaymentMenu, { passive: true })
+  window.addEventListener('scroll', recalcPaymentMenu, { passive: true, capture: true })
+  window.addEventListener('mousedown', handlePaymentMenuOutside, true)
+  window.addEventListener('keydown', handlePaymentMenuEscape, true)
+})
+
+onBeforeUnmount(() => {
+  useEventBus.off("loadDataForPayments", loadData)
+  window.removeEventListener('resize', recalcPaymentMenu)
+  window.removeEventListener('scroll', recalcPaymentMenu, true)
+  window.removeEventListener('mousedown', handlePaymentMenuOutside, true)
+  window.removeEventListener('keydown', handlePaymentMenuEscape, true)
 })
 </script>
 
@@ -658,7 +891,7 @@ onMounted(async () => {
 }
 
 .payment-card--full {
-  padding: 8px 40px 8px 14px;
+  padding: 8px 72px 8px 14px;
 }
 
 .payment-card:hover {
@@ -715,14 +948,21 @@ onMounted(async () => {
   }
 }
 
-.card-with-copy {
-  padding-right: 36px;
+.card-with-actions {
+  padding-right: 68px;
 }
 
-.card-with-copy .copy-btn {
+.card-actions {
   position: absolute;
   top: 6px;
   right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-btn,
+.action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -735,8 +975,14 @@ onMounted(async () => {
   transition: color 0.2s ease, transform 0.15s ease;
 }
 
-.card-with-copy .copy-btn:hover {
+.copy-btn:hover,
+.action-btn:hover {
   color: var(--ui-text-main);
   transform: translateY(-1px);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 </style>

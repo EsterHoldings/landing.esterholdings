@@ -824,6 +824,18 @@
     "billing": {
       "title": "Billing",
       "create": "Create new payment",
+      "backToMethodSelection": "Back to payment method selection",
+      "backToList": "Back to payments list",
+      "openPayment": "Open",
+      "deletePayment": "Delete",
+      "deletePaymentConfirm": "Delete payment?",
+      "deletePaymentSuccess": "Payment deleted.",
+      "deletePaymentError": "Failed to delete payment.",
+      "paymentNotFound": "Payment not found.",
+      "paymentLoadError": "Failed to load payment.",
+      "updatedAt": "Updated At",
+      "comment": "Comment",
+      "redirectLink": "Payment link",
       "search": "Search",
       "view": {
         "list": "List",

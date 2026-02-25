@@ -824,6 +824,18 @@
     "billing": {
       "title": "Платежи",
       "create": "Создать новый платёж",
+      "backToMethodSelection": "Вернуться к выбору способа оплаты",
+      "backToList": "К списку платежей",
+      "openPayment": "Открыть",
+      "deletePayment": "Удалить",
+      "deletePaymentConfirm": "Удалить платеж?",
+      "deletePaymentSuccess": "Платеж удален.",
+      "deletePaymentError": "Не удалось удалить платеж.",
+      "paymentNotFound": "Платеж не найден.",
+      "paymentLoadError": "Не удалось загрузить платеж.",
+      "updatedAt": "Обновлено",
+      "comment": "Комментарий",
+      "redirectLink": "Ссылка оплаты",
       "search": "Поиск",
       "view": {
         "list": "Список",

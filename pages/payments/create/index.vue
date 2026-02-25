@@ -1,30 +1,37 @@
 <template>
   <UiContainer class="payments-create-modal">
-    <div class="payments-create-modal__top">
-      <UiTextH4>Створити новий платіж</UiTextH4>
+    <div
+      v-if="props.title"
+      class="payments-create-modal__top">
+      <UiTextH4>{{ props.title }}</UiTextH4>
     </div>
 
-    <div class="payments-create-modal__content">
+    <div
+      class="payments-create-modal__content"
+      :class="{ 'without-top': !props.title }">
       <div class="payments-create-modal__center">
         <div
           v-if="isSelected"
           class="payments-create-modal__back-row">
           <button
             type="button"
-            class="h-[34px] w-[34px] rounded-[10px] border border-[var(--color-stroke-ui-dark)] inline-flex items-center justify-center"
+            class="payments-create-modal__back-btn"
             @click="goBackToSelect"
-            aria-label="Back">
-            <svg
-              viewBox="0 0 24 24"
-              class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
-              fill="none">
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
+            :aria-label="backToMethodLabel">
+            <span class="payments-create-modal__back-icon">
+              <svg
+                viewBox="0 0 24 24"
+                class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
+                fill="none">
+                <path
+                  d="M15 18l-6-6 6-6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="payments-create-modal__back-text">{{ backToMethodLabel }}</span>
           </button>
         </div>
 
@@ -72,6 +79,7 @@
   import useAppCore from "~/composables/useAppCore";
   import { definePageMeta } from "~/.nuxt/imports";
   import { reactive, ref, computed, onMounted } from "vue";
+  import { useI18n } from "vue-i18n";
 
   import TabDeposit from "~/pages/payments/create/components/TabDeposit.vue";
   import TabDepositFormBTC from "~/pages/payments/create/components/TabDepositFormBTC.vue";
@@ -100,7 +108,24 @@
     middleware: ["auth-client", "client-check-auth"],
   });
 
+  const props = withDefaults(
+    defineProps<{
+      title?: string;
+      initialTab?: "deposit" | "withdrawal";
+    }>(),
+    {
+      title: "",
+      initialTab: "deposit",
+    },
+  );
+
   const appCore = useAppCore();
+  const { t } = useI18n({ useScope: "global" });
+  const backToMethodLabel = computed(() => {
+    const key = "cabinet.billing.backToMethodSelection";
+    const translated = t(key);
+    return translated === key ? "Повернутися до вибору способу оплати" : translated;
+  });
 
   const configMap = reactive<
     Record<
@@ -230,6 +255,8 @@
   };
 
   onMounted(async () => {
+    tabActiveIndex.value = props.initialTab === "withdrawal" ? 1 : 0;
+
     paymentSystemsListIsLoading.value = true;
     const { data } = await appCore.paymentSystems.get();
 
@@ -271,6 +298,10 @@
     min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+
+    &.without-top {
+      border-top: none;
+    }
   }
 
   .payments-create-modal__center {
@@ -283,6 +314,40 @@
 
   .payments-create-modal__back-row {
     margin-bottom: 14px;
+  }
+
+  .payments-create-modal__back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--ui-text-secondary);
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .payments-create-modal__back-btn:hover {
+    color: var(--ui-text-main);
+  }
+
+  .payments-create-modal__back-icon {
+    height: 34px;
+    width: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--color-stroke-ui-dark);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .payments-create-modal__back-text {
+    color: inherit;
+    text-align: left;
   }
 
   @media (max-width: 768px) {

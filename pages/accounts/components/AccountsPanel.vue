@@ -46,13 +46,6 @@
               :modelValue="viewMode"
               :options="viewOptions"
               @update:modelValue="viewMode = $event" />
-
-            <UiButtonDefault
-              state="info--small"
-              class="sm:w-auto">
-              <UiIconFilters class="mr-2" />
-              <UiTextSmall>Filters</UiTextSmall>
-            </UiButtonDefault>
           </div>
         </div>
       </template>
@@ -62,21 +55,10 @@
           <TableMain ref="tableRef">
             <template #thead>
               <tr>
-                <th class="px-4 py-2 text-left font-normal w-[56px]"></th>
-                <th class="px-5 py-2 text-left font-normal">
-                  <div class="flex items-center justify-start">
+                <th class="px-4 py-2 text-left font-normal">
+                  <div class="flex items-center justify-start gap-2">
                     <UiTextSmall
-                      class="cursor-pointer mr-[10px]"
-                      @click="handleOrderByAndDirection('type')">
-                      {{ t("cabinet.accounts.columns.type") }}
-                    </UiTextSmall>
-                  </div>
-                </th>
-
-                <th class="px-5 py-2 text-left font-normal">
-                  <div class="flex items-center justify-start">
-                    <UiTextSmall
-                      class="cursor-pointer mr-[10px]"
+                      class="cursor-pointer"
                       @click="handleOrderByAndDirection('number')">
                       {{ t("cabinet.accounts.columns.number") }}
                     </UiTextSmall>
@@ -87,31 +69,27 @@
                   </div>
                 </th>
 
-                <th class="px-5 py-2 text-left font-normal">
-                  <div class="flex items-center justify-start">
-                    <UiTextSmall
-                      class="cursor-pointer mr-[10px]"
-                      @click="handleOrderByAndDirection('leverage')">
+                <th class="px-5 py-2 text-right font-normal">
+                  <div class="table-account-right-head">
+                    <UiTextSmall class="whitespace-nowrap">
+                      {{ t("cabinet.accounts.columns.type") }}
+                    </UiTextSmall>
+                    <UiTextSmall class="whitespace-nowrap">
                       {{ t("cabinet.accounts.columns.leverage") }}
                     </UiTextSmall>
+                    <div class="flex items-center gap-2">
+                      <UiTextSmall
+                        class="cursor-pointer whitespace-nowrap"
+                        @click="handleOrderByAndDirection('balance')">
+                        {{ t("cabinet.accounts.columns.balance") }}
+                      </UiTextSmall>
+                      <UiIconSort
+                        :active="orderBy === 'balance'"
+                        :direction="orderDirection"
+                        @click="handleOrderByAndDirection('balance')" />
+                    </div>
                   </div>
                 </th>
-
-                <th class="px-5 py-2 text-right font-normal">
-                  <div class="flex items-center justify-end">
-                    <UiTextSmall
-                      class="cursor-pointer mr-[10px]"
-                      @click="handleOrderByAndDirection('balance')">
-                      {{ t("cabinet.accounts.columns.balance") }}
-                    </UiTextSmall>
-                    <UiIconSort
-                      :active="orderBy === 'balance'"
-                      :direction="orderDirection"
-                      @click="handleOrderByAndDirection('balance')" />
-                  </div>
-                </th>
-
-                <th class="px-5 py-2 text-right font-normal"></th>
               </tr>
             </template>
 
@@ -128,7 +106,7 @@
                   :key="account.id"
                   class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)]">
                   <td class="px-4 py-3 align-middle">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
                       <button
                         class="flex h-8 w-8 items-center justify-center rounded-md transition text-[var(--ui-text-secondary)]"
                         type="button"
@@ -149,46 +127,30 @@
                         </svg>
                       </button>
                       <UiIconCopy :text="account.number" />
+                      <span class="table-account-number">{{ account.number }}</span>
                     </div>
                   </td>
                   <td class="px-5 py-3 align-middle">
-                    <div class="font-bold">
-                      {{ account.account_type.name }}
-                    </div>
-                  </td>
-
-                  <td class="px-5 py-3 align-middle">
-                    <div class="flex items-center gap-2">
-                      <span>{{ account.number }}</span>
-                      <UiIconCopy :text="account.number" />
-                    </div>
-                  </td>
-
-                  <td class="px-5 py-3 align-middle">{{ getLeverageDisplay(account) }}</td>
-
-                  <td class="px-5 py-3 align-middle">
-                    <div class="flex items-center justify-end gap-[10px] text-right text-[20px] font-bold">
-                      <span
-                        class="cursor-pointer"
-                        :class="getBalanceHighlightClass(account.id)">
-                        $ {{ account.balance }}
-                      </span>
-                      <button
-                        type="button"
-                        class="refresh-balance-btn mr-[10px]"
-                        :class="getRefreshButtonClass(account.id)"
-                        :disabled="isBalanceRefreshing(account.id)"
-                        title="Refresh balance"
-                        @click.stop="refreshAccountBalance(account)">
-                        <UiIconUpdate
-                          class="h-[14px] w-[14px]"
-                          :spinning="isBalanceRefreshing(account.id)" />
-                      </button>
-                    </div>
-                  </td>
-
-                  <td class="px-5 py-3 align-middle">
-                    <div class="flex justify-end items-center gap-[5px] w-auto">
+                    <div class="table-account-right-cell">
+                      <span class="table-account-type">{{ account.account_type.name }}</span>
+                      <span class="table-account-leverage">{{ getLeverageDisplay(account) }}</span>
+                      <div class="table-account-balance">
+                        <span
+                          class="cursor-pointer"
+                          :class="getBalanceHighlightClass(account.id)">
+                          $ {{ account.balance }}
+                        </span>
+                        <button
+                          type="button"
+                          class="refresh-balance-btn"
+                          :disabled="isBalanceRefreshing(account.id)"
+                          title="Refresh balance"
+                          @click.stop="refreshAccountBalance(account)">
+                          <UiIconUpdate
+                            class="h-[14px] w-[14px]"
+                            :spinning="isBalanceRefreshing(account.id)" />
+                        </button>
+                      </div>
                       <button
                         type="button"
                         @click.stop="toggleRowOptions(index)"
@@ -382,25 +344,13 @@
                 class="account-card__body"
                 :class="viewMode === 'full' ? 'account-card__body--row' : 'account-card__body--compact'">
                 <template v-if="viewMode === 'full'">
-                  <div class="min-w-[140px]">
-                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                      {{ t("cabinet.accounts.columns.type") }}
-                    </UiTextSmall>
-                    <div class="font-semibold">{{ account.account_type.name }}</div>
-                  </div>
-                  <div class="min-w-[140px]">
+                  <div class="min-w-[160px]">
                     <UiTextSmall class="text-[var(--ui-text-secondary)]">
                       {{ t("cabinet.accounts.columns.number") }}
                     </UiTextSmall>
                     <div class="font-semibold">{{ account.number }}</div>
                   </div>
-                  <div class="min-w-[120px]">
-                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
-                      {{ t("cabinet.accounts.columns.leverage") }}
-                    </UiTextSmall>
-                    <div class="font-semibold">{{ getLeverageDisplay(account) }}</div>
-                  </div>
-                  <div class="min-w-[140px]">
+                  <div class="min-w-[170px]">
                     <UiTextSmall class="text-[var(--ui-text-secondary)]">
                       {{ t("cabinet.accounts.columns.balance") }}
                     </UiTextSmall>
@@ -409,7 +359,6 @@
                       <button
                         type="button"
                         class="refresh-balance-btn"
-                        :class="getRefreshButtonClass(account.id)"
                         @click.stop="refreshAccountBalance(account)"
                         :disabled="isBalanceRefreshing(account.id)"
                         title="Refresh balance">
@@ -418,26 +367,33 @@
                           :spinning="isBalanceRefreshing(account.id)" />
                       </button>
                     </div>
+                  </div>
+                  <div class="min-w-[140px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.type") }}
+                    </UiTextSmall>
+                    <div class="font-semibold">{{ account.account_type.name }}</div>
+                  </div>
+                  <div class="min-w-[120px]">
+                    <UiTextSmall class="text-[var(--ui-text-secondary)]">
+                      {{ t("cabinet.accounts.columns.leverage") }}
+                    </UiTextSmall>
+                    <div class="font-semibold">{{ getLeverageDisplay(account) }}</div>
                   </div>
                 </template>
 
                 <template v-else>
                   <div class="account-card__compact-main">
-                    <div class="account-card__compact-type">{{ account.account_type.name }}</div>
                     <div class="account-card__compact-number">#{{ account.number }}</div>
+                    <div class="account-card__compact-type">{{ account.account_type.name }}</div>
                   </div>
 
                   <div class="account-card__compact-side">
-                    <div class="account-card__compact-meta">
-                      <span>{{ t("cabinet.accounts.columns.leverage") }}</span>
-                      <strong>{{ getLeverageDisplay(account) }}</strong>
-                    </div>
                     <div class="account-card__compact-balance">
                       <span :class="getBalanceHighlightClass(account.id)">${{ account.balance }}</span>
                       <button
                         type="button"
                         class="refresh-balance-btn"
-                        :class="getRefreshButtonClass(account.id)"
                         @click.stop="refreshAccountBalance(account)"
                         :disabled="isBalanceRefreshing(account.id)"
                         title="Refresh balance">
@@ -445,6 +401,10 @@
                           class="h-[14px] w-[14px]"
                           :spinning="isBalanceRefreshing(account.id)" />
                       </button>
+                    </div>
+                    <div class="account-card__compact-meta">
+                      <span>{{ t("cabinet.accounts.columns.leverage") }}</span>
+                      <strong>{{ getLeverageDisplay(account) }}</strong>
                     </div>
                   </div>
                 </template>
@@ -498,7 +458,6 @@
   import TableMain from "~/components/block/tables/TableMain.vue";
 
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-  import UiIconFilters from "~/components/ui/UiIconFilters.vue";
   import UiIconHistory from "~/components/ui/UiIconHistory.vue";
   import UiIconPayment from "~/components/ui/UiIconPayment.vue";
   import UiIconCopy from "~/components/ui/UiIconCopy.vue";
@@ -552,11 +511,8 @@
 
   const accounts = reactive<any[]>([]);
   const refreshingBalanceIds = reactive<Record<string, boolean>>({});
-  type BalanceRefreshFeedback = "success" | "error";
   type BalanceChangeDirection = "up" | "down" | "same";
-  const refreshFeedbackById = reactive<Record<string, BalanceRefreshFeedback | undefined>>({});
   const balanceHighlightById = reactive<Record<string, BalanceChangeDirection | undefined>>({});
-  const refreshFeedbackTimers = new Map<string, ReturnType<typeof setTimeout>>();
   const balanceHighlightTimers = new Map<string, ReturnType<typeof setTimeout>>();
   const tableMenuStyle = ref<Record<string, string>>({});
   const tableMenuRef = ref<HTMLElement | null>(null);
@@ -698,19 +654,6 @@
       timers.delete(key);
     }
   };
-  const setRefreshFeedback = (id: string | number, status: BalanceRefreshFeedback) => {
-    const key = refreshKey(id);
-    clearTimer(refreshFeedbackTimers, key);
-    delete refreshFeedbackById[key];
-    window.requestAnimationFrame(() => {
-      refreshFeedbackById[key] = status;
-      const timer = setTimeout(() => {
-        delete refreshFeedbackById[key];
-        refreshFeedbackTimers.delete(key);
-      }, 420);
-      refreshFeedbackTimers.set(key, timer);
-    });
-  };
   const setBalanceHighlight = (id: string | number, direction: BalanceChangeDirection) => {
     const key = refreshKey(id);
     clearTimer(balanceHighlightTimers, key);
@@ -721,8 +664,6 @@
     }, 1000);
     balanceHighlightTimers.set(key, timer);
   };
-  const getRefreshButtonClass = (id: string | number) =>
-    refreshFeedbackById[refreshKey(id)] ? "refresh-balance-btn--shake" : "";
   const getBalanceHighlightClass = (id: string | number) => {
     const state = balanceHighlightById[refreshKey(id)];
     if (state === "up") return "balance-highlight-up";
@@ -761,14 +702,11 @@
           }
         }
 
-        setRefreshFeedback(account.id, "success");
         return;
       }
 
-      setRefreshFeedback(account.id, "error");
       toast.error("Failed to refresh account balance.");
     } catch {
-      setRefreshFeedback(account.id, "error");
       toast.error("Failed to refresh account balance.");
     } finally {
       refreshingBalanceIds[key] = false;
@@ -1005,11 +943,6 @@
   });
 
   onBeforeUnmount(() => {
-    for (const timer of refreshFeedbackTimers.values()) {
-      clearTimeout(timer);
-    }
-    refreshFeedbackTimers.clear();
-
     for (const timer of balanceHighlightTimers.values()) {
       clearTimeout(timer);
     }
@@ -1109,6 +1042,48 @@
     flex: 1 1 140px;
   }
 
+  .table-account-number {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .table-account-right-head {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .table-account-right-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .table-account-type,
+  .table-account-leverage {
+    white-space: nowrap;
+    color: var(--ui-text-secondary);
+    font-size: 13px;
+  }
+
+  .table-account-balance {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    text-align: right;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ui-text-main);
+    white-space: nowrap;
+  }
+
   .account-card__body--compact {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -1124,17 +1099,19 @@
   }
 
   .account-card__compact-type {
-    font-weight: 600;
+    font-size: 12px;
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--ui-text-secondary);
   }
 
   .account-card__compact-number {
-    font-size: 12px;
+    font-size: 15px;
+    font-weight: 700;
     line-height: 1.2;
-    color: var(--ui-text-secondary);
+    color: var(--ui-text-main);
   }
 
   .account-card__compact-side {
@@ -1176,6 +1153,11 @@
   }
 
   @media (max-width: 1024px) {
+    .table-account-right-head,
+    .table-account-right-cell {
+      gap: 16px;
+    }
+
     .account-card__body--row {
       flex-wrap: wrap;
     }
@@ -1275,10 +1257,6 @@
     cursor: default;
   }
 
-  .refresh-balance-btn--shake {
-    animation: refresh-shake 0.35s ease;
-  }
-
   .balance-highlight-up {
     animation: balance-highlight-up 1s ease;
   }
@@ -1336,27 +1314,6 @@
     }
     100% {
       transform: rotate(360deg);
-    }
-  }
-
-  @keyframes refresh-shake {
-    0% {
-      transform: translateX(0);
-    }
-    20% {
-      transform: translateX(-1.5px);
-    }
-    40% {
-      transform: translateX(1.5px);
-    }
-    60% {
-      transform: translateX(-1.5px);
-    }
-    80% {
-      transform: translateX(1.5px);
-    }
-    100% {
-      transform: translateX(0);
     }
   }
 
