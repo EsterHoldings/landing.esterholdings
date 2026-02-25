@@ -1,62 +1,67 @@
 <template>
-  <UiContainer>
-    <div class="text-[var(--ui-text-main)] p-5">
-      <div class="flex items-center gap-3 mb-5">
-        <button
+  <UiContainer class="payments-create-modal">
+    <div class="payments-create-modal__top">
+      <UiTextH4>Створити новий платіж</UiTextH4>
+    </div>
+
+    <div class="payments-create-modal__content">
+      <div class="payments-create-modal__center">
+        <div
           v-if="isSelected"
-          type="button"
-          class="h-[34px] w-[34px] rounded-[10px] border border-[var(--color-stroke-ui-dark)] inline-flex items-center justify-center"
-          @click="goBackToSelect"
-          aria-label="Back">
-          <svg
-            viewBox="0 0 24 24"
-            class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
-            fill="none">
-            <path
-              d="M15 18l-6-6 6-6"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </button>
-
-        <UiTextH4 class="mb-0">Створити новий платіж</UiTextH4>
-      </div>
-
-      <div class="grid grid-cols-1 gap-5 items-start">
-        <div>
-          <UiTextH5 class="mb-5"># Вибір платіжного способу</UiTextH5>
-
-          <component
-            :is="componentIs.component"
-            :paymentSystemsList="paymentSystemsForUi"
-            :activePaymentSystemIndex="activePaymentSystemIndexForUi"
-            @select="handleSelectPaymentSystem"
-            :isLoading="paymentSystemsListIsLoading" />
+          class="payments-create-modal__back-row">
+          <button
+            type="button"
+            class="h-[34px] w-[34px] rounded-[10px] border border-[var(--color-stroke-ui-dark)] inline-flex items-center justify-center"
+            @click="goBackToSelect"
+            aria-label="Back">
+            <svg
+              viewBox="0 0 24 24"
+              class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
+              fill="none">
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
         </div>
 
-        <div>
-          <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 translate-y-2"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 translate-y-2">
-            <!-- wrapper ВАЖЛИВИЙ: гарантує 1 root для Transition -->
-            <div
-              v-if="isFormVisible && activePaymentSystem?.componentForm"
-              key="payment-form">
-              <component
-                :is="activePaymentSystem.componentForm"
-                :paymentSystem="
-                  paymentSystems.find(
-                    ps => (ps.config_key ?? ps.componentForm?.config_key) === activePaymentSystem.cfgKey
-                  )
-                " />
-            </div>
-          </Transition>
+        <div class="grid grid-cols-1 gap-5 items-start">
+          <div>
+            <UiTextH5 class="mb-5"># Вибір платіжного способу</UiTextH5>
+
+            <component
+              :is="componentIs.component"
+              :paymentSystemsList="paymentSystemsForUi"
+              :activePaymentSystemIndex="activePaymentSystemIndexForUi"
+              @select="handleSelectPaymentSystem"
+              :isLoading="paymentSystemsListIsLoading" />
+          </div>
+
+          <div>
+            <Transition
+              enter-active-class="transition duration-300 ease-out"
+              enter-from-class="opacity-0 translate-y-2"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-200 ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-2">
+              <!-- wrapper ВАЖЛИВИЙ: гарантує 1 root для Transition -->
+              <div
+                v-if="isFormVisible && activePaymentSystem?.componentForm"
+                key="payment-form">
+                <component
+                  :is="activePaymentSystem.componentForm"
+                  :paymentSystem="
+                    paymentSystems.find(
+                      ps => (ps.config_key ?? ps.componentForm?.config_key) === activePaymentSystem.cfgKey
+                    )
+                  " />
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
     </div>
@@ -242,3 +247,52 @@
     paymentSystemsListIsLoading.value = false;
   });
 </script>
+
+<style scoped>
+  .payments-create-modal {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .payments-create-modal__top {
+    min-height: 50px;
+    padding-left: 40px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--color-stroke-ui-dark);
+  }
+
+  .payments-create-modal__content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .payments-create-modal__center {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 40px;
+  }
+
+  .payments-create-modal__back-row {
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .payments-create-modal__top {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .payments-create-modal__center {
+      padding: 20px;
+    }
+  }
+</style>

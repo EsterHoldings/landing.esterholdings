@@ -207,7 +207,7 @@
     }
 
     &__actions {
-      margin-top: 24px;
+      margin-top: 12px;
       padding-bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) + 6px));
       display: flex;
       align-items: center;
@@ -233,7 +233,7 @@
       }
 
       &__actions {
-        margin-top: 20px;
+        margin-top: 12px;
       }
 
       &__save-btn {
