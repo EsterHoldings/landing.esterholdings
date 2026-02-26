@@ -179,10 +179,10 @@
             :currentUser="currentUser"
             :mobile-controls="isMobileViewport && isMobileFullscreenChat"
             :mobile-panel-expanded="isSideExpanded"
+            @mobile-back="handleMobileBack"
             @mobile-toggle-panel="toggleSideExpanded"
             @mobile-header-swipe="handleMobileHeaderSwipe"
-            @mobile-input-swipe-up="handleMobileInputSwipeUp"
-            @mobile-close-chat="handleMobileChatClose" />
+            @mobile-input-swipe-up="handleMobileInputSwipeUp" />
         </div>
       </div>
     </div>
@@ -197,7 +197,7 @@
   import { definePageMeta, useAuthStore, useHead } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
-  import { useRoute } from "vue-router";
+  import { useRoute, useRouter } from "vue-router";
   import ChatDefault from "~/components/block/chats/ChatDefault.vue";
   import UiIconChevronDown from "~/components/ui/UiIconChevronDown.vue";
   import UiIconChevronUp from "~/components/ui/UiIconChevronUp.vue";
@@ -208,6 +208,7 @@
   const { t } = useI18n({ useScope: "global" });
 
   const route = useRoute();
+  const router = useRouter();
 
   const appCore = useAppCore();
 
@@ -298,7 +299,9 @@
   };
 
   const MOBILE_BREAKPOINT = 768;
+  const TABLET_BREAKPOINT = 1024;
   const DESKTOP_GRID_BOTTOM_GAP = 16;
+  const TABLET_BOTTOM_MENU_RESERVED = 78;
   const MIN_DESKTOP_GRID_HEIGHT = 320;
   const MOBILE_CHAT_BOTTOM_GAP = 20;
   const MOBILE_PANEL_CLOSE_MIN_SWIPE = 42;
@@ -358,7 +361,11 @@
     if (!grid) return;
 
     const top = grid.getBoundingClientRect().top;
-    const available = Math.floor(window.innerHeight - top - DESKTOP_GRID_BOTTOM_GAP);
+    const hasTabletBottomMenu = window.innerWidth >= MOBILE_BREAKPOINT && window.innerWidth < TABLET_BREAKPOINT;
+    const bottomReserved = hasTabletBottomMenu
+      ? TABLET_BOTTOM_MENU_RESERVED + DESKTOP_GRID_BOTTOM_GAP
+      : DESKTOP_GRID_BOTTOM_GAP;
+    const available = Math.floor(window.innerHeight - top - bottomReserved);
     desktopGridHeight.value = Math.max(MIN_DESKTOP_GRID_HEIGHT, available);
   };
 
@@ -540,10 +547,8 @@
     resetSidePanelTouch();
   };
 
-  const handleMobileChatClose = () => {
-    if (!isMobileViewport.value) return;
-    collapseSidePanel();
-    isMobileFullscreenChat.value = false;
+  const handleMobileBack = () => {
+    router.push("/support");
   };
 
   const handleMobileInputSwipeUp = () => {

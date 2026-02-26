@@ -38,6 +38,15 @@
   import UiIconSetting from "~/components/ui/UiIconSetting.vue";
   import UiSpacer from "~/components/ui/UiSpacer.vue";
 
+  const props = withDefaults(
+    defineProps<{
+      supportUnreadCount?: number;
+    }>(),
+    {
+      supportUnreadCount: 0,
+    }
+  );
+
   const { locale, t } = useI18n({ useScope: "global" });
   const addCurrentLocaleToPath = (path = "") => `/${locale.value}/${path}`;
 
@@ -61,6 +70,7 @@
       title: t("cabinet.menu.support"),
       to: addCurrentLocaleToPath("support"),
       icon: UiIconSupport,
+      notificationsCount: props.supportUnreadCount,
     },
     { title: t("cabinet.menu.settings"), to: addCurrentLocaleToPath("profile"), icon: UiIconSetting },
   ]);

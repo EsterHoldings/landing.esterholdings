@@ -9,13 +9,17 @@
             }" />
         </NuxtLink>
       </div>
-      <button class="side-bar-cabinet__close" type="button" aria-label="Close menu" @click="emit('close')">
+      <button
+        class="side-bar-cabinet__close"
+        type="button"
+        aria-label="Close menu"
+        @click="emit('close')">
         ×
       </button>
     </div>
 
     <div class="side-bar-cabinet__content">
-      <AdminSidebarMenu />
+      <AdminSidebarMenu :supportUnreadCount="supportUnreadCount" />
     </div>
 
     <div class="side-bar-cabinet__logout">
@@ -29,12 +33,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from "vue";
-  import { navigateTo } from "nuxt/app";
+  import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+  import { navigateTo, useNuxtApp } from "nuxt/app";
   import { useAuthStore } from "~/stores/authStore";
   import { useRoute } from "vue-router";
   import { useThemeStore } from "~/stores/themeStore.js";
   import { useLocalePath } from "~/.nuxt/imports";
+  import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
 
   import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
   import AdminSidebarMenu from "~/components/block/AdminSidebarMenu.vue";
@@ -47,8 +53,16 @@
   const emit = defineEmits(["close"]);
 
   const authStore = useAuthStore();
+  const appCore = useAppCore();
   const localePath = useLocalePath();
   const themeStore = useThemeStore();
+  const supportUnreadCount = ref(0);
+  const SUPPORT_BADGE_REFRESH_MS = 10000;
+  const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
+  const { $echo } = useNuxtApp() as { $echo?: any };
+  let supportBadgeTimer: ReturnType<typeof setInterval> | null = null;
+  let supportUnreadRafId: number | null = null;
+  let supportRealtimeChannel: any = null;
 
   if (!authStore.user) {
     authStore.initAuth();
@@ -72,6 +86,69 @@
     const segments = route.path.split("/");
     const last = segments[segments.length - 1];
     return last === "profile";
+  });
+
+  const loadSupportUnreadCount = async () => {
+    try {
+      const response = await appCore.adminModules.tickets.getUnreadSummary();
+      const count = Number(response?.data?.data?.unread_messages_count ?? response?.data?.unread_messages_count ?? 0);
+      supportUnreadCount.value = Number.isFinite(count) ? Math.max(0, count) : 0;
+    } catch {}
+  };
+
+  const startSupportBadgeRefresh = () => {
+    if (supportBadgeTimer) return;
+
+    supportBadgeTimer = setInterval(() => {
+      loadSupportUnreadCount().catch(() => {});
+    }, SUPPORT_BADGE_REFRESH_MS);
+  };
+
+  const stopSupportBadgeRefresh = () => {
+    if (!supportBadgeTimer) return;
+
+    clearInterval(supportBadgeTimer);
+    supportBadgeTimer = null;
+  };
+
+  const handleSupportUnreadUpdated = () => {
+    if (supportUnreadRafId !== null) return;
+
+    supportUnreadRafId = window.requestAnimationFrame(() => {
+      supportUnreadRafId = null;
+      loadSupportUnreadCount().catch(() => {});
+    });
+  };
+
+  const connectSupportRealtime = () => {
+    if (!$echo || supportRealtimeChannel) return;
+
+    supportRealtimeChannel = $echo.private("support.global").listen(".MessageSent", handleSupportUnreadUpdated);
+  };
+
+  const disconnectSupportRealtime = () => {
+    if (!$echo || !supportRealtimeChannel) return;
+
+    supportRealtimeChannel.stopListening(".MessageSent");
+    $echo.leave("support.global");
+    supportRealtimeChannel = null;
+  };
+
+  onMounted(async () => {
+    await loadSupportUnreadCount();
+    useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    startSupportBadgeRefresh();
+    connectSupportRealtime();
+  });
+
+  onBeforeUnmount(() => {
+    useEventBus.off(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    stopSupportBadgeRefresh();
+    disconnectSupportRealtime();
+    if (supportUnreadRafId !== null) {
+      window.cancelAnimationFrame(supportUnreadRafId);
+      supportUnreadRafId = null;
+    }
   });
 </script>
 

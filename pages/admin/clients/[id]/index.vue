@@ -2,22 +2,18 @@
   <UiContainer>
     <div>
       <div class="mb-5">
-        <UiTextH4 class="text-[var(--ui-text-main)]">
-          {{ userData.first_name }} {{ userData.last_name }}
-        </UiTextH4>
+        <UiTextH4 class="text-[var(--ui-text-main)]"> {{ userData.first_name }} {{ userData.last_name }} </UiTextH4>
         <UiTextParagraph class="text-[var(--ui-text-secondary)]">{{ userData.email }}</UiTextParagraph>
       </div>
 
       <PanelDefault>
         <div class="flex flex-row max-lg:flex-col">
           <div
-            class="w-[240px] max-lg:w-full border-r max-lg:border-r-0 max-lg:border-b border-[var(--ui-primary-main)] p-2 max-lg:p-2"
-          >
+            class="w-[240px] max-lg:w-full border-r max-lg:border-r-0 max-lg:border-b border-[var(--ui-primary-main)] p-2 max-lg:p-2">
             <TabsAsList
               :tabsList="tabsList"
               @selectTab="handleActiveTab"
-              :activeTabIndex="activeTabIndex"
-            />
+              :activeTabIndex="activeTabIndex" />
           </div>
 
           <div class="flex-1 min-w-0">
@@ -28,12 +24,10 @@
               leave-active-class="transition ease-linear duration-100"
               leave-from-class="opacity-100 translate-x-0"
               leave-to-class="opacity-0 -translate-x-4"
-              mode="out-in"
-            >
+              mode="out-in">
               <div>
                 <div
-                  class="text-[--ui-text-main] h-[66px] w-full pl-5 pr-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-start"
-                >
+                  class="text-[--ui-text-main] h-[66px] w-full pl-5 pr-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-start">
                   {{ tabsList[activeTabIndex].label }}
                 </div>
                 <div class="p-5 overflow-y-auto overflow-x-hidden">
@@ -41,8 +35,7 @@
                     :is="tabsList[activeTabIndex].component"
                     :key="activeTabIndex"
                     :clientId="clientId"
-                    :userData="userData"
-                  />
+                    :userData="userData" />
                 </div>
               </div>
             </Transition>
@@ -54,101 +47,108 @@
 </template>
 
 <script setup lang="ts">
-import useAppCore from "~/composables/useAppCore";
-import {computed, onMounted, reactive, ref, watch} from "vue";
-import {definePageMeta} from "~/.nuxt/imports";
-import {useI18n} from "vue-i18n";
-import {useRoute, useRouter} from "vue-router";
+  import useAppCore from "~/composables/useAppCore";
+  import { onMounted, reactive, ref, watch } from "vue";
+  import { definePageMeta } from "~/.nuxt/imports";
+  import { useI18n } from "vue-i18n";
+  import { useRoute } from "vue-router";
 
-import TabChangePassword from "~/pages/admin/clients/[id]/components/TabChangePassword.vue";
-import TabKYC from "~/pages/admin/clients/[id]/components/TabKYC.vue";
-import TabReferrals from "~/pages/admin/clients/[id]/components/TabReferrals.vue";
-import TabVerification from "~/pages/admin/clients/[id]/components/TabVerification.vue";
-import TabsAsList from "~/components/block/tabs/TabsAsList.vue";
-import PanelDefault from "~/components/block/panels/PanelDefault.vue";
-import UiContainer from "~/components/ui/UiContainer.vue";
-import UiTextH4 from "~/components/ui/UiTextH4.vue";
-import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
+  import TabChangePassword from "~/pages/admin/clients/[id]/components/TabChangePassword.vue";
+  import TabKYC from "~/pages/admin/clients/[id]/components/TabKYC.vue";
+  import TabReferrals from "~/pages/admin/clients/[id]/components/TabReferrals.vue";
+  import TabVerification from "~/pages/admin/clients/[id]/components/TabVerification.vue";
+  import TabsAsList from "~/components/block/tabs/TabsAsList.vue";
+  import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+  import UiContainer from "~/components/ui/UiContainer.vue";
+  import UiTextH4 from "~/components/ui/UiTextH4.vue";
+  import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 
-definePageMeta({
-  middleware: ["admin-middleware"],
-});
+  definePageMeta({
+    middleware: ["admin-middleware"],
+  });
 
-const {t} = useI18n({useScope: "global"});
-const route = useRoute();
-const router = useRouter();
-const appCore = useAppCore();
+  const { t } = useI18n({ useScope: "global" });
+  const route = useRoute();
+  const appCore = useAppCore();
 
-const clientId = ref(route.params.id as string);
+  const clientId = ref(route.params.id as string);
 
+  let userData = reactive({
+    address: null,
+    birthdate: null,
+    city: null,
+    country: null,
+    created_at: null,
+    email: null,
+    email_verified_at: null,
+    first_name: null,
+    id: null,
+    last_name: null,
+    mid_name: null,
+    phone: null,
+    photo_path: null,
+    photo_url: null,
+    postal_code: null,
+    state: null,
+    updated_at: null,
+  });
 
-let userData = reactive({
-  address: null,
-  birthdate: null,
-  city: null,
-  country: null,
-  created_at: null,
-  email: null,
-  email_verified_at: null,
-  first_name: null,
-  id: null,
-  last_name: null,
-  mid_name: null,
-  phone: null,
-  photo_path: null,
-  photo_url: null,
-  postal_code: null,
-  state: null,
-  updated_at: null,
-});
+  const loadData = async () => {
+    const resp = await appCore.adminModules.clients.getById(clientId.value);
+    Object.assign(userData, resp.data.data);
+  };
 
+  const STORAGE_KEY = "profileActiveTab";
+  const tabsList = [
+    { label: "KYC", component: TabKYC },
+    { label: "Верификация", component: TabVerification },
+    { label: "Рефералы", component: TabReferrals },
+    { label: "Смена пароля", component: TabChangePassword },
+  ];
 
-const loadData = async () => {
-  const resp = await appCore.adminModules.clients.getById(clientId.value);
-  Object.assign(userData, resp.data.data);
-};
+  const activeTabIndex = ref(0);
 
-const STORAGE_KEY = "profileActiveTab";
-const tabsList = [
-  { label: 'KYC', component: TabKYC },
-  { label: 'Верификация', component: TabVerification },
-  { label: 'Рефералы', component: TabReferrals },
-  { label: 'Смена пароля', component: TabChangePassword },
-];
+  // При монтуванні – читаємо ?tab і записуємо в activeTabIndex
+  onMounted(async () => {
+    await loadData();
 
-const activeTabIndex = ref(0);
-
-// При монтуванні – читаємо ?tab і записуємо в activeTabIndex
-onMounted(async () => {
-  await loadData();
-
-  const q = Number(route.query.tab);
-  if (!isNaN(q) && q >= 0 && q < tabsList.length) {
-    activeTabIndex.value = q;
-  } else {
-    const saved = Number(localStorage.getItem(STORAGE_KEY));
-    if (!isNaN(saved) && saved >= 0 && saved < tabsList.length) {
-      activeTabIndex.value = saved;
+    const q = Number(route.query.tab);
+    if (!isNaN(q) && q >= 0 && q < tabsList.length) {
+      activeTabIndex.value = q;
+    } else {
+      const saved = Number(localStorage.getItem(STORAGE_KEY));
+      if (!isNaN(saved) && saved >= 0 && saved < tabsList.length) {
+        activeTabIndex.value = saved;
+      }
     }
-  }
 
-  // Ініціально в URL зробимо ?tab=…
-  const url = new URL(window.location.href);
-  url.searchParams.set('tab', activeTabIndex.value.toString());
-  window.history.replaceState(null, '', url.toString());
-});
+    // Ініціально в URL зробимо ?tab=…
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", activeTabIndex.value.toString());
+    window.history.replaceState(null, "", url.toString());
+  });
 
-watch(activeTabIndex, (newIndex) => {
-  localStorage.setItem(STORAGE_KEY, newIndex.toString());
+  watch(activeTabIndex, newIndex => {
+    localStorage.setItem(STORAGE_KEY, newIndex.toString());
 
-  const url = new URL(window.location.href);
-  url.searchParams.set('tab', newIndex.toString());
-  window.history.replaceState(null, '', url.toString());
-});
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", newIndex.toString());
+    window.history.replaceState(null, "", url.toString());
+  });
 
-const handleActiveTab = (i: number) => {
-  activeTabIndex.value = i;
-};
+  watch(
+    () => route.query.tab,
+    nextTab => {
+      const q = Number(nextTab);
+      if (!isNaN(q) && q >= 0 && q < tabsList.length && q !== activeTabIndex.value) {
+        activeTabIndex.value = q;
+      }
+    }
+  );
+
+  const handleActiveTab = (i: number) => {
+    activeTabIndex.value = i;
+  };
 </script>
 
 <!--<script lang="ts" setup>-->

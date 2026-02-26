@@ -26,6 +26,26 @@ export class TicketsModule implements BasicModuleInterface {
     return await this.ticketsService.storeTicketMessage(id, payload);
   }
 
+  async markRead(id: string, payload: any = {}): Promise<any> {
+    return await this.ticketsService.markRead(id, payload);
+  }
+
+  async typing(id: string, payload: any = {}): Promise<any> {
+    return await this.ticketsService.typing(id, payload);
+  }
+
+  async getUnreadSummary(): Promise<any> {
+    return await this.ticketsService.getUnreadSummary();
+  }
+
+  async presencePing(id: string, payload: any = {}): Promise<any> {
+    return await this.ticketsService.presencePing(id, payload);
+  }
+
+  async presenceLeave(id: string, payload: any = {}): Promise<any> {
+    return await this.ticketsService.presenceLeave(id, payload);
+  }
+
   async getById(id: any) {
     return await this.ticketsService.getById(id);
   }

@@ -88,7 +88,9 @@
                         :direction="orderDirection"
                         @click="handleOrderByAndDirection('balance')" />
                     </div>
-                    <span class="table-account-col table-account-col--actions" aria-hidden="true"></span>
+                    <span
+                      class="table-account-col table-account-col--actions"
+                      aria-hidden="true"></span>
                   </div>
                 </th>
               </tr>
@@ -133,8 +135,12 @@
                   </td>
                   <td class="px-5 py-3 align-middle">
                     <div class="table-account-right-cell">
-                      <span class="table-account-col table-account-col--type table-account-type">{{ account.account_type.name }}</span>
-                      <span class="table-account-col table-account-col--leverage table-account-leverage">{{ getLeverageDisplay(account) }}</span>
+                      <span class="table-account-col table-account-col--type table-account-type">{{
+                        account.account_type.name
+                      }}</span>
+                      <span class="table-account-col table-account-col--leverage table-account-leverage">{{
+                        getLeverageDisplay(account)
+                      }}</span>
                       <div class="table-account-col table-account-col--balance table-account-balance">
                         <span
                           class="cursor-pointer"
@@ -417,12 +423,28 @@
     </PageStructureContent>
 
     <template v-if="!isInitialLoading && accounts.length === 0">
-      <div class="flex items-center justify-center flex-col gap-5 h-[calc(100vh-370px)]">
-        <span class="text-[var(--ui-text-main)]">{{ t("cabinet.accounts.nothingToShow") }}</span>
+      <div class="accounts-empty-state">
+        <div class="accounts-empty-state__icon-wrap">
+          <UiIconCardCheck class="accounts-empty-state__icon" />
+        </div>
+        <div class="accounts-empty-state__title">
+          {{ emptyTitle }}
+        </div>
+        <UiTextSmall class="accounts-empty-state__subtitle">
+          {{ emptySubtitle }}
+        </UiTextSmall>
+        <UiTextSmall
+          v-if="showBlockedNotice"
+          class="accounts-empty-state__warning">
+          {{ props.accountCreationBlockedReason }}
+        </UiTextSmall>
+
         <UiButtonDefault
           state="success--outline"
+          class="accounts-empty-state__button"
+          :disabled="!props.canCreateAccount"
           @click="handleClickCreateNewAccount">
-          {{ t("cabinet.accounts.openAccount") }}
+          {{ openAccountLabel }}
           &nbsp;
           <UiIconSuccess />
         </UiButtonDefault>
@@ -482,9 +504,22 @@
   import UiIconWithdraw from "~/components/ui/UiIconWithdraw.vue";
   import UiIconTrash from "~/components/ui/UiIconTrash.vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import UiIconCardCheck from "~/components/ui/UiIconCardCheck.vue";
   import ViewModeToggle from "~/components/block/controls/ViewModeToggle.vue";
 
   const isInitialLoading = ref(true);
+  const props = withDefaults(
+    defineProps<{
+      canCreateAccount?: boolean;
+      accountCreationBlockedReason?: string;
+      isEligibilityLoaded?: boolean;
+    }>(),
+    {
+      canCreateAccount: true,
+      accountCreationBlockedReason: "",
+      isEligibilityLoaded: false,
+    }
+  );
 
   const { t } = useI18n({ useScope: "global" });
   const appCore = useAppCore();
@@ -677,6 +712,18 @@
 
     return value !== "" ? value : "1:100";
   };
+
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const emptyTitle = computed(() => resolveText("cabinet.accounts.emptyTitle", "Счетов пока нет"));
+  const emptySubtitle = computed(() =>
+    resolveText("cabinet.accounts.emptySubtitle", "Откройте первый торговый счет, чтобы начать работу.")
+  );
+  const openAccountLabel = computed(() => resolveText("cabinet.accounts.openAccount", "Открыть счет"));
+  const showBlockedNotice = computed(() => props.isEligibilityLoaded && !props.canCreateAccount);
 
   const refreshAccountBalance = async (account: any) => {
     const key = refreshKey(account.id);
@@ -1004,13 +1051,69 @@
     closeCardMenu();
   };
 
-  const handleClickCreateNewAccount = () =>
+  const handleClickCreateNewAccount = () => {
+    if (!props.canCreateAccount) return;
     openModal(AccountsCreateNew, {
       title: t("cabinet.accounts.accounts-form.title"),
     });
+  };
 </script>
 
 <style lang="postcss" scoped>
+  .accounts-empty-state {
+    min-height: calc(100vh - 370px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 24px 18px;
+    margin: 0 auto;
+    max-width: 680px;
+    border-radius: 14px;
+    border: 1px dashed var(--color-stroke-ui-light);
+    background: color-mix(in srgb, var(--ui-background-card) 76%, transparent);
+  }
+
+  .accounts-empty-state__icon-wrap {
+    height: 64px;
+    width: 64px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--ui-primary-main) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ui-primary-main) 36%, transparent);
+  }
+
+  .accounts-empty-state__icon {
+    width: 28px;
+    height: 28px;
+    color: var(--ui-primary-main);
+  }
+
+  .accounts-empty-state__title {
+    color: var(--ui-text-main);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .accounts-empty-state__subtitle {
+    color: var(--ui-text-secondary);
+    max-width: 420px;
+  }
+
+  .accounts-empty-state__warning {
+    color: var(--color-warning);
+    max-width: 460px;
+  }
+
+  .accounts-empty-state__button {
+    min-width: 220px;
+    justify-content: center;
+  }
+
   .account-card {
     position: relative;
     background: var(--ui-background-panel);

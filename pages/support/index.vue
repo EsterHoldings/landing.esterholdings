@@ -104,6 +104,9 @@
                   </div>
                 </th>
                 <th class="px-4 font-semibold">
+                  <UiTextSmall class="whitespace-nowrap">Counterparty</UiTextSmall>
+                </th>
+                <th class="px-4 font-semibold">
                   <div class="flex items-center justify-start gap-2">
                     <UiTextSmall @click="handleOrderByAndDirection('status')">
                       {{ t("support.page.status") }}
@@ -143,19 +146,37 @@
                 </td>
 
                 <td class="px-4">
-                  <UiBadge
-                    :outline="true"
-                    state="info"
-                    class="whitespace-nowrap !p-[10px]"
-                    >{{ t.status }}</UiBadge
-                  >
+                  <span
+                    class="inline-flex items-center gap-1.5 text-xs text-[var(--ui-text-secondary)] whitespace-nowrap">
+                    <span
+                      class="h-1.5 w-1.5 rounded-full"
+                      :class="
+                        t.counterparty_online ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'
+                      " />
+                    {{ t.counterparty_online ? "Online" : "Offline" }}
+                  </span>
+                </td>
+
+                <td class="px-4">
+                  <span
+                    class="inline-flex items-center gap-1.5 text-xs text-[var(--ui-text-secondary)] whitespace-nowrap">
+                    <span
+                      class="h-1.5 w-1.5 rounded-full"
+                      :class="getTicketStatusDotClass(t.status)" />
+                    {{ t.status }}
+                  </span>
                 </td>
 
                 <td class="px-2 text-right">
                   <div class="flex items-center justify-end gap-2">
                     <span
-                      class="hidden h-[42px] w-[42px] items-center justify-center rounded-full active:bg-[var(--color-stroke-ui-dark)] hover:bg-[var(--color-stroke-ui-light)] md:flex"
-                      @click.stop="() => (currentTicketIdForChat = t.id)">
+                      class="relative h-[42px] w-[42px] flex items-center justify-center rounded-full active:bg-[var(--color-stroke-ui-dark)] hover:bg-[var(--color-stroke-ui-light)]"
+                      @click.stop="handleChatIconClick(t.id)">
+                      <span
+                        v-if="t.unread_messages_count > 0"
+                        class="absolute top-1 right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-[var(--ui-sticker-danger)] text-white text-[10px] leading-none flex items-center justify-center">
+                        {{ t.unread_messages_count }}
+                      </span>
                       <UiIconChat class="!h-[24px] !w-[24px]" />
                     </span>
                     <button
@@ -231,12 +252,12 @@
                   </button>
                 </div>
               </div>
-              <UiBadge
-                :outline="true"
-                state="info"
-                class="whitespace-nowrap !px-2.5 !py-1 !text-[11px] !leading-none">
+              <span class="inline-flex items-center gap-1.5 text-xs text-[var(--ui-text-secondary)] whitespace-nowrap">
+                <span
+                  class="h-1.5 w-1.5 rounded-full"
+                  :class="getTicketStatusDotClass(ticket.status)" />
                 {{ ticket.status }}
-              </UiBadge>
+              </span>
             </div>
 
             <div class="mt-3 grid grid-cols-[auto_1fr] items-center gap-x-2 text-xs text-[var(--ui-text-secondary)]">
@@ -248,15 +269,24 @@
 
             <div class="mt-3 flex items-center justify-between">
               <span class="inline-flex items-center gap-1.5 text-xs text-[var(--ui-text-secondary)]">
-                <span class="h-1.5 w-1.5 rounded-full bg-[var(--ui-primary-main)]" />
-                Ticket
+                <span
+                  class="h-1.5 w-1.5 rounded-full"
+                  :class="
+                    ticket.counterparty_online ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'
+                  " />
+                {{ ticket.counterparty_online ? "Online" : "Offline" }}
               </span>
 
               <div class="flex items-center gap-1">
                 <button
-                  class="hidden md:flex h-[34px] w-[34px] items-center justify-center rounded-md text-[var(--ui-text-secondary)] hover:bg-[var(--color-stroke-ui-light)] hover:text-[var(--ui-text-main)] active:opacity-[.5]"
-                  @click.stop="() => (currentTicketIdForChat = ticket.id)"
+                  class="relative h-[34px] w-[34px] flex items-center justify-center rounded-md text-[var(--ui-text-secondary)] hover:bg-[var(--color-stroke-ui-light)] hover:text-[var(--ui-text-main)] active:opacity-[.5]"
+                  @click.stop="handleChatIconClick(ticket.id)"
                   aria-label="Open chat">
+                  <span
+                    v-if="ticket.unread_messages_count > 0"
+                    class="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[var(--ui-sticker-danger)] text-white text-[10px] leading-none flex items-center justify-center">
+                    {{ ticket.unread_messages_count }}
+                  </span>
                   <UiIconChat class="!h-[18px] !w-[18px]" />
                 </button>
                 <button
@@ -343,7 +373,6 @@
   import ChatDefault from "~/components/block/chats/ChatDefault.vue";
   import PanelDefault from "~/components/block/panels/PanelDefault.vue";
   import TicketsCreateNew from "~/pages/support/components/TicketsCreateNew.vue";
-  import UiBadge from "~/components/ui/UiBadge.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiIconChat from "~/components/ui/UiIconChat.vue";
@@ -364,6 +393,7 @@
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
   import { definePageMeta, useAuthStore } from "~/.nuxt/imports";
+  import { useNuxtApp } from "nuxt/app";
   import {
     ref,
     computed,
@@ -380,10 +410,11 @@
   import { useRouter } from "vue-router";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 
-  type Status = "resolved" | "in_progress" | "cancelled";
-
   const ORDER_DIRECTION_ASC = "asc";
   const ORDER_DIRECTION_DESC = "desc";
+  const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
+  const SUPPORT_LIST_RELOAD_EVENT = "loadDataForSupport";
+  const { $echo } = useNuxtApp() as { $echo?: any };
 
   const tickets = reactive([]);
 
@@ -431,6 +462,7 @@
   const orderDirection = ref(ORDER_DIRECTION_DESC);
   const currentRowActiveOptions = ref<number | null>(null);
   const VIEW_MODE_STORAGE_KEY = "support_view_mode";
+  const SUPPORT_LIST_REFRESH_MS = 10000;
   const viewMode = ref<"table" | "cards" | "full">("table");
   const viewOptions = [
     {
@@ -573,19 +605,29 @@
 
   // ---
 
-  const currentTicketIdForChat = ref<number | null>(null);
+  const currentTicketIdForChat = ref<string | null>(null);
 
   const filtered = computed(() =>
     tickets.filter(t =>
-      `${t.id} ${t.subject} ${t.lastUpdate} ${t.statusText}`.toLowerCase().includes(search.value.toLowerCase())
+      `${t.id} ${t.subject} ${t.last_message_at} ${t.status}`.toLowerCase().includes(search.value.toLowerCase())
     )
   );
 
-  const statusPillClass = (s: Status) => ({
-    "border-[var(--color-success)]/30 text-[var(--color-success)] bg-[var(--color-success)]/10": s === "resolved",
-    "border-[var(--color-warning)]/30 text-[var(--color-warning)] bg-[var(--color-warning)]/10": s === "in_progress",
-    "border-[var(--color-danger)]/30  text-[var(--color-danger)]  bg-[var(--color-danger)]/10": s === "cancelled",
-  });
+  const getTicketStatusDotClass = (status: unknown) => {
+    const normalizedStatus = String(status ?? "")
+      .trim()
+      .toLowerCase();
+
+    if (["open", "in_progress", "in progress", "pending", "active"].includes(normalizedStatus)) {
+      return "bg-[var(--ui-sticker-success)]";
+    }
+
+    if (["closed", "resolved", "cancelled", "rejected", "archived"].includes(normalizedStatus)) {
+      return "bg-[var(--ui-sticker-danger)]";
+    }
+
+    return "bg-[var(--ui-text-secondary)]";
+  };
 
   definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
 
@@ -693,24 +735,97 @@
   };
 
   const passiveFalse = { passive: false } as AddEventListenerOptions;
+  let supportListRefreshTimer: ReturnType<typeof setInterval> | null = null;
+  let supportGlobalChannel: any = null;
+  let reloadQueued = false;
 
   const loadData = async () => {
-    isLoading.value = true;
-    const response = await appCore.tickets.get({
-      search: search.value,
-      perPage: perPage.value,
-      page: currentPage.value,
-      orderBy: orderBy.value,
-      orderDirection: orderDirection.value,
-    });
+    if (isLoading.value) {
+      reloadQueued = true;
+      return;
+    }
 
-    perPage.value = response.data.meta.per_page;
-    currentPage.value = response.data.meta.current_page;
-    total.value = response.data.meta.total;
+    do {
+      reloadQueued = false;
+      isLoading.value = true;
+      try {
+        const response = await appCore.tickets.get({
+          search: search.value,
+          perPage: perPage.value,
+          page: currentPage.value,
+          orderBy: orderBy.value,
+          orderDirection: orderDirection.value,
+        });
 
-    tickets.splice(0, tickets.length, ...response.data.data);
-    isLoading.value = false;
-    isInitialLoading.value = false;
+        perPage.value = response.data.meta.per_page;
+        currentPage.value = response.data.meta.current_page;
+        total.value = response.data.meta.total;
+
+        tickets.splice(0, tickets.length, ...response.data.data);
+      } finally {
+        isLoading.value = false;
+        isInitialLoading.value = false;
+      }
+    } while (reloadQueued);
+  };
+
+  const connectSupportRealtime = () => {
+    if (!$echo || supportGlobalChannel) return;
+
+    supportGlobalChannel = $echo.private("support.global").listen(".MessageSent", handleSupportListReload);
+  };
+
+  const disconnectSupportRealtime = () => {
+    if (!$echo || !supportGlobalChannel) return;
+
+    supportGlobalChannel.stopListening(".MessageSent");
+    $echo.leave("support.global");
+    supportGlobalChannel = null;
+  };
+
+  const syncCurrentTicketUnreadCount = (ticketId: string, unreadCount: number) => {
+    const target = tickets.find((item: any) => String(item.id) === String(ticketId));
+    if (!target) return;
+    target.unread_messages_count = Math.max(0, unreadCount);
+  };
+
+  const normalizeSupportUnreadPayload = (payload?: any): { ticketId: string; unread: number } | null => {
+    if (!payload || typeof payload !== "object") return null;
+
+    const rawTicketId = payload.ticketId ?? payload.ticket_id;
+    const rawUnread = payload.unread ?? payload.unread_count ?? payload.unread_messages_count;
+    if (rawTicketId === undefined || rawTicketId === null || rawUnread === undefined || rawUnread === null) return null;
+
+    const normalizedUnread = Number(rawUnread);
+    if (!Number.isFinite(normalizedUnread)) return null;
+
+    return {
+      ticketId: String(rawTicketId),
+      unread: Math.max(0, normalizedUnread),
+    };
+  };
+
+  const handleSupportUnreadPayload = (payload?: any): boolean => {
+    const normalizedPayload = normalizeSupportUnreadPayload(payload);
+    if (!normalizedPayload) return false;
+
+    syncCurrentTicketUnreadCount(normalizedPayload.ticketId, normalizedPayload.unread);
+    return true;
+  };
+
+  const startSupportListRefresh = () => {
+    if (supportListRefreshTimer) return;
+
+    supportListRefreshTimer = setInterval(() => {
+      loadData().catch(() => {});
+    }, SUPPORT_LIST_REFRESH_MS);
+  };
+
+  const stopSupportListRefresh = () => {
+    if (!supportListRefreshTimer) return;
+
+    clearInterval(supportListRefreshTimer);
+    supportListRefreshTimer = null;
   };
 
   const initViewMode = () => {
@@ -795,8 +910,28 @@
 
   const handleClickRow = (ticketId: string) => router.push(`/support/${ticketId}`);
 
+  const handleChatIconClick = (ticketId: string) => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      router.push(`/support/${ticketId}`);
+      return;
+    }
+
+    currentTicketIdForChat.value = ticketId;
+  };
+
+  const handleSupportListReload = () => {
+    loadData().catch(() => {});
+  };
+
+  const handleSupportUnreadUpdated = (payload?: any) => {
+    if (handleSupportUnreadPayload(payload)) return;
+    loadData().catch(() => {});
+  };
+
   onMounted(async () => {
-    useEventBus.on("loadDataForSupport", loadData);
+    useEventBus.on(SUPPORT_LIST_RELOAD_EVENT, handleSupportListReload);
+    useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    connectSupportRealtime();
 
     const response = await appCore.auth.getAuthUser();
     currentUser.id = response.data.id;
@@ -812,9 +947,14 @@
     await placeBottomLeft();
     window.addEventListener("resize", placeBottomLeft);
     await loadData();
+    startSupportListRefresh();
   });
 
   onBeforeUnmount(() => {
+    useEventBus.off(SUPPORT_LIST_RELOAD_EVENT, handleSupportListReload);
+    useEventBus.off(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    disconnectSupportRealtime();
+    stopSupportListRefresh();
     window.removeEventListener("resize", placeBottomLeft);
     document.body.style.userSelect = "";
     document.body.style.cursor = "";

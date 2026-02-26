@@ -1,17 +1,20 @@
-import {reactive, Reactive} from "vue";
+import { reactive, Reactive } from "vue";
 
 export interface IFormDataDto {
-  email: String;
-  first_name: String,
-  mid_name: String,
-  last_name: String,
-  birthdate: String,
-  phone: String,
-  country: String,
-  state: String,
-  city: String,
-  address: String,
-  postal_code: String,
+  email: string;
+  first_name: string;
+  mid_name: string;
+  last_name: string;
+  birthdate: string;
+  phone: string;
+  country: string;
+  state: string;
+  city: string;
+  address: string;
+  postal_code: string;
+  country_id: string | null;
+  state_id: string | null;
+  city_id: string | null;
 }
 
 export const formData: Reactive<IFormDataDto> = reactive({
@@ -26,4 +29,7 @@ export const formData: Reactive<IFormDataDto> = reactive({
   city: "",
   address: "",
   postal_code: "",
+  country_id: null,
+  state_id: null,
+  city_id: null,
 });

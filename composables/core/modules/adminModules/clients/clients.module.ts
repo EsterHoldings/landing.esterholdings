@@ -1,11 +1,4 @@
-import { useAuthStore } from "@/stores/authStore";
 import ClientsService from "~/composables/core/modules/adminModules/clients/clients.service";
-
-interface ResponseDTO {
-  success: Boolean;
-  data: any;
-  errors: any;
-}
 
 export class ClientsModule {
   private clientsService: ClientsService;
@@ -14,27 +7,35 @@ export class ClientsModule {
     this.clientsService = new ClientsService();
   }
 
-  async get(params:object = {}) {
+  async get(params: object = {}) {
     return await this.clientsService.get(params);
   }
 
-  async getById(id:any): Promise<any> {
+  async getById(id: any): Promise<any> {
     return await this.clientsService.getById(id);
   }
 
-  async post(data:any): Promise<any> {
+  async getPaymentDetails(id: any, params: object = {}): Promise<any> {
+    return await this.clientsService.getPaymentDetails(id, params);
+  }
+
+  async patchPaymentDetailStatus(id: any, paymentDetailId: any, data: object = {}): Promise<any> {
+    return await this.clientsService.patchPaymentDetailStatus(id, paymentDetailId, data);
+  }
+
+  async post(data: any): Promise<any> {
     return await this.clientsService.post(data);
   }
 
-  async put(id:any, data:object): Promise<any> {
+  async put(id: any, data: object): Promise<any> {
     return await this.clientsService.put(id, data);
   }
 
-  async patch(id:any, data:object): Promise<any> {
+  async patch(id: any, data: object): Promise<any> {
     return await this.clientsService.patch(id, data);
   }
 
-  async delete(id:any): Promise<any> {
+  async delete(id: any): Promise<any> {
     return await this.clientsService.delete(id);
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <button
     class="btn"
+    :disabled="props.disabled || props.isLoading"
     :class="{
       'btn--info': props.state === 'info',
       'btn--link': props.state === 'link',
@@ -20,6 +21,7 @@
       'btn--danger--outline': props.state === 'danger--outline',
       'btn--danger--outline--small': props.state === 'danger--outline--small',
       'btn--secondary': props.state === 'secondary',
+      'btn--disabled': props.disabled || props.isLoading,
     }"
     :type="props.type"
     @click="handleClick">
@@ -48,13 +50,20 @@
       type: Boolean,
       default: false,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
     state: {
       type: String,
       default: "",
     },
   });
   const emit = defineEmits(["click"]);
-  const handleClick = (): void => emit("click");
+  const handleClick = (): void => {
+    if (props.disabled || props.isLoading) return;
+    emit("click");
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -78,6 +87,14 @@
     font-weight: 600;
 
     color: var(--ui-text-main);
+
+    &:disabled,
+    &--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+      transform: none !important;
+    }
 
     &--info {
       background-color: #719edf;

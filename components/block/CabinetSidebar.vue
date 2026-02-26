@@ -11,23 +11,27 @@
     </div>
 
     <div class="flex-1 w-full flex items-start justify-center p-2">
-      <CabinetSidebarMenu />
+      <CabinetSidebarMenu :supportUnreadCount="supportUnreadCount" />
     </div>
   </aside>
 
   <nav
     class="cabinet-mobile-nav lg:hidden fixed bottom-0 inset-x-0 z-50 h-[74px] pb-[max(env(safe-area-inset-bottom,0px),8px)] bg-[var(--ui-background-sidebar)]/78 backdrop-blur-xl text-[var(--ui-text-main)] shadow-[0_-8px_24px_-16px_rgba(0,0,0,.6)]">
     <div class="h-full px-2 flex items-center justify-evenly gap-1 overflow-hidden">
-      <CabinetSidebarMenu class="mobile-bottom-menu flex-1" />
+      <CabinetSidebarMenu
+        class="mobile-bottom-menu flex-1"
+        :supportUnreadCount="supportUnreadCount" />
     </div>
   </nav>
 </template>
 
 <script lang="ts" setup>
   import { useRoute } from "vue-router";
-  import { navigateTo } from "nuxt/app";
-  import { computed, reactive, ref } from "vue";
+  import { navigateTo, useNuxtApp } from "nuxt/app";
+  import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
   import { useI18n } from "vue-i18n";
+  import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
 
   import { useThemeStore } from "~/stores/themeStore.js";
   import { useAuthStore } from "~/stores/authStore";
@@ -47,11 +51,19 @@
 
   const authStore = useAuthStore();
   const themeStore = useThemeStore();
+  const appCore = useAppCore();
   const { locale } = useI18n({ useScope: "global" });
   const addCurrentLocaleToPath = (path = "") => `/${locale.value}/${path}`;
+  const SUPPORT_BADGE_REFRESH_MS = 10000;
+  const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
+  const { $echo } = useNuxtApp() as { $echo?: any };
 
   const isOpen = ref(false);
   const isLoading = ref(false);
+  const supportUnreadCount = ref(0);
+  let supportBadgeTimer: ReturnType<typeof setInterval> | null = null;
+  let supportUnreadRafId: number | null = null;
+  let supportRealtimeChannel: any = null;
   const notifications = reactive([
     { type: "info", message: "Test info notification message", wasRead: false },
     { type: "warning", message: "Test warning notification message", wasRead: false },
@@ -78,6 +90,69 @@
   const isProfileRoute = computed(() => route.path.split("/").pop() === "profile");
 
   const handleClickNotifications = () => (isOpen.value = !isOpen.value);
+
+  const loadSupportUnreadCount = async () => {
+    try {
+      const response = await appCore.tickets.getUnreadSummary();
+      const count = Number(response?.data?.data?.unread_messages_count ?? response?.data?.unread_messages_count ?? 0);
+      supportUnreadCount.value = Number.isFinite(count) ? Math.max(0, count) : 0;
+    } catch {}
+  };
+
+  const startSupportBadgeRefresh = () => {
+    if (supportBadgeTimer) return;
+
+    supportBadgeTimer = setInterval(() => {
+      loadSupportUnreadCount().catch(() => {});
+    }, SUPPORT_BADGE_REFRESH_MS);
+  };
+
+  const stopSupportBadgeRefresh = () => {
+    if (!supportBadgeTimer) return;
+
+    clearInterval(supportBadgeTimer);
+    supportBadgeTimer = null;
+  };
+
+  const handleSupportUnreadUpdated = () => {
+    if (supportUnreadRafId !== null) return;
+
+    supportUnreadRafId = window.requestAnimationFrame(() => {
+      supportUnreadRafId = null;
+      loadSupportUnreadCount().catch(() => {});
+    });
+  };
+
+  const connectSupportRealtime = () => {
+    if (!$echo || supportRealtimeChannel) return;
+
+    supportRealtimeChannel = $echo.private("support.global").listen(".MessageSent", handleSupportUnreadUpdated);
+  };
+
+  const disconnectSupportRealtime = () => {
+    if (!$echo || !supportRealtimeChannel) return;
+
+    supportRealtimeChannel.stopListening(".MessageSent");
+    $echo.leave("support.global");
+    supportRealtimeChannel = null;
+  };
+
+  onMounted(async () => {
+    await loadSupportUnreadCount();
+    useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    startSupportBadgeRefresh();
+    connectSupportRealtime();
+  });
+
+  onBeforeUnmount(() => {
+    useEventBus.off(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    stopSupportBadgeRefresh();
+    disconnectSupportRealtime();
+    if (supportUnreadRafId !== null) {
+      window.cancelAnimationFrame(supportUnreadRafId);
+      supportUnreadRafId = null;
+    }
+  });
 </script>
 
 <style scoped>
@@ -139,5 +214,9 @@
   .mobile-bottom-menu :deep(em),
   .mobile-bottom-menu :deep(strong) {
     display: none !important;
+  }
+
+  .mobile-bottom-menu :deep(.menu-notification-badge) {
+    display: inline-flex !important;
   }
 </style>

@@ -6,6 +6,7 @@
       </div>
       <div class="mt4-header-card__actions">
         <NuxtLink
+          v-if="canCreateAccount"
           :to="profileAccountsLink"
           class="w-full sm:w-auto">
           <UiButtonDefault
@@ -14,6 +15,13 @@
             {{ t("cabinet.dashboard.mt4.openNewAccount") }}
           </UiButtonDefault>
         </NuxtLink>
+        <UiButtonDefault
+          v-else
+          state="primary"
+          class="w-full sm:w-auto"
+          :disabled="true">
+          {{ t("cabinet.dashboard.mt4.openNewAccount") }}
+        </UiButtonDefault>
       </div>
     </div>
 
@@ -46,6 +54,43 @@
       <div
         v-else
         class="mt4-list">
+        <div
+          v-if="visibleAccounts.length === 0"
+          class="mt4-empty-state">
+          <div class="mt4-empty-state__icon-wrap">
+            <UiIconCardCheck class="mt4-empty-state__icon" />
+          </div>
+          <div class="mt4-empty-state__title">
+            {{ emptyTitle }}
+          </div>
+          <UiTextSmall class="mt4-empty-state__subtitle">
+            {{ emptySubtitle }}
+          </UiTextSmall>
+          <UiTextSmall
+            v-if="!canCreateAccount && blockedReasonText"
+            class="mt4-empty-state__warning">
+            {{ blockedReasonText }}
+          </UiTextSmall>
+
+          <NuxtLink
+            v-if="canCreateAccount"
+            :to="profileAccountsLink"
+            class="w-full sm:w-auto">
+            <UiButtonDefault
+              state="success--outline"
+              class="w-full sm:w-auto">
+              {{ openAccountLabel }}
+            </UiButtonDefault>
+          </NuxtLink>
+          <UiButtonDefault
+            v-else
+            state="success--outline"
+            class="w-full sm:w-auto"
+            :disabled="true">
+            {{ openAccountLabel }}
+          </UiButtonDefault>
+        </div>
+
         <div
           v-for="account in visibleAccounts"
           :key="account.id"
@@ -112,6 +157,7 @@
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
   import UiBadge from "~/components/ui/UiBadge.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+  import UiIconCardCheck from "~/components/ui/UiIconCardCheck.vue";
 
   type Mt4Status = "active" | "inactive";
   type Mt4Account = {
@@ -125,10 +171,19 @@
     favorite_at?: string | null;
   };
 
-  const props = defineProps<{
-    accounts: Mt4Account[];
-    isLoading?: boolean;
-  }>();
+  const props = withDefaults(
+    defineProps<{
+      accounts: Mt4Account[];
+      isLoading?: boolean;
+      canCreateAccount?: boolean;
+      accountCreationBlockedReason?: string;
+    }>(),
+    {
+      isLoading: false,
+      canCreateAccount: true,
+      accountCreationBlockedReason: "",
+    }
+  );
 
   const { isLoading } = toRefs(props);
 
@@ -140,11 +195,27 @@
   const localePath = useLocalePath();
 
   const profileAccountsLink = computed(() => localePath("/accounts"));
+  const canCreateAccount = computed(() => !!props.canCreateAccount);
 
   const statusText = {
     active: () => t("cabinet.dashboard.mt4.table.active"),
     inactive: () => t("cabinet.dashboard.mt4.table.inactive"),
   };
+
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const emptyTitle = computed(() => resolveText("cabinet.dashboard.mt4.emptyTitle", "Счетов пока нет"));
+  const emptySubtitle = computed(() =>
+    resolveText("cabinet.dashboard.mt4.emptySubtitle", "Откройте первый торговый счет, чтобы начать работу.")
+  );
+  const openAccountLabel = computed(() => resolveText("cabinet.accounts.openAccount", "Открыть счет"));
+  const blockedReasonText = computed(() => {
+    const raw = String(props.accountCreationBlockedReason || "").trim();
+    return raw;
+  });
 
   const mt4BadgeState = (status: Mt4Status) => {
     return status === "active" ? "success" : "warning";
@@ -216,6 +287,53 @@
     align-content: start;
     overflow-y: auto;
     padding-right: 4px;
+  }
+
+  .mt4-empty-state {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 18px 12px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ui-background-card) 72%, transparent);
+    border: 1px dashed var(--color-stroke-ui-light);
+  }
+
+  .mt4-empty-state__icon-wrap {
+    height: 56px;
+    width: 56px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--ui-primary-main) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ui-primary-main) 40%, transparent);
+  }
+
+  .mt4-empty-state__icon {
+    width: 24px;
+    height: 24px;
+    color: var(--ui-primary-main);
+  }
+
+  .mt4-empty-state__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-text-main);
+  }
+
+  .mt4-empty-state__subtitle {
+    color: var(--ui-text-secondary);
+    max-width: 320px;
+  }
+
+  .mt4-empty-state__warning {
+    color: var(--color-warning);
+    max-width: 360px;
   }
 
   .mt4-card {

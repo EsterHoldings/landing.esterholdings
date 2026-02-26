@@ -12,49 +12,55 @@
         @touchmove="handleHeaderTouchMove"
         @touchend="handleHeaderTouchEnd"
         @touchcancel="handleHeaderTouchEnd">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <button
+            v-if="showMobileControls"
+            type="button"
+            class="chat-mobile-back"
+            aria-label="Back to tickets"
+            @click="emit('mobile-back')">
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+
           <h3 class="text-lg font-semibold text-[var(--ui-text-main)]">Support Chat</h3>
           <div class="flex items-center gap-2 text-sm text-[var(--ui-text-secondary)]">
             <span
               class="inline-flex h-2.5 w-2.5 rounded-full"
               :class="isCounterpartyOnline ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'" />
             <span>{{ isCounterpartyOnline ? "Online" : "Offline" }}</span>
-
-            <button
-              v-if="showMobileControls"
-              type="button"
-              class="chat-mobile-toggle ml-3"
-              :class="{ 'is-expanded': props.mobilePanelExpanded }"
-              aria-label="Toggle details"
-              @click="emit('mobile-toggle-panel')">
-              <svg
-                viewBox="0 0 24 24"
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
+            <span
+              v-if="isCounterpartyTyping"
+              class="text-[var(--ui-primary-accent)]">
+              typing...
+            </span>
           </div>
         </div>
 
         <button
           v-if="showMobileControls"
           type="button"
-          class="chat-mobile-close"
-          aria-label="Close chat"
-          @click="emit('mobile-close-chat')">
+          class="chat-mobile-toggle"
+          :class="{ 'is-expanded': props.mobilePanelExpanded }"
+          aria-label="Toggle details"
+          @click="emit('mobile-toggle-panel')">
           <svg
             viewBox="0 0 24 24"
             class="h-4 w-4"
             fill="none"
             stroke="currentColor"
             stroke-width="2.5"
-            stroke-linecap="round">
-            <path d="M6 6l12 12M18 6l-12 12" />
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
           </svg>
         </button>
 
@@ -227,6 +233,11 @@
                       isCounterpartyOnline ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'
                     " />
                   <span>{{ isCounterpartyOnline ? "Online" : "Offline" }}</span>
+                  <span
+                    v-if="isCounterpartyTyping"
+                    class="text-[var(--ui-primary-accent)]">
+                    typing...
+                  </span>
                 </div>
               </div>
               <button
@@ -379,6 +390,7 @@
   import { ref, computed, withDefaults, onMounted, onBeforeUnmount, nextTick, reactive, watch, useAttrs } from "vue";
   import { useNuxtApp } from "nuxt/app";
   import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
   import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
   import VueDraggableResizable from "vue-draggable-resizable";
   import "vue-draggable-resizable/style.css";
@@ -387,6 +399,7 @@
   defineOptions({ inheritAttrs: false });
 
   const attrs = useAttrs();
+  const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
 
   type ChatMessage = {
     id: string;
@@ -418,7 +431,7 @@
   type RenderSep = { kind: "sep"; key: string; label: "today" | "yesterday" };
   type RenderMsg = { kind: "msg"; key: string; msg: ChatMessage };
   type RenderItem = RenderSep | RenderMsg;
-  type PresenceUser = { id: number; name: string; role?: string };
+  type PresenceUser = { id: string; name: string; role?: string };
   type ChatCurrentUser = {
     id: number | string | null;
     name?: string | null;
@@ -447,8 +460,8 @@
   );
   const emit = defineEmits<{
     (e: "close"): void;
+    (e: "mobile-back"): void;
     (e: "mobile-toggle-panel"): void;
-    (e: "mobile-close-chat"): void;
     (e: "mobile-header-swipe", direction: "up" | "down"): void;
     (e: "mobile-input-swipe-up"): void;
   }>();
@@ -717,6 +730,9 @@
   let lastUserScrollAt = 0;
   const STICKY_EPS = 16;
   const SCROLL_IDLE_MS = 200;
+  const LOCAL_TYPING_IDLE_MS = 1400;
+  const LOCAL_TYPING_HEARTBEAT_MS = 1800;
+  const REMOTE_TYPING_TTL_MS = 3500;
 
   const normalizeUserId = (value: unknown): string => {
     if (value === null || value === undefined) return "";
@@ -804,6 +820,23 @@
     });
   };
   const canSend = computed(() => draft.value.trim().length > 0);
+  const remoteTypingUsers = reactive<Set<string>>(new Set());
+  const remoteTypingTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  let localTypingStopTimer: ReturnType<typeof setTimeout> | null = null;
+  let localTypingSent = false;
+  let localTypingLastPingAt = 0;
+
+  const isCounterpartyTyping = computed(() => {
+    if (remoteTypingUsers.size === 0) return false;
+
+    for (const userId of Array.from(remoteTypingUsers.values())) {
+      if (userId !== currentUserId.value) {
+        return true;
+      }
+    }
+
+    return false;
+  });
 
   const preserveInputFocusOnMobile = () => {
     if (!isMobileChatInteraction()) return;
@@ -817,6 +850,90 @@
         field.setSelectionRange(end, end);
       }
     });
+  };
+
+  const clearRemoteTypingTimer = (userId: string) => {
+    const timer = remoteTypingTimers.get(userId);
+    if (!timer) return;
+
+    clearTimeout(timer);
+    remoteTypingTimers.delete(userId);
+  };
+
+  const clearAllRemoteTyping = () => {
+    for (const timer of Array.from(remoteTypingTimers.values())) {
+      clearTimeout(timer);
+    }
+    remoteTypingTimers.clear();
+    remoteTypingUsers.clear();
+  };
+
+  const applyRemoteTypingState = (userId: unknown, isTyping: boolean) => {
+    const normalizedUserId = normalizeUserId(userId);
+    if (!normalizedUserId || normalizedUserId === currentUserId.value) return;
+
+    clearRemoteTypingTimer(normalizedUserId);
+
+    if (!isTyping) {
+      remoteTypingUsers.delete(normalizedUserId);
+      return;
+    }
+
+    remoteTypingUsers.add(normalizedUserId);
+    const timer = setTimeout(() => {
+      remoteTypingUsers.delete(normalizedUserId);
+      remoteTypingTimers.delete(normalizedUserId);
+    }, REMOTE_TYPING_TTL_MS);
+    remoteTypingTimers.set(normalizedUserId, timer);
+  };
+
+  const clearLocalTypingStopTimer = () => {
+    if (!localTypingStopTimer) return;
+
+    clearTimeout(localTypingStopTimer);
+    localTypingStopTimer = null;
+  };
+
+  const sendTypingState = async (isTyping: boolean) => {
+    const payload = { is_typing: isTyping };
+    try {
+      if (props.adminChat) {
+        await appCore.adminModules.tickets.typing(props.ticketId, payload);
+      } else {
+        await appCore.tickets.typing(props.ticketId, payload);
+      }
+    } catch {
+      // noop
+    }
+  };
+
+  const scheduleLocalTypingStop = () => {
+    clearLocalTypingStopTimer();
+    localTypingStopTimer = setTimeout(() => {
+      void stopTyping();
+    }, LOCAL_TYPING_IDLE_MS);
+  };
+
+  const startTyping = async () => {
+    const now = Date.now();
+
+    if (!localTypingSent || now - localTypingLastPingAt >= LOCAL_TYPING_HEARTBEAT_MS) {
+      localTypingSent = true;
+      localTypingLastPingAt = now;
+      await sendTypingState(true);
+    }
+
+    scheduleLocalTypingStop();
+  };
+
+  const stopTyping = async (force = false) => {
+    clearLocalTypingStopTimer();
+
+    if (!localTypingSent && !force) return;
+
+    localTypingSent = false;
+    localTypingLastPingAt = 0;
+    await sendTypingState(false);
   };
 
   const handleSendPointerDown = (event: PointerEvent) => {
@@ -929,6 +1046,84 @@
     });
   }
 
+  const lastReadAckMessageId = ref<string | null>(null);
+  let markReadInFlight = false;
+  let markReadRafId: number | null = null;
+  let markReadDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  let pendingMarkReadMessageId: string | null = null;
+
+  const isMessageElementVisible = (containerRect: DOMRect, messageEl: HTMLElement): boolean => {
+    const rect = messageEl.getBoundingClientRect();
+    return rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+  };
+
+  const messageIndexById = computed(() => {
+    const index = new Map<string, number>();
+    messages.forEach((message, idx) => {
+      index.set(message.id, idx);
+    });
+    return index;
+  });
+
+  const messageById = computed(() => {
+    const mapped = new Map<string, ChatMessage>();
+    messages.forEach(message => {
+      mapped.set(message.id, message);
+    });
+    return mapped;
+  });
+
+  const isIncomingMessageId = (messageId: string): boolean => {
+    const message = messageById.value.get(messageId);
+    if (!message) return false;
+
+    return message.userId !== currentUserId.value;
+  };
+
+  const isMessageIdNewerThan = (candidateId: string, baselineId: string | null): boolean => {
+    if (!baselineId) return true;
+    if (candidateId === baselineId) return false;
+
+    const candidateIndex = messageIndexById.value.get(candidateId);
+    const baselineIndex = messageIndexById.value.get(baselineId);
+
+    if (candidateIndex !== undefined && baselineIndex !== undefined) {
+      return candidateIndex > baselineIndex;
+    }
+
+    return candidateId > baselineId;
+  };
+
+  const getLastVisibleIncomingMessageId = (): string | null => {
+    const list = listRef.value;
+    if (!list) return null;
+
+    const containerRect = list.getBoundingClientRect();
+    const nodes = Array.from(list.querySelectorAll<HTMLElement>("[data-mid]"));
+    let lastVisibleId: string | null = null;
+
+    for (const node of nodes) {
+      if (!isMessageElementVisible(containerRect, node)) continue;
+      const mid = node.dataset.mid?.trim();
+      if (mid && isIncomingMessageId(mid)) {
+        lastVisibleId = mid;
+      }
+    }
+
+    return lastVisibleId;
+  };
+
+  const getLatestIncomingMessageId = (): string | null => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const message = messages[i];
+      if (message.userId !== currentUserId.value) {
+        return message.id;
+      }
+    }
+
+    return null;
+  };
+
   const appCore = useAppCore();
   const waitForNextPaint = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 
@@ -993,6 +1188,8 @@
     await ensureScrollableHistoryForBlock();
     scrollToBottom();
     userIsNearBottom.value = true;
+    await waitForNextPaint();
+    await markVisibleMessagesAsRead();
     booting.value = false;
   }
   let loadingMore = false;
@@ -1020,6 +1217,7 @@
     lastUserScrollAt = performance.now();
     userIsNearBottom.value = el.scrollTop + el.clientHeight >= el.scrollHeight - STICKY_EPS;
     if (!loadingMore && hasMore.value && el.scrollTop <= 400) loadMoreAbove();
+    scheduleMarkVisibleMessagesAsRead();
   }
 
   const { $echo } = useNuxtApp() as unknown as { $echo: any };
@@ -1029,38 +1227,46 @@
     ch.listen(".MessageSent", async (e: any) => {
       const el = listRef.value;
       const shouldStick = !!el && userIsNearBottom.value && performance.now() - lastUserScrollAt > SCROLL_IDLE_MS;
-      messages.push(
-        mapApi({
-          id: e.id,
-          ticket_id: e.ticket_id,
-          user_id: e.user_id,
-          type: e.type,
-          body: e.body,
-          meta: e.meta,
-          created_at: e.created_at,
-          author: e.author,
-          author_photo_url: e.author_photo_url,
-          author_first_name: e.author_first_name,
-          author_last_name: e.author_last_name,
-          author_email: e.author_email,
-          author_initials: e.author_initials,
-        })
-      );
+      const incomingMessage = mapApi({
+        id: e.id,
+        ticket_id: e.ticket_id,
+        user_id: e.user_id,
+        type: e.type,
+        body: e.body,
+        meta: e.meta,
+        created_at: e.created_at,
+        author: e.author,
+        author_photo_url: e.author_photo_url,
+        author_first_name: e.author_first_name,
+        author_last_name: e.author_last_name,
+        author_email: e.author_email,
+        author_initials: e.author_initials,
+      });
+      messages.push(incomingMessage);
       ensureAscOrder();
       await nextTick();
       await new Promise(requestAnimationFrame);
-      if (shouldStick) scrollToBottom();
+      if (shouldStick) {
+        scrollToBottom();
+        await waitForNextPaint();
+      }
+      if (incomingMessage.userId !== currentUserId.value) {
+        await markVisibleMessagesAsRead();
+      }
+    });
+    ch.listen(".Typing", (e: { user_id: string; is_typing: boolean }) => {
+      applyRemoteTypingState(e?.user_id, Boolean(e?.is_typing));
     });
     return ch;
   }
 
   let presenceChan: any = null;
-  const onlineMap = reactive<Map<number, PresenceUser>>(new Map());
+  const onlineMap = reactive<Map<string, PresenceUser>>(new Map());
 
   const isCounterpartyOnline = computed(() => {
     if (onlineMap.size === 0) return false;
     for (const u of Array.from(onlineMap.values())) {
-      if (normalizeUserId(u.id) !== currentUserId.value) {
+      if (u.id !== currentUserId.value) {
         return true;
       }
     }
@@ -1068,20 +1274,27 @@
   });
 
   function applyPresencePayload(payload: any) {
+    const data = payload?.data ?? payload;
     onlineMap.clear();
-    if (payload && Array.isArray(payload.online_admins)) {
-      payload.online_admins.forEach((u: any) => {
-        onlineMap.set(Number(u.id), {
-          id: Number(u.id),
+    if (data && Array.isArray(data.online_admins)) {
+      data.online_admins.forEach((u: any) => {
+        const id = normalizeUserId(u?.id);
+        if (!id) return;
+
+        onlineMap.set(id, {
+          id,
           name: String(u.name),
           role: "admin",
         });
       });
     }
-    if (payload && payload.online_client) {
-      const u = payload.online_client;
-      onlineMap.set(Number(u.id), {
-        id: Number(u.id),
+    if (data && data.online_client) {
+      const u = data.online_client;
+      const id = normalizeUserId(u?.id);
+      if (!id) return;
+
+      onlineMap.set(id, {
+        id,
         name: String(u.name),
         role: "client",
       });
@@ -1105,10 +1318,18 @@
 
   let hb: any = null;
   async function apiOpen(ticketId: string) {
-    const data = await appCore.ticketsPresence.ping(ticketId);
-    applyPresencePayload(data);
+    const response = props.adminChat
+      ? await appCore.adminModules.tickets.presencePing(ticketId)
+      : await appCore.ticketsPresence.ping(ticketId);
+
+    applyPresencePayload(response?.data ?? response);
   }
   async function apiClose(ticketId: string) {
+    if (props.adminChat) {
+      await appCore.adminModules.tickets.presenceLeave(ticketId);
+      return;
+    }
+
     await appCore.ticketsPresence.presence(ticketId);
   }
   async function startPresenceHeartbeat(ticketId: string) {
@@ -1129,8 +1350,96 @@
   let resizeListenerAttached = false;
   let mobileModeResizeListenerAttached = false;
 
+  async function markReadUpToMessageId(messageId: string) {
+    if (!messageId || !isIncomingMessageId(messageId)) return;
+    if (!isMessageIdNewerThan(messageId, lastReadAckMessageId.value)) return;
+
+    if (markReadInFlight) {
+      if (isMessageIdNewerThan(messageId, pendingMarkReadMessageId)) {
+        pendingMarkReadMessageId = messageId;
+      }
+      return;
+    }
+
+    markReadInFlight = true;
+    const payload = { last_message_id: messageId };
+
+    try {
+      const response = props.adminChat
+        ? await appCore.adminModules.tickets.markRead(props.ticketId, payload)
+        : await appCore.tickets.markRead(props.ticketId, payload);
+      const updatedCount = Number(response?.data?.data?.updated_count ?? response?.data?.updated_count ?? 0);
+      const unreadCount = Number(
+        response?.data?.data?.unread_messages_count ?? response?.data?.unread_messages_count ?? Number.NaN
+      );
+
+      const latestIncomingId = Number.isFinite(unreadCount) && unreadCount === 0 ? getLatestIncomingMessageId() : null;
+      if (latestIncomingId && isMessageIdNewerThan(latestIncomingId, messageId)) {
+        lastReadAckMessageId.value = latestIncomingId;
+      } else {
+        lastReadAckMessageId.value = messageId;
+      }
+
+      if (Number.isFinite(updatedCount) && updatedCount > 0) {
+        const normalizedUnread = Number.isFinite(unreadCount) ? Math.max(0, unreadCount) : 0;
+        useEventBus.emit(SUPPORT_UNREAD_UPDATED_EVENT, {
+          ticketId: props.ticketId,
+          unread: normalizedUnread,
+        });
+      }
+    } catch (error) {
+      console.error("[ChatDefault] markRead failed", error);
+    } finally {
+      markReadInFlight = false;
+
+      if (pendingMarkReadMessageId) {
+        const pending = pendingMarkReadMessageId;
+        pendingMarkReadMessageId = null;
+        await markReadUpToMessageId(pending);
+      }
+    }
+  }
+
+  async function markVisibleMessagesAsRead() {
+    const lastVisibleId = getLastVisibleIncomingMessageId();
+    if (!lastVisibleId) return;
+
+    await markReadUpToMessageId(lastVisibleId);
+  }
+
+  function scheduleMarkVisibleMessagesAsRead() {
+    if (markReadDebounceTimer) {
+      clearTimeout(markReadDebounceTimer);
+    }
+
+    markReadDebounceTimer = setTimeout(() => {
+      markReadDebounceTimer = null;
+      if (markReadRafId !== null) return;
+
+      markReadRafId = requestAnimationFrame(() => {
+        markReadRafId = null;
+        markVisibleMessagesAsRead().catch(() => {});
+      });
+    }, 180);
+  }
+
+  watch(draft, value => {
+    if (!mounted.value) return;
+
+    if (value.trim().length === 0) {
+      void stopTyping();
+      return;
+    }
+
+    void startTyping();
+  });
+
   onMounted(async () => {
     mounted.value = true;
+    clearAllRemoteTyping();
+    localTypingSent = false;
+    localTypingLastPingAt = 0;
+    clearLocalTypingStopTimer();
     const prefersTouch = window.matchMedia?.("(pointer: coarse)").matches;
     dragHandle.value = prefersTouch ? ".drag-handle" : ".support-chat";
     syncMobileTextInputMode();
@@ -1142,6 +1451,7 @@
       initPosition();
     }
 
+    lastReadAckMessageId.value = null;
     await loadInitial();
 
     // resize listener тоже только для плавающего окна
@@ -1157,6 +1467,8 @@
   });
 
   onBeforeUnmount(() => {
+    void stopTyping(true);
+    clearAllRemoteTyping();
     try {
       if (privateChan) $echo.leave(`chat.${props.ticketId}`);
     } catch {}
@@ -1172,12 +1484,24 @@
       window.removeEventListener("resize", syncMobileTextInputMode);
       mobileModeResizeListenerAttached = false;
     }
+    if (markReadRafId !== null) {
+      cancelAnimationFrame(markReadRafId);
+      markReadRafId = null;
+    }
+    if (markReadDebounceTimer) {
+      clearTimeout(markReadDebounceTimer);
+      markReadDebounceTimer = null;
+    }
+    pendingMarkReadMessageId = null;
+    clearLocalTypingStopTimer();
   });
 
   watch(
     () => props.ticketId,
     async (id, oldId) => {
       if (id === oldId) return;
+      await stopTyping(true);
+      clearAllRemoteTyping();
       try {
         if (privateChan) $echo.leave(`chat.${oldId}`);
       } catch {}
@@ -1189,6 +1513,7 @@
       await startPresenceHeartbeat(id);
       booting.value = true;
       messages.splice(0, messages.length);
+      lastReadAckMessageId.value = null;
       nextPage = 2;
       hasMore.value = true;
       await loadInitial();
@@ -1197,6 +1522,7 @@
 
   async function send() {
     if (!canSend.value) return;
+    await stopTyping(true);
     const shouldKeepKeyboardOpen =
       isMobileChatInteraction() && (document.activeElement === inputRef.value || isKeyboardVisible());
     const body = draft.value.trim();
@@ -1258,8 +1584,7 @@
     transform: rotate(180deg);
   }
 
-  .chat-mobile-close {
-    margin-left: auto;
+  .chat-mobile-back {
     height: 30px;
     width: 30px;
     display: inline-flex;
