@@ -194,6 +194,7 @@
   import UiContainer from "~/components/ui/UiContainer.vue";
 
   import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
   import { definePageMeta, useAuthStore, useHead } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
@@ -211,6 +212,7 @@
   const router = useRouter();
 
   const appCore = useAppCore();
+  const SUPPORT_PRESENCE_UPDATED_EVENT = "support-presence-updated";
 
   const activeTabIndex = ref(0);
   const isLoading = ref(false);
@@ -587,7 +589,19 @@
     scheduleDesktopGridMeasure();
   };
 
+  const handleSupportPresenceUpdated = (payload?: any) => {
+    if (!payload || typeof payload !== "object") return;
+
+    const payloadTicketId = String(payload.ticketId ?? payload.ticket_id ?? "");
+    if (!payloadTicketId || payloadTicketId !== id.value) return;
+
+    const counterpartyOnline = Boolean(payload.counterparty_online ?? payload.counterpartyOnline);
+    participants[0].online = true;
+    participants[1].online = counterpartyOnline;
+  };
+
   onMounted(async () => {
+    useEventBus.on(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     updateViewportState();
     window.addEventListener("resize", updateViewportState, { passive: true });
 
@@ -615,6 +629,7 @@
   });
 
   onBeforeUnmount(() => {
+    useEventBus.off(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     window.removeEventListener("resize", updateViewportState);
     clearSidePanelCloseTimer();
     if (desktopGridRafId !== null) {

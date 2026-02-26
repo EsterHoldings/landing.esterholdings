@@ -400,6 +400,7 @@
 
   const attrs = useAttrs();
   const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
+  const SUPPORT_PRESENCE_UPDATED_EVENT = "support-presence-updated";
 
   type ChatMessage = {
     id: string;
@@ -1272,6 +1273,17 @@
     }
     return false;
   });
+
+  watch(
+    () => [props.ticketId, isCounterpartyOnline.value] as const,
+    ([ticketId, counterpartyOnline]) => {
+      useEventBus.emit(SUPPORT_PRESENCE_UPDATED_EVENT, {
+        ticketId,
+        counterparty_online: counterpartyOnline,
+      });
+    },
+    { immediate: true }
+  );
 
   function applyPresencePayload(payload: any) {
     const data = payload?.data ?? payload;

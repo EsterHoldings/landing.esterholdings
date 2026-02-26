@@ -377,6 +377,7 @@
   const ORDER_DIRECTION_ASC = "asc";
   const ORDER_DIRECTION_DESC = "desc";
   const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
+  const SUPPORT_PRESENCE_UPDATED_EVENT = "support-presence-updated";
   const { $echo } = useNuxtApp() as { $echo?: any };
 
   const tickets = reactive([]);
@@ -592,7 +593,7 @@
     return "bg-[var(--ui-text-secondary)]";
   };
 
-  definePageMeta({ layout: "default", middleware: ["auth-client", "client-check-auth"] });
+  definePageMeta({ layout: "default", middleware: ["admin-middleware"] });
 
   /* ===== Пересувний чат: без виділення і лагів ===== */
   const panelRef = ref<HTMLElement | null>(null);
@@ -749,6 +750,12 @@
     target.unread_messages_count = Math.max(0, unreadCount);
   };
 
+  const syncCurrentTicketCounterpartyOnline = (ticketId: string, counterpartyOnline: boolean) => {
+    const target = tickets.find((item: any) => String(item.id) === String(ticketId));
+    if (!target) return;
+    target.counterparty_online = counterpartyOnline;
+  };
+
   const normalizeSupportUnreadPayload = (payload?: any): { ticketId: string; unread: number } | null => {
     if (!payload || typeof payload !== "object") return null;
 
@@ -770,6 +777,27 @@
     if (!normalizedPayload) return false;
 
     syncCurrentTicketUnreadCount(normalizedPayload.ticketId, normalizedPayload.unread);
+    return true;
+  };
+
+  const normalizeSupportPresencePayload = (payload?: any): { ticketId: string; counterpartyOnline: boolean } | null => {
+    if (!payload || typeof payload !== "object") return null;
+
+    const rawTicketId = payload.ticketId ?? payload.ticket_id;
+    const rawCounterpartyOnline = payload.counterparty_online ?? payload.counterpartyOnline;
+    if (rawTicketId === undefined || rawTicketId === null || rawCounterpartyOnline === undefined) return null;
+
+    return {
+      ticketId: String(rawTicketId),
+      counterpartyOnline: Boolean(rawCounterpartyOnline),
+    };
+  };
+
+  const applySupportPresencePayload = (payload?: any): boolean => {
+    const normalizedPayload = normalizeSupportPresencePayload(payload);
+    if (!normalizedPayload) return false;
+
+    syncCurrentTicketCounterpartyOnline(normalizedPayload.ticketId, normalizedPayload.counterpartyOnline);
     return true;
   };
 
@@ -858,9 +886,14 @@
     loadData().catch(() => {});
   };
 
+  const handleSupportPresenceUpdated = (payload?: any) => {
+    applySupportPresencePayload(payload);
+  };
+
   onMounted(async () => {
     // useEventBus.on("loadDataForAdminSupport", loadData);
     useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    useEventBus.on(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     connectSupportRealtime();
 
     const response = await appCore.adminModules.auth.getAuthUser();
@@ -885,6 +918,7 @@
 
   onBeforeUnmount(() => {
     useEventBus.off(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    useEventBus.off(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     disconnectSupportRealtime();
     stopAdminSupportListRefresh();
     window.removeEventListener("resize", placeBottomLeft);

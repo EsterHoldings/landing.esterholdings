@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, computed, watch } from 'vue';
+import { defineStore } from "pinia";
+import { ref, computed, watch } from "vue";
 import useAppCore from "~/composables/useAppCore";
-import {navigateTo} from "nuxt/app";
-import {ROUTE_ADMIN_AUTH_LOGIN, ROUTE_AUTH_LOGIN} from "~/constants/routes";
-import {ADMIN_ACCESS_TOKEN} from "~/constants/auth";
+import { navigateTo } from "nuxt/app";
+import { ROUTE_ADMIN_AUTH_LOGIN } from "~/constants/routes";
+import { ADMIN_ACCESS_TOKEN } from "~/constants/auth";
 
 interface Role {
   id: string;
@@ -15,8 +15,9 @@ interface Permission {
   name: string;
 }
 
-export const useAdminAuthStore = defineStore('adminAuth', () => {
-  const accessToken = ref('');
+export const useAdminAuthStore = defineStore("adminAuth", () => {
+  const LEGACY_ADMIN_ACCESS_TOKEN_KEY = "access_token";
+  const accessToken = ref("");
   const roles = ref<Role[]>([]);
   const permissions = ref<Permission[]>([]);
 
@@ -24,18 +25,29 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
   const photoUrl = ref<string>("");
 
   if (process.client) {
-    const storedAccessToken = localStorage.getItem('access_token');
+    const storedAccessToken = localStorage.getItem(ADMIN_ACCESS_TOKEN);
+    const legacyStoredAccessToken = localStorage.getItem(LEGACY_ADMIN_ACCESS_TOKEN_KEY);
 
     if (storedAccessToken) {
       accessToken.value = storedAccessToken;
+    } else if (legacyStoredAccessToken) {
+      accessToken.value = legacyStoredAccessToken;
+      localStorage.setItem(ADMIN_ACCESS_TOKEN, legacyStoredAccessToken);
     }
   }
 
   const isAuthenticated = computed(() => !!accessToken.value);
 
-  watch(accessToken, (newValue) => {
+  watch(accessToken, newValue => {
     if (process.client) {
-      localStorage.setItem('access_token', newValue);
+      if (newValue) {
+        localStorage.setItem(ADMIN_ACCESS_TOKEN, newValue);
+      } else {
+        localStorage.removeItem(ADMIN_ACCESS_TOKEN);
+      }
+
+      // Keep backward compatibility with old admin token key.
+      localStorage.removeItem(LEGACY_ADMIN_ACCESS_TOKEN_KEY);
     }
   });
 
@@ -62,7 +74,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
       setRoles(response.data.data.roles || []);
       setPermissions(response.data.data.permissions || []);
     } catch (error) {
-      console.error('Failed to initAuth:', error);
+      console.error("Failed to initAuth:", error);
     }
   }
 
@@ -72,8 +84,9 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
     photoUrl.value = "";
     if (process.client) {
       localStorage.removeItem(ADMIN_ACCESS_TOKEN);
+      localStorage.removeItem(LEGACY_ADMIN_ACCESS_TOKEN_KEY);
     }
-    navigateTo('/ru' + ROUTE_ADMIN_AUTH_LOGIN);
+    navigateTo("/ru" + ROUTE_ADMIN_AUTH_LOGIN);
   }
 
   const hasPermission = computed(() => (permName: string): boolean => {

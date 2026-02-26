@@ -144,14 +144,16 @@
   import ChatDefault from "~/components/block/chats/ChatDefault.vue";
 
   import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
   import { definePageMeta } from "~/.nuxt/imports";
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
   import { useRoute } from "vue-router";
 
-  definePageMeta({ layout: "default", middleware: ["auth-client", "client-check-auth"] });
+  definePageMeta({ layout: "default", middleware: ["admin-middleware"] });
 
   const route = useRoute();
   const appCore = useAppCore();
+  const SUPPORT_PRESENCE_UPDATED_EVENT = "support-presence-updated";
 
   const supportGridRef = ref<HTMLElement | null>(null);
   const desktopGridHeight = ref<number | null>(null);
@@ -316,7 +318,19 @@
     scheduleDesktopGridMeasure();
   };
 
+  const handleSupportPresenceUpdated = (payload?: any) => {
+    if (!payload || typeof payload !== "object") return;
+
+    const payloadTicketId = String(payload.ticketId ?? payload.ticket_id ?? "");
+    if (!payloadTicketId || payloadTicketId !== id.value) return;
+
+    const counterpartyOnline = Boolean(payload.counterparty_online ?? payload.counterpartyOnline);
+    participants[0].online = true;
+    participants[1].online = counterpartyOnline;
+  };
+
   onMounted(async () => {
+    useEventBus.on(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     updateViewportState();
     window.addEventListener("resize", updateViewportState, { passive: true });
 
@@ -345,6 +359,7 @@
   });
 
   onBeforeUnmount(() => {
+    useEventBus.off(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     window.removeEventListener("resize", updateViewportState);
 
     if (desktopGridRafId !== null) {
