@@ -645,7 +645,7 @@
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
-  import { useRoute, useRouter } from "vue-router";
+  import { useRoute } from "vue-router";
 
   import UiIconFailed from "~/components/ui/UiIconFailed.vue";
   import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
@@ -749,7 +749,6 @@
 
   const appCore = useAppCore();
   const route = useRoute();
-  const router = useRouter();
   const isLoading = ref(false);
   const isPayoutLoading = ref(false);
   const toast = useToast();
@@ -1033,6 +1032,30 @@
     return String(value || "").toLowerCase() === "payout" ? "payout" : "client";
   };
 
+  const parseVerificationTabFromLocation = (): "client" | "payout" => {
+    if (typeof window === "undefined") {
+      return parseVerificationTabFromRoute(route.query.verificationTab);
+    }
+
+    const fromUrl = new URL(window.location.href).searchParams.get("verificationTab");
+    return parseVerificationTabFromRoute(fromUrl);
+  };
+
+  const syncVerificationTabInLocation = (tab: "client" | "payout"): void => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    if (tab === "client") {
+      url.searchParams.delete("verificationTab");
+    } else {
+      url.searchParams.set("verificationTab", tab);
+    }
+
+    window.history.replaceState(window.history.state, "", url.toString());
+  };
+
   const ensurePayoutCommentState = (rows: AdminPaymentDetailItem[]): void => {
     const activeIds = new Set(rows.map(row => row.id));
 
@@ -1168,13 +1191,8 @@
     }
 
     activeVerificationTab.value = tab;
+    syncVerificationTabInLocation(tab);
     nextTick(() => scheduleVerificationTabMinHeightUpdate());
-    router.replace({
-      query: {
-        ...route.query,
-        verificationTab: tab,
-      },
-    });
   };
 
   const handleRefreshActiveTab = async () => {
@@ -1357,14 +1375,6 @@
   });
 
   watch(
-    () => route.query.verificationTab,
-    nextTab => {
-      activeVerificationTab.value = parseVerificationTabFromRoute(nextTab);
-      nextTick(() => scheduleVerificationTabMinHeightUpdate());
-    }
-  );
-
-  watch(
     () => activeVerificationTab.value,
     () => {
       nextTick(() => scheduleVerificationTabMinHeightUpdate());
@@ -1376,7 +1386,7 @@
   };
 
   onMounted(async () => {
-    activeVerificationTab.value = parseVerificationTabFromRoute(route.query.verificationTab);
+    activeVerificationTab.value = parseVerificationTabFromLocation();
 
     await Promise.all([loadVerificationData(), loadPayoutVerificationData(), loadPayoutHistoryData()]);
     nextTick(() => scheduleVerificationTabMinHeightUpdate());
