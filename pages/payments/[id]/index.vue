@@ -5,8 +5,12 @@
         {{ pageTitle }}
       </UiTextH4>
 
-      <NuxtLink :to="paymentsListLink" class="w-full md:w-auto">
-        <UiButtonDefault state="info--outline" class="w-full md:w-auto">
+      <NuxtLink
+        :to="paymentsListLink"
+        class="w-full md:w-auto">
+        <UiButtonDefault
+          state="info--outline"
+          class="w-full md:w-auto">
           {{ backLabel }}
         </UiButtonDefault>
       </NuxtLink>
@@ -15,22 +19,19 @@
     <template #content>
       <div
         v-if="isLoading"
-        class="flex min-h-[40vh] items-center justify-center"
-      >
+        class="flex min-h-[40vh] items-center justify-center">
         <UiIconSpinnerDefault />
       </div>
 
       <div
         v-else-if="errorMessage"
-        class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 text-[var(--ui-sticker-danger)]"
-      >
+        class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 text-[var(--ui-sticker-danger)]">
         {{ errorMessage }}
       </div>
 
       <div
         v-else-if="payment"
-        class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 md:p-5"
-      >
+        class="rounded-xl border border-[var(--color-stroke-ui-light)] bg-[var(--ui-background-panel)] p-4 md:p-5">
         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div class="payment-field">
             <UiTextSmall class="payment-field__label">ID</UiTextSmall>
@@ -91,11 +92,6 @@
             <UiTextSmall class="payment-field__label">{{ redirectLinkLabel }}</UiTextSmall>
             <div class="payment-field__value break-all">{{ valueOrDash(payment.redirect_link) }}</div>
           </div>
-
-          <div class="payment-field md:col-span-2">
-            <UiTextSmall class="payment-field__label">Meta</UiTextSmall>
-            <pre class="payment-meta">{{ formattedMeta }}</pre>
-          </div>
         </div>
       </div>
     </template>
@@ -103,122 +99,101 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
-import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
-import { useI18n } from "vue-i18n";
+  import { computed, onMounted, ref } from "vue";
+  import { useRoute } from "vue-router";
+  import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
+  import { useI18n } from "vue-i18n";
 
-import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
-import UiTextH4 from "~/components/ui/UiTextH4.vue";
-import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-import useAppCore from "~/composables/useAppCore";
+  import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
+  import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+  import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+  import UiTextH4 from "~/components/ui/UiTextH4.vue";
+  import UiTextSmall from "~/components/ui/UiTextSmall.vue";
+  import useAppCore from "~/composables/useAppCore";
 
-definePageMeta({
-  layout: "cabinet",
-  middleware: ["auth-client", "client-check-auth"],
-});
+  definePageMeta({
+    layout: "cabinet",
+    middleware: ["auth-client", "client-check-auth"],
+  });
 
-const appCore = useAppCore();
-const route = useRoute();
-const localePath = useLocalePath();
-const { t } = useI18n({ useScope: "global" });
+  const appCore = useAppCore();
+  const route = useRoute();
+  const localePath = useLocalePath();
+  const { t } = useI18n({ useScope: "global" });
 
-const isLoading = ref(true);
-const errorMessage = ref<string | null>(null);
-const payment = ref<any | null>(null);
+  const isLoading = ref(true);
+  const errorMessage = ref<string | null>(null);
+  const payment = ref<any | null>(null);
 
-const paymentId = computed(() => String(route.params.id ?? "").trim());
-const paymentsListLink = computed(() => localePath("/payments"));
+  const paymentId = computed(() => String(route.params.id ?? "").trim());
+  const paymentsListLink = computed(() => localePath("/payments"));
 
-const resolveI18nValue = (key: string, fallback: string): string => {
-  const translated = t(key);
-  return translated === key ? fallback : translated;
-};
+  const resolveI18nValue = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
 
-const pageTitle = computed(() => `${resolveI18nValue("cabinet.billing.title", "Платежи")} #${paymentId.value}`);
-const backLabel = computed(() => resolveI18nValue("cabinet.billing.backToList", "К списку платежей"));
-const accountLabel = computed(() => resolveI18nValue("cabinet.billing.columns.accountNumber", "Номер счета"));
-const amountLabel = computed(() => resolveI18nValue("cabinet.billing.columns.amount", "Сумма"));
-const currencyLabel = computed(() => resolveI18nValue("cabinet.billing.columns.currency", "Валюта"));
-const statusLabel = computed(() => resolveI18nValue("cabinet.billing.columns.status", "Статус"));
-const typeLabel = computed(() => resolveI18nValue("cabinet.dashboard.transactions.type", "Тип"));
-const paymentSystemLabel = computed(() => resolveI18nValue("cabinet.billing.columns.paymentSystem", "Платежная система"));
-const gatewayLabel = computed(() => "Gateway");
-const createdAtLabel = computed(() => resolveI18nValue("cabinet.billing.columns.createdAt", "Создано"));
-const updatedAtLabel = computed(() => resolveI18nValue("cabinet.billing.updatedAt", "Обновлено"));
-const commentLabel = computed(() => resolveI18nValue("cabinet.billing.comment", "Комментарий"));
-const redirectLinkLabel = computed(() => resolveI18nValue("cabinet.billing.redirectLink", "Ссылка оплаты"));
+  const pageTitle = computed(() => `${resolveI18nValue("cabinet.billing.title", "Платежи")} #${paymentId.value}`);
+  const backLabel = computed(() => resolveI18nValue("cabinet.billing.backToList", "К списку платежей"));
+  const accountLabel = computed(() => resolveI18nValue("cabinet.billing.columns.accountNumber", "Номер счета"));
+  const amountLabel = computed(() => resolveI18nValue("cabinet.billing.columns.amount", "Сумма"));
+  const currencyLabel = computed(() => resolveI18nValue("cabinet.billing.columns.currency", "Валюта"));
+  const statusLabel = computed(() => resolveI18nValue("cabinet.billing.columns.status", "Статус"));
+  const typeLabel = computed(() => resolveI18nValue("cabinet.dashboard.transactions.type", "Тип"));
+  const paymentSystemLabel = computed(() =>
+    resolveI18nValue("cabinet.billing.columns.paymentSystem", "Платежная система")
+  );
+  const gatewayLabel = computed(() => "Gateway");
+  const createdAtLabel = computed(() => resolveI18nValue("cabinet.billing.columns.createdAt", "Создано"));
+  const updatedAtLabel = computed(() => resolveI18nValue("cabinet.billing.updatedAt", "Обновлено"));
+  const commentLabel = computed(() => resolveI18nValue("cabinet.billing.comment", "Комментарий"));
+  const redirectLinkLabel = computed(() => resolveI18nValue("cabinet.billing.redirectLink", "Ссылка оплаты"));
 
-const formattedMeta = computed(() => {
-  const meta = payment.value?.meta;
-  if (meta === null || meta === undefined || meta === "") return "-";
+  const valueOrDash = (value: unknown): string => {
+    const stringValue = String(value ?? "").trim();
+    return stringValue === "" ? "-" : stringValue;
+  };
 
-  if (typeof meta === "string") return meta;
-
-  try {
-    return JSON.stringify(meta, null, 2);
-  } catch {
-    return String(meta);
-  }
-});
-
-const valueOrDash = (value: unknown): string => {
-  const stringValue = String(value ?? "").trim();
-  return stringValue === "" ? "-" : stringValue;
-};
-
-const fetchPayment = async () => {
-  if (!paymentId.value) {
-    errorMessage.value = resolveI18nValue("cabinet.billing.paymentNotFound", "Платеж не найден.");
-    isLoading.value = false;
-    return;
-  }
-
-  isLoading.value = true;
-  errorMessage.value = null;
-
-  try {
-    const response = await appCore.payments.getById(paymentId.value);
-    payment.value = response?.data?.data ?? null;
-
-    if (!payment.value) {
+  const fetchPayment = async () => {
+    if (!paymentId.value) {
       errorMessage.value = resolveI18nValue("cabinet.billing.paymentNotFound", "Платеж не найден.");
+      isLoading.value = false;
+      return;
     }
-  } catch (error: any) {
-    errorMessage.value = error?.response?.data?.message ?? resolveI18nValue("cabinet.billing.paymentLoadError", "Не удалось загрузить платеж.");
-  } finally {
-    isLoading.value = false;
-  }
-};
 
-onMounted(fetchPayment);
+    isLoading.value = true;
+    errorMessage.value = null;
+
+    try {
+      const response = await appCore.payments.getById(paymentId.value);
+      payment.value = response?.data?.data ?? null;
+
+      if (!payment.value) {
+        errorMessage.value = resolveI18nValue("cabinet.billing.paymentNotFound", "Платеж не найден.");
+      }
+    } catch (error: any) {
+      errorMessage.value =
+        error?.response?.data?.message ??
+        resolveI18nValue("cabinet.billing.paymentLoadError", "Не удалось загрузить платеж.");
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  onMounted(fetchPayment);
 </script>
 
 <style scoped>
-.payment-field {
-  min-width: 0;
-}
+  .payment-field {
+    min-width: 0;
+  }
 
-.payment-field__label {
-  color: var(--ui-text-secondary);
-}
+  .payment-field__label {
+    color: var(--ui-text-secondary);
+  }
 
-.payment-field__value {
-  color: var(--ui-text-main);
-  font-weight: 600;
-}
-
-.payment-meta {
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid var(--color-stroke-ui-light);
-  background: var(--ui-background-card);
-  padding: 10px 12px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--ui-text-main);
-  font-size: 12px;
-}
+  .payment-field__value {
+    color: var(--ui-text-main);
+    font-weight: 600;
+  }
 </style>

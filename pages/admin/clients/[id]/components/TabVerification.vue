@@ -686,7 +686,6 @@
     info: VerificationSection;
     photo: VerificationSection;
     email: VerificationSection;
-    address: VerificationSection;
     documents: VerificationSection;
     deposit: VerificationSection;
     history?: VerificationHistoryItem[];
@@ -741,7 +740,6 @@
     info: { verification_status: "pending", comment: "" },
     email: { verification_status: "pending", comment: "" },
     photo: { verification_status: "pending", comment: "" },
-    address: { verification_status: "pending", comment: "" },
     documents: { verification_status: "pending", comment: "" },
     deposit: { verification_status: "pending", comment: "" },
     history: [],
@@ -785,8 +783,6 @@
   const emailComment = ref("");
   const photoStatus = ref("pending");
   const photoComment = ref("");
-  const addressStatus = ref("pending");
-  const addressComment = ref("");
   const depositStatus = ref("pending");
   const depositComment = ref("");
   const documentsStatus = ref("pending");
@@ -1144,8 +1140,6 @@
         emailComment.value = verificationRequestData?.email?.comment || "";
         photoStatus.value = normalizeVerificationStatus(verificationRequestData?.photo?.verification_status);
         photoComment.value = verificationRequestData?.photo?.comment || "";
-        addressStatus.value = normalizeVerificationStatus(verificationRequestData?.address?.verification_status);
-        addressComment.value = verificationRequestData?.address?.comment || "";
         depositStatus.value = normalizeVerificationStatus(verificationRequestData?.deposit?.verification_status);
         depositComment.value = verificationRequestData?.deposit?.comment || "";
         documentsStatus.value = normalizeVerificationStatus(verificationRequestData?.documents?.verification_status);

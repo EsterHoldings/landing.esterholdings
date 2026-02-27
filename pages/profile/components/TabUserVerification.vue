@@ -228,14 +228,12 @@
   let verificationRequestData = reactive<Record<string, any>>({});
   const paymentDetailsRows = ref<PaymentDetailsRow[]>([]);
 
-  const addressStatus = ref<VerificationStatus>("pending");
   const documentsStatus = ref<VerificationStatus>("pending");
   const depositStatus = ref<VerificationStatus>("pending");
   const emailStatus = ref<VerificationStatus>("pending");
   const infoStatus = ref<VerificationStatus>("pending");
   const photoStatus = ref<VerificationStatus>("pending");
 
-  const addressComment = ref<string>("");
   const documentsComment = ref<string>("");
   const depositComment = ref<string>("");
   const emailComment = ref<string>("");
@@ -305,14 +303,12 @@
       const response = await appCore.verifications.get();
       Object.assign(verificationRequestData, response.data.data);
 
-      addressStatus.value = normalizeStatus(verificationRequestData["address"]?.["verification_status"]);
       emailStatus.value = normalizeStatus(verificationRequestData["email"]?.["verification_status"]);
       photoStatus.value = normalizeStatus(verificationRequestData["photo"]?.["verification_status"]);
       infoStatus.value = normalizeStatus(verificationRequestData["info"]?.["verification_status"]);
       documentsStatus.value = normalizeStatus(verificationRequestData["documents"]?.["verification_status"]);
       depositStatus.value = normalizeStatus(verificationRequestData["deposit"]?.["verification_status"]);
 
-      addressComment.value = verificationRequestData["address"]?.["comment"] ?? "";
       emailComment.value = verificationRequestData["email"]?.["comment"] ?? "";
       photoComment.value = verificationRequestData["photo"]?.["comment"] ?? "";
       infoComment.value = verificationRequestData["info"]?.["comment"] ?? "";
