@@ -120,6 +120,11 @@
                 {{ row.paymentSystemName || "Payment system" }} · {{ row.updatedAt || "-" }}
               </div>
               <div class="payout-list__meta">Документы: {{ row.documentsCount }}</div>
+              <div
+                v-if="row.adminComment"
+                class="payout-list__comment">
+                {{ row.adminComment }}
+              </div>
             </div>
             <div class="payout-list__status">
               <component :is="iconByStatus(row.status)" />
@@ -210,6 +215,7 @@
     status: VerificationStatus;
     updatedAt: string;
     documentsCount: number;
+    adminComment: string;
   }
 
   const { t } = useI18n({ useScope: "global" });
@@ -342,6 +348,7 @@
           : row.documents && typeof row.documents === "object"
             ? Object.keys(row.documents).length
             : 0,
+        adminComment: String(row.admin_comment ?? ""),
       }));
     } finally {
       setTimeout(() => (isPaymentDetailsLoading.value = false), 250);
@@ -451,6 +458,18 @@
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
+  }
+
+  .payout-list__comment {
+    margin-top: 4px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, var(--ui-primary-main) 50%, var(--color-stroke-ui-light));
+    background: color-mix(in srgb, var(--ui-primary-main) 9%, var(--ui-background-panel));
+    color: var(--ui-text-main);
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
   }
 
   @media (max-width: 768px) {

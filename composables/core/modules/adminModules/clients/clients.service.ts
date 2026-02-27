@@ -18,6 +18,10 @@ export class ClientsService {
     return await this.useApi.get(`/admin/clients/${id}/payment-details`, params);
   }
 
+  async getPaymentDetailsHistory(id: any, params: object = {}) {
+    return await this.useApi.get(`/admin/clients/${id}/payment-details/history`, params);
+  }
+
   async patchPaymentDetailStatus(id: any, paymentDetailId: any, data: object = {}) {
     return await this.useApi.patch(`/admin/clients/${id}/payment-details/${paymentDetailId}`, data);
   }

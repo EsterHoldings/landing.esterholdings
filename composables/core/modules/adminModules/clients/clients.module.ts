@@ -19,6 +19,10 @@ export class ClientsModule {
     return await this.clientsService.getPaymentDetails(id, params);
   }
 
+  async getPaymentDetailsHistory(id: any, params: object = {}): Promise<any> {
+    return await this.clientsService.getPaymentDetailsHistory(id, params);
+  }
+
   async patchPaymentDetailStatus(id: any, paymentDetailId: any, data: object = {}): Promise<any> {
     return await this.clientsService.patchPaymentDetailStatus(id, paymentDetailId, data);
   }

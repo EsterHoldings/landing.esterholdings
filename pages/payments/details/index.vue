@@ -130,11 +130,38 @@
                 <tr
                   v-for="(paymentDetail, index) in paymentDetails"
                   :key="paymentDetail.id"
-                  class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)]">
+                  class="border-t border-[var(--color-ui-border)] hover:bg-[var(--color-stroke-ui-dark)] cursor-pointer"
+                  @click="handleClickViewPaymentDetail(paymentDetail.id)">
                   <td
                     class="px-5 py-3 align-middle font-bold truncate"
                     :title="paymentDetail?.name">
-                    {{ paymentDetail?.name }}
+                    <div class="payment-row-name">
+                      <span class="payment-row-name__title">{{ paymentDetail?.name }}</span>
+                      <div
+                        v-if="resolvePaymentDetailDocuments(paymentDetail).length > 0"
+                        class="payment-row-docs">
+                        <span
+                          v-for="(document, docIndex) in resolvePaymentDetailDocuments(paymentDetail).slice(0, 4)"
+                          :key="paymentDetail.id + ':table-doc:' + docIndex"
+                          class="payment-row-docs__thumb">
+                          <img
+                            v-if="resolveDocumentPreviewSrc(document)"
+                            :src="resolveDocumentPreviewSrc(document)"
+                            :alt="`Preview #${docIndex + 1}`"
+                            class="payment-row-docs__thumb-img" />
+                          <span
+                            v-else
+                            class="payment-row-docs__thumb-fallback"
+                            >DOC</span
+                          >
+                        </span>
+                        <span
+                          v-if="resolvePaymentDetailDocuments(paymentDetail).length > 4"
+                          class="payment-row-docs__more">
+                          +{{ resolvePaymentDetailDocuments(paymentDetail).length - 4 }}
+                        </span>
+                      </div>
+                    </div>
                   </td>
 
                   <td
@@ -159,7 +186,9 @@
                     </div>
                   </td>
 
-                  <td class="px-5 py-3 align-middle">
+                  <td
+                    class="px-5 py-3 align-middle"
+                    @click.stop>
                     <span
                       @click="toggleRowOptions(index)"
                       class="relative flex h-[32px] w-[32px] items-center justify-center rounded-md border border-transparent transition-colors cursor-pointer"
@@ -215,13 +244,15 @@
               <div
                 v-for="paymentDetail in paymentDetails"
                 :key="paymentDetail.id"
-                class="payment-card card-with-actions">
+                class="payment-card card-with-actions cursor-pointer"
+                @click="handleClickViewPaymentDetail(paymentDetail.id)">
                 <div
                   class="card-actions"
                   aria-hidden="true">
                   <button
                     class="copy-btn"
-                    aria-label="Copy id">
+                    aria-label="Copy id"
+                    @click.stop>
                     <UiIconCopy :text="paymentDetail.id" />
                   </button>
                   <button
@@ -263,6 +294,30 @@
                       {{ t("cabinet.billing.columns.paymentSystem") }}
                     </UiTextSmall>
                     <div class="truncate font-semibold">{{ paymentDetail.payment_system_name }}</div>
+                    <div
+                      v-if="resolvePaymentDetailDocuments(paymentDetail).length > 0"
+                      class="payment-row-docs mt-2">
+                      <span
+                        v-for="(document, docIndex) in resolvePaymentDetailDocuments(paymentDetail).slice(0, 5)"
+                        :key="paymentDetail.id + ':card-doc:' + docIndex"
+                        class="payment-row-docs__thumb">
+                        <img
+                          v-if="resolveDocumentPreviewSrc(document)"
+                          :src="resolveDocumentPreviewSrc(document)"
+                          :alt="`Preview #${docIndex + 1}`"
+                          class="payment-row-docs__thumb-img" />
+                        <span
+                          v-else
+                          class="payment-row-docs__thumb-fallback"
+                          >DOC</span
+                        >
+                      </span>
+                      <span
+                        v-if="resolvePaymentDetailDocuments(paymentDetail).length > 5"
+                        class="payment-row-docs__more">
+                        +{{ resolvePaymentDetailDocuments(paymentDetail).length - 5 }}
+                      </span>
+                    </div>
                   </div>
                   <div class="min-w-[120px]">
                     <UiTextSmall class="text-[var(--ui-text-secondary)]">
@@ -634,6 +689,29 @@
     return "pending";
   };
 
+  const resolvePaymentDetailDocuments = (paymentDetail: any): any[] => {
+    const rawDocuments = paymentDetail?.documents;
+    if (Array.isArray(rawDocuments)) {
+      return rawDocuments;
+    }
+
+    if (rawDocuments && typeof rawDocuments === "object") {
+      return Object.values(rawDocuments);
+    }
+
+    return [];
+  };
+
+  const resolveDocumentPreviewSrc = (document: any): string => {
+    const previewUrl = String(document?.preview_url ?? document?.previewUrl ?? "").trim();
+    if (previewUrl) {
+      return previewUrl;
+    }
+
+    const path = String(document?.path ?? "").trim();
+    return path;
+  };
+
   const statusDotClass = (value: unknown): string => {
     const normalized = normalizeStatus(value);
     if (normalized === "approved") return "status-inline__dot--approved";
@@ -943,5 +1021,59 @@
   .updated-at-cell__absolute {
     color: var(--ui-text-main);
     font-size: 12px;
+  }
+
+  .payment-row-name {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .payment-row-name__title {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .payment-row-docs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .payment-row-docs__thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid var(--color-stroke-ui-light);
+    background: var(--ui-background);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+  }
+
+  .payment-row-docs__thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .payment-row-docs__thumb-fallback {
+    color: var(--ui-text-secondary);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .payment-row-docs__more {
+    color: var(--ui-text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    padding-left: 2px;
   }
 </style>

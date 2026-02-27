@@ -7,26 +7,30 @@ export class PaymentDetailsService {
     this.useApi = new useApi(true);
   }
 
-  async get(params: {}):Promise<any> {
+  async get(params: {}): Promise<any> {
     return await this.useApi.get("/client/payment-details", params);
   }
-  async getById(id:any) {
+  async getById(id: any) {
     return await this.useApi.get(`/client/payment-details/${id}`);
   }
 
-  async post(data:object = {}):Promise<any> {
+  async getHistory(id: any, params: object = {}) {
+    return await this.useApi.get(`/client/payment-details/${id}/history`, params);
+  }
+
+  async post(data: object = {}): Promise<any> {
     return await this.useApi.post("/client/payment-details", data);
   }
 
-  async put(id:any, data:object = {}):Promise<any> {
+  async put(id: any, data: object = {}): Promise<any> {
     return await this.useApi.put(`/client/payment-details/${id}`, data);
   }
 
-  async patch(id:any, data:object = {}):Promise<any> {
+  async patch(id: any, data: object = {}): Promise<any> {
     return await this.useApi.patch(`/client/payment-details/${id}`, data);
   }
 
-  async delete(id:any):Promise<any> {
+  async delete(id: any): Promise<any> {
     return await this.useApi.delete(`/client/payment-details/${id}`);
   }
 }

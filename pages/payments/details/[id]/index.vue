@@ -31,73 +31,79 @@
 
       <div
         v-else-if="paymentDetail"
-        class="payment-detail-grid">
-        <section class="payment-detail-card payment-detail-card--main">
-          <div class="payment-detail-card__header">
-            <div>
-              <UiTextSmall class="payment-detail-card__label">Название</UiTextSmall>
-              <h3 class="payment-detail-card__title">{{ paymentDetail.name || "-" }}</h3>
-            </div>
-            <div class="status-inline">
-              <span
-                class="status-inline__dot"
-                :class="statusDotClass(paymentDetail.status)"></span>
-              <span class="status-inline__text">{{ statusText(paymentDetail.status) }}</span>
-            </div>
-          </div>
-
-          <div class="payment-detail-card__meta-grid">
-            <div class="meta-item">
-              <UiTextSmall class="meta-item__label">Платежная система</UiTextSmall>
-              <div class="meta-item__value">{{ paymentSystemName }}</div>
-            </div>
-
-            <div class="meta-item">
-              <UiTextSmall class="meta-item__label">Обновлено</UiTextSmall>
-              <div class="updated-at-cell">
-                <span class="updated-at-cell__relative">{{ formatRelativeDate(paymentDetail.updated_at) }}</span>
-                <span class="updated-at-cell__absolute">{{ formatDateTime(paymentDetail.updated_at) }}</span>
+        class="payment-detail-layout">
+        <div class="payment-detail-layout__left">
+          <section class="payment-detail-card payment-detail-card--main">
+            <div class="payment-detail-card__header">
+              <div>
+                <UiTextSmall class="payment-detail-card__label">Название</UiTextSmall>
+                <h3 class="payment-detail-card__title">{{ paymentDetail.name || "-" }}</h3>
+              </div>
+              <div class="status-inline">
+                <span
+                  class="status-inline__dot"
+                  :class="statusDotClass(paymentDetail.status)"></span>
+                <span class="status-inline__text">{{ statusText(paymentDetail.status) }}</span>
               </div>
             </div>
 
-            <div class="meta-item">
-              <UiTextSmall class="meta-item__label">Создано</UiTextSmall>
-              <div class="meta-item__value">{{ formatDateTime(paymentDetail.created_at) }}</div>
-            </div>
+            <div class="payment-detail-card__meta-grid">
+              <div class="meta-item">
+                <UiTextSmall class="meta-item__label">Платежная система</UiTextSmall>
+                <div class="meta-item__value">{{ paymentSystemName }}</div>
+              </div>
 
-            <div class="meta-item">
-              <UiTextSmall class="meta-item__label">ID</UiTextSmall>
-              <div class="meta-item__value break-all">{{ paymentDetail.id || "-" }}</div>
-            </div>
-          </div>
-        </section>
+              <div class="meta-item">
+                <UiTextSmall class="meta-item__label">Обновлено</UiTextSmall>
+                <div class="updated-at-cell">
+                  <span class="updated-at-cell__relative">{{ formatRelativeDate(paymentDetail.updated_at) }}</span>
+                  <span class="updated-at-cell__absolute">{{ formatDateTime(paymentDetail.updated_at) }}</span>
+                </div>
+              </div>
 
-        <section class="payment-detail-card">
-          <UiTextSmall class="payment-detail-card__label">Поля реквизита</UiTextSmall>
-          <div
-            v-if="dataRows.length === 0"
-            class="payment-detail-card__empty">
-            Нет данных.
-          </div>
-          <div
-            v-else
-            class="details-fields-grid">
+              <div class="meta-item">
+                <UiTextSmall class="meta-item__label">Создано</UiTextSmall>
+                <div class="meta-item__value">{{ formatDateTime(paymentDetail.created_at) }}</div>
+              </div>
+
+              <div class="meta-item">
+                <UiTextSmall class="meta-item__label">ID</UiTextSmall>
+                <div class="meta-item__value break-all">{{ paymentDetail.id || "-" }}</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="payment-detail-card">
+            <UiTextSmall class="payment-detail-card__label">Поля реквизита</UiTextSmall>
             <div
-              v-for="row in dataRows"
-              :key="row.key"
-              class="details-field">
-              <div class="details-field__key">{{ row.key }}</div>
-              <div class="details-field__value">{{ row.value }}</div>
+              v-if="dataRows.length === 0"
+              class="payment-detail-card__empty">
+              Нет данных.
             </div>
-          </div>
-        </section>
+            <div
+              v-else
+              class="details-fields-grid">
+              <div
+                v-for="row in dataRows"
+                :key="row.key"
+                class="details-field">
+                <div class="details-field__key">{{ row.key }}</div>
+                <div class="details-field__value">{{ row.value }}</div>
+              </div>
+            </div>
+          </section>
+        </div>
 
-        <section class="payment-detail-card">
-          <UiTextSmall class="payment-detail-card__label">Комментарий администратора</UiTextSmall>
-          <div class="payment-detail-card__comment">
-            {{ paymentDetail.admin_comment || "Комментарий отсутствует." }}
-          </div>
-        </section>
+        <div class="payment-detail-layout__right">
+          <section
+            class="payment-detail-card payment-detail-card--comment"
+            :class="{ 'payment-detail-card--comment-has-value': hasAdminComment }">
+            <UiTextSmall class="payment-detail-card__label">Комментарий администратора</UiTextSmall>
+            <div class="payment-detail-card__comment">
+              {{ paymentDetail.admin_comment || "Комментарий отсутствует." }}
+            </div>
+          </section>
+        </div>
 
         <section class="payment-detail-card payment-detail-card--full">
           <div class="payment-detail-card__documents-header">
@@ -141,6 +147,76 @@
             </button>
           </div>
         </section>
+
+        <section class="payment-detail-card payment-detail-card--full">
+          <div class="payment-detail-card__documents-header">
+            <UiTextSmall class="payment-detail-card__label">История изменений реквизита</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__counter">Всего: {{ payoutHistoryRows.length }}</UiTextSmall>
+          </div>
+
+          <div
+            v-if="isHistoryLoading"
+            class="payment-detail-card__empty">
+            Загрузка истории...
+          </div>
+          <div
+            v-else-if="payoutHistoryRows.length === 0"
+            class="payment-detail-card__empty">
+            История пока отсутствует.
+          </div>
+          <div
+            v-else
+            class="history-list">
+            <article
+              v-for="historyRow in payoutHistoryRows"
+              :key="historyRow.id"
+              class="history-item">
+              <div class="history-item__top">
+                <div class="history-item__title-wrap">
+                  <div class="history-item__title">{{ historyRow.name }}</div>
+                  <div class="history-item__meta">
+                    {{ historyRow.date }}
+                    <span v-if="historyRow.actor.name">· {{ historyRow.actor.name }}</span>
+                  </div>
+                </div>
+                <div class="status-inline">
+                  <span
+                    class="status-inline__dot"
+                    :class="statusDotClass(historyRow.status)"></span>
+                  <span class="status-inline__text">{{ statusText(historyRow.status) }}</span>
+                </div>
+              </div>
+
+              <div
+                v-if="historyRow.comment"
+                class="history-item__comment">
+                {{ historyRow.comment }}
+              </div>
+
+              <div
+                v-if="historyRow.documents.length > 0"
+                class="history-item__docs">
+                <button
+                  v-for="(historyDocument, docIndex) in historyRow.documents"
+                  :key="historyRow.id + ':history-doc:' + docIndex"
+                  type="button"
+                  class="history-item__doc"
+                  @click="openDocument(historyDocument)">
+                  <img
+                    v-if="historyDocument.preview_url"
+                    :src="historyDocument.preview_url"
+                    :alt="`History document #${docIndex + 1}`"
+                    class="history-item__doc-img" />
+                  <span
+                    v-else
+                    class="history-item__doc-fallback"
+                    >DOC</span
+                  >
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
       </div>
     </template>
   </PageStructureDefault>
@@ -172,18 +248,36 @@
     uploaded_at?: string | null;
   };
 
+  type PayoutHistoryRow = {
+    id: string;
+    key: string;
+    name: string;
+    date: string;
+    status: "approved" | "pending" | "rejected";
+    comment: string;
+    actor: {
+      id: string;
+      type: string;
+      name: string;
+    };
+    documents: PaymentDetailDocument[];
+  };
+
   const appCore = useAppCore();
   const route = useRoute();
   const localePath = useLocalePath();
 
   const paymentDetail = ref<any | null>(null);
   const isLoading = ref(true);
+  const isHistoryLoading = ref(false);
   const errorMessage = ref("");
+  const payoutHistoryRows = ref<PayoutHistoryRow[]>([]);
 
   const paymentDetailId = computed(() => String(route.params.id ?? "").trim());
   const backLink = computed(() => localePath("/payments/details"));
   const backLabel = computed(() => "К списку реквизитов");
   const pageTitle = computed(() => `Реквизит #${paymentDetailId.value}`);
+  const hasAdminComment = computed(() => String(paymentDetail.value?.admin_comment ?? "").trim().length > 0);
 
   const paymentSystemName = computed(() => {
     const direct = String(paymentDetail.value?.payment_system_name ?? "").trim();
@@ -278,11 +372,63 @@
       paymentDetail.value = response?.data?.data ?? null;
       if (!paymentDetail.value) {
         errorMessage.value = "Реквизит не найден.";
+        payoutHistoryRows.value = [];
+      } else {
+        await loadPaymentDetailHistory();
       }
     } catch (error: any) {
       errorMessage.value = error?.response?.data?.message || "Не удалось загрузить реквизит.";
+      payoutHistoryRows.value = [];
     } finally {
       isLoading.value = false;
+    }
+  };
+
+  const normalizeHistoryDocuments = (value: unknown): PaymentDetailDocument[] => {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.map((row: any) => ({
+      name: String(row?.name ?? ""),
+      path: String(row?.path ?? ""),
+      preview_url: String(row?.preview_url ?? ""),
+      mime_type: String(row?.mime_type ?? ""),
+      size: Number.isFinite(Number(row?.size)) ? Number(row?.size) : null,
+      uploaded_at: row?.uploaded_at ? String(row.uploaded_at) : null,
+    }));
+  };
+
+  const loadPaymentDetailHistory = async (): Promise<void> => {
+    if (!paymentDetailId.value) {
+      payoutHistoryRows.value = [];
+      return;
+    }
+
+    isHistoryLoading.value = true;
+
+    try {
+      const response = await appCore.paymentDetails.getHistory(paymentDetailId.value, { limit: 200 });
+      const rawRows = Array.isArray(response?.data?.data) ? response.data.data : [];
+
+      payoutHistoryRows.value = rawRows.map((row: any) => ({
+        id: String(row?.id ?? ""),
+        key: String(row?.key ?? ""),
+        name: String(row?.name ?? ""),
+        date: String(row?.date ?? ""),
+        status: normalizeStatus(row?.status),
+        comment: String(row?.comment ?? ""),
+        actor: {
+          id: String(row?.actor?.id ?? ""),
+          type: String(row?.actor?.type ?? ""),
+          name: String(row?.actor?.name ?? ""),
+        },
+        documents: normalizeHistoryDocuments(row?.documents),
+      }));
+    } catch (error) {
+      payoutHistoryRows.value = [];
+    } finally {
+      isHistoryLoading.value = false;
     }
   };
 
@@ -290,9 +436,23 @@
 </script>
 
 <style scoped>
-  .payment-detail-grid {
+  .payment-detail-layout {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .payment-detail-layout__left {
+    grid-column: span 12;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payment-detail-layout__right {
+    grid-column: span 12;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
   }
 
@@ -304,12 +464,18 @@
     padding: 14px;
   }
 
-  .payment-detail-card--main {
+  .payment-detail-card--full {
     grid-column: span 12;
   }
 
-  .payment-detail-card--full {
-    grid-column: span 12;
+  .payment-detail-card--comment {
+    min-height: 100%;
+  }
+
+  .payment-detail-card--comment-has-value {
+    border-color: color-mix(in srgb, var(--ui-primary-main) 50%, var(--color-stroke-ui-light));
+    background: color-mix(in srgb, var(--ui-primary-main) 7%, var(--ui-background-panel));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ui-primary-main) 18%, transparent);
   }
 
   .payment-detail-card__header {
@@ -361,6 +527,7 @@
     margin-top: 8px;
     color: var(--ui-text-main);
     white-space: pre-wrap;
+    line-height: 1.5;
   }
 
   .payment-detail-card__documents-header {
@@ -455,6 +622,83 @@
     text-overflow: ellipsis;
   }
 
+  .history-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .history-item {
+    border: 1px solid var(--color-stroke-ui-light);
+    border-radius: 10px;
+    background: var(--ui-background);
+    padding: 10px;
+  }
+
+  .history-item__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .history-item__title-wrap {
+    min-width: 0;
+  }
+
+  .history-item__title {
+    color: var(--ui-text-main);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .history-item__meta {
+    color: var(--ui-text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .history-item__comment {
+    margin-top: 8px;
+    color: var(--ui-text-main);
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+
+  .history-item__docs {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .history-item__doc {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-stroke-ui-light);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--ui-background-panel);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .history-item__doc-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .history-item__doc-fallback {
+    color: var(--ui-text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
   .status-inline {
     display: inline-flex;
     align-items: center;
@@ -503,12 +747,11 @@
   }
 
   @media (min-width: 1024px) {
-    .payment-detail-card--main {
+    .payment-detail-layout__left {
       grid-column: span 8;
     }
 
-    .payment-detail-grid > .payment-detail-card:nth-child(2),
-    .payment-detail-grid > .payment-detail-card:nth-child(3) {
+    .payment-detail-layout__right {
       grid-column: span 4;
     }
   }
@@ -520,6 +763,11 @@
 
     .details-fields-grid {
       grid-template-columns: 1fr;
+    }
+
+    .history-item__top {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

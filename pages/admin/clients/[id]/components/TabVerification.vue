@@ -402,6 +402,26 @@
             </div>
           </div>
 
+          <div class="user-verification__payout-owner">
+            <div class="user-verification__payout-owner-avatar">
+              <img
+                v-if="payoutOwnerAvatarUrl"
+                :src="payoutOwnerAvatarUrl"
+                alt="Owner avatar"
+                class="user-verification__payout-owner-avatar-img" />
+              <span
+                v-else
+                class="user-verification__payout-owner-avatar-fallback">
+                {{ payoutOwnerInitials }}
+              </span>
+            </div>
+            <div class="user-verification__payout-owner-meta">
+              <span class="user-verification__payout-owner-label">Владелец реквизита</span>
+              <span class="user-verification__payout-owner-name">{{ payoutOwnerFullName }}</span>
+              <span class="user-verification__payout-owner-email">{{ payoutOwnerEmail }}</span>
+            </div>
+          </div>
+
           <div class="user-verification__left__verification-list_wrapper">
             <ul class="user-verification__left__verification-list">
               <li
@@ -535,8 +555,75 @@
   </div>
 
   <div class="user-verification__panel user-verification__section">
-    <UiTextH5 class="user-verification__panel__title"># Verification history</UiTextH5>
-    <div class="user-verification__panel__verification-history">
+    <UiTextH5 class="user-verification__panel__title">
+      {{ activeVerificationTab === "payout" ? "# История реквизитов выплат" : "# Verification history" }}
+    </UiTextH5>
+
+    <div
+      v-if="activeVerificationTab === 'payout'"
+      class="user-verification__panel__payout-history">
+      <div
+        v-if="isPayoutHistoryLoading"
+        class="user-verification__panel__verification-history_log">
+        <span>Loading payout history...</span>
+      </div>
+
+      <template v-else>
+        <article
+          v-for="historyItem in payoutHistoryRows"
+          :key="historyItem.id"
+          class="user-verification__panel__payout-history-item">
+          <div class="user-verification__panel__payout-history-item-top">
+            <div class="user-verification__panel__payout-history-item-main">
+              <div class="user-verification__panel__payout-history-item-title">{{ historyItem.name }}</div>
+              <div class="user-verification__panel__payout-history-item-meta">
+                {{ historyItem.date }}
+                <span v-if="historyItem.actor.name">· {{ historyItem.actor.name }}</span>
+              </div>
+            </div>
+            <span :class="historyItem.status">{{ historyItem.paymentDetail.status }}</span>
+          </div>
+
+          <div
+            v-if="historyItem.comment"
+            class="user-verification__panel__payout-history-item-comment">
+            {{ historyItem.comment }}
+          </div>
+
+          <div
+            v-if="historyItem.documents.length > 0"
+            class="user-verification__panel__payout-history-item-documents">
+            <button
+              v-for="(historyDocument, historyDocumentIndex) in historyItem.documents"
+              :key="historyItem.id + ':history-doc:' + historyDocumentIndex"
+              type="button"
+              class="user-verification__panel__payout-history-item-doc"
+              @click="openPayoutHistoryDocument(historyDocument)">
+              <img
+                v-if="resolvePayoutDocumentPreviewSrc(historyDocument)"
+                :src="resolvePayoutDocumentPreviewSrc(historyDocument)"
+                :alt="`History document #${historyDocumentIndex + 1}`"
+                class="user-verification__panel__payout-history-item-doc-img" />
+              <span
+                v-else
+                class="user-verification__panel__payout-history-item-doc-fallback"
+                >DOC</span
+              >
+            </button>
+          </div>
+        </article>
+
+        <div
+          v-if="payoutHistoryRows.length === 0"
+          class="user-verification__panel__verification-history_log">
+          <span>No payout history yet.</span>
+        </div>
+      </template>
+    </div>
+
+    <div
+      v-else
+      class="user-verification__panel__verification-history">
       <div
         v-for="historyItem in historyRows"
         :key="historyItem.id"
@@ -555,7 +642,7 @@
 
 <script lang="ts" setup>
   import useAppCore from "~/composables/useAppCore";
-  import { onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+  import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
   import { useRoute, useRouter } from "vue-router";
@@ -614,6 +701,31 @@
     documents: AdminPaymentDetailDocument[];
   }
 
+  interface AdminPayoutHistoryRow {
+    id: string;
+    key: string;
+    name: string;
+    date: string;
+    status: AdminPaymentDetailStatus;
+    comment: string;
+    actor: {
+      id: string;
+      type: string;
+      name: string;
+    };
+    paymentDetail: {
+      id: string;
+      name: string;
+      status: AdminPaymentDetailStatus;
+      paymentSystemName: string;
+      paymentSystemId: string;
+      data: Record<string, unknown>;
+      comment: string;
+      isDeleted: boolean;
+    };
+    documents: AdminPaymentDetailDocument[];
+  }
+
   const initialData: VerificationRequestDto = {
     info: { verification_status: "pending", comment: "" },
     email: { verification_status: "pending", comment: "" },
@@ -651,8 +763,11 @@
     { id: "payout" as const, label: "Реквизиты для выплат" },
   ];
   const VERIFICATION_TAB_SWITCH_DURATION_MS = 260;
+  const VERIFICATION_TAB_MIN_BOTTOM_GAP_PX = 16;
+  const VERIFICATION_TAB_MIN_HEIGHT_FALLBACK_PX = 420;
   const verificationTabSwitchRef = ref<HTMLElement | null>(null);
   let verificationTabSwitchResetTimer: ReturnType<typeof setTimeout> | null = null;
+  let verificationTabSwitchMinHeightFrame: number | null = null;
 
   const infoStatus = ref("pending");
   const infoComment = ref("");
@@ -671,6 +786,8 @@
   const isDocumentsCommentOpen = ref(false);
   const documentsCommentDraft = ref("");
   const historyRows = ref<VerificationHistoryItem[]>([]);
+  const payoutHistoryRows = ref<AdminPayoutHistoryRow[]>([]);
+  const isPayoutHistoryLoading = ref(false);
   const payoutDocumentLoadingMap = reactive<Record<string, boolean>>({});
   const payoutCommentOpenMap = reactive<Record<string, boolean>>({});
   const payoutCommentDraftMap = reactive<Record<string, string>>({});
@@ -735,6 +852,44 @@
     unlockVerificationTabSwitchHeight();
   };
 
+  const cancelVerificationTabMinHeightFrame = (): void => {
+    if (verificationTabSwitchMinHeightFrame === null || typeof cancelAnimationFrame !== "function") {
+      return;
+    }
+
+    cancelAnimationFrame(verificationTabSwitchMinHeightFrame);
+    verificationTabSwitchMinHeightFrame = null;
+  };
+
+  const updateVerificationTabMinHeight = (): void => {
+    const anchor = verificationTabSwitchRef.value;
+    if (!anchor || typeof window === "undefined") {
+      return;
+    }
+
+    const top = anchor.getBoundingClientRect().top;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const computedMinHeight = Math.max(
+      VERIFICATION_TAB_MIN_HEIGHT_FALLBACK_PX,
+      Math.round(viewportHeight - top - VERIFICATION_TAB_MIN_BOTTOM_GAP_PX)
+    );
+
+    anchor.style.minHeight = `${computedMinHeight}px`;
+  };
+
+  const scheduleVerificationTabMinHeightUpdate = (): void => {
+    if (typeof window === "undefined" || typeof requestAnimationFrame !== "function") {
+      return;
+    }
+
+    cancelVerificationTabMinHeightFrame();
+
+    verificationTabSwitchMinHeightFrame = requestAnimationFrame(() => {
+      updateVerificationTabMinHeight();
+      verificationTabSwitchMinHeightFrame = null;
+    });
+  };
+
   const normalizePaymentStatus = (value: unknown): AdminPaymentDetailStatus => {
     if (typeof value !== "string") {
       return "pending";
@@ -778,6 +933,41 @@
       .filter((item): item is AdminPaymentDetailDocument => Boolean(item));
   };
 
+  const normalizePayoutHistoryRows = (value: unknown): AdminPayoutHistoryRow[] => {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.map((item: any) => {
+      const paymentDetail = item?.payment_detail ?? {};
+
+      return {
+        id: String(item?.id ?? ""),
+        key: String(item?.key ?? ""),
+        name: String(item?.name ?? ""),
+        date: String(item?.date ?? ""),
+        status: normalizePaymentStatus(item?.status),
+        comment: String(item?.comment ?? ""),
+        actor: {
+          id: String(item?.actor?.id ?? ""),
+          type: String(item?.actor?.type ?? ""),
+          name: String(item?.actor?.name ?? ""),
+        },
+        paymentDetail: {
+          id: String(paymentDetail?.id ?? ""),
+          name: String(paymentDetail?.name ?? ""),
+          status: normalizePaymentStatus(paymentDetail?.status),
+          paymentSystemName: String(paymentDetail?.payment_system_name ?? ""),
+          paymentSystemId: String(paymentDetail?.payment_system_id ?? ""),
+          data: paymentDetail?.data && typeof paymentDetail.data === "object" ? paymentDetail.data : {},
+          comment: String(paymentDetail?.comment ?? ""),
+          isDeleted: Boolean(paymentDetail?.is_deleted),
+        },
+        documents: normalizePayoutDocuments(item?.documents),
+      };
+    });
+  };
+
   const isAbsoluteHttpUrl = (value: string): boolean => /^https?:\/\//i.test(value);
 
   const resolvePayoutDocumentPreviewSrc = (document: AdminPaymentDetailDocument): string => {
@@ -787,6 +977,38 @@
 
     return isAbsoluteHttpUrl(document.path) ? document.path : "";
   };
+
+  const payoutOwnerFullName = computed<string>(() => {
+    const firstName = String(props.userData?.first_name ?? "").trim();
+    const lastName = String(props.userData?.last_name ?? "").trim();
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || "Клиент";
+  });
+
+  const payoutOwnerEmail = computed<string>(() => String(props.userData?.email ?? "").trim() || "-");
+
+  const payoutOwnerAvatarUrl = computed<string>(() => String(props.userData?.photo_url ?? "").trim());
+
+  const payoutOwnerInitials = computed<string>(() => {
+    const firstName = String(props.userData?.first_name ?? "").trim();
+    const lastName = String(props.userData?.last_name ?? "").trim();
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    if (fullName) {
+      const parts = fullName.split(/\s+/).filter(Boolean).slice(0, 2);
+      const initials = parts.map(item => item.charAt(0).toUpperCase()).join("");
+      if (initials) {
+        return initials;
+      }
+    }
+
+    const email = String(props.userData?.email ?? "").trim();
+    if (email) {
+      return email.slice(0, 2).toUpperCase();
+    }
+
+    return "U";
+  });
 
   const getPayoutDocumentLoadingKey = (paymentDetailId: string, documentIndex: number): string =>
     `${paymentDetailId}:${documentIndex}`;
@@ -927,12 +1149,26 @@
     }
   };
 
+  const loadPayoutHistoryData = async () => {
+    isPayoutHistoryLoading.value = true;
+
+    try {
+      const response = await appCore.adminModules.clients.getPaymentDetailsHistory(props.clientId, {
+        limit: 200,
+      });
+      payoutHistoryRows.value = normalizePayoutHistoryRows(response?.data?.data);
+    } finally {
+      isPayoutHistoryLoading.value = false;
+    }
+  };
+
   const setVerificationTab = (tab: "client" | "payout") => {
     if (activeVerificationTab.value === tab) {
       return;
     }
 
     activeVerificationTab.value = tab;
+    nextTick(() => scheduleVerificationTabMinHeightUpdate());
     router.replace({
       query: {
         ...route.query,
@@ -943,7 +1179,7 @@
 
   const handleRefreshActiveTab = async () => {
     if (activeVerificationTab.value === "payout") {
-      await loadPayoutVerificationData();
+      await Promise.all([loadPayoutVerificationData(), loadPayoutHistoryData()]);
       return;
     }
 
@@ -966,7 +1202,7 @@
       });
       toast.success("Payment details status updated!");
       payoutCommentOpenMap[paymentDetailId] = false;
-      await Promise.all([loadPayoutVerificationData(), loadVerificationData()]);
+      await Promise.all([loadPayoutVerificationData(), loadVerificationData(), loadPayoutHistoryData()]);
     } finally {
       isPayoutLoading.value = false;
     }
@@ -1018,6 +1254,16 @@
     } finally {
       delete payoutDocumentLoadingMap[loadingKey];
     }
+  };
+
+  const openPayoutHistoryDocument = (document: AdminPaymentDetailDocument): void => {
+    const targetUrl = resolvePayoutDocumentPreviewSrc(document);
+    if (!targetUrl) {
+      toast.error("Документ не найден.");
+      return;
+    }
+
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
 
   const toggleInfoComment = () => {
@@ -1114,17 +1360,39 @@
     () => route.query.verificationTab,
     nextTab => {
       activeVerificationTab.value = parseVerificationTabFromRoute(nextTab);
+      nextTick(() => scheduleVerificationTabMinHeightUpdate());
     }
   );
+
+  watch(
+    () => activeVerificationTab.value,
+    () => {
+      nextTick(() => scheduleVerificationTabMinHeightUpdate());
+    }
+  );
+
+  const handleWindowResize = (): void => {
+    scheduleVerificationTabMinHeightUpdate();
+  };
 
   onMounted(async () => {
     activeVerificationTab.value = parseVerificationTabFromRoute(route.query.verificationTab);
 
-    await Promise.all([loadVerificationData(), loadPayoutVerificationData()]);
+    await Promise.all([loadVerificationData(), loadPayoutVerificationData(), loadPayoutHistoryData()]);
+    nextTick(() => scheduleVerificationTabMinHeightUpdate());
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleWindowResize, { passive: true });
+    }
   });
 
   onBeforeUnmount(() => {
     clearVerificationTabSwitchResetTimer();
+    cancelVerificationTabMinHeightFrame();
+
+    if (typeof window !== "undefined") {
+      window.removeEventListener("resize", handleWindowResize);
+    }
   });
 </script>
 
@@ -1184,6 +1452,7 @@
 
   .verification-tab-switch-anchor {
     position: relative;
+    min-height: 420px;
     transition: height 0.26s ease;
     will-change: height;
   }
@@ -1215,9 +1484,77 @@
     padding: 12px;
     border-radius: 10px;
     color: var(--ui-text-secondary);
-    background: var(--ui-background-panel);
-    border: 1px dashed var(--color-stroke-ui-light);
+    background: color-mix(in srgb, var(--ui-background-card) 72%, transparent);
+    border: 0;
     margin-top: 8px;
+  }
+
+  .user-verification__payout-owner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 0;
+    background: color-mix(in srgb, var(--ui-primary-main) 7%, var(--ui-background-card));
+    margin-top: -4px;
+    margin-bottom: 10px;
+  }
+
+  .user-verification__payout-owner-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0;
+    background: color-mix(in srgb, var(--ui-primary-main) 18%, var(--ui-background));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 52px;
+  }
+
+  .user-verification__payout-owner-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .user-verification__payout-owner-avatar-fallback {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-text-main);
+    text-transform: uppercase;
+  }
+
+  .user-verification__payout-owner-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .user-verification__payout-owner-label {
+    color: var(--ui-text-secondary);
+    font-size: 11px;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .user-verification__payout-owner-name {
+    color: var(--ui-text-main);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .user-verification__payout-owner-email {
+    color: var(--ui-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    word-break: break-word;
   }
 
   .user {
@@ -1481,7 +1818,7 @@
 
   .user-profile-card {
     background: var(--ui-background-panel);
-    border: 1px solid var(--color-stroke-ui-light);
+    border: 0;
     border-radius: 14px;
     padding: 16px;
     display: flex;
@@ -1559,7 +1896,7 @@
 
   .user-verification__right__info-group {
     background: var(--ui-background-panel);
-    border: 1px solid var(--color-stroke-ui-light);
+    border: 0;
     border-radius: 12px;
     padding: 8px;
   }
@@ -1572,7 +1909,7 @@
     width: 100%;
     padding: 8px 12px;
     border-radius: 10px;
-    border: 1px solid var(--color-stroke-ui-light);
+    border: 0;
     background: var(--ui-background-panel);
     margin-bottom: 16px;
   }
@@ -1627,8 +1964,8 @@
         align-items: center;
         justify-content: flex-start;
         gap: 16px;
-        background: var(--ui-background-panel);
-        border: 1px solid var(--color-stroke-ui-light);
+        background: var(--ui-background-card);
+        border: 0;
         border-radius: 12px;
         padding: 12px 14px;
         user-select: none;
@@ -1671,7 +2008,7 @@
         }
 
         &:hover {
-          background-color: var(--color-stroke-ui-dark);
+          background-color: color-mix(in srgb, var(--ui-background-card) 72%, var(--color-stroke-ui-dark));
         }
 
         &:active {
@@ -1728,6 +2065,91 @@
         }
       }
     }
+
+    &__payout-history {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__payout-history-item {
+      border: 0;
+      border-radius: 10px;
+      background: var(--ui-background-card);
+      padding: 10px;
+    }
+
+    &__payout-history-item-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    &__payout-history-item-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &__payout-history-item-title {
+      color: var(--ui-text-main);
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    &__payout-history-item-meta {
+      color: var(--ui-text-secondary);
+      font-size: 12px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    &__payout-history-item-comment {
+      margin-top: 8px;
+      color: var(--ui-text-main);
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--ui-primary-main) 8%, var(--ui-background-panel));
+      border: 1px solid color-mix(in srgb, var(--ui-primary-main) 36%, var(--color-stroke-ui-light));
+    }
+
+    &__payout-history-item-documents {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    &__payout-history-item-doc {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--color-stroke-ui-light);
+      background: var(--ui-background);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    &__payout-history-item-doc-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &__payout-history-item-doc-fallback {
+      color: var(--ui-text-secondary);
+      font-size: 10px;
+      font-weight: 700;
+    }
   }
 
   .user-verification__left,
@@ -1763,6 +2185,16 @@
   }
 
   @media (max-width: 768px) {
+    .user-verification__payout-owner {
+      align-items: flex-start;
+    }
+
+    .user-verification__payout-owner-avatar {
+      width: 44px;
+      height: 44px;
+      flex-basis: 44px;
+    }
+
     .user-profile-card__header {
       flex-direction: column;
       align-items: flex-start;
@@ -1815,6 +2247,11 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 4px;
+    }
+
+    .user-verification__panel__payout-history-item-top {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

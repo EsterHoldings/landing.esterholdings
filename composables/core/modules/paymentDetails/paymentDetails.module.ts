@@ -1,4 +1,4 @@
-import {BasicModuleInterface} from "../module.interface";
+import { BasicModuleInterface } from "../module.interface";
 import PaymentDetailsService from "~/composables/core/modules/paymentDetails/paymentDetails.service";
 
 interface ResponseDTO {
@@ -14,30 +14,32 @@ export class PaymentDetailsModule implements BasicModuleInterface {
     this.paymentDetailsService = new PaymentDetailsService();
   }
 
-  async get(params: {} = {}):Promise<any> {
+  async get(params: {} = {}): Promise<any> {
     return await this.paymentDetailsService.get(params);
   }
-  async getById(id:any) {
+  async getById(id: any) {
     return await this.paymentDetailsService.getById(id);
   }
 
-  async post(data:object = {}):Promise<any> {
+  async getHistory(id: any, params: object = {}) {
+    return await this.paymentDetailsService.getHistory(id, params);
+  }
+
+  async post(data: object = {}): Promise<any> {
     return await this.paymentDetailsService.post(data);
   }
 
-  async put(id:any, data:object = {}):Promise<any> {
+  async put(id: any, data: object = {}): Promise<any> {
     return await this.paymentDetailsService.put(id, data);
   }
 
-  async patch(id:any, data:object = {}):Promise<any> {
+  async patch(id: any, data: object = {}): Promise<any> {
     return await this.paymentDetailsService.patch(id, data);
   }
 
-  async delete(id:any):Promise<any> {
+  async delete(id: any): Promise<any> {
     return await this.paymentDetailsService.delete(id);
   }
-
-
 }
 
 export default PaymentDetailsModule;
