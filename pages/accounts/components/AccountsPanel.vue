@@ -2,11 +2,11 @@
 <template>
   <div>
     <PageStructureContent
-      v-if="!isInitialLoading"
+      v-if="!isInitialLoading && accounts.length > 0"
       :plain="viewMode !== 'table'">
       <template #top>
-        <div class="flex w-full flex-col gap-2 md:flex-row md:items-center">
-          <div class="flex w-full flex-1 min-w-[260px] items-center gap-2">
+        <div class="cabinet-controls-row">
+          <div class="cabinet-controls-row__left">
             <UiInput
               class="w-full"
               @input="handleInputSearch"
@@ -25,9 +25,9 @@
             </UiButtonDefault>
           </div>
 
-          <div class="flex w-full flex-1 items-center gap-2 md:w-auto md:flex-none md:justify-end">
+          <div class="cabinet-controls-row__right">
             <UiSelect
-              class="min-w-[180px] sm:w-[200px]"
+              class="w-full min-w-[180px] sm:w-[200px]"
               :value="orderBy"
               :data="sortByFilterData"
               :withoutNoSelect="true"
@@ -41,11 +41,12 @@
             </UiSelect>
 
             <ViewModeToggle
+              v-if="!isMobileViewport"
               class="w-full sm:w-auto"
               bordered
               :modelValue="viewMode"
               :options="viewOptions"
-              @update:modelValue="viewMode = $event" />
+              @update:modelValue="handleChangeViewMode" />
           </div>
         </div>
       </template>
@@ -428,10 +429,10 @@
           <UiIconCardCheck class="accounts-empty-state__icon" />
         </div>
         <div class="accounts-empty-state__title">
-          {{ emptyTitle }}
+          {{ currentEmptyTitle }}
         </div>
         <UiTextSmall class="accounts-empty-state__subtitle">
-          {{ emptySubtitle }}
+          {{ currentEmptySubtitle }}
         </UiTextSmall>
         <UiTextSmall
           v-if="showBlockedNotice"
@@ -440,6 +441,7 @@
         </UiTextSmall>
 
         <UiButtonDefault
+          v-if="!isVerificationRequired"
           state="success--outline"
           class="accounts-empty-state__button"
           :disabled="!props.canCreateAccount"
@@ -447,6 +449,13 @@
           {{ openAccountLabel }}
           &nbsp;
           <UiIconSuccess />
+        </UiButtonDefault>
+        <UiButtonDefault
+          v-else
+          state="info--outline"
+          class="accounts-empty-state__button"
+          @click="handleClickGoToVerification">
+          {{ verifyActionLabel }}
         </UiButtonDefault>
       </div>
     </template>
@@ -459,6 +468,7 @@
     </template>
 
     <PaginationMain
+      v-if="!isInitialLoading && accounts.length > 0"
       class="px-5 py-2"
       :current-page="currentPage"
       :total-pages="totalPages"
@@ -494,7 +504,7 @@
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
   import { computed, inject, onMounted, reactive, ref, nextTick, onBeforeUnmount, watch, h } from "vue";
-  import { navigateTo } from "nuxt/app";
+  import { navigateTo, useLocalePath } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
   import UiIconSortBy from "~/components/ui/UiIconSortBy.vue";
@@ -523,6 +533,7 @@
 
   const { t } = useI18n({ useScope: "global" });
   const appCore = useAppCore();
+  const localePath = useLocalePath();
 
   const ORDER_DIRECTION_ASC = "asc";
   const ORDER_DIRECTION_DESC = "desc";
@@ -539,6 +550,7 @@
   const orderBy = ref("balance");
   const orderDirection = ref(ORDER_DIRECTION_DESC);
   const currentRowActiveOptions = ref<number | null>(null);
+  const isMobileViewport = ref(false);
 
   const sortByFilterData = reactive([
     { id: "number", value: "number", text: "Number" },
@@ -722,8 +734,26 @@
   const emptySubtitle = computed(() =>
     resolveText("cabinet.accounts.emptySubtitle", "Откройте первый торговый счет, чтобы начать работу.")
   );
+  const verifyTitle = computed(() =>
+    resolveText("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для открытия счёта")
+  );
+  const verifySubtitle = computed(() =>
+    resolveText(
+      "cabinet.dashboard.mt4.verifySubtitle",
+      "Подтвердите данные профиля и документы, после этого сможете открыть MT4 счёт."
+    )
+  );
   const openAccountLabel = computed(() => resolveText("cabinet.accounts.openAccount", "Открыть счет"));
+  const verifyActionLabel = computed(() =>
+    resolveText("cabinet.dashboard.accountVerification.goToVerification", "Перейти к верификации")
+  );
   const showBlockedNotice = computed(() => props.isEligibilityLoaded && !props.canCreateAccount);
+  const isVerificationRequired = computed(() => props.isEligibilityLoaded && !props.canCreateAccount);
+  const currentEmptyTitle = computed(() => (isVerificationRequired.value ? verifyTitle.value : emptyTitle.value));
+  const currentEmptySubtitle = computed(() =>
+    isVerificationRequired.value ? verifySubtitle.value : emptySubtitle.value
+  );
+  const verificationLink = computed(() => localePath({ path: "/profile", query: { tab: "verification" } }));
 
   const refreshAccountBalance = async (account: any) => {
     const key = refreshKey(account.id);
@@ -845,18 +875,40 @@
     isInitialLoading.value = false;
   };
 
+  const resolveDefaultViewMode = (width: number): "table" | "cards" | "full" => {
+    if (width < 768) return "full";
+    if (width < 1024) return "cards";
+    return "table";
+  };
+
+  const syncViewport = () => {
+    if (typeof window === "undefined") return;
+    isMobileViewport.value = window.innerWidth < 768;
+  };
+
   const initViewMode = () => {
     if (typeof window === "undefined") return;
+    syncViewport();
+
     const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     if (saved && ["table", "cards", "full"].includes(saved)) {
       viewMode.value = saved as typeof viewMode.value;
+      return;
     }
+
+    viewMode.value = resolveDefaultViewMode(window.innerWidth);
   };
 
   watch(viewMode, mode => {
     if (typeof window === "undefined") return;
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
+
+  const handleChangeViewMode = (nextViewMode: string) => {
+    if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
+      viewMode.value = nextViewMode;
+    }
+  };
 
   const tableRef = ref<any>(null);
 
@@ -967,6 +1019,7 @@
   };
 
   const recalc = () => {
+    syncViewport();
     if (currentRowActiveOptions.value != null) {
       updateTableMenuPosition(currentRowActiveOptions.value);
     }
@@ -991,9 +1044,7 @@
   });
 
   onBeforeUnmount(() => {
-    for (const timer of balanceHighlightTimers.values()) {
-      clearTimeout(timer);
-    }
+    balanceHighlightTimers.forEach(timer => clearTimeout(timer));
     balanceHighlightTimers.clear();
 
     window.removeEventListener("resize", recalc);
@@ -1057,9 +1108,50 @@
       title: t("cabinet.accounts.accounts-form.title"),
     });
   };
+
+  const handleClickGoToVerification = async () => {
+    await navigateTo(verificationLink.value);
+  };
 </script>
 
 <style lang="postcss" scoped>
+  .cabinet-controls-row {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__left {
+    display: flex;
+    width: 100%;
+    min-width: 260px;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__right {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cabinet-controls-row {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .cabinet-controls-row__right {
+      width: auto;
+      flex: none;
+      justify-content: flex-end;
+    }
+  }
+
   .accounts-empty-state {
     min-height: calc(100vh - 370px);
     display: flex;

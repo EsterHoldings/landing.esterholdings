@@ -41,11 +41,15 @@ export class AuthModule implements AuthModuleInterface {
   }
 
   async doCheckIsAuth(): Promise<any> {
-    return await this.authService.checkIsAuth()
+    return await this.authService.checkIsAuth();
   }
 
   async doRefresh(): Promise<any> {
-    return await this.authService.refresh()
+    return await this.authService.refresh();
+  }
+
+  async verifyEmail(payload: { id: string; hash: string; expires: string; signature: string }): Promise<any> {
+    return await this.authService.verifyEmail(payload);
   }
 }
 

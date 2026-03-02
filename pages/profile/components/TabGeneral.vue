@@ -1,7 +1,17 @@
 <template>
   <div class="profile__tab--general">
     <div class="profile__tab--general__profile-data__photo">
-      <UserPhotoUploader class="ml-5 mr-5" />
+      <div class="profile__tab--general__profile-data__photo-uploader">
+        <UserPhotoUploader />
+      </div>
+      <div
+        class="profile__verification-status"
+        :class="`profile__verification-status--${profileInfoVerificationState}`">
+        <span class="profile__verification-status__dot" />
+        <span class="profile__verification-status__label">
+          {{ profileInfoVerificationLabel }}
+        </span>
+      </div>
     </div>
 
     <div class="profile__tab--general_wrapper">
@@ -186,7 +196,8 @@
           <div class="profile__tab--general__profile-data--additional__form__field__save_btn">
             <UiButtonDefault
               state="info--outline"
-              @click="validateUserDataForm(handleSubmit)">
+              :isLoading="isLoading"
+              @click="handleValidateAndSubmit">
               <UiIconSpinnerDefault v-if="isLoading" />
               <span v-if="!isLoading">{{ t("cabinet.profile.components.tab-general.button") }}</span>
             </UiButtonDefault>
@@ -198,16 +209,12 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, reactive, ref } from "vue";
+  import { computed, onMounted, reactive, ref } from "vue";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
   import useAppCore from "~/composables/useAppCore";
   import { formData } from "~/pages/profile/composables";
-  import {
-    resetValidationUserDataForm,
-    validateUserDataForm,
-    validatorUserDataForm,
-  } from "~/pages/profile/composables/validation";
+  import { validatorUserDataForm } from "~/pages/profile/composables/validation";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   import UiFormControl from "~/components/ui/UiFormControl.vue";
   import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
@@ -260,6 +267,26 @@
   let countrySearchTimer: ReturnType<typeof setTimeout> | null = null;
   let stateSearchTimer: ReturnType<typeof setTimeout> | null = null;
   let citySearchTimer: ReturnType<typeof setTimeout> | null = null;
+  const profileInfoVerificationState = ref<"initial" | "pending" | "approved" | "rejected">("initial");
+
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const profileInfoVerificationLabel = computed(() => {
+    const title = resolveText("cabinet.dashboard.accountVerification.steps.profile", "Profile data verification");
+    if (profileInfoVerificationState.value === "initial") {
+      return `${title}: ${resolveText("cabinet.profile.generalVerification.notStarted", "Not started")}`;
+    }
+    if (profileInfoVerificationState.value === "approved") {
+      return `${title}: ${resolveText("cabinet.dashboard.accountVerification.statuses.done", "Done")}`;
+    }
+    if (profileInfoVerificationState.value === "rejected") {
+      return `${title}: ${resolveText("cabinet.dashboard.accountVerification.statuses.required", "Required")}`;
+    }
+    return `${title}: ${resolveText("cabinet.dashboard.accountVerification.statuses.inProgress", "In progress")}`;
+  });
 
   const normalizeText = (value: string): string => value.trim().toLowerCase();
 
@@ -577,21 +604,121 @@
     try {
       isLoading.value = true;
 
+      const toNullableInt = (value: string | null): number | null => {
+        if (!value) {
+          return null;
+        }
+        const parsed = Number.parseInt(value, 10);
+        return Number.isFinite(parsed) ? parsed : null;
+      };
+
       await appCore.users.patch({
         ...formData,
-        country_id: formData.country_id,
-        state_id: formData.state_id,
-        city_id: formData.city_id,
+        country_id: toNullableInt(formData.country_id),
+        state_id: toNullableInt(formData.state_id),
+        city_id: toNullableInt(formData.city_id),
       });
 
-      resetValidationUserDataForm();
+      validatorUserDataForm.clearFieldsErrors();
+      await loadProfileInfoVerificationStatus();
       toast.success(t("cabinet.profile.components.tab-general.success"));
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      const responseStatus = e?.response?.status;
+      const serverErrors = e?.response?.data?.errors;
+
+      if (responseStatus === 422 && serverErrors && typeof serverErrors === "object") {
+        const mapFieldName = (fieldName: string): string =>
+          ({
+            country_id: "country",
+            state_id: "state",
+            city_id: "city",
+          })[fieldName] || fieldName;
+
+        Object.entries(serverErrors as Record<string, string[]>).forEach(([field, errors]) => {
+          const targetField = mapFieldName(field);
+          const target = validatorUserDataForm.errorsFormData[targetField];
+          if (!target) {
+            return;
+          }
+          target.isDirty = true;
+          target.errors = Array.isArray(errors) ? errors : [String(errors)];
+        });
+
+        toast.error(resolveText("cabinet.profile.components.tab-general.validationError", "Please check form fields."));
+        return;
+      }
+
+      toast.error(resolveText("cabinet.profile.components.tab-general.serverError", "Unable to save profile data."));
     } finally {
-      setTimeout(() => {
-        isLoading.value = false;
-      }, 1000);
+      isLoading.value = false;
+    }
+  };
+
+  const handleValidateAndSubmit = async () => {
+    const isValid = validatorUserDataForm.doValidate();
+    if (!isValid) {
+      toast.error(resolveText("cabinet.profile.components.tab-general.validationError", "Please check form fields."));
+      return;
+    }
+
+    await handleSubmit();
+  };
+
+  const normalizeVerificationStatus = (value: unknown): "pending" | "approved" | "rejected" => {
+    if (typeof value !== "string") return "pending";
+    const normalized = value.trim().toLowerCase();
+    if (["approved", "done", "success", "verified"].includes(normalized)) return "approved";
+    if (["rejected", "failed", "declined", "required"].includes(normalized)) return "rejected";
+    return "pending";
+  };
+
+  const hasProfileInfoInput = (): boolean => {
+    const fields = [
+      formData.birthdate,
+      formData.phone,
+      formData.country,
+      formData.state,
+      formData.city,
+      formData.address,
+      formData.postal_code,
+    ];
+
+    return fields.some(value => String(value ?? "").trim() !== "");
+  };
+
+  const hasVerificationActivity = (verificationRecord: Record<string, any>): boolean => {
+    const historyRows = verificationRecord?.data?.history;
+    if (Array.isArray(historyRows) && historyRows.length > 0) {
+      return true;
+    }
+
+    const createdAt = typeof verificationRecord?.created_at === "string" ? verificationRecord.created_at : "";
+    const updatedAt = typeof verificationRecord?.updated_at === "string" ? verificationRecord.updated_at : "";
+
+    return createdAt !== "" && updatedAt !== "" && createdAt !== updatedAt;
+  };
+
+  const resolveProfileInfoVerificationState = (
+    rawStatus: unknown,
+    hasRequestActivity = false
+  ): "initial" | "pending" | "approved" | "rejected" => {
+    const status = normalizeVerificationStatus(rawStatus);
+    if (status === "approved" || status === "rejected") {
+      return status;
+    }
+
+    return hasRequestActivity || hasProfileInfoInput() ? "pending" : "initial";
+  };
+
+  const loadProfileInfoVerificationStatus = async (): Promise<void> => {
+    try {
+      const response = await appCore.verifications.get();
+      const verificationRecord = response?.data && typeof response.data === "object" ? response.data : {};
+      const rawStatus = verificationRecord?.data?.info?.verification_status;
+      const hasRequestActivity = hasVerificationActivity(verificationRecord);
+      profileInfoVerificationState.value = resolveProfileInfoVerificationState(rawStatus, hasRequestActivity);
+    } catch {
+      profileInfoVerificationState.value = hasProfileInfoInput() ? "pending" : "initial";
     }
   };
 
@@ -617,6 +744,7 @@
       formData.city_id = null;
 
       await initializeLocationSelections(formData.country, formData.state, formData.city);
+      await loadProfileInfoVerificationStatus();
     } finally {
       isLoadingAllComponentData.value = false;
     }
@@ -632,6 +760,19 @@
     min-height: 400px;
     width: 100%;
     border-radius: 10px;
+
+    &__profile-data__photo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 4px 20px 0;
+    }
+
+    &__profile-data__photo-uploader {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
 
     &_wrapper {
       display: flex;
@@ -700,12 +841,6 @@
         &__form {
           padding: 15px;
         }
-
-        &__photo {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 20px;
-        }
       }
 
       &__profile-data--additional {
@@ -714,6 +849,67 @@
         &__form {
           padding: 15px;
         }
+      }
+
+      &__profile-data__photo {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 4px 15px 0;
+
+        .profile__verification-status {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
+  .profile__verification-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--color-stroke-ui-light);
+    border-radius: 999px;
+    padding: 6px 12px;
+    background: color-mix(in srgb, var(--ui-background-panel) 70%, transparent);
+    flex-shrink: 0;
+
+    &__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--ui-text-secondary);
+    }
+
+    &__label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ui-text-main);
+      line-height: 1;
+    }
+
+    &--initial {
+      .profile__verification-status__dot {
+        background: var(--ui-text-secondary);
+      }
+    }
+
+    &--approved {
+      .profile__verification-status__dot {
+        background: var(--color-success);
+      }
+    }
+
+    &--pending {
+      .profile__verification-status__dot {
+        background: var(--color-warning);
+      }
+    }
+
+    &--rejected {
+      .profile__verification-status__dot {
+        background: var(--color-danger);
       }
     }
   }

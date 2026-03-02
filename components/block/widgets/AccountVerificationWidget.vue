@@ -27,11 +27,14 @@
       <div
         class="verification-step-progress"
         :aria-label="verifiedCountText">
-        <span
+        <button
           v-for="step in orderedSteps"
           :key="`progress-${step.key}`"
+          type="button"
           class="verification-step-progress__item"
-          :class="`is-${step.status}`">
+          :class="`is-${step.status}`"
+          :title="step.title"
+          @click="handleOpenStep(step.key)">
           <span
             class="verification-step-progress__icon"
             aria-hidden="true">
@@ -73,7 +76,7 @@
             </svg>
           </span>
           <span class="verification-step-progress__label">{{ step.title }}</span>
-        </span>
+        </button>
       </div>
     </div>
 
@@ -101,41 +104,46 @@
           v-for="step in orderedSteps"
           :key="step.key"
           class="verification-step">
-          <div
-            class="verification-step__icon"
-            :class="step.stateClass">
-            <component
-              :is="step.icon"
-              class="verification-step__icon-svg" />
-          </div>
-
-          <div class="verification-step__meta">
-            <div class="verification-step__title-row">
-              <div
-                class="verification-step__title"
-                :title="step.title">
-                {{ step.title }}
-              </div>
-
-              <UiBadge
-                :state="step.badgeState"
-                outline
-                class="verification-step__badge !px-2.5 !py-0.5 text-xs">
-                {{ step.statusLabel }}
-              </UiBadge>
-            </div>
-            <div class="verification-step__status">
-              <span
-                class="verification-step__status-dot"
-                :class="step.stateClass"></span>
-              <span>{{ step.statusLabel }}</span>
-            </div>
+          <button
+            type="button"
+            class="verification-step__button"
+            @click="handleOpenStep(step.key)">
             <div
-              v-if="step.comment"
-              class="verification-step__comment">
-              {{ step.comment }}
+              class="verification-step__icon"
+              :class="step.stateClass">
+              <component
+                :is="step.icon"
+                class="verification-step__icon-svg" />
             </div>
-          </div>
+
+            <div class="verification-step__meta">
+              <div class="verification-step__title-row">
+                <div
+                  class="verification-step__title"
+                  :title="step.title">
+                  {{ step.title }}
+                </div>
+
+                <UiBadge
+                  :state="step.badgeState"
+                  outline
+                  class="verification-step__badge !px-2.5 !py-0.5 text-xs">
+                  {{ step.statusLabel }}
+                </UiBadge>
+              </div>
+              <div class="verification-step__status">
+                <span
+                  class="verification-step__status-dot"
+                  :class="step.stateClass"></span>
+                <span>{{ step.statusLabel }}</span>
+              </div>
+              <div
+                v-if="step.comment"
+                class="verification-step__comment">
+                {{ step.comment }}
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </div>
@@ -145,6 +153,7 @@
 <script lang="ts" setup>
   import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
   import { useI18n } from "vue-i18n";
+  import { navigateTo, useLocalePath } from "~/.nuxt/imports";
 
   import UiImageCircle from "~/components/ui/UiImageCircle.vue";
   import UiBadge from "~/components/ui/UiBadge.vue";
@@ -163,6 +172,7 @@
   type VerificationStepKey = "photo" | "profile" | "email" | "documents" | "deposit";
 
   const { t } = useI18n({ useScope: "global" });
+  const localePath = useLocalePath();
   const appCore = useAppCore();
   const authStore = useAuthStore();
 
@@ -325,6 +335,23 @@
     loadVerificationData();
   };
 
+  const resolveStepRoute = (key: VerificationStepKey): { path: string; query?: Record<string, string> } => {
+    if (key === "documents") {
+      return { path: "/profile", query: { tab: "documents" } };
+    }
+
+    if (key === "deposit") {
+      return { path: "/payments", query: { openDeposit: "1" } };
+    }
+
+    return { path: "/profile", query: { tab: "general" } };
+  };
+
+  const handleOpenStep = async (key: VerificationStepKey): Promise<void> => {
+    const target = resolveStepRoute(key);
+    await navigateTo(localePath({ path: target.path, query: target.query ?? {} }));
+  };
+
   const loadVerificationData = async () => {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -382,11 +409,7 @@
     padding: 12px;
     border-radius: 0;
     background:
-      linear-gradient(
-        110deg,
-        color-mix(in srgb, var(--color-success, var(--ui-primary-accent)) 18%, transparent) 0%,
-        transparent 52%
-      ),
+      linear-gradient(136deg, color-mix(in srgb, var(--ui-primary-main) 10%, transparent) 0%, transparent 70.44%),
       var(--ui-background-card);
   }
 
@@ -446,6 +469,9 @@
     min-height: 30px;
     height: 30px;
     max-height: 30px;
+    width: 100%;
+    border: 0;
+    cursor: pointer;
     border-radius: 10px;
     background: var(--color-stroke-ui-light);
     display: flex;
@@ -455,6 +481,11 @@
     padding: 0 8px;
     min-width: 0;
     color: var(--ui-text-main);
+  }
+
+  .verification-step-progress__item:focus-visible {
+    outline: 1px solid var(--ui-primary-main);
+    outline-offset: 1px;
   }
 
   .verification-step-progress__icon {
@@ -542,19 +573,33 @@
   }
 
   .verification-step {
+    border-radius: 12px;
+    border: 0;
+    background: transparent;
+  }
+
+  .verification-step__button {
+    width: 100%;
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: flex-start;
     gap: 10px;
-    border-radius: 12px;
     border: 0;
     background: transparent;
     padding: 10px 12px;
+    border-radius: 12px;
     transition: background-color 0.2s ease;
+    text-align: left;
+    cursor: pointer;
   }
 
-  .verification-step:hover {
+  .verification-step__button:hover {
     background: var(--ui-background-card);
+  }
+
+  .verification-step__button:focus-visible {
+    outline: 1px solid var(--ui-primary-main);
+    outline-offset: 1px;
   }
 
   .verification-step--skeleton {

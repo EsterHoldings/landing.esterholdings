@@ -6,46 +6,6 @@
           {{ t("cabinet.dashboard.title") }}
         </UiTextH4>
         <div class="flex w-full items-center gap-2 sm:w-auto sm:ml-auto">
-          <div class="auto-refresh-field auto-refresh-field--icon-only">
-            <UiSelect
-              class="auto-refresh-select"
-              :value="autoRefreshInterval"
-              :data="autoRefreshOptions"
-              :withoutNoSelect="true"
-              @change="handleChangeAutoRefresh">
-              <template #icon-left>
-                <span
-                  class="auto-refresh-indicator"
-                  :class="{ 'is-off': !isAutoRefreshEnabled }"
-                  :style="{ '--auto-refresh-progress': `${autoRefreshProgress}%` }"
-                  aria-hidden="true">
-                  <span
-                    v-if="isAutoRefreshEnabled"
-                    class="auto-refresh-indicator__value">
-                    {{ autoRefreshRemainingLabel }}
-                  </span>
-                  <svg
-                    v-else
-                    class="auto-refresh-indicator__icon"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true">
-                    <path
-                      d="M12 3v7"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round" />
-                    <path
-                      d="M7.5 6.5a7 7 0 1 0 9 0"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round" />
-                  </svg>
-                </span>
-              </template>
-            </UiSelect>
-          </div>
           <UiButtonDefault
             state="info--small"
             class="!w-[36px]"
@@ -119,14 +79,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
+  import { definePageMeta, useLocalePath, useRoute, useRouter } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, onBeforeUnmount, onMounted, ref } from "vue";
   import { useNuxtApp } from "nuxt/app";
+  import { useToast } from "vue-toastification";
 
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
-  import UiSelect from "~/components/ui/UiSelect.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
 
@@ -138,6 +98,7 @@
   import AccountVerificationWidget from "~/components/block/widgets/AccountVerificationWidget.vue";
   import Mt4AccountsWidget from "~/components/block/widgets/Mt4AccountsWidget.vue";
   import { useUiStore } from "~/stores/uiStore";
+  import { useAuthStore } from "~/stores/authStore";
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
   import useAccountCreationEligibility from "~/composables/useAccountCreationEligibility";
@@ -147,9 +108,12 @@
   const { t } = useI18n({ useScope: "global" });
   const { $echo } = useNuxtApp();
   const localePath = useLocalePath();
+  const route = useRoute();
+  const router = useRouter();
+  const toast = useToast();
+  const authStore = useAuthStore();
   const uiStore = useUiStore();
   const appCore = useAppCore();
-  let mt4RefreshTimer: ReturnType<typeof setInterval> | null = null;
   const { canCreateAccount, refreshAccountCreationEligibility } = useAccountCreationEligibility();
 
   type DashboardSummary = {
@@ -169,91 +133,81 @@
   });
   const isSummaryLoading = ref(false);
 
-  const AUTO_REFRESH_STORAGE_KEY = "dashboardAutoRefreshInterval";
-  const DEFAULT_REFRESH_SECONDS = "20";
-  const autoRefreshInterval = ref(DEFAULT_REFRESH_SECONDS);
-  const autoRefreshRemaining = ref(0);
-  const autoRefreshProgressValue = ref(0);
-  let nextRefreshAt: number | null = null;
+  const EMAIL_VERIFY_QUERY_FLAG = "verify_email";
+  const EMAIL_VERIFY_QUERY_ID = "verify_id";
+  const EMAIL_VERIFY_QUERY_HASH = "verify_hash";
+  const EMAIL_VERIFY_QUERY_EXPIRES = "verify_expires";
+  const EMAIL_VERIFY_QUERY_SIGNATURE = "verify_signature";
 
-  const autoRefreshOptions = computed(() => {
-    const secondsShort = t("cabinet.accounts.autoRefresh.secondsShort");
-    return [
-      { id: "off", value: "0", text: t("cabinet.accounts.autoRefresh.off") },
-      { id: "2", value: "2", text: `2${secondsShort}` },
-      { id: "3", value: "3", text: `3${secondsShort}` },
-      { id: "5", value: "5", text: `5${secondsShort}` },
-      { id: "10", value: "10", text: `10${secondsShort}` },
-      { id: "15", value: "15", text: `15${secondsShort}` },
-      { id: "20", value: "20", text: `20${secondsShort}` },
-      { id: "30", value: "30", text: `30${secondsShort}` },
-      { id: "60", value: "60", text: `60${secondsShort}` },
-    ];
-  });
-
-  const isAutoRefreshEnabled = computed(() => Number(autoRefreshInterval.value) > 0);
-  const autoRefreshRemainingLabel = computed(() => {
-    if (!isAutoRefreshEnabled.value) return t("cabinet.accounts.autoRefresh.offShort");
-    return `${autoRefreshRemaining.value}${t("cabinet.accounts.autoRefresh.secondsShort")}`;
-  });
-  const autoRefreshProgress = computed(() => {
-    if (!isAutoRefreshEnabled.value) return 0;
-    return Math.min(100, Math.max(0, autoRefreshProgressValue.value));
-  });
-
-  const clearAutoRefresh = () => {
-    if (!mt4RefreshTimer) return;
-    clearInterval(mt4RefreshTimer);
-    mt4RefreshTimer = null;
-    nextRefreshAt = null;
-    autoRefreshProgressValue.value = 0;
+  const normalizeQueryValue = (value: unknown): string => {
+    if (Array.isArray(value)) return typeof value[0] === "string" ? value[0] : "";
+    return typeof value === "string" ? value : "";
   };
 
-  const setupAutoRefresh = () => {
-    clearAutoRefresh();
-    const seconds = Number(autoRefreshInterval.value);
-    if (!seconds || Number.isNaN(seconds)) {
-      autoRefreshRemaining.value = 0;
+  const getEmailVerificationPayloadFromQuery = (): {
+    id: string;
+    hash: string;
+    expires: string;
+    signature: string;
+  } | null => {
+    const shouldVerify = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_FLAG]);
+    if (shouldVerify !== "1") return null;
+
+    const id = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_ID]).trim();
+    const hash = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_HASH]).trim();
+    const expires = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_EXPIRES]).trim();
+    const signature = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_SIGNATURE]).trim();
+
+    if (!id || !hash || !expires || !signature) return null;
+
+    return {
+      id,
+      hash,
+      expires,
+      signature,
+    };
+  };
+
+  const clearEmailVerificationQuery = async () => {
+    const nextQuery = { ...route.query };
+    delete nextQuery[EMAIL_VERIFY_QUERY_FLAG];
+    delete nextQuery[EMAIL_VERIFY_QUERY_ID];
+    delete nextQuery[EMAIL_VERIFY_QUERY_HASH];
+    delete nextQuery[EMAIL_VERIFY_QUERY_EXPIRES];
+    delete nextQuery[EMAIL_VERIFY_QUERY_SIGNATURE];
+    await router.replace({ query: nextQuery });
+  };
+
+  const refreshAuthUser = async () => {
+    const response = await appCore.auth.getAuthUser();
+    authStore.setUser(response.data);
+  };
+
+  const handleEmailVerificationFromQuery = async () => {
+    const shouldVerify = normalizeQueryValue(route.query?.[EMAIL_VERIFY_QUERY_FLAG]) === "1";
+    if (!shouldVerify) return;
+
+    const payload = getEmailVerificationPayloadFromQuery();
+    if (!payload) {
+      toast.error(resolveText("cabinet.dashboard.emailVerification.error", "Failed to verify email."));
+      await clearEmailVerificationQuery();
       return;
     }
 
-    const totalMs = seconds * 1000;
-    nextRefreshAt = Date.now() + totalMs;
-    autoRefreshRemaining.value = seconds;
-    autoRefreshProgressValue.value = 0;
-
-    mt4RefreshTimer = setInterval(() => {
-      if (!nextRefreshAt) return;
-      const now = Date.now();
-      const remainingMs = nextRefreshAt - now;
-      const clampedRemainingMs = Math.max(0, remainingMs);
-      autoRefreshRemaining.value = Math.max(0, Math.ceil(clampedRemainingMs / 1000));
-      autoRefreshProgressValue.value = ((totalMs - clampedRemainingMs) / totalMs) * 100;
-
-      if (remainingMs <= 0) {
-        handleRefreshDashboard();
-        nextRefreshAt = Date.now() + totalMs;
-        autoRefreshRemaining.value = seconds;
-        autoRefreshProgressValue.value = 0;
-      }
-    }, 100);
-  };
-
-  const handleChangeAutoRefresh = (value: string | null) => {
-    if (!value) return;
-    autoRefreshInterval.value = value;
-    if (typeof window === "undefined") return;
-    localStorage.setItem(AUTO_REFRESH_STORAGE_KEY, value);
-    setupAutoRefresh();
-  };
-
-  const initAutoRefresh = () => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem(AUTO_REFRESH_STORAGE_KEY);
-    const isValid = !!autoRefreshOptions.value.find(option => option.value === saved);
-    autoRefreshInterval.value = isValid ? (saved as string) : DEFAULT_REFRESH_SECONDS;
-    localStorage.setItem(AUTO_REFRESH_STORAGE_KEY, autoRefreshInterval.value);
-    setupAutoRefresh();
+    try {
+      const response = await appCore.auth.verifyEmail(payload);
+      const message =
+        response?.data?.message || resolveText("cabinet.dashboard.emailVerification.success", "Email verified.");
+      toast.success(message);
+      await refreshAuthUser();
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        resolveText("cabinet.dashboard.emailVerification.error", "Failed to verify email.");
+      toast.error(message);
+    } finally {
+      await clearEmailVerificationQuery();
+    }
   };
 
   onMounted(async () => {
@@ -263,8 +217,8 @@
       console.log("[TEST] Ping received:", e);
     });
 
+    await handleEmailVerificationFromQuery();
     await handleRefreshDashboard();
-    initAutoRefresh();
   });
 
   onBeforeUnmount(() => {
@@ -272,7 +226,6 @@
       // @ts-ignore
       $echo.leave("test");
     } catch {}
-    clearAutoRefresh();
   });
 
   type Mt4Status = "active" | "inactive";
@@ -466,6 +419,9 @@
   .dashboard-widget-link :deep(.dashboard-widget-card) {
     height: 100%;
     cursor: pointer;
+    background:
+      linear-gradient(136deg, color-mix(in srgb, var(--ui-primary-main) 10%, transparent) 0%, transparent 70.44%),
+      var(--ui-background-card) !important;
     transition:
       background-color 0.2s ease,
       border-color 0.2s ease,
@@ -473,91 +429,8 @@
   }
 
   .dashboard-widget-link:hover :deep(.dashboard-widget-card) {
-    background: var(--ui-background-card);
     border-color: var(--color-stroke-ui-light);
     opacity: 0.95;
-  }
-
-  .auto-refresh-indicator {
-    --auto-refresh-progress: 0%;
-    height: 26px;
-    width: 26px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: conic-gradient(var(--ui-primary-accent) var(--auto-refresh-progress), var(--color-stroke-ui-light) 0);
-    color: var(--ui-text-main);
-    font-size: 10px;
-    line-height: 1;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .auto-refresh-indicator.is-off {
-    background: var(--color-stroke-ui-light);
-    color: var(--ui-text-secondary);
-  }
-
-  .auto-refresh-indicator__value {
-    display: block;
-    max-width: 24px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-    transform: translateY(0.5px);
-  }
-
-  .auto-refresh-indicator__icon {
-    width: 14px;
-    height: 14px;
-  }
-
-  .auto-refresh-field {
-    display: inline-flex;
-    width: auto;
-    background-color: var(--color-stroke-ui-dark);
-    border: 1px solid var(--color-stroke-ui-light);
-    border-radius: 10px;
-    padding: 6px;
-  }
-
-  .auto-refresh-field :deep(.select) {
-    border: none;
-    background: transparent;
-    height: 32px;
-    padding-left: 6px;
-    padding-right: 2px;
-    width: auto;
-    white-space: nowrap;
-  }
-
-  .auto-refresh-field--icon-only {
-    flex-shrink: 0;
-  }
-
-  .auto-refresh-field--icon-only :deep(.select) {
-    width: 44px;
-    min-width: 44px;
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
-    gap: 4px;
-  }
-
-  .auto-refresh-field--icon-only :deep(.select > .block.w-full) {
-    display: none;
-  }
-
-  .auto-refresh-field--icon-only :deep(.select > .ml-2) {
-    margin-left: 0;
-  }
-
-  .auto-refresh-field--icon-only :deep([role="listbox"]) {
-    min-width: 136px;
-    left: auto;
-    right: 0;
   }
 
   .dashboard-page :deep(.dashboard-widget-card) {
@@ -568,6 +441,11 @@
   .dashboard-page :deep(.transactions-widget__error),
   .dashboard-page :deep(.transactions-widget__empty) {
     border: none !important;
+  }
+
+  .dashboard-page :deep(.transactions-widget__empty) {
+    min-height: 92px !important;
+    padding: 10px !important;
   }
 
   .dashboard-page :deep(.transaction-row) {

@@ -7,7 +7,7 @@
       <div class="mt4-header-card__actions">
         <NuxtLink
           v-if="canCreateAccount"
-          :to="profileAccountsLink"
+          :to="profileAccountsCreateLink"
           class="w-full sm:w-auto">
           <UiButtonDefault
             state="primary"
@@ -15,13 +15,16 @@
             {{ t("cabinet.dashboard.mt4.openNewAccount") }}
           </UiButtonDefault>
         </NuxtLink>
-        <UiButtonDefault
+        <NuxtLink
           v-else
-          state="primary"
-          class="w-full sm:w-auto"
-          :disabled="true">
-          {{ t("cabinet.dashboard.mt4.openNewAccount") }}
-        </UiButtonDefault>
+          :to="profileVerificationLink"
+          class="w-full sm:w-auto">
+          <UiButtonDefault
+            state="info--outline"
+            class="w-full sm:w-auto">
+            {{ verifyActionLabel }}
+          </UiButtonDefault>
+        </NuxtLink>
       </div>
     </div>
 
@@ -61,10 +64,10 @@
             <UiIconCardCheck class="mt4-empty-state__icon" />
           </div>
           <div class="mt4-empty-state__title">
-            {{ emptyTitle }}
+            {{ currentEmptyTitle }}
           </div>
           <UiTextSmall class="mt4-empty-state__subtitle">
-            {{ emptySubtitle }}
+            {{ currentEmptySubtitle }}
           </UiTextSmall>
           <UiTextSmall
             v-if="!canCreateAccount && blockedReasonText"
@@ -74,7 +77,7 @@
 
           <NuxtLink
             v-if="canCreateAccount"
-            :to="profileAccountsLink"
+            :to="profileAccountsCreateLink"
             class="w-full sm:w-auto">
             <UiButtonDefault
               state="success--outline"
@@ -82,13 +85,16 @@
               {{ openAccountLabel }}
             </UiButtonDefault>
           </NuxtLink>
-          <UiButtonDefault
+          <NuxtLink
             v-else
-            state="success--outline"
-            class="w-full sm:w-auto"
-            :disabled="true">
-            {{ openAccountLabel }}
-          </UiButtonDefault>
+            :to="profileVerificationLink"
+            class="w-full sm:w-auto">
+            <UiButtonDefault
+              state="info--outline"
+              class="w-full sm:w-auto">
+              {{ verifyActionLabel }}
+            </UiButtonDefault>
+          </NuxtLink>
         </div>
 
         <div
@@ -194,7 +200,8 @@
   const { t } = useI18n({ useScope: "global" });
   const localePath = useLocalePath();
 
-  const profileAccountsLink = computed(() => localePath("/accounts"));
+  const profileAccountsCreateLink = computed(() => localePath({ path: "/accounts", query: { openCreate: "1" } }));
+  const profileVerificationLink = computed(() => localePath({ path: "/profile", query: { tab: "verification" } }));
   const canCreateAccount = computed(() => !!props.canCreateAccount);
 
   const statusText = {
@@ -211,7 +218,21 @@
   const emptySubtitle = computed(() =>
     resolveText("cabinet.dashboard.mt4.emptySubtitle", "Откройте первый торговый счет, чтобы начать работу.")
   );
+  const verifyTitle = computed(() =>
+    resolveText("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для открытия счёта")
+  );
+  const verifySubtitle = computed(() =>
+    resolveText(
+      "cabinet.dashboard.mt4.verifySubtitle",
+      "Подтвердите данные профиля и документы, после этого сможете открыть MT4 счёт."
+    )
+  );
   const openAccountLabel = computed(() => resolveText("cabinet.accounts.openAccount", "Открыть счет"));
+  const verifyActionLabel = computed(() =>
+    resolveText("cabinet.dashboard.accountVerification.goToVerification", "Перейти к верификации")
+  );
+  const currentEmptyTitle = computed(() => (canCreateAccount.value ? emptyTitle.value : verifyTitle.value));
+  const currentEmptySubtitle = computed(() => (canCreateAccount.value ? emptySubtitle.value : verifySubtitle.value));
   const blockedReasonText = computed(() => {
     const raw = String(props.accountCreationBlockedReason || "").trim();
     return raw;
@@ -253,11 +274,7 @@
     box-sizing: border-box;
     border-radius: 0;
     background:
-      linear-gradient(
-        110deg,
-        color-mix(in srgb, var(--color-success, var(--ui-primary-accent)) 18%, transparent) 0%,
-        transparent 52%
-      ),
+      linear-gradient(136deg, color-mix(in srgb, var(--ui-primary-main) 10%, transparent) 0%, transparent 70.44%),
       var(--ui-background-card);
   }
 

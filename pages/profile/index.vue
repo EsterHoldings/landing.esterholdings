@@ -48,7 +48,7 @@
 <script lang="ts" setup>
   import { useI18n } from "vue-i18n";
   import { ref, onMounted, watch, computed } from "vue";
-  import { definePageMeta } from "~/.nuxt/imports";
+  import { definePageMeta, useRoute } from "~/.nuxt/imports";
 
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
@@ -76,6 +76,7 @@
 
   const STORAGE_KEY = "profileActiveTab";
   const activeTabIndex = ref(0);
+  const route = useRoute();
 
   const tabsList = computed(() => [
     {
@@ -105,12 +106,51 @@
     },
   ]);
 
+  const tabIndexByQueryKey: Record<string, number> = {
+    general: 0,
+    documents: 1,
+    verification: 2,
+    security: 3,
+    password: 3,
+    change_password: 3,
+  };
+
+  const resolveTabIndexFromQuery = (value: unknown): number | null => {
+    const key = String(value ?? "")
+      .trim()
+      .toLowerCase();
+    if (!key) return null;
+    const index = tabIndexByQueryKey[key];
+    if (typeof index !== "number") return null;
+    if (index < 0 || index >= tabsList.value.length) return null;
+    return index;
+  };
+
   onMounted(() => {
+    const queryIndex = resolveTabIndexFromQuery(route.query?.tab);
+    if (queryIndex !== null) {
+      activeTabIndex.value = queryIndex;
+      localStorage.setItem(STORAGE_KEY, queryIndex.toString());
+      return;
+    }
+
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved !== null && !isNaN(+saved)) {
-      activeTabIndex.value = +saved;
+      const next = +saved;
+      if (next >= 0 && next < tabsList.value.length) {
+        activeTabIndex.value = next;
+      }
     }
   });
+
+  watch(
+    () => route.query?.tab,
+    value => {
+      const queryIndex = resolveTabIndexFromQuery(value);
+      if (queryIndex === null || queryIndex === activeTabIndex.value) return;
+      activeTabIndex.value = queryIndex;
+    }
+  );
 
   watch(activeTabIndex, idx => {
     localStorage.setItem(STORAGE_KEY, idx.toString());

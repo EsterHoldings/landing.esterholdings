@@ -2,31 +2,53 @@
   <div class="login-form">
     <UiTextH3 class="login-form__title">Login</UiTextH3>
 
-    <UiFormControl class="login-form__field" label="Email" :errors="validatorLoginForm.errorsFormData.email.errors">
-      <UiInput type="text" placeholder="example@test.com" :value="props.formData.email"
+    <UiFormControl
+      class="login-form__field"
+      label="Email"
+      :errors="validatorLoginForm.errorsFormData.email.errors">
+      <UiInput
+        type="text"
+        placeholder="example@test.com"
+        :value="props.formData.email"
         :isDirty="validatorLoginForm.errorsFormData.email.isDirty"
-        :isInvalid="validatorLoginForm.errorsFormData.email.errors.length > 0" @input="
-          validatorLoginForm.doValidateField('email', $event.target.value)
-          " @blur="validatorLoginForm.doValidateField('email', $event.target.value)" />
+        :isInvalid="validatorLoginForm.errorsFormData.email.errors.length > 0"
+        @input="validatorLoginForm.doValidateField('email', $event.target.value)"
+        @blur="validatorLoginForm.doValidateField('email', $event.target.value)" />
     </UiFormControl>
 
-    <UiFormControl class="login-form__field" label="Password"
+    <UiFormControl
+      class="login-form__field"
+      label="Password"
       :errors="validatorLoginForm.errorsFormData.password.errors">
-      <UiInput type="password" placeholder="********" :value="props.formData.password"
-        :isDirty="validatorLoginForm.errorsFormData.password.isDirty" :isInvalid="validatorLoginForm.errorsFormData.password.errors.length > 0
-          " @input="
-            validatorLoginForm.doValidateField('password', $event.target.value)
-            " @blur="
-              validatorLoginForm.doValidateField('password', $event.target.value)
-              " />
+      <UiInput
+        type="password"
+        placeholder="********"
+        :value="props.formData.password"
+        :isDirty="validatorLoginForm.errorsFormData.password.isDirty"
+        :isInvalid="validatorLoginForm.errorsFormData.password.errors.length > 0"
+        @input="validatorLoginForm.doValidateField('password', $event.target.value)"
+        @blur="validatorLoginForm.doValidateField('password', $event.target.value)" />
     </UiFormControl>
 
-    <UiFormControl class="login-form__field" label="2Fa code" :errors="twoFaErrors" v-if="twoFaEnabled">
-      <UiInput type="text" placeholder="********" :value="props.formData.twoFaCode" :isDirty="twoFaErrors.length > 0"
-        :isInvalid="twoFaErrors.length > 0" @input="handleTwoFaCodeInput" />
+    <UiFormControl
+      class="login-form__field"
+      label="2Fa code"
+      :errors="twoFaErrors"
+      v-if="twoFaEnabled">
+      <UiInput
+        type="text"
+        placeholder="********"
+        :value="props.formData.twoFaCode"
+        :isDirty="twoFaErrors.length > 0"
+        :isInvalid="twoFaErrors.length > 0"
+        @input="handleTwoFaCodeInput" />
     </UiFormControl>
 
-    <UiButtonDefault type="submit" state="primary" class="login-form__btn" :isLoading="isLoading"
+    <UiButtonDefault
+      type="submit"
+      state="primary"
+      class="login-form__btn"
+      :isLoading="isLoading"
       @click="validateLoginForm(doSendForm)">
       Login
     </UiButtonDefault>
@@ -49,146 +71,158 @@
 </template>
 
 <script lang="ts" setup>
-import FacebookLogin from "./FacebookLogin.vue";
-import GoogleLogin from "./GoogleLogin.vue";
-import LinkedInLogin from "./LinkedInLogin.vue";
-import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
-import UiFormControl from "~/components/ui/UiFormControl.vue";
-import UiInput from "~/components/ui/UiInput.vue";
-import UiTextH3 from "~/components/ui/UiTextH3.vue";
+  import FacebookLogin from "./FacebookLogin.vue";
+  import GoogleLogin from "./GoogleLogin.vue";
+  import LinkedInLogin from "./LinkedInLogin.vue";
+  import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+  import UiFormControl from "~/components/ui/UiFormControl.vue";
+  import UiInput from "~/components/ui/UiInput.vue";
+  import UiTextH3 from "~/components/ui/UiTextH3.vue";
 
-import { navigateTo } from "nuxt/app";
-import { reactive, ref } from "vue";
-import { useAppCore } from "~/composables/useAppCore";
-import { useAuthStore } from "~/stores/authStore";
-import { useToast } from "vue-toastification";
+  import { navigateTo, useRoute } from "nuxt/app";
+  import { reactive, ref } from "vue";
+  import { useAppCore } from "~/composables/useAppCore";
+  import { useAuthStore } from "~/stores/authStore";
+  import { useToast } from "vue-toastification";
 
-import {
-  validatorLoginForm,
-  validateLoginForm,
-  resetValidationLoginForm,
-} from "@/pages/auth/login/composables/validation";
-import { useErrorStack } from "~/stores/errors";
+  import {
+    validatorLoginForm,
+    validateLoginForm,
+    resetValidationLoginForm,
+  } from "@/pages/auth/login/composables/validation";
+  import { useErrorStack } from "~/stores/errors";
 
-const props = defineProps({
-  formData: {
-    type: Object,
-    required: true,
-  },
-});
+  const props = defineProps({
+    formData: {
+      type: Object,
+      required: true,
+    },
+  });
 
-const isRecaptchaValid = ref(false)
-const isLoading = ref(false);
-const twoFaEnabled = ref(false);
-const appCore = useAppCore();
-const toast = useToast();
-const emit = defineEmits(['input2Fa'])
+  const isRecaptchaValid = ref(false);
+  const isLoading = ref(false);
+  const twoFaEnabled = ref(false);
+  const appCore = useAppCore();
+  const toast = useToast();
+  const route = useRoute();
+  const emit = defineEmits(["input2Fa"]);
 
-const twoFaErrors = ref<string[]>([])
+  const twoFaErrors = ref<string[]>([]);
 
-const handleTwoFaCodeInput = (value: string) => {
-  emit('input2Fa', value);
-}
+  const handleTwoFaCodeInput = (value: string) => {
+    emit("input2Fa", value);
+  };
 
-const errors = useErrorStack();
+  const errors = useErrorStack();
 
-const doSendForm = async () => {
-  try {
-    isLoading.value = true;
-    const authStore = useAuthStore();
-    const response = await appCore.auth.doLogin(props.formData);
-    const accessToken = response.data.access_token;
-    authStore.setAccessToken(accessToken);
-    toast.success("Welcome!");
-    navigateTo("/dashboard");
-  } catch (e: any) {
-    const responseData = e.response?.data;
-    const twoFaRequired =
-      responseData?.data?.two_fa_is_required ||
-      responseData?.errors?.twoFaCode?.length > 0 ||
-      String(responseData?.message ?? "").toLowerCase().includes("two fa");
-    if (twoFaRequired) {
-      if (!twoFaEnabled.value) {
-        toast.info(responseData?.message ?? "")
-        twoFaEnabled.value = true;
-      }
-      twoFaErrors.value = responseData?.errors?.twoFaCode ?? [responseData?.message ?? ""].filter(Boolean);
-    } else if (e.status === 401) {
-      toast.error(errors.currentMessage("Invalid credentials"));
-    } else {
-      toast.error("Invalid credentials");
+  const resolvePostLoginTarget = (): string => {
+    const raw = Array.isArray(route.query?.return_to) ? route.query.return_to[0] : route.query?.return_to;
+    if (typeof raw === "string" && raw.startsWith("/")) {
+      return raw;
     }
-  } finally {
-    resetValidationLoginForm();
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 1500);
-  }
-};
 
-// @ts-ignore
-onUnmounted(() => resetValidationLoginForm());
+    return "/dashboard";
+  };
+
+  const doSendForm = async () => {
+    try {
+      isLoading.value = true;
+      const authStore = useAuthStore();
+      const response = await appCore.auth.doLogin(props.formData);
+      const accessToken = response.data.access_token;
+      authStore.setAccessToken(accessToken);
+      toast.success("Welcome!");
+      navigateTo(resolvePostLoginTarget());
+    } catch (e: any) {
+      const responseData = e.response?.data;
+      const twoFaRequired =
+        responseData?.data?.two_fa_is_required ||
+        responseData?.errors?.twoFaCode?.length > 0 ||
+        String(responseData?.message ?? "")
+          .toLowerCase()
+          .includes("two fa");
+      if (twoFaRequired) {
+        if (!twoFaEnabled.value) {
+          toast.info(responseData?.message ?? "");
+          twoFaEnabled.value = true;
+        }
+        twoFaErrors.value = responseData?.errors?.twoFaCode ?? [responseData?.message ?? ""].filter(Boolean);
+      } else if (e.status === 401) {
+        toast.error(errors.currentMessage("Invalid credentials"));
+      } else {
+        toast.error("Invalid credentials");
+      }
+    } finally {
+      resetValidationLoginForm();
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 1500);
+    }
+  };
+
+  // @ts-ignore
+  onUnmounted(() => resetValidationLoginForm());
 </script>
 
 <style lang="scss" scoped>
-.login-form {
-  color: var(--ui-text-main);
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
+  .login-form {
+    color: var(--ui-text-main);
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 
-  &__link {
-    margin-bottom: 10px;
+    &__link {
+      margin-bottom: 10px;
 
-    a {
-      color: var(--ui-text-main);
+      a {
+        color: var(--ui-text-main);
 
-      &:hover {
-        color: var(--ui-text-secondary);
+        &:hover {
+          color: var(--ui-text-secondary);
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
       }
     }
 
-    &:last-child {
-      margin-bottom: 0;
+    &__links {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    &__social-links {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    &__social-link {
+      display: flex;
+      place-content: center;
+      padding: 3px;
+      background: white;
+
+      border-radius: 100%;
+    }
+
+    &__title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    &__field {
+      margin-bottom: 20px;
+    }
+
+    &__btn {
+      margin-top: 30px;
+      margin-bottom: 40px;
     }
   }
-
-  &__links {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-
-  &__social-links {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  &__social-link {
-    display: flex;
-    place-content: center;
-    padding: 3px;
-    background: white;
-
-    border-radius: 100%;
-  }
-
-  &__title {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  &__field {
-    margin-bottom: 20px;
-  }
-
-  &__btn {
-    margin-top: 30px;
-    margin-bottom: 40px;
-  }
-}
 </style>

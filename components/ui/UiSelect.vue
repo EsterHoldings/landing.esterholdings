@@ -10,6 +10,7 @@
       :data-open="isOpen || null"
       :data-open-up="dropup || null"
       :data-invalid="(props.isDirty && props.isInvalid) || null"
+      :data-valid="(props.isDirty && !props.isInvalid) || null"
       :aria-expanded="isOpen ? 'true' : 'false'"
       aria-haspopup="listbox"
       @click.stop="toggle">
@@ -279,6 +280,16 @@
 </script>
 
 <style scoped>
+  .select[data-invalid] {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-danger) 30%, transparent);
+  }
+
+  .select[data-valid] {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-success) 25%, transparent);
+  }
+
   .select__search-input {
     width: 100%;
     height: 36px;

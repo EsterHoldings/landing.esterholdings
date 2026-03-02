@@ -1002,6 +1002,9 @@
           }
         }
       },
+      "generalVerification": {
+        "notStarted": "Not started"
+      },
       "index": {
         "tabs": {
           "general": "General",

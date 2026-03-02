@@ -1,25 +1,40 @@
 <template>
   <PageStructureDefault>
     <template #header>
-      <UiTextH4 class="text-[var(--ui-text-main)] mr-5">
-        {{ t("cabinet.billing.title") }}
-      </UiTextH4>
+      <div class="payments-header">
+        <UiTextH4 class="text-[var(--ui-text-main)] mr-5">
+          {{ t("cabinet.billing.title") }}
+        </UiTextH4>
 
-      <UiButtonDefault
-        state="success--outline"
-        class="w-full md:w-auto"
-        @click="handleClickCreateNewDeposit">
-        {{ t("cabinet.billing.create") }}
-      </UiButtonDefault>
+        <UiButtonDefault
+          v-if="canCreatePayment"
+          state="success--outline"
+          class="w-full md:w-auto"
+          @click="handleClickCreateNewDeposit">
+          {{ createPaymentLabel }}
+        </UiButtonDefault>
+        <UiButtonDefault
+          v-else
+          state="info--outline"
+          class="w-full md:w-auto"
+          @click="handleGoToVerification">
+          {{ verifyActionLabel }}
+        </UiButtonDefault>
+      </div>
+      <div
+        v-if="isVerificationRequired"
+        class="payments-header__notice">
+        {{ paymentCreationBlockedReason }}
+      </div>
     </template>
 
     <template #content>
       <PageStructureContent
-        v-if="!isInitialLoading"
+        v-if="!isInitialLoading && payments.length > 0"
         :plain="viewMode !== 'table'">
         <template #top>
-          <div class="flex w-full flex-col gap-2 md:flex-row md:items-center">
-            <div class="flex w-full flex-1 min-w-[260px] items-center gap-2">
+          <div class="cabinet-controls-row">
+            <div class="cabinet-controls-row__left">
               <UiInput
                 class="w-full"
                 @input="handleInputSearch"
@@ -38,7 +53,7 @@
               </UiButtonDefault>
             </div>
 
-            <div class="flex w-full flex-1 items-center gap-2 md:w-auto md:flex-none md:justify-end">
+            <div class="cabinet-controls-row__right">
               <UiSelect
                 class="min-w-[180px] sm:w-[200px]"
                 :value="orderBy"
@@ -54,11 +69,12 @@
               </UiSelect>
 
               <ViewModeToggle
+                v-if="!isMobileViewport"
                 class="w-full sm:w-auto"
                 bordered
                 :modelValue="viewMode"
                 :options="viewOptions"
-                @update:modelValue="viewMode = $event" />
+                @update:modelValue="handleChangeViewMode" />
             </div>
           </div>
         </template>
@@ -345,13 +361,36 @@
       </template>
 
       <template v-if="!isInitialLoading && payments.length === 0">
-        <div class="h-[40vh] flex items-center justify-center">
-          <span
-            v-if="!isLoading"
-            class="text-[var(--ui-text-main)]">
-            {{ t("cabinet.billing.nothingToShow") }}
-          </span>
-          <UiIconSpinnerDefault v-else />
+        <div class="payments-empty-state">
+          <div class="payments-empty-state__icon-wrap">
+            <UiIconCardCheck class="payments-empty-state__icon" />
+          </div>
+          <div class="payments-empty-state__title">
+            {{ emptyStateTitle }}
+          </div>
+          <UiTextSmall class="payments-empty-state__subtitle">
+            {{ emptyStateSubtitle }}
+          </UiTextSmall>
+          <UiTextSmall
+            v-if="isVerificationRequired"
+            class="payments-empty-state__warning">
+            {{ paymentCreationBlockedReason }}
+          </UiTextSmall>
+
+          <UiButtonDefault
+            v-if="canCreatePayment"
+            state="success--outline"
+            class="payments-empty-state__button"
+            @click="handleClickCreateNewDeposit">
+            {{ createPaymentLabel }}
+          </UiButtonDefault>
+          <UiButtonDefault
+            v-else
+            state="info--outline"
+            class="payments-empty-state__button"
+            @click="handleGoToVerification">
+            {{ verifyActionLabel }}
+          </UiButtonDefault>
         </div>
       </template>
 
@@ -379,6 +418,7 @@
   import PaginationMain from "~/components/block/paginations/PaginationMain.vue";
   import TableMain from "~/components/block/tables/TableMain.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
+  import UiIconCardCheck from "~/components/ui/UiIconCardCheck.vue";
   import UiIconCopy from "~/components/ui/UiIconCopy.vue";
   import UiIconSearch from "~/components/ui/UiIconSearch.vue";
   import UiIconSort from "~/components/ui/UiIconSort.vue";
@@ -392,10 +432,11 @@
   import UiSelect from "~/components/ui/UiSelect.vue";
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
   import ViewModeToggle from "~/components/block/controls/ViewModeToggle.vue";
+  import useAccountCreationEligibility from "~/composables/useAccountCreationEligibility";
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
 
-  import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
+  import { definePageMeta, navigateTo, useLocalePath } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, h, inject, onBeforeUnmount, onMounted, reactive, ref, watch, nextTick } from "vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
@@ -415,6 +456,7 @@
   const toast = useToast();
 
   const appCore = useAppCore();
+  const { canCreateAccount, isEligibilityLoaded, refreshAccountCreationEligibility } = useAccountCreationEligibility();
 
   const ORDER_DIRECTION_ASC = "asc";
   const ORDER_DIRECTION_DESC = "desc";
@@ -429,6 +471,7 @@
   const isLoading = ref(false);
   const isInitialLoading = ref(true);
   const viewMode = ref<"table" | "cards" | "full">("table");
+  const isMobileViewport = ref(false);
   const sortByFilterData = reactive([
     { id: "created_at", value: "created_at", text: "Created at" },
     { id: "amount", value: "amount", text: "Amount" },
@@ -526,6 +569,32 @@
     const translated = t(key);
     return translated === key ? fallback : translated;
   };
+
+  const canCreatePayment = computed(() => canCreateAccount.value);
+  const isVerificationRequired = computed(() => isEligibilityLoaded.value && !canCreateAccount.value);
+  const createPaymentLabel = computed(() => resolveI18nValue("cabinet.billing.create", "Создать"));
+  const verifyActionLabel = computed(() =>
+    resolveI18nValue("cabinet.dashboard.accountVerification.goToVerification", "Перейти к верификации")
+  );
+  const paymentCreationBlockedReason = computed(() =>
+    resolveI18nValue(
+      "cabinet.accounts.openBlocked",
+      "Открытие счета будет доступно после верификации данных профиля и документов."
+    )
+  );
+  const emptyStateTitle = computed(() =>
+    isVerificationRequired.value
+      ? resolveI18nValue("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для создания платежа")
+      : resolveI18nValue("cabinet.billing.emptyTitle", "Платежей пока нет")
+  );
+  const emptyStateSubtitle = computed(() =>
+    isVerificationRequired.value
+      ? resolveI18nValue(
+          "cabinet.dashboard.mt4.verifySubtitle",
+          "Подтвердите данные профиля и документы, после этого сможете создать платеж."
+        )
+      : resolveI18nValue("cabinet.billing.emptySubtitle", "Создайте первый платёж, чтобы начать работу.")
+  );
 
   const openMenuLabel = computed(() => resolveI18nValue("cabinet.billing.openPayment", "Открыть"));
   const deleteMenuLabel = computed(() => resolveI18nValue("cabinet.billing.deletePayment", "Удалить"));
@@ -804,7 +873,16 @@
     if (id) navigator.clipboard.writeText(id);
   };
 
+  const handleGoToVerification = async () => {
+    await navigateTo(localePath({ path: "/profile", query: { tab: "verification" } }));
+  };
+
   const handleClickCreateNewDeposit = async (initialTab: "deposit" | "withdrawal" = "deposit") => {
+    if (isVerificationRequired.value) {
+      await handleGoToVerification();
+      return;
+    }
+
     openModal(CreateNewDeposit, {
       title: t("cabinet.billing.create"),
       initialTab,
@@ -823,10 +901,15 @@
 
   const initViewMode = () => {
     if (typeof window === "undefined") return;
+    syncViewport();
+
     const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     if (saved && ["table", "cards", "full"].includes(saved)) {
       viewMode.value = saved as typeof viewMode.value;
+      return;
     }
+
+    viewMode.value = resolveDefaultViewMode(window.innerWidth);
   };
 
   watch(viewMode, mode => {
@@ -834,10 +917,32 @@
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
 
+  const handleChangeViewMode = (nextViewMode: string) => {
+    if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
+      viewMode.value = nextViewMode;
+    }
+  };
+
+  const resolveDefaultViewMode = (width: number): "table" | "cards" | "full" => {
+    if (width < 768) return "full";
+    if (width < 1024) return "cards";
+    return "table";
+  };
+
+  const syncViewport = () => {
+    if (typeof window === "undefined") return;
+    isMobileViewport.value = window.innerWidth < 768;
+  };
+
+  const handleViewportResize = () => {
+    syncViewport();
+    recalcPaymentMenu();
+  };
+
   onMounted(async () => {
     initViewMode();
     useEventBus.on("loadDataForPayments", loadData);
-    await loadData();
+    await Promise.all([loadData(), refreshAccountCreationEligibility()]);
     await nextTick();
     const openDeposit = route.query?.openDeposit;
     const openWithdrawal = route.query?.openWithdrawal;
@@ -848,7 +953,7 @@
       handleClickCreateNewDeposit("deposit");
     }
 
-    window.addEventListener("resize", recalcPaymentMenu, { passive: true });
+    window.addEventListener("resize", handleViewportResize, { passive: true });
     window.addEventListener("scroll", recalcPaymentMenu, { passive: true, capture: true });
     window.addEventListener("mousedown", handlePaymentMenuOutside, true);
     window.addEventListener("keydown", handlePaymentMenuEscape, true);
@@ -856,7 +961,7 @@
 
   onBeforeUnmount(() => {
     useEventBus.off("loadDataForPayments", loadData);
-    window.removeEventListener("resize", recalcPaymentMenu);
+    window.removeEventListener("resize", handleViewportResize);
     window.removeEventListener("scroll", recalcPaymentMenu, true);
     window.removeEventListener("mousedown", handlePaymentMenuOutside, true);
     window.removeEventListener("keydown", handlePaymentMenuEscape, true);
@@ -864,6 +969,125 @@
 </script>
 
 <style scoped>
+  .cabinet-controls-row {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__left {
+    display: flex;
+    width: 100%;
+    min-width: 260px;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__right {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cabinet-controls-row {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .cabinet-controls-row__right {
+      width: auto;
+      flex: none;
+      justify-content: flex-end;
+    }
+  }
+
+  .payments-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .payments-header__notice {
+    margin-top: 8px;
+    color: var(--color-warning);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .payments-empty-state {
+    min-height: calc(100vh - 370px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 24px 18px;
+    margin: 0 auto;
+    max-width: 680px;
+    border-radius: 14px;
+    border: 1px dashed var(--color-stroke-ui-light);
+    background: color-mix(in srgb, var(--ui-background-card) 76%, transparent);
+  }
+
+  .payments-empty-state__icon-wrap {
+    height: 64px;
+    width: 64px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--ui-primary-main) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ui-primary-main) 36%, transparent);
+  }
+
+  .payments-empty-state__icon {
+    width: 28px;
+    height: 28px;
+    color: var(--ui-primary-main);
+  }
+
+  .payments-empty-state__title {
+    color: var(--ui-text-main);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .payments-empty-state__subtitle {
+    color: var(--ui-text-secondary);
+    max-width: 420px;
+  }
+
+  .payments-empty-state__warning {
+    color: var(--color-warning);
+    max-width: 460px;
+  }
+
+  .payments-empty-state__button {
+    min-width: 220px;
+    justify-content: center;
+  }
+
+  @media (max-width: 767px) {
+    .payments-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .payments-empty-state__button {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
   @keyframes wiggle {
     0% {
       transform: translateX(0);

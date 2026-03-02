@@ -22,8 +22,8 @@
         </UiButtonDefault>
       </div>
 
-      <div class="mb-5 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex w-full items-center gap-2 sm:w-auto sm:flex-1 sm:max-w-[360px]">
+      <div class="mb-5 cabinet-controls-row">
+        <div class="cabinet-controls-row__left">
           <UiInput
             class="w-full min-w-0"
             @input="handleInputSearch"
@@ -40,9 +40,9 @@
             <UiIconSpinnerDefault v-if="isLoading" />
           </UiButtonDefault>
         </div>
-        <div class="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
+        <div class="cabinet-controls-row__right">
           <UiSelect
-            class="w-full min-w-0 sm:w-[220px]"
+            class="w-full min-w-[180px] sm:w-[200px]"
             :value="orderBy"
             :data="sortByFilterData"
             :withoutNoSelect="true"
@@ -56,11 +56,12 @@
           </UiSelect>
 
           <ViewModeToggle
+            v-if="!isMobileViewport"
             class="w-full sm:w-[160px]"
             bordered
             :modelValue="viewMode"
             :options="viewOptions"
-            @update:modelValue="viewMode = $event" />
+            @update:modelValue="handleChangeViewMode" />
 
           <!--          <UiButtonDefault state="info&#45;&#45;small">-->
           <!--            <UiIconFilters class="mr-2"/>-->
@@ -71,7 +72,7 @@
 
       <!-- Таблиця тікетів -->
       <PanelDefault
-        v-if="viewMode === 'table'"
+        v-if="viewMode === 'table' && filtered.length > 0"
         ref="panelRef"
         class="relative rounded-2xl border border-[var(--color-stroke-ui-dark)] bg-[var(--ui-background)]">
         <div
@@ -122,7 +123,7 @@
             </thead>
             <!--            <tbody v-if="!isLoading && tickets.length > 0" class="divide-y divide-[var(&#45;&#45;color-stroke-ui-dark)]">-->
             <tbody
-              v-if="tickets.length > 0"
+              v-if="filtered.length > 0"
               class="divide-y divide-[var(--color-stroke-ui-dark)]">
               <tr
                 v-for="t in filtered"
@@ -193,7 +194,7 @@
 
           <!--          <div v-if="!isLoading && tickets.length === 0" class="w-full h-[100px] flex items-center justify-center">-->
           <div
-            v-if="tickets.length === 0"
+            v-if="filtered.length === 0"
             class="w-full h-[50vh] flex items-center justify-center">
             <UiButtonDefault
               state="info"
@@ -215,7 +216,7 @@
         </div>
 
         <div
-          v-if="tickets.length === 0"
+          v-if="filtered.length === 0"
           class="w-full h-[50vh] flex items-center justify-center">
           <UiButtonDefault
             state="info"
@@ -308,7 +309,7 @@
           <UiSelect
             class="!w-min flex items-center justify-center !h-[32px]"
             :data="perPageList"
-            :value="perPage"
+            :value="String(perPage)"
             @change="handleChangePerPage"
             :withoutNoSelect="true" />
         </div>
@@ -465,6 +466,7 @@
   const VIEW_MODE_STORAGE_KEY = "support_view_mode";
   const SUPPORT_LIST_REFRESH_MS = 20000;
   const viewMode = ref<"table" | "cards" | "full">("table");
+  const isMobileViewport = ref(false);
   const viewOptions = [
     {
       value: "table" as const,
@@ -544,22 +546,22 @@
   ];
 
   const perPageList = reactive([
-    { id: 1, value: 1, text: "1" },
-    { id: 2, value: 2, text: "2" },
-    { id: 3, value: 3, text: "3" },
-    { id: 4, value: 4, text: "4" },
-    { id: 5, value: 5, text: "5" },
-    { id: 6, value: 6, text: "6" },
-    { id: 7, value: 7, text: "7" },
-    { id: 8, value: 8, text: "8" },
-    { id: 9, value: 9, text: "9" },
-    { id: 10, value: 10, text: "10" },
-    { id: 12, value: 12, text: "12" },
-    { id: 15, value: 15, text: "15" },
-    { id: 20, value: 20, text: "20" },
-    { id: 25, value: 25, text: "25" },
-    { id: 50, value: 50, text: "50" },
-    { id: 100, value: 100, text: "100" },
+    { id: "1", value: "1", text: "1" },
+    { id: "2", value: "2", text: "2" },
+    { id: "3", value: "3", text: "3" },
+    { id: "4", value: "4", text: "4" },
+    { id: "5", value: "5", text: "5" },
+    { id: "6", value: "6", text: "6" },
+    { id: "7", value: "7", text: "7" },
+    { id: "8", value: "8", text: "8" },
+    { id: "9", value: "9", text: "9" },
+    { id: "10", value: "10", text: "10" },
+    { id: "12", value: "12", text: "12" },
+    { id: "15", value: "15", text: "15" },
+    { id: "20", value: "20", text: "20" },
+    { id: "25", value: "25", text: "25" },
+    { id: "50", value: "50", text: "50" },
+    { id: "100", value: "100", text: "100" },
   ]);
 
   const totalPages = computed(() => Math.ceil(total.value / perPage.value));
@@ -864,18 +866,45 @@
     supportListRefreshTimer = null;
   };
 
+  const resolveDefaultViewMode = (width: number): "table" | "cards" | "full" => {
+    if (width < 768) return "full";
+    if (width < 1024) return "cards";
+    return "table";
+  };
+
+  const syncViewport = () => {
+    if (typeof window === "undefined") return;
+    isMobileViewport.value = window.innerWidth < 768;
+  };
+
+  const handleWindowResize = () => {
+    syncViewport();
+    void placeBottomLeft();
+  };
+
   const initViewMode = () => {
     if (typeof window === "undefined") return;
+    syncViewport();
+
     const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     if (saved && ["table", "cards", "full"].includes(saved)) {
       viewMode.value = saved as typeof viewMode.value;
+      return;
     }
+
+    viewMode.value = resolveDefaultViewMode(window.innerWidth);
   };
 
   watch(viewMode, mode => {
     if (typeof window === "undefined") return;
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
+
+  const handleChangeViewMode = (nextViewMode: string) => {
+    if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
+      viewMode.value = nextViewMode;
+    }
+  };
 
   const openChat = async () => {
     chatOpen.value = true;
@@ -916,8 +945,11 @@
 
   const handleCloseChat = () => (currentTicketIdForChat.value = null);
 
-  const handleChangePerPage = async (newPerPage: number) => {
-    perPage.value = newPerPage;
+  const handleChangePerPage = async (newPerPage: string) => {
+    const nextPerPage = Number.parseInt(newPerPage, 10);
+    if (!Number.isFinite(nextPerPage) || nextPerPage <= 0) return;
+
+    perPage.value = nextPerPage;
     await loadData();
   };
 
@@ -990,7 +1022,7 @@
 
     await nextTick();
     await placeBottomLeft();
-    window.addEventListener("resize", placeBottomLeft);
+    window.addEventListener("resize", handleWindowResize);
     await loadData();
     startSupportListRefresh();
   });
@@ -1001,7 +1033,7 @@
     useEventBus.off(SUPPORT_PRESENCE_UPDATED_EVENT, handleSupportPresenceUpdated);
     disconnectSupportRealtime();
     stopSupportListRefresh();
-    window.removeEventListener("resize", placeBottomLeft);
+    window.removeEventListener("resize", handleWindowResize);
     document.body.style.userSelect = "";
     document.body.style.cursor = "";
   });
@@ -1011,3 +1043,42 @@
   };
   /* ===== /Пересувний чат ===== */
 </script>
+
+<style scoped>
+  .cabinet-controls-row {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__left {
+    display: flex;
+    width: 100%;
+    min-width: 260px;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cabinet-controls-row__right {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cabinet-controls-row {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .cabinet-controls-row__right {
+      width: auto;
+      flex: none;
+      justify-content: flex-end;
+    }
+  }
+</style>

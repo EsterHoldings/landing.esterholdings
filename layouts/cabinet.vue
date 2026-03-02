@@ -157,6 +157,12 @@
     overflow-anchor: none;
   }
 
+  @media (max-width: 1023px) {
+    .cabinet-main {
+      padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
   @media (max-width: 767px) {
     html.support-chat-fullscreen .cabinet-header,
     body.support-chat-fullscreen .cabinet-header {
