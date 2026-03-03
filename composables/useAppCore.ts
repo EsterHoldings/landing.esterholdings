@@ -19,6 +19,7 @@ import TicketsModule from "~/composables/core/modules/tickets/tickets.module";
 import MessagesModule from "~/composables/core/modules/messages/messages.module";
 import LocationsModule from "~/composables/core/modules/locations/locations.module";
 import TicketsPresenceModule from "~/composables/core/modules/ticketsPresence/ticketsPresence.module";
+import ClientPresenceModule from "~/composables/core/modules/clientPresence/clientPresence.module";
 
 export interface ICoreModules {
   accounts: AccountsModule;
@@ -38,6 +39,7 @@ export interface ICoreModules {
   password: PasswordModule;
   tickets: TicketsModule;
   ticketsPresence: TicketsPresenceModule;
+  clientPresence: ClientPresenceModule;
   messages: MessagesModule;
   locations: LocationsModule;
   verifications: VerificationsModule;
@@ -63,6 +65,7 @@ export const useAppCore = (): ICoreModules => {
     paymentSystems: new PaymentSystemsModule(),
     tickets: new TicketsModule(),
     ticketsPresence: new TicketsPresenceModule(),
+    clientPresence: new ClientPresenceModule(),
     messages: new MessagesModule(),
     locations: new LocationsModule(),
     users: new UsersModule(),
