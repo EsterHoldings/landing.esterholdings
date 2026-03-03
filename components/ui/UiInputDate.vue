@@ -75,13 +75,40 @@
   .date-input {
     width: 100%;
     height: var(--ui-input--height);
-    background-color: var(--color-stroke-ui-dark);
+    background-color: var(--ui-control-bg);
     border: 1px solid var(--color-stroke-ui-light);
-    color: var(--color-ui-text);
+    color: var(--ui-text-main);
+    -webkit-text-fill-color: var(--ui-text-main);
+    color-scheme: var(--ui-date-input-color-scheme, dark);
     border-radius: 10px;
     padding: 0 15px;
     font-size: 14px;
     outline: none;
+  }
+
+  .date-input::-webkit-datetime-edit,
+  .date-input::-webkit-datetime-edit-fields-wrapper,
+  .date-input::-webkit-datetime-edit-text,
+  .date-input::-webkit-datetime-edit-month-field,
+  .date-input::-webkit-datetime-edit-day-field,
+  .date-input::-webkit-datetime-edit-year-field {
+    color: var(--ui-text-main);
+    -webkit-text-fill-color: var(--ui-text-main);
+  }
+
+  .date-input::-webkit-calendar-picker-indicator {
+    opacity: 0.92;
+    cursor: pointer;
+    filter: var(--ui-date-input-icon-filter, brightness(0) saturate(100%) invert(100%));
+  }
+
+  .date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  .date-input.disabled::-webkit-calendar-picker-indicator {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .date-input.is-invalid {
@@ -93,10 +120,11 @@
   }
 
   .date-input.disabled {
-    background-color: var(--ui-background-panel);
+    background-color: var(--ui-control-bg-disabled);
     border-color: var(--color-stroke-ui-light);
     border-style: dashed;
     color: var(--ui-text-secondary);
+    -webkit-text-fill-color: var(--ui-text-secondary);
     cursor: not-allowed;
   }
 

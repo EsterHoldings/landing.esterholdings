@@ -18,6 +18,10 @@ export const useThemeStore = defineStore("theme", () => {
     "--ui-text-invert": "#faf9f9",
     "--ui-text-main": "#151515",
     "--ui-text-secondary": "#3C3C3C",
+    "--ui-control-bg": "rgba(228, 228, 231, 0.6)",
+    "--ui-control-bg-disabled": "#e4e4e7",
+    "--ui-date-input-icon-filter": "brightness(0) saturate(100%) invert(0%)",
+    "--ui-date-input-color-scheme": "light",
 
     "--ui-sticker-success": "#03c11f",
     "--ui-sticker-danger": "#d93025",
@@ -42,14 +46,17 @@ export const useThemeStore = defineStore("theme", () => {
     "--ui-text-invert": "#eeeeef",
     "--ui-text-main": "#ffffff",
     "--ui-text-secondary": "#b8b8c3",
+    "--ui-control-bg": "#011644",
+    "--ui-control-bg-disabled": "rgba(1, 22, 68, 0.6)",
+    "--ui-date-input-icon-filter": "brightness(0) saturate(100%) invert(100%)",
+    "--ui-date-input-color-scheme": "dark",
 
     "--ui-sticker-success": "#03c11f",
     "--ui-sticker-danger": "#d93025",
 
     "--color-stroke-ui-dark": "#011644",
     "--color-stroke-ui-light": "#002880",
-    "--color-stroke-ui":
-      "linear-gradient(137.67deg, #1b63ff 2.397%, #011644 99.041%)",
+    "--color-stroke-ui": "linear-gradient(137.67deg, #1b63ff 2.397%, #011644 99.041%)",
     "--color-ui-grey": "#b8b8c3",
   };
 

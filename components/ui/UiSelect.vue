@@ -5,10 +5,10 @@
     <button
       ref="body"
       type="button"
-      class="select outline-none inline-flex h-10 w-full items-center justify-start gap-2 rounded-[8px] border bg-[var(--color-stroke-ui-dark)] px-5 text-[var(--color-ui-text)] transition border-[var(--color-stroke-ui-light)]"
+      class="select outline-none inline-flex h-10 w-full items-center justify-start gap-2 rounded-[8px] border bg-[var(--ui-control-bg)] px-5 text-[var(--ui-text-main)] transition border-[var(--color-stroke-ui-light)]"
       :class="{
         '!border-none !bg-[transparent]': withoutOverlay,
-        'cursor-not-allowed opacity-60 pointer-events-none': props.disabled,
+        'cursor-not-allowed pointer-events-none': props.disabled,
       }"
       :data-open="isOpen || null"
       :data-open-up="dropup || null"
@@ -28,7 +28,10 @@
         class="block w-full text-left text-[0.875rem] font-medium"
         v-html="displayText" />
 
-      <div class="ml-2 shrink-0">
+      <div class="ml-2 flex shrink-0 items-center gap-2">
+        <UiIconSpinnerDefault
+          v-if="props.isLoading"
+          class="opacity-30" />
         <UiIconArrowDown :rotate180="isOpen" />
       </div>
     </button>
@@ -36,7 +39,7 @@
     <div
       v-if="isOpen"
       ref="menu"
-      class="absolute left-0 z-50 w-full overflow-y-auto rounded border bg-[var(--color-stroke-ui-dark)] p-2 shadow-lg border-[var(--color-stroke-ui-light)] data-[down=true]:top-full data-[down=true]:mt-2 data-[up=true]:bottom-full data-[up=true]:mb-2"
+      class="absolute left-0 z-50 w-full overflow-y-auto rounded border bg-[var(--ui-control-bg)] p-2 shadow-lg border-[var(--color-stroke-ui-light)] data-[down=true]:top-full data-[down=true]:mt-2 data-[up=true]:bottom-full data-[up=true]:mb-2"
       role="listbox"
       :data-down="!dropup || null"
       :data-up="dropup || null"
@@ -59,7 +62,7 @@
 
       <UiTextSmall
         v-if="!withoutNoSelect"
-        class="select__option flex items-center justify-start mb-1 h-10 cursor-pointer rounded px-5 text-[var(--color-ui-text)] font-semibold text-[0.8125rem] hover:bg-[var(--color-stroke-ui-light)]"
+        class="select__option flex items-center justify-start mb-1 h-10 cursor-pointer rounded px-5 text-[var(--ui-text-main)] font-semibold text-[0.8125rem] hover:bg-[var(--color-stroke-ui-light)]"
         :class="{ 'opacity-80': internalValue === null }"
         role="option"
         :aria-selected="internalValue === null ? 'true' : 'false'"
@@ -70,7 +73,7 @@
       <UiTextSmall
         v-for="item in data"
         :key="item.value"
-        class="select__option flex items-center justify-start mb-1 h-10 cursor-pointer rounded px-5 text-[var(--color-ui-text)] hover:bg-[var(--color-stroke-ui-light)] last:mb-0"
+        class="select__option flex items-center justify-start mb-1 h-10 cursor-pointer rounded px-5 text-[var(--ui-text-main)] hover:bg-[var(--color-stroke-ui-light)] last:mb-0"
         :class="{ 'font-semibold': internalValue === item.value }"
         role="option"
         :aria-selected="internalValue === item.value ? 'true' : 'false'"
@@ -94,6 +97,7 @@
   import { useI18n } from "vue-i18n";
   import { useSlots, ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
   import UiIconArrowDown from "~/components/ui/UiIconArrowDown.vue";
+  import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
 
   interface Option {
@@ -116,6 +120,7 @@
     searchValue?: string;
     searchPlaceholder?: string;
     disabled?: boolean;
+    isLoading?: boolean;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -127,6 +132,7 @@
     searchValue: "",
     searchPlaceholder: "",
     disabled: false,
+    isLoading: false,
   });
 
   const emit = defineEmits<{
@@ -315,15 +321,25 @@
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-success) 25%, transparent);
   }
 
+  .select:disabled {
+    background: var(--ui-control-bg-disabled);
+    border-style: dashed;
+    color: var(--ui-text-secondary);
+  }
+
   .select__search-input {
     width: 100%;
     height: 36px;
     border-radius: 8px;
     border: 1px solid var(--color-stroke-ui-light);
-    background: var(--color-stroke-ui-dark);
-    color: var(--color-ui-text);
+    background: var(--ui-control-bg);
+    color: var(--ui-text-main);
     padding: 0 10px;
     outline: none;
     font-size: 13px;
+  }
+
+  .select__search-input::placeholder {
+    color: var(--ui-text-secondary);
   }
 </style>

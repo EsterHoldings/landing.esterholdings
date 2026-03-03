@@ -108,6 +108,7 @@
             <UiSelect
               :data="countryOptions"
               :value="selectedCountryId"
+              :isLoading="isLoadingAllComponentData || countriesMeta.loading"
               :isDirty="validatorUserDataForm.errorsFormData.country.isDirty"
               :isInvalid="validatorUserDataForm.errorsFormData.country.errors.length > 0"
               searchable
@@ -127,6 +128,7 @@
               :data="stateOptions"
               :value="selectedStateId"
               :disabled="!selectedCountryId"
+              :isLoading="isLoadingAllComponentData || statesMeta.loading"
               :isDirty="validatorUserDataForm.errorsFormData.state.isDirty"
               :isInvalid="validatorUserDataForm.errorsFormData.state.errors.length > 0"
               searchable
@@ -146,6 +148,7 @@
               :data="cityOptions"
               :value="selectedCityId"
               :disabled="!selectedStateId"
+              :isLoading="isLoadingAllComponentData || citiesMeta.loading"
               :isDirty="validatorUserDataForm.errorsFormData.city.isDirty"
               :isInvalid="validatorUserDataForm.errorsFormData.city.errors.length > 0"
               searchable

@@ -1,29 +1,33 @@
 <template>
   <div
-      class="input phone-input"
-      :class="{
-      'is-invalid':   isDirty && isInvalid,
-      'is-valid':     isDirty && !isInvalid,
-      'disabled':     disabled
-    }"
-  >
-    <div v-if="props.isLoading" class="is-loading">
+    class="input phone-input"
+    :class="{
+      'is-invalid': isDirty && isInvalid,
+      'is-valid': isDirty && !isInvalid,
+      disabled: disabled,
+    }">
+    <div
+      v-if="props.isLoading"
+      class="is-loading">
       <UiIconSpinnerDefault class="absolute right-[20px] top-[50%] translate-y-[-50%] opacity-15" />
     </div>
 
-    <div class="input-icon--left country-select" @click="open = !open">
+    <div
+      class="input-icon--left country-select"
+      @click="open = !open">
       <span class="flag">{{ selected.flag }}</span>
       <span class="dial">{{ selected.dialCode }}</span>
       <span class="arrow">▾</span>
     </div>
 
-    <ul v-if="open" class="country-dropdown">
+    <ul
+      v-if="open"
+      class="country-dropdown">
       <li
-          v-for="c in countries"
-          :key="c.code"
-          class="country-option"
-          @click="selectCountry(c)"
-      >
+        v-for="c in countries"
+        :key="c.code"
+        class="country-option"
+        @click="selectCountry(c)">
         <span class="flag">{{ c.flag }}</span>
         <span class="name">{{ c.name }}</span>
         <span class="dial">{{ c.dialCode }}</span>
@@ -31,208 +35,219 @@
     </ul>
 
     <input
-        type="tel"
-        class="input-field"
-        :class="{ 'no-padding': paddingNone }"
-        :placeholder="placeholder"
-        :value="localNumber"
-        :disabled="disabled"
-        @focus="e => emit('focus', e)"
-        @input="onNumberInput"
-        @blur="e => emit('blur', e)"
-    />
-
+      type="tel"
+      class="input-field"
+      :class="{ 'no-padding': paddingNone }"
+      :placeholder="placeholder"
+      :value="localNumber"
+      :disabled="disabled"
+      @focus="e => emit('focus', e)"
+      @input="onNumberInput"
+      @blur="e => emit('blur', e)" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
-import UiIconSpinnerDefault from '~/components/ui/UiIconSpinnerDefault.vue'
-import { allCountries } from 'country-telephone-data'
+  import { ref, reactive, computed, watch } from "vue";
+  import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+  import { allCountries } from "country-telephone-data";
 
-// підготовка повного списку
-const countries = reactive(
+  // підготовка повного списку
+  const countries = reactive(
     allCountries.map(({ name, iso2, dialCode }) => ({
       name,
       code: iso2.toUpperCase(),
       dialCode: `+${dialCode}`,
       flag: iso2
-          .toUpperCase()
-          .split('')
-          .map(ch => String.fromCodePoint(0x1F1E6 + ch.charCodeAt(0) - 65))
-          .join(''),
+        .toUpperCase()
+        .split("")
+        .map(ch => String.fromCodePoint(0x1f1e6 + ch.charCodeAt(0) - 65))
+        .join(""),
     }))
-)
+  );
 
-// щоб шукати префікс від найдовшого до найкоротшого
-const sortedCountries = computed(() =>
-    [...countries].sort((a, b) => b.dialCode.length - a.dialCode.length)
-)
+  // щоб шукати префікс від найдовшого до найкоротшого
+  const sortedCountries = computed(() => [...countries].sort((a, b) => b.dialCode.length - a.dialCode.length));
 
-const props = defineProps({
-  modelValue: { type: String, default: '' },
-  placeholder: { type: String,  default: ''   },
-  isDirty:     { type: Boolean, default: false},
-  isInvalid:   { type: Boolean, default: false},
-  isLoading:   { type: Boolean, default: false},
-  borderNone:  { type: Boolean, default: false},
-  paddingNone: { type: Boolean, default: false},
-  disabled:    { type: Boolean, default: false}
-})
+  const props = defineProps({
+    modelValue: { type: String, default: "" },
+    placeholder: { type: String, default: "" },
+    isDirty: { type: Boolean, default: false },
+    isInvalid: { type: Boolean, default: false },
+    isLoading: { type: Boolean, default: false },
+    borderNone: { type: Boolean, default: false },
+    paddingNone: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+  });
 
-const emit = defineEmits<{
-  (e: 'input', v: string): void
-  (e: 'focus', v: FocusEvent): void
-  (e: 'blur', v: FocusEvent): void
-}>()
+  const emit = defineEmits<{
+    (e: "input", v: string): void;
+    (e: "focus", v: FocusEvent): void;
+    (e: "blur", v: FocusEvent): void;
+  }>();
 
-const open        = ref(false)
-const selected    = ref(countries.find(c => c.code === 'UA')!)
-const localNumber = ref('')
+  const open = ref(false);
+  const selected = ref(countries.find(c => c.code === "UA")!);
+  const localNumber = ref("");
 
-watch(
+  watch(
     () => props.modelValue,
-    (val) => {
+    val => {
       if (!val) {
-        localNumber.value = ''
-        return
+        localNumber.value = "";
+        return;
       }
-      const country = sortedCountries.value.find(c =>
-          val.startsWith(c.dialCode)
-      )
+      const country = sortedCountries.value.find(c => val.startsWith(c.dialCode));
       if (country) {
-        selected.value = country
-        localNumber.value = val.slice(country.dialCode.length)
+        selected.value = country;
+        localNumber.value = val.slice(country.dialCode.length);
       } else {
-        localNumber.value = val.replace(/\D/g, '')
+        localNumber.value = val.replace(/\D/g, "");
       }
     },
     { immediate: true }
-)
+  );
 
-function selectCountry(c: any) {
-  selected.value = c
-  open.value = false
-  updateModel()
-}
+  function selectCountry(c: any) {
+    selected.value = c;
+    open.value = false;
+    updateModel();
+  }
 
-function onNumberInput(e: Event) {
-  const v = (e.target as HTMLInputElement).value
-  localNumber.value = v.replace(/\D/g, '')
-  updateModel()
-}
+  function onNumberInput(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    localNumber.value = v.replace(/\D/g, "");
+    updateModel();
+  }
 
-function updateModel() {
-  emit('input', selected.value.dialCode + localNumber.value)
-}
+  function updateModel() {
+    emit("input", selected.value.dialCode + localNumber.value);
+  }
 </script>
 
 <style lang="scss" scoped>
-.phone-input {
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--color-stroke-ui-light);
-  border-radius: 10px;
-  background: var(--color-stroke-ui-dark);
-  height: var(--ui-input--height);
-
-  &.no-border {
-    border: none;
-  }
-  &.is-invalid {
-    border-color: red;
-  }
-  &.is-valid {
-    border-color: green;
-  }
-  &.disabled {
-    background: #e5e5e5;
-  }
-
-  .country-select {
+  .phone-input {
+    position: relative;
     display: flex;
     align-items: center;
-    cursor: pointer;
-    padding: 0 12px;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    height: 100%;
-
-    .flag { margin-right: 6px; }
-    .dial { margin-right: 4px; }
-    .arrow { font-size: 0.7em; }
-  }
-
-  .country-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 20;
-    width: 250px;
-    max-height: 140px;
-    height: 150px;
-    overflow-y: auto;
-    background: var(--color-stroke-ui-dark);
     border: 1px solid var(--color-stroke-ui-light);
-    border-radius: 4px;
-    margin-top: 4px;
+    border-radius: 10px;
+    background: var(--ui-control-bg);
+    color: var(--ui-text-main);
+    height: var(--ui-input--height);
 
-    .country-option {
+    &.no-border {
+      border: none;
+    }
+    &.is-invalid {
+      border-color: red;
+    }
+    &.is-valid {
+      border-color: green;
+    }
+    &.disabled {
+      background: var(--ui-control-bg-disabled);
+    }
+
+    .country-select {
       display: flex;
       align-items: center;
-      padding: 6px 10px;
       cursor: pointer;
+      padding: 0 12px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      height: 100%;
+
+      .flag {
+        margin-right: 6px;
+      }
+      .dial {
+        margin-right: 4px;
+      }
+      .arrow {
+        font-size: 0.7em;
+      }
     }
-    .country-option:hover {
-      background: rgba(255,255,255,0.05);
+
+    .country-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 20;
+      width: 250px;
+      max-height: 140px;
+      height: 150px;
+      overflow-y: auto;
+      background: var(--ui-control-bg);
+      border: 1px solid var(--color-stroke-ui-light);
+      border-radius: 4px;
+      margin-top: 4px;
+
+      .country-option {
+        display: flex;
+        align-items: center;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+      .country-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .country-option .flag {
+        margin-right: 8px;
+      }
+      .country-option .name {
+        flex: 1;
+      }
+      .country-option .dial {
+        margin-left: auto;
+      }
     }
-    .country-option .flag  { margin-right: 8px; }
-    .country-option .name  { flex: 1;      }
-    .country-option .dial  { margin-left: auto; }
-  }
 
-  .input-field {
-    flex: 1;
-    padding: 0 12px;
-    border: none;
-    border-radius: 0;
-    outline: none;
-    background: transparent;
-    color: var(--color-ui-text);
-    height: 100%;
+    .input-field {
+      flex: 1;
+      padding: 0 12px;
+      border: none;
+      border-radius: 0;
+      outline: none;
+      background: transparent;
+      color: var(--ui-text-main);
+      height: 100%;
 
-    &.no-padding {
-      padding: 0;
+      &.no-padding {
+        padding: 0;
+      }
+
+      &::placeholder {
+        color: var(--ui-text-secondary);
+      }
     }
   }
-}
 
-.input .is-loading {
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  overflow: hidden;
+  .input .is-loading {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    overflow: hidden;
 
-  /* как в .animated из примера */
-  background: linear-gradient(
-          to right,
-          rgba(243, 243, 243, 0.1) 5%,
-          rgba(238, 238, 238, 0.15) 20%,
-          rgba(243, 243, 243, 0.1) 35%
-  );
-  background-size: 1000px 100%; /* важно, чтобы было что двигать */
+    /* как в .animated из примера */
+    background: linear-gradient(
+      to right,
+      rgba(243, 243, 243, 0.1) 5%,
+      rgba(238, 238, 238, 0.15) 20%,
+      rgba(243, 243, 243, 0.1) 35%
+    );
+    background-size: 1000px 100%; /* важно, чтобы было что двигать */
 
-  animation: placeholderShimmer 1.5s linear infinite;
-}
-
-@keyframes placeholderShimmer {
-  0% {
-    background-position: -500px 0;
+    animation: placeholderShimmer 1.5s linear infinite;
   }
-  100% {
-    background-position: 500px 0;
+
+  @keyframes placeholderShimmer {
+    0% {
+      background-position: -500px 0;
+    }
+    100% {
+      background-position: 500px 0;
+    }
   }
-}
 </style>

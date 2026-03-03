@@ -649,7 +649,6 @@
     gap: 10px;
     margin: -12px -12px 0;
     padding: 12px;
-    min-height: 64px;
     box-sizing: border-box;
     border-radius: 0;
     background:
@@ -971,6 +970,12 @@
       width: auto;
       flex-direction: row;
       align-items: center;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .mt4-header-card {
+      height: 64px;
     }
   }
 

@@ -6,7 +6,10 @@
       :key="tabItem.label"
       :class="{ active: activeTabIndex === index }"
       @click="handleClickTab(index)">
-      <component v-if="tabItem.icon" :is="tabItem.icon" class="tab__icon" />
+      <component
+        v-if="tabItem.icon"
+        :is="tabItem.icon"
+        class="tab__icon" />
       <span>{{ tabItem.label }}</span>
     </div>
   </div>
@@ -55,6 +58,7 @@
 
       &.active {
         background-color: var(--ui-primary-main);
+        color: #fff;
       }
 
       @media (max-width: 1023px) {

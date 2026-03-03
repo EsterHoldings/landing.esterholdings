@@ -151,10 +151,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+  import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
   import { useI18n } from "vue-i18n";
   import { navigateTo, useLocalePath } from "~/.nuxt/imports";
 
+  import CreateNewDeposit from "~/pages/payments/create/index.vue";
   import UiImageCircle from "~/components/ui/UiImageCircle.vue";
   import UiBadge from "~/components/ui/UiBadge.vue";
   import UiIconImage from "~/components/ui/UiIconImage.vue";
@@ -175,6 +176,7 @@
   const localePath = useLocalePath();
   const appCore = useAppCore();
   const authStore = useAuthStore();
+  const modalControl = inject("modalControl") as { openModal?: Function } | undefined;
 
   const isLoading = ref(false);
   const verificationRequestData = reactive<Record<string, any>>({});
@@ -335,6 +337,17 @@
     loadVerificationData();
   };
 
+  const tryOpenDepositModal = (): boolean => {
+    if (!modalControl?.openModal) return false;
+
+    modalControl.openModal(CreateNewDeposit, {
+      title: t("cabinet.billing.create"),
+      initialTab: "deposit",
+    });
+
+    return true;
+  };
+
   const resolveStepRoute = (key: VerificationStepKey): { path: string; query?: Record<string, string> } => {
     if (key === "documents") {
       return { path: "/profile", query: { tab: "documents" } };
@@ -348,6 +361,8 @@
   };
 
   const handleOpenStep = async (key: VerificationStepKey): Promise<void> => {
+    if (key === "deposit" && tryOpenDepositModal()) return;
+
     const target = resolveStepRoute(key);
     await navigateTo(localePath({ path: target.path, query: target.query ?? {} }));
   };
@@ -407,6 +422,7 @@
     gap: 10px;
     margin: -12px -12px 0;
     padding: 12px;
+    box-sizing: border-box;
     border-radius: 0;
     background:
       linear-gradient(136deg, color-mix(in srgb, var(--ui-primary-main) 10%, transparent) 0%, transparent 70.44%),
@@ -462,7 +478,11 @@
     margin-top: 8px;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 6px;
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-stroke-ui-light);
+    border: 1px solid color-mix(in srgb, var(--ui-text-main) 10%, transparent);
   }
 
   .verification-step-progress__item {
@@ -472,8 +492,8 @@
     width: 100%;
     border: 0;
     cursor: pointer;
-    border-radius: 10px;
-    background: var(--color-stroke-ui-light);
+    border-radius: 0;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -485,7 +505,7 @@
 
   .verification-step-progress__item:focus-visible {
     outline: 1px solid var(--ui-primary-main);
-    outline-offset: 1px;
+    outline-offset: -1px;
   }
 
   .verification-step-progress__icon {
@@ -718,6 +738,12 @@
     .verification-step__title-row {
       flex-direction: column;
       gap: 6px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .verification-header-card {
+      height: 64px;
     }
   }
 
