@@ -49,10 +49,10 @@
         <span class="summary-skeleton summary-skeleton--value animate-pulse" />
       </template>
       <template v-else>
-        <UiTextSmall class="summary-title !text-[var(--color-success)] text-left">
+        <UiTextSmall class="summary-title text-left">
           {{ title }}
         </UiTextSmall>
-        <UiTextH3 class="summary-value amount-text !text-[var(--color-success)]">
+        <UiTextH3 class="summary-value amount-text">
           {{ formattedAmount }}
         </UiTextH3>
       </template>

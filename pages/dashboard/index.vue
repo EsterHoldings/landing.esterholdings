@@ -62,7 +62,8 @@
               :is-loading="isMt4Refreshing"
               :can-create-account="canCreateAccount"
               :account-creation-blocked-reason="accountCreationBlockedReason"
-              @toggle-favorite="toggleFavorite" />
+              @toggle-favorite="toggleFavorite"
+              @refresh-requested="handleRefreshDashboard" />
           </div>
 
           <div class="col-span-1 flex h-full flex-col gap-3 text-[var(--ui-text-main)]">
@@ -232,6 +233,7 @@
 
   type Mt4Account = {
     id: string;
+    number: string;
     type: string;
     leverage: string;
     currency: string;
@@ -250,6 +252,11 @@
       if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
       return (b.balance ?? 0) - (a.balance ?? 0);
     });
+
+  const normalizeBalance = (value: unknown): number => {
+    const normalized = Number.parseFloat(String(value ?? "0").replace(",", "."));
+    return Number.isFinite(normalized) ? normalized : 0;
+  };
 
   const resolveText = (key: string, fallback: string): string => {
     const translated = t(key);
@@ -349,10 +356,11 @@
       const items = response?.data?.data?.data ?? [];
       const mapped = items.map((account: any) => ({
         id: account.id,
+        number: account.number ?? String(account.id ?? ""),
         type: account.account_type?.name ?? account.accountType?.name ?? "-",
-        leverage: account.leverage ?? "1:50",
+        leverage: String(account?.leverage_display ?? account?.leverage ?? "1:100"),
         currency: account.currency ?? "USD",
-        balance: Number(account.balance ?? 0),
+        balance: normalizeBalance(account.balance),
         status: account.status ?? "active",
         is_favorite: !!account.is_favorite,
         favorite_at: account.favorite_at ?? null,

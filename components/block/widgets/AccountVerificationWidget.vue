@@ -584,17 +584,20 @@
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: flex-start;
     gap: 10px;
-    border: 0;
-    background: transparent;
+    border: 1px solid transparent;
+    background: var(--ui-background-card);
     padding: 10px 12px;
     border-radius: 12px;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
     text-align: left;
     cursor: pointer;
   }
 
   .verification-step__button:hover {
-    background: var(--ui-background-card);
+    background: transparent;
+    border-color: var(--ui-background-card);
   }
 
   .verification-step__button:focus-visible {

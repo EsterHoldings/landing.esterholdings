@@ -1,5 +1,5 @@
 <template>
-  <div class="mt4-widget dashboard-side-widget flex flex-col gap-4 text-[var(--ui-text-main)]">
+  <div class="mt4-widget dashboard-side-widget text-[var(--ui-text-main)]">
     <div class="mt4-header-card">
       <div class="mt4-header-card__title">
         {{ t("cabinet.dashboard.mt4.title") }}
@@ -50,7 +50,9 @@
             <div class="h-3 w-16 rounded bg-[var(--color-stroke-ui-light)]"></div>
             <div class="h-4 w-28 rounded bg-[var(--color-stroke-ui-light)]"></div>
           </div>
-          <div class="mt4-badge h-6 w-16 rounded bg-[var(--color-stroke-ui-light)]"></div>
+          <div class="mt4-actions">
+            <div class="h-8 w-8 rounded bg-[var(--color-stroke-ui-light)]"></div>
+          </div>
         </div>
       </div>
 
@@ -100,13 +102,18 @@
         <div
           v-for="account in visibleAccounts"
           :key="account.id"
-          class="verification-item mt4-card mt4-grid">
+          class="verification-item mt4-card mt4-grid"
+          role="button"
+          tabindex="0"
+          @click="handleOpenAccount(account.id)"
+          @keydown.enter.prevent="handleOpenAccount(account.id)"
+          @keydown.space.prevent="handleOpenAccount(account.id)">
           <button
             class="mt4-star flex h-8 w-8 items-center justify-center rounded-md transition text-[var(--ui-text-secondary)]"
             type="button"
             :aria-pressed="account.is_favorite"
             :title="account.is_favorite ? 'Remove from favorites' : 'Add to favorites'"
-            @click.stop="emit('toggle-favorite', account.id)">
+            @click.stop="handleToggleFavorite(account.id)">
             <svg
               viewBox="0 0 24 24"
               class="h-4 w-4"
@@ -123,56 +130,137 @@
             <UiTextSmall class="text-[var(--ui-text-secondary)]">
               {{ t("cabinet.dashboard.mt4.table.type") }}
             </UiTextSmall>
-            <div class="truncate font-semibold">{{ account.type }}</div>
+            <div class="truncate font-semibold">{{ getAccountType(account) }}</div>
             <UiTextSmall class="text-[var(--ui-text-secondary)] truncate">
-              {{ t("cabinet.accounts.columns.leverage") }}: {{ account.leverage }}
+              {{ t("cabinet.accounts.columns.leverage") }}: {{ getLeverageDisplay(account) }}
             </UiTextSmall>
           </div>
           <div class="mt4-account min-w-0 text-[var(--ui-text-main)]">
             <UiTextSmall class="text-[var(--ui-text-secondary)]">
-              {{ t("cabinet.dashboard.mt4.table.account") }}
+              {{ t("cabinet.accounts.columns.number") }}
             </UiTextSmall>
-            <UiTextSmall class="text-[var(--ui-text-main)] font-semibold truncate"> MT4 {{ account.id }} </UiTextSmall>
+            <UiTextSmall class="mt4-account-number text-[var(--ui-text-main)] font-semibold truncate">
+              {{ getAccountNumber(account) }}
+            </UiTextSmall>
           </div>
           <div class="mt4-balance min-w-0 text-[var(--ui-text-main)]">
             <UiTextSmall class="text-[var(--ui-text-secondary)]">
               {{ t("cabinet.dashboard.mt4.table.balance") }}
             </UiTextSmall>
-            <div class="truncate font-semibold">
-              {{ account.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
-              {{ account.currency }}
+            <div class="mt4-balance-value">
+              <span
+                class="truncate font-semibold"
+                :class="getBalanceHighlightClass(account.id)">
+                {{ formatBalance(account) }}
+              </span>
+              <button
+                type="button"
+                class="refresh-balance-btn"
+                :disabled="isBalanceRefreshing(account.id)"
+                :title="refreshBalanceLabel"
+                @click.stop="refreshAccountBalance(account)">
+                <UiIconUpdate
+                  class="h-[14px] w-[14px]"
+                  :spinning="isBalanceRefreshing(account.id)" />
+              </button>
             </div>
           </div>
-          <UiBadge
-            :state="mt4BadgeState(account.status)"
-            outline
-            class="mt4-badge border text-xs !px-3 !py-1 bg-[var(--color-stroke-ui-dark)]">
-            {{ statusText[account.status]() }}
-          </UiBadge>
+          <div class="mt4-actions">
+            <button
+              type="button"
+              class="mt4-menu-trigger"
+              :aria-label="openMenuLabel"
+              @click.stop="toggleAccountMenu(account.id)"
+              :ref="el => setMenuTriggerRef(account.id, el as HTMLElement | null)">
+              <UiIconDotsVertical class="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <Teleport to="body">
+    <div
+      v-if="activeMenuAccount"
+      ref="menuRef"
+      class="card-menu"
+      :style="menuStyle">
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickDeposit(activeMenuAccount.id)">
+        <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
+        <UiTextSmall class="whitespace-nowrap">{{ t("cabinet.accounts.actions.deposit") || "Deposit" }}</UiTextSmall>
+      </button>
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickWithdraw(activeMenuAccount.id)">
+        <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+        <UiTextSmall class="whitespace-nowrap">{{ t("cabinet.accounts.actions.withdraw") || "Withdraw" }}</UiTextSmall>
+      </button>
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickTransfer(activeMenuAccount.id)">
+        <UiIconTransfer class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+        <UiTextSmall class="whitespace-nowrap">{{ t("cabinet.accounts.actions.transfer") || "Transfer" }}</UiTextSmall>
+      </button>
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickHistory(activeMenuAccount.id)">
+        <UiIconHistory class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+        <UiTextSmall class="whitespace-nowrap">{{ t("cabinet.accounts.actions.history") || "History" }}</UiTextSmall>
+      </button>
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickChangeType(activeMenuAccount.id)">
+        <UiIconUpdate class="!h-4 !w-4 text-[var(--ui-text-main)]" />
+        <UiTextSmall class="whitespace-nowrap">{{
+          t("cabinet.accounts.actions.changeType") || "Change type"
+        }}</UiTextSmall>
+      </button>
+      <button
+        class="card-menu__item"
+        type="button"
+        @click="handleClickDelete(activeMenuAccount.id)">
+        <UiIconTrash class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-danger)]" />
+        <UiTextSmall class="whitespace-nowrap">{{ t("cabinet.accounts.actions.remove") || "Remove" }}</UiTextSmall>
+      </button>
+    </div>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
-  import { computed, toRefs } from "vue";
+  import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
+  import { navigateTo, useLocalePath } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
-  import { useLocalePath } from "~/.nuxt/imports";
+  import { useToast } from "vue-toastification";
 
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-  import UiBadge from "~/components/ui/UiBadge.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
   import UiIconCardCheck from "~/components/ui/UiIconCardCheck.vue";
+  import UiIconDotsVertical from "~/components/ui/UiIconDotsVertical.vue";
+  import UiIconPayment from "~/components/ui/UiIconPayment.vue";
+  import UiIconWithdraw from "~/components/ui/UiIconWithdraw.vue";
+  import UiIconTransfer from "~/components/ui/UiIconTransfer.vue";
+  import UiIconHistory from "~/components/ui/UiIconHistory.vue";
+  import UiIconUpdate from "~/components/ui/UiIconUpdate.vue";
+  import UiIconTrash from "~/components/ui/UiIconTrash.vue";
+  import useAppCore from "~/composables/useAppCore";
 
-  type Mt4Status = "active" | "inactive";
+  type Mt4Status = "active" | "inactive" | string;
   type Mt4Account = {
     id: string;
-    type: string;
-    leverage: string;
-    currency: string;
-    balance: number;
-    status: Mt4Status;
+    number?: string;
+    type?: string;
+    leverage?: string;
+    currency?: string;
+    balance?: number;
+    status?: Mt4Status;
     is_favorite: boolean;
     favorite_at?: string | null;
   };
@@ -195,23 +283,45 @@
 
   const emit = defineEmits<{
     (event: "toggle-favorite", id: string): void;
+    (event: "refresh-requested"): void;
   }>();
 
   const { t } = useI18n({ useScope: "global" });
   const localePath = useLocalePath();
+  const toast = useToast();
+  const appCore = useAppCore();
+
+  const MENU_WIDTH = 180;
+  const MENU_GAP = 8;
+  const VIEWPORT_OFFSET = 8;
+  const FALLBACK_MENU_HEIGHT = 260;
+
+  const activeMenuAccountId = ref<string | null>(null);
+  const menuStyle = ref<Record<string, string>>({});
+  const menuRef = ref<HTMLElement | null>(null);
+  const menuTriggerRefs = reactive<Record<string, HTMLElement | null>>({});
+  const refreshingBalanceIds = reactive<Record<string, boolean>>({});
+  const balanceOverrides = reactive<Record<string, number | undefined>>({});
+  type BalanceChangeDirection = "up" | "down" | "same";
+  const balanceHighlightById = reactive<Record<string, BalanceChangeDirection | undefined>>({});
+  const balanceHighlightTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   const profileAccountsCreateLink = computed(() => localePath({ path: "/accounts", query: { openCreate: "1" } }));
   const profileVerificationLink = computed(() => localePath({ path: "/profile", query: { tab: "verification" } }));
   const canCreateAccount = computed(() => !!props.canCreateAccount);
-
-  const statusText = {
-    active: () => t("cabinet.dashboard.mt4.table.active"),
-    inactive: () => t("cabinet.dashboard.mt4.table.inactive"),
-  };
+  const openMenuLabel = computed(() => resolveText("cabinet.common.openMenu", "Open menu"));
+  const refreshBalanceLabel = computed(() => resolveText("cabinet.accounts.refreshBalance", "Refresh balance"));
 
   const resolveText = (key: string, fallback: string): string => {
     const translated = t(key);
     return translated === key ? fallback : translated;
+  };
+
+  const normalizeAccountId = (value: string | number | undefined | null): string => String(value ?? "");
+
+  const normalizeBalance = (value: unknown): number => {
+    const normalized = Number.parseFloat(String(value ?? "0").replace(",", "."));
+    return Number.isFinite(normalized) ? normalized : 0;
   };
 
   const emptyTitle = computed(() => resolveText("cabinet.dashboard.mt4.emptyTitle", "Счетов пока нет"));
@@ -233,34 +343,303 @@
   );
   const currentEmptyTitle = computed(() => (canCreateAccount.value ? emptyTitle.value : verifyTitle.value));
   const currentEmptySubtitle = computed(() => (canCreateAccount.value ? emptySubtitle.value : verifySubtitle.value));
-  const blockedReasonText = computed(() => {
-    const raw = String(props.accountCreationBlockedReason || "").trim();
-    return raw;
-  });
+  const blockedReasonText = computed(() => String(props.accountCreationBlockedReason || "").trim());
 
-  const mt4BadgeState = (status: Mt4Status) => {
-    return status === "active" ? "success" : "warning";
+  const getAccountType = (account: Mt4Account): string => {
+    const type = String(account.type ?? "").trim();
+    return type === "" ? "-" : type;
+  };
+
+  const getLeverageDisplay = (account: Mt4Account): string => {
+    const leverage = String(account.leverage ?? "").trim();
+    return leverage === "" ? "1:100" : leverage;
+  };
+
+  const getAccountNumber = (account: Mt4Account): string => {
+    const number = String(account.number ?? "").trim();
+    return number === "" ? normalizeAccountId(account.id) : number;
+  };
+
+  const formatBalance = (account: Mt4Account): string => {
+    const balance = getDisplayedBalanceValue(account);
+    const currency = String(account.currency ?? "").trim();
+
+    if (currency !== "") {
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(balance);
+      } catch {}
+    }
+
+    return `$ ${balance.toFixed(2)}`;
+  };
+
+  const refreshKey = (id: string | number): string => normalizeAccountId(id);
+  const isBalanceRefreshing = (id: string | number): boolean => !!refreshingBalanceIds[refreshKey(id)];
+
+  const clearBalanceHighlightTimer = (key: string) => {
+    const timer = balanceHighlightTimers.get(key);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      balanceHighlightTimers.delete(key);
+    }
+  };
+
+  const setBalanceHighlight = (id: string | number, direction: BalanceChangeDirection) => {
+    const key = refreshKey(id);
+    clearBalanceHighlightTimer(key);
+    balanceHighlightById[key] = direction;
+    const timer = setTimeout(() => {
+      delete balanceHighlightById[key];
+      balanceHighlightTimers.delete(key);
+    }, 1000);
+    balanceHighlightTimers.set(key, timer);
+  };
+
+  const getBalanceHighlightClass = (id: string | number): string => {
+    const state = balanceHighlightById[refreshKey(id)];
+    if (state === "up") return "balance-highlight-up";
+    if (state === "down") return "balance-highlight-down";
+    if (state === "same") return "balance-highlight-same";
+    return "";
+  };
+
+  const getDisplayedBalanceValue = (account: Mt4Account): number => {
+    const key = refreshKey(account.id);
+    const override = balanceOverrides[key];
+    if (typeof override === "number" && Number.isFinite(override)) return override;
+    return normalizeBalance(account.balance);
+  };
+
+  const refreshAccountBalance = async (account: Mt4Account) => {
+    const key = refreshKey(account.id);
+    if (refreshingBalanceIds[key]) return;
+
+    const previousBalance = getDisplayedBalanceValue(account);
+    refreshingBalanceIds[key] = true;
+    try {
+      const response = await appCore.accounts.refreshBalance(normalizeAccountId(account.id));
+      const data = response?.data?.data ?? {};
+      const updatedBalance = data.balance;
+
+      if (updatedBalance !== undefined && updatedBalance !== null) {
+        const nextBalance = normalizeBalance(updatedBalance);
+        balanceOverrides[key] = nextBalance;
+
+        if (nextBalance > previousBalance) {
+          setBalanceHighlight(account.id, "up");
+        } else if (nextBalance < previousBalance) {
+          setBalanceHighlight(account.id, "down");
+        } else {
+          setBalanceHighlight(account.id, "same");
+        }
+
+        return;
+      }
+
+      toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+    } catch {
+      toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+    } finally {
+      refreshingBalanceIds[key] = false;
+    }
   };
 
   const visibleAccounts = computed(() => {
     const accounts = Array.isArray(props.accounts) ? props.accounts : [];
-    const favorites = accounts.filter(account => account.is_favorite).sort((a, b) => b.balance - a.balance);
-    const remaining = accounts.filter(account => !account.is_favorite).sort((a, b) => b.balance - a.balance);
+    const favorites = accounts
+      .filter(account => account.is_favorite)
+      .sort((a, b) => normalizeBalance(b.balance) - normalizeBalance(a.balance));
+    const remaining = accounts
+      .filter(account => !account.is_favorite)
+      .sort((a, b) => normalizeBalance(b.balance) - normalizeBalance(a.balance));
 
     return [...favorites, ...remaining].slice(0, 3);
   });
+
+  const activeMenuAccount = computed(() => {
+    if (!activeMenuAccountId.value) return null;
+    return visibleAccounts.value.find(account => normalizeAccountId(account.id) === activeMenuAccountId.value) ?? null;
+  });
+
+  watch(
+    visibleAccounts,
+    items => {
+      if (!activeMenuAccountId.value) return;
+      const exists = items.some(account => normalizeAccountId(account.id) === activeMenuAccountId.value);
+      if (!exists) closeMenu();
+    },
+    { deep: true }
+  );
+
+  const setMenuTriggerRef = (id: string | number, element: HTMLElement | null) => {
+    menuTriggerRefs[normalizeAccountId(id)] = element;
+  };
+
+  const closeMenu = () => {
+    activeMenuAccountId.value = null;
+    menuStyle.value = {};
+  };
+
+  const buildFloatingMenuStyle = (trigger: HTMLElement, menuElement?: HTMLElement | null): Record<string, string> => {
+    const rect = trigger.getBoundingClientRect();
+    const menuHeight = menuElement?.offsetHeight ?? FALLBACK_MENU_HEIGHT;
+
+    const maxLeft = Math.max(VIEWPORT_OFFSET, window.innerWidth - MENU_WIDTH - VIEWPORT_OFFSET);
+    const left = Math.min(Math.max(rect.right - MENU_WIDTH, VIEWPORT_OFFSET), maxLeft);
+
+    const fitsBottom = rect.bottom + MENU_GAP + menuHeight <= window.innerHeight - VIEWPORT_OFFSET;
+    const top = fitsBottom ? rect.bottom + MENU_GAP : Math.max(VIEWPORT_OFFSET, rect.top - menuHeight - MENU_GAP);
+
+    return {
+      top: `${Math.round(top)}px`,
+      left: `${Math.round(left)}px`,
+      width: `${MENU_WIDTH}px`,
+    };
+  };
+
+  const updateMenuPosition = (id: string) => {
+    const trigger = menuTriggerRefs[id];
+    if (!trigger) return;
+    menuStyle.value = buildFloatingMenuStyle(trigger, menuRef.value);
+  };
+
+  const recalcMenuPosition = () => {
+    if (!activeMenuAccountId.value) return;
+    updateMenuPosition(activeMenuAccountId.value);
+  };
+
+  const toggleAccountMenu = async (id: string | number) => {
+    const normalizedId = normalizeAccountId(id);
+    const willOpen = activeMenuAccountId.value !== normalizedId;
+    if (!willOpen) {
+      closeMenu();
+      return;
+    }
+
+    activeMenuAccountId.value = normalizedId;
+    menuStyle.value = {};
+
+    await nextTick();
+    updateMenuPosition(normalizedId);
+    await nextTick();
+    updateMenuPosition(normalizedId);
+  };
+
+  const handleMenuOutside = (event: MouseEvent) => {
+    if (!activeMenuAccountId.value) return;
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest(".card-menu") || target.closest(".mt4-menu-trigger")) return;
+
+    closeMenu();
+  };
+
+  const handleMenuEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  };
+
+  onMounted(() => {
+    window.addEventListener("resize", recalcMenuPosition);
+    window.addEventListener("scroll", recalcMenuPosition, true);
+    window.addEventListener("mousedown", handleMenuOutside, true);
+    window.addEventListener("keydown", handleMenuEscape, true);
+  });
+
+  onBeforeUnmount(() => {
+    balanceHighlightTimers.forEach(timer => clearTimeout(timer));
+    balanceHighlightTimers.clear();
+
+    window.removeEventListener("resize", recalcMenuPosition);
+    window.removeEventListener("scroll", recalcMenuPosition, true);
+    window.removeEventListener("mousedown", handleMenuOutside, true);
+    window.removeEventListener("keydown", handleMenuEscape, true);
+  });
+
+  const accountRoute = (accountId: string | number, tab?: number): string => {
+    const path = `/accounts/${encodeURIComponent(normalizeAccountId(accountId))}`;
+    if (typeof tab === "number") {
+      return localePath({ path, query: { tab: String(tab) } });
+    }
+    return localePath({ path });
+  };
+
+  const handleToggleFavorite = (id: string | number) => {
+    emit("toggle-favorite", normalizeAccountId(id));
+  };
+
+  const handleOpenAccount = async (accountId: string | number) => {
+    closeMenu();
+    await navigateTo(accountRoute(accountId));
+  };
+
+  const handleClickDeposit = async (_accountId: string | number) => {
+    closeMenu();
+    await navigateTo(localePath({ path: "/payments", query: { openDeposit: "1" } }));
+  };
+
+  const handleClickWithdraw = async (_accountId: string | number) => {
+    closeMenu();
+    await navigateTo(localePath({ path: "/payments", query: { openWithdrawal: "1" } }));
+  };
+
+  const handleClickTransfer = async (accountId: string | number) => {
+    closeMenu();
+    await navigateTo(accountRoute(accountId, 0));
+  };
+
+  const handleClickHistory = async (accountId: string | number) => {
+    closeMenu();
+    await navigateTo(accountRoute(accountId, 1));
+  };
+
+  const handleClickChangeType = async (accountId: string | number) => {
+    closeMenu();
+    await navigateTo(accountRoute(accountId, 0));
+  };
+
+  const handleClickDelete = async (accountId: string | number) => {
+    const shouldDelete = confirm(resolveText("cabinet.accounts.deleteConfirm", "Archive this account?"));
+    if (!shouldDelete) {
+      closeMenu();
+      return;
+    }
+
+    try {
+      await appCore.accounts.delete(normalizeAccountId(accountId));
+      toast.success(resolveText("cabinet.accounts.deleteSuccess", "Account archived!"));
+      emit("refresh-requested");
+    } catch {
+      toast.error(resolveText("cabinet.accounts.deleteError", "Failed to archive account."));
+    } finally {
+      closeMenu();
+    }
+  };
 </script>
 
 <style scoped>
-  .dashboard-side-widget {
-    --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
-    min-height: var(--dashboard-side-widget-height);
-    height: var(--dashboard-side-widget-height);
+  .mt4-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     overflow: hidden;
     border-radius: 14px;
     border: 0;
     background: var(--ui-background-panel);
     padding: 12px;
+  }
+
+  .dashboard-side-widget {
+    --dashboard-side-widget-height: clamp(360px, 43vh, 440px);
+    min-height: var(--dashboard-side-widget-height);
+    height: var(--dashboard-side-widget-height);
   }
 
   .mt4-header-card {
@@ -354,22 +733,27 @@
   }
 
   .mt4-card {
-    background: transparent;
+    background: var(--ui-background-card);
+    border: 1px solid transparent;
     border-radius: 8px;
     padding: 10px 12px;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+    cursor: pointer;
   }
 
   .mt4-card:hover {
-    background: var(--ui-background-card);
+    background: transparent;
+    border-color: var(--ui-background-card);
   }
 
   .mt4-grid {
     display: grid;
-    grid-template-columns: 44px repeat(3, minmax(0, 1fr)) minmax(0, 1fr);
+    grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
     gap: 14px;
     align-items: center;
-    grid-template-areas: "star type account balance badge";
+    grid-template-areas: "star type account balance actions";
   }
 
   .mt4-grid > * {
@@ -379,34 +763,185 @@
   .mt4-star {
     grid-area: star;
   }
+
   .mt4-star:hover {
     background: var(--ui-background-card);
   }
+
   .mt4-type {
     grid-area: type;
   }
+
   .mt4-account {
     grid-area: account;
   }
+
   .mt4-balance {
     grid-area: balance;
   }
-  .mt4-badge {
-    grid-area: badge;
+
+  .mt4-balance-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  .mt4-account-number {
+    letter-spacing: 0.01em;
+  }
+
+  .mt4-actions {
+    grid-area: actions;
     justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mt4-menu-trigger {
+    height: 30px;
+    width: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ui-text-secondary);
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .mt4-menu-trigger:hover {
+    color: var(--ui-text-main);
+    border-color: var(--color-stroke-ui-light);
+    background: var(--ui-background-card);
+  }
+
+  .refresh-balance-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ui-text-main);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .refresh-balance-btn:hover,
+  .refresh-balance-btn:focus-visible {
+    color: var(--ui-text-main);
+  }
+
+  .refresh-balance-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .balance-highlight-up {
+    animation: balance-highlight-up 1s ease;
+  }
+
+  .balance-highlight-down {
+    animation: balance-highlight-down 1s ease;
+  }
+
+  .balance-highlight-same {
+    animation: balance-highlight-same 1s ease;
   }
 
   .verification-item {
     border-radius: 12px;
-    background: transparent;
-    border: 0;
+    background: var(--ui-background-card);
+    border: 1px solid transparent;
     padding: 10px 12px;
     min-height: 92px;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .verification-item:hover {
-    background: var(--ui-background-card);
+    background: transparent;
+    border-color: var(--ui-background-card);
+  }
+
+  .card-menu {
+    position: fixed;
+    z-index: 9999;
+    min-width: 160px;
+    width: 180px;
+    border-radius: 10px;
+    border: 1px solid var(--color-stroke-ui-light);
+    background: var(--ui-background-panel);
+    opacity: 1;
+    pointer-events: auto;
+    padding: 8px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .card-menu__item {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 0;
+    background: transparent;
+    transition: background-color 0.2s ease;
+  }
+
+  .card-menu__item:hover {
+    background: var(--color-stroke-ui-light);
+  }
+
+  @keyframes balance-highlight-up {
+    0% {
+      color: inherit;
+    }
+    30% {
+      color: var(--ui-sticker-success);
+    }
+    100% {
+      color: inherit;
+    }
+  }
+
+  @keyframes balance-highlight-down {
+    0% {
+      color: inherit;
+    }
+    30% {
+      color: var(--ui-sticker-danger);
+    }
+    100% {
+      color: inherit;
+    }
+  }
+
+  @keyframes balance-highlight-same {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    20% {
+      opacity: 0.35;
+    }
+    40% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.35;
+    }
+    80% {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 767px) {
@@ -416,13 +951,18 @@
     }
 
     .mt4-grid {
-      grid-template-columns: 44px 1fr 1fr;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
       grid-template-areas:
-        "star type badge"
-        "star account badge"
-        "star balance badge";
+        "star type actions"
+        "star account actions"
+        "star balance actions";
       gap: 10px 12px;
       align-items: start;
+    }
+
+    .mt4-actions {
+      flex-direction: column;
+      align-items: flex-end;
     }
   }
 
