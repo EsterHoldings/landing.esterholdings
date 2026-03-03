@@ -260,7 +260,10 @@
               <div
                 v-for="paymentDetail in paymentDetails"
                 :key="paymentDetail.id"
-                class="cabinet-card card-with-actions cursor-pointer"
+                :class="[
+                  'cabinet-card card-with-actions cursor-pointer',
+                  viewMode === 'full' ? 'cabinet-card--full-row' : '',
+                ]"
                 @click="handleClickViewPaymentDetail(paymentDetail.id)">
                 <div
                   class="card-actions"
@@ -1317,7 +1320,34 @@
     transform: translateY(-1px);
   }
 
+  .cabinet-card--full-row {
+    display: grid;
+    grid-template-columns: minmax(280px, 1.3fr) minmax(380px, 1.7fr);
+    align-items: center;
+    column-gap: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .cabinet-card--full-row .cabinet-card__header {
+    min-height: 0;
+    align-items: center;
+  }
+
+  .cabinet-card--full-row .cabinet-card__head-side {
+    min-width: 0;
+  }
+
+  .cabinet-card--full-row .cabinet-card__grid {
+    margin-top: 0;
+  }
+
   @media (max-width: 1024px) {
+    .cabinet-card--full-row {
+      grid-template-columns: 1fr;
+      row-gap: 10px;
+    }
+
     .cabinet-card__grid--full {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }

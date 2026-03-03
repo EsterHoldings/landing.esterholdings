@@ -252,7 +252,11 @@
             <div
               v-for="account in accounts"
               :key="account.id"
-              :class="['cabinet-card card-with-actions', cardMenuOpenId === account.id ? 'card-open' : '']"
+              :class="[
+                'cabinet-card card-with-actions',
+                cardMenuOpenId === account.id ? 'card-open' : '',
+                viewMode === 'full' ? 'cabinet-card--full-row' : '',
+              ]"
               role="button"
               tabindex="0"
               :aria-label="`Open account ${account.number}`"
@@ -1315,6 +1319,33 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .cabinet-card--full-row {
+    display: grid;
+    grid-template-columns: minmax(300px, 1.2fr) minmax(420px, 1.8fr);
+    align-items: center;
+    column-gap: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .cabinet-card--full-row .cabinet-card__header {
+    min-height: 0;
+    align-items: center;
+  }
+
+  .cabinet-card--full-row .cabinet-card__head-side {
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .cabinet-card--full-row .account-balance-block {
+    align-items: flex-start;
+  }
+
+  .cabinet-card--full-row .cabinet-card__grid {
+    margin-top: 0;
+  }
+
   .cabinet-card__field {
     min-width: 0;
   }
@@ -1429,6 +1460,11 @@
   }
 
   @media (max-width: 1024px) {
+    .cabinet-card--full-row {
+      grid-template-columns: 1fr;
+      row-gap: 10px;
+    }
+
     .table-account-right-head,
     .table-account-right-cell {
       grid-template-columns: 130px 100px 170px 32px;

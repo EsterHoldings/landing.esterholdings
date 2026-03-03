@@ -233,7 +233,10 @@
           <div
             v-for="ticket in filtered"
             :key="ticket.id"
-            class="cabinet-card ticket-card card-with-actions cursor-pointer"
+            :class="[
+              'cabinet-card ticket-card card-with-actions cursor-pointer',
+              viewMode === 'full' ? 'ticket-card--full-row' : '',
+            ]"
             @click="handleClickRow(ticket.id)">
             <div class="card-actions">
               <button
@@ -1246,6 +1249,41 @@
     justify-content: flex-end;
   }
 
+  .ticket-card--full-row {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.5fr) minmax(320px, 1.4fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .ticket-card--full-row .cabinet-card__header {
+    min-height: 0;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .ticket-card--full-row .cabinet-card__grid {
+    margin-top: 0;
+  }
+
+  .ticket-card--full-row .cabinet-card__footer {
+    margin-top: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .ticket-card--full-row {
+      grid-template-columns: 1fr;
+      row-gap: 10px;
+    }
+
+    .ticket-card--full-row .cabinet-card__grid,
+    .ticket-card--full-row .cabinet-card__footer {
+      margin-top: 0;
+    }
+  }
+
   .chat-btn {
     position: relative;
     display: inline-flex;
@@ -1289,6 +1327,10 @@
   @media (max-width: 640px) {
     .card-with-actions {
       padding-right: 82px;
+    }
+
+    .ticket-card--full-row {
+      display: block;
     }
 
     .cabinet-card__header {
