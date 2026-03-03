@@ -448,13 +448,11 @@
       asBlock?: boolean;
       ticketId: string;
       currentUser: ChatCurrentUser;
-      adminChat?: boolean;
       mobileControls?: boolean;
       mobilePanelExpanded?: boolean;
     }>(),
     {
       asBlock: false,
-      adminChat: false,
       mobileControls: false,
       mobilePanelExpanded: false,
     }
@@ -898,11 +896,7 @@
   const sendTypingState = async (isTyping: boolean) => {
     const payload = { is_typing: isTyping };
     try {
-      if (props.adminChat) {
-        await appCore.adminModules.tickets.typing(props.ticketId, payload);
-      } else {
-        await appCore.tickets.typing(props.ticketId, payload);
-      }
+      await appCore.tickets.typing(props.ticketId, payload);
     } catch {
       // noop
     }
@@ -1171,9 +1165,7 @@
       pageSize: PAGE_SIZE,
       sort: "desc" as const,
     };
-    const res = props.adminChat
-      ? await appCore.adminModules.tickets.getTicketMessages(props.ticketId, params)
-      : await appCore.tickets.getTicketMessages(props.ticketId, params);
+    const res = await appCore.tickets.getTicketMessages(props.ticketId, params);
     const arr: ApiMsg[] = Array.isArray(res?.data) ? res.data : (res?.data?.data ?? []);
     return arr.map(mapApi).reverse();
   }
@@ -1330,18 +1322,11 @@
 
   let hb: any = null;
   async function apiOpen(ticketId: string) {
-    const response = props.adminChat
-      ? await appCore.adminModules.tickets.presencePing(ticketId)
-      : await appCore.ticketsPresence.ping(ticketId);
+    const response = await appCore.ticketsPresence.ping(ticketId);
 
     applyPresencePayload(response?.data ?? response);
   }
   async function apiClose(ticketId: string) {
-    if (props.adminChat) {
-      await appCore.adminModules.tickets.presenceLeave(ticketId);
-      return;
-    }
-
     await appCore.ticketsPresence.presence(ticketId);
   }
   async function startPresenceHeartbeat(ticketId: string) {
@@ -1377,9 +1362,7 @@
     const payload = { last_message_id: messageId };
 
     try {
-      const response = props.adminChat
-        ? await appCore.adminModules.tickets.markRead(props.ticketId, payload)
-        : await appCore.tickets.markRead(props.ticketId, payload);
+      const response = await appCore.tickets.markRead(props.ticketId, payload);
       const updatedCount = Number(response?.data?.data?.updated_count ?? response?.data?.updated_count ?? 0);
       const unreadCount = Number(
         response?.data?.data?.unread_messages_count ?? response?.data?.unread_messages_count ?? Number.NaN
@@ -1542,18 +1525,11 @@
     const el = listRef.value;
     const shouldStick = !!el && userIsNearBottom.value && performance.now() - lastUserScrollAt > SCROLL_IDLE_MS;
 
-    if (props.adminChat)
-      await appCore.adminModules.tickets.storeTicketMessage(props.ticketId, {
-        user_id: props.currentUser.id,
-        type: "text",
-        body,
-      });
-    else
-      await appCore.tickets.storeTicketMessage(props.ticketId, {
-        user_id: props.currentUser.id,
-        type: "text",
-        body,
-      });
+    await appCore.tickets.storeTicketMessage(props.ticketId, {
+      user_id: props.currentUser.id,
+      type: "text",
+      body,
+    });
 
     await nextTick();
     if (shouldStick) scrollToBottom();

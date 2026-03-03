@@ -1,26 +1,17 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { useAdminAuthStore } from "~/stores/adminAuthStore";
 import { useAuthStore } from "~/stores/authStore";
 import {
-    ROUTE_ADMIN_AUTH_LOGIN,
-    ROUTE_ADMIN_AUTH_REFRESH,
     ROUTE_AUTH_LOGIN,
     ROUTE_AUTH_REFRESH
 } from "~/constants/routes";
 import { useCookie, useNuxtApp, useRuntimeConfig } from "nuxt/app";
-import { ADMIN_REFRESH_TOKEN } from "~/constants/auth";
 import useAppCore from "~/composables/useAppCore";
 import { useErrorStack } from "~/stores/errors";
-import {RuntimeConfig} from "nuxt/schema";
-
-interface runtimeCfgInterface {
-    baseApi: string
-}
 
 export class useApi {
     private readonly api: AxiosInstance;
 
-    constructor(forClient = false) {
+    constructor(forClient = true) {
         const config = useRuntimeConfig()
         // @ts-ignore
         const {baseApi} = config.public as { baseApi: string }
@@ -51,7 +42,7 @@ export class useApi {
         };
 
         this.api.interceptors.request.use((config) => {
-            const authStore = forClient ? useAuthStore() : useAdminAuthStore();
+            const authStore = useAuthStore();
             if (authStore.accessToken)
                 config.headers.Authorization = `Bearer ${authStore.accessToken}`;
 
@@ -68,21 +59,19 @@ export class useApi {
             res => res,
             async err => {
                 const appCore = useAppCore();
-                const authStore = forClient ? useAuthStore() : useAdminAuthStore();
+                const authStore = useAuthStore();
                 const orig = err.config;
 
                 if (
                     err.response?.status === 401 &&
                     !orig._retry &&
                     !orig.url?.endsWith(ROUTE_AUTH_REFRESH) &&
-                    !orig.url?.endsWith(ROUTE_AUTH_LOGIN) &&
-                    !orig.url?.endsWith(ROUTE_ADMIN_AUTH_REFRESH) &&
-                    !orig.url?.endsWith(ROUTE_ADMIN_AUTH_LOGIN)
+                    !orig.url?.endsWith(ROUTE_AUTH_LOGIN)
                 ) {
                     orig._retry = true;
 
                     try {
-                        const { data } = forClient ? await appCore.auth.doRefresh() : await appCore.adminModules.auth.doRefresh();
+                        const { data } = await appCore.auth.doRefresh();
                         authStore.setAccessToken(data.access_token)
                         orig.headers.Authorization = `Bearer ${data.access_token}`
                         return this.api(orig)

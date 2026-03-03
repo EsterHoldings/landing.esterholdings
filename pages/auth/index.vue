@@ -6,7 +6,6 @@
 <script setup>
 // @ts-ignore
 definePageMeta({
-  // middleware: ["admin-login-middleware"],
   layout: "empty"
 });
 </script>

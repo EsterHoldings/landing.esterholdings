@@ -2,8 +2,8 @@ import Echo from "laravel-echo";
 import type EchoType from "laravel-echo";
 import Pusher from "pusher-js";
 import { defineNuxtPlugin, useRuntimeConfig } from "nuxt/app";
-import { ADMIN_ACCESS_TOKEN, USER_ACCESS_TOKEN } from "~/constants/auth";
-import { ROUTE_ADMIN_AUTH_REFRESH, ROUTE_AUTH_REFRESH } from "~/constants/routes";
+import { USER_ACCESS_TOKEN } from "~/constants/auth";
+import { ROUTE_AUTH_REFRESH } from "~/constants/routes";
 
 declare global {
   interface Window {
@@ -30,13 +30,7 @@ const resolveOrigin = (candidate: string | undefined): string => {
   }
 };
 
-const isAdminRoute = (): boolean => /\/admin(\/|$)/.test(window.location.pathname);
-
-const resolveAuthToken = (preferAdminAuth: boolean): string => {
-  if (preferAdminAuth) {
-    return localStorage.getItem(ADMIN_ACCESS_TOKEN) || localStorage.getItem("access_token") || "";
-  }
-
+const resolveAuthToken = (): string => {
   return localStorage.getItem(USER_ACCESS_TOKEN) || "";
 };
 
@@ -59,24 +53,15 @@ const resolveApiBase = (candidate: string | undefined): string => {
   }
 };
 
-const resolveRefreshEndpoint = (apiBase: string, preferAdminAuth: boolean): string => {
-  const relativePath = preferAdminAuth ? ROUTE_ADMIN_AUTH_REFRESH : ROUTE_AUTH_REFRESH;
-  return new URL(relativePath.replace(/^\/+/, ""), withTrailingSlash(apiBase)).toString();
-};
+const resolveRefreshEndpoint = (apiBase: string): string =>
+  new URL(ROUTE_AUTH_REFRESH.replace(/^\/+/, ""), withTrailingSlash(apiBase)).toString();
 
 const extractAccessToken = (payload: any): string => {
   return String(payload?.access_token ?? payload?.data?.access_token ?? "");
 };
 
-const persistAccessToken = (preferAdminAuth: boolean, token: string) => {
+const persistAccessToken = (token: string) => {
   if (!token) return;
-
-  if (preferAdminAuth) {
-    localStorage.setItem(ADMIN_ACCESS_TOKEN, token);
-    // keep backward compatibility with legacy admin token key
-    localStorage.removeItem("access_token");
-    return;
-  }
 
   localStorage.setItem(USER_ACCESS_TOKEN, token);
 };
@@ -100,7 +85,7 @@ export default defineNuxtPlugin(() => {
   const port = sanitizePort(cfg.reverbPort, forceTLS ? 443 : 80);
   let refreshInFlight: Promise<string | null> | null = null;
 
-  const refreshAccessToken = async (preferAdminAuth: boolean): Promise<string | null> => {
+  const refreshAccessToken = async (): Promise<string | null> => {
     if (refreshInFlight) {
       return refreshInFlight;
     }
@@ -108,7 +93,7 @@ export default defineNuxtPlugin(() => {
     refreshInFlight = (async () => {
       try {
         const xsrf = resolveXsrfToken();
-        const refreshEndpoint = resolveRefreshEndpoint(apiBase, preferAdminAuth);
+        const refreshEndpoint = resolveRefreshEndpoint(apiBase);
         const response = await fetch(refreshEndpoint, {
           method: "PUT",
           credentials: "include",
@@ -129,7 +114,7 @@ export default defineNuxtPlugin(() => {
           return null;
         }
 
-        persistAccessToken(preferAdminAuth, refreshedToken);
+        persistAccessToken(refreshedToken);
         return refreshedToken;
       } catch {
         return null;
@@ -143,9 +128,9 @@ export default defineNuxtPlugin(() => {
     }
   };
 
-  const authorizeChannel = async (socketId: string, channelName: string, preferAdminAuth: boolean) => {
+  const authorizeChannel = async (socketId: string, channelName: string) => {
     const xsrf = resolveXsrfToken();
-    let token = resolveAuthToken(preferAdminAuth);
+    let token = resolveAuthToken();
 
     const requestAuth = async (currentToken: string) =>
       fetch(authEndpoint, {
@@ -166,8 +151,8 @@ export default defineNuxtPlugin(() => {
     let response = await requestAuth(token);
 
     if (response.status === 401) {
-      const refreshedToken = await refreshAccessToken(preferAdminAuth);
-      token = refreshedToken ?? resolveAuthToken(preferAdminAuth);
+      const refreshedToken = await refreshAccessToken();
+      token = refreshedToken ?? resolveAuthToken();
       response = await requestAuth(token);
     }
 
@@ -189,7 +174,7 @@ export default defineNuxtPlugin(() => {
     authorizer: (channel: any) => ({
       authorize: async (socketId: string, callback: (error: boolean, data: any) => void) => {
         try {
-          const response = await authorizeChannel(socketId, channel.name, isAdminRoute());
+          const response = await authorizeChannel(socketId, channel.name);
 
           if (!response.ok) {
             const errorBody = await response.text();
