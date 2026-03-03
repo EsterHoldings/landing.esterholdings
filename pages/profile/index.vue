@@ -28,13 +28,25 @@
               mode="out-in">
               <div>
                 <div
-                  class="text-[--ui-text-main] h-[66px] w-full pl-5 pr-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-start">
-                  {{ tabsList[activeTabIndex].label }}
+                  class="text-[--ui-text-main] h-[66px] w-full pl-5 pr-5 border-b border-solid border-[var(--ui-primary-main)] flex items-center justify-between gap-3">
+                  <span class="truncate">{{ tabsList[activeTabIndex].label }}</span>
+                  <span
+                    v-if="activeTabIndex === 0 && profileInfoHeaderLabel"
+                    class="shrink-0 text-right text-[13px] font-medium"
+                    :class="{
+                      'text-[var(--ui-text-secondary)]': profileInfoHeaderState === 'initial',
+                      'text-[var(--color-warning)]': profileInfoHeaderState === 'pending',
+                      'text-[var(--color-success)]': profileInfoHeaderState === 'approved',
+                      'text-[var(--color-danger)]': profileInfoHeaderState === 'rejected',
+                    }">
+                    {{ profileInfoHeaderLabel }}
+                  </span>
                 </div>
                 <div class="p-5 overflow-y-scroll">
                   <component
                     :is="tabsList[activeTabIndex].component"
-                    :key="activeTabIndex" />
+                    :key="activeTabIndex"
+                    @profile-info-status-change="handleProfileInfoStatusChange" />
                 </div>
               </div>
             </Transition>
@@ -77,6 +89,9 @@
   const STORAGE_KEY = "profileActiveTab";
   const activeTabIndex = ref(0);
   const route = useRoute();
+  type ProfileInfoVerificationState = "initial" | "pending" | "approved" | "rejected";
+  const profileInfoHeaderState = ref<ProfileInfoVerificationState>("initial");
+  const profileInfoHeaderLabel = ref("");
 
   const tabsList = computed(() => [
     {
@@ -158,5 +173,10 @@
 
   const handleActiveTab = (tabIndex: number) => {
     activeTabIndex.value = tabIndex;
+  };
+
+  const handleProfileInfoStatusChange = (payload: { state: ProfileInfoVerificationState; label: string }) => {
+    profileInfoHeaderState.value = payload.state;
+    profileInfoHeaderLabel.value = payload.label;
   };
 </script>

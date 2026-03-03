@@ -4,14 +4,6 @@
       <div class="profile__tab--general__profile-data__photo-uploader">
         <UserPhotoUploader />
       </div>
-      <div
-        class="profile__verification-status"
-        :class="`profile__verification-status--${profileInfoVerificationState}`">
-        <span class="profile__verification-status__dot" />
-        <span class="profile__verification-status__label">
-          {{ profileInfoVerificationLabel }}
-        </span>
-      </div>
     </div>
 
     <div class="profile__tab--general_wrapper">
@@ -211,7 +203,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref } from "vue";
+  import { computed, onMounted, reactive, ref, watch } from "vue";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
   import useAppCore from "~/composables/useAppCore";
@@ -250,6 +242,18 @@
     stateId?: string | null;
   }
 
+  type ProfileInfoVerificationState = "initial" | "pending" | "approved" | "rejected";
+
+  const emit = defineEmits<{
+    (
+      e: "profile-info-status-change",
+      payload: {
+        state: ProfileInfoVerificationState;
+        label: string;
+      }
+    ): void;
+  }>();
+
   const { t, locale } = useI18n();
   const toast = useToast();
   const appCore = useAppCore();
@@ -276,7 +280,7 @@
   let countrySearchTimer: ReturnType<typeof setTimeout> | null = null;
   let stateSearchTimer: ReturnType<typeof setTimeout> | null = null;
   let citySearchTimer: ReturnType<typeof setTimeout> | null = null;
-  const profileInfoVerificationState = ref<"initial" | "pending" | "approved" | "rejected">("initial");
+  const profileInfoVerificationState = ref<ProfileInfoVerificationState>("initial");
 
   const resolveText = (key: string, fallback: string): string => {
     const translated = t(key);
@@ -336,8 +340,7 @@
     return (
       options.find(
         option =>
-          normalizeText(option.text) === normalizedLabel ||
-          normalizeText(option.originalText) === normalizedLabel
+          normalizeText(option.text) === normalizedLabel || normalizeText(option.originalText) === normalizedLabel
       ) || null
     );
   };
@@ -789,7 +792,7 @@
   const resolveProfileInfoVerificationState = (
     rawStatus: unknown,
     hasRequestActivity = false
-  ): "initial" | "pending" | "approved" | "rejected" => {
+  ): ProfileInfoVerificationState => {
     const status = normalizeVerificationStatus(rawStatus);
     if (status === "approved" || status === "rejected") {
       return status;
@@ -809,6 +812,14 @@
       profileInfoVerificationState.value = hasProfileInfoInput() ? "pending" : "initial";
     }
   };
+
+  watch(
+    [profileInfoVerificationState, profileInfoVerificationLabel],
+    ([state, label]) => {
+      emit("profile-info-status-change", { state, label });
+    },
+    { immediate: true }
+  );
 
   onMounted(async () => {
     isLoadingAllComponentData.value = true;
@@ -945,59 +956,6 @@
         gap: 10px;
         margin-bottom: 20px;
         padding: 4px 15px 0;
-
-        .profile__verification-status {
-          margin-left: auto;
-        }
-      }
-    }
-  }
-
-  .profile__verification-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid var(--color-stroke-ui-light);
-    border-radius: 999px;
-    padding: 6px 12px;
-    background: color-mix(in srgb, var(--ui-background-panel) 70%, transparent);
-    flex-shrink: 0;
-
-    &__dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--ui-text-secondary);
-    }
-
-    &__label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ui-text-main);
-      line-height: 1;
-    }
-
-    &--initial {
-      .profile__verification-status__dot {
-        background: var(--ui-text-secondary);
-      }
-    }
-
-    &--approved {
-      .profile__verification-status__dot {
-        background: var(--color-success);
-      }
-    }
-
-    &--pending {
-      .profile__verification-status__dot {
-        background: var(--color-warning);
-      }
-    }
-
-    &--rejected {
-      .profile__verification-status__dot {
-        background: var(--color-danger);
       }
     }
   }
