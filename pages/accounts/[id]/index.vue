@@ -317,13 +317,16 @@
   .account-layout {
     display: grid;
     min-height: inherit;
+    height: 100%;
     width: 100%;
     flex: 1 1 auto;
     grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
   }
 
   .account-layout__tabs {
-    min-height: 0;
+    min-height: 100%;
+    height: 100%;
+    align-self: stretch;
     border-right: 1px solid var(--color-stroke-ui-light);
     background: color-mix(in srgb, var(--ui-background-card) 60%, transparent);
     padding: 12px;
