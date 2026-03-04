@@ -585,7 +585,9 @@
     const onlineAgentIds = new Set<string>();
     for (const rawOnlineAdmin of onlineAdminsRaw) {
       if (!rawOnlineAdmin || typeof rawOnlineAdmin !== "object") continue;
-      const participantUserId = normalizeText((rawOnlineAdmin as Record<string, unknown>).participant_user_id);
+      const participantUserId =
+        normalizeText((rawOnlineAdmin as Record<string, unknown>).participant_user_id) ||
+        normalizeText((rawOnlineAdmin as Record<string, unknown>).id);
       if (participantUserId) {
         onlineAgentIds.add(participantUserId);
       }
@@ -1373,6 +1375,10 @@
 
     const payloadTicketId = String(payload.ticketId ?? payload.ticket_id ?? "");
     if (!payloadTicketId || payloadTicketId !== id.value) return;
+    const actorParticipantId = normalizeText(payload.actor_participant_id);
+    if (actorParticipantId && !normalizeText(currentUser.linkedUserId)) {
+      currentUser.linkedUserId = actorParticipantId;
+    }
 
     const participantsPayload = Array.isArray(payload.participants) ? payload.participants : [];
     if (participantsPayload.length > 0) {
