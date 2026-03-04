@@ -1515,10 +1515,14 @@
       })
       .filter((attachment): attachment is ChatAttachment => Boolean(attachment && attachment.url));
 
+    const serverAttachmentsCount = toPositiveInt(metaRecord.attachments_count ?? metaRecord.attachmentsCount);
+    const effectiveAttachmentsCount =
+      serverAttachmentsCount > 0 ? Math.max(serverAttachmentsCount, attachments.length) : attachments.length;
+
     return {
       ...metaRecord,
       attachments,
-      attachmentsCount: attachments.length,
+      attachmentsCount: effectiveAttachmentsCount,
     };
   };
   const firstUpper = (value: string): string => value.charAt(0).toUpperCase();
@@ -2297,6 +2301,71 @@
       authorInitials: normalizeOptionalText(m.author_initials),
     };
   }
+  function isSameMessage(a: ChatMessage, b: ChatMessage): boolean {
+    const aMeta = JSON.stringify(a.meta ?? null);
+    const bMeta = JSON.stringify(b.meta ?? null);
+    return (
+      a.id === b.id &&
+      a.userId === b.userId &&
+      a.type === b.type &&
+      a.body === b.body &&
+      aMeta === bMeta &&
+      a.createdAt === b.createdAt &&
+      a.author === b.author &&
+      a.authorPhotoUrl === b.authorPhotoUrl &&
+      a.authorFirstName === b.authorFirstName &&
+      a.authorLastName === b.authorLastName &&
+      a.authorEmail === b.authorEmail &&
+      a.authorInitials === b.authorInitials
+    );
+  }
+  function upsertMessage(incoming: ChatMessage): "inserted" | "updated" | "unchanged" {
+    const index = messages.findIndex(message => message.id === incoming.id);
+    if (index === -1) {
+      messages.push(incoming);
+      return "inserted";
+    }
+
+    const current = messages[index];
+    if (isSameMessage(current, incoming)) {
+      return "unchanged";
+    }
+
+    messages[index] = incoming;
+    return "updated";
+  }
+  const messageNeedsAttachmentHydration = (message: ChatMessage): boolean => {
+    if (message.type !== "attachment") return false;
+
+    const meta = message.meta;
+    if (!meta) return false;
+
+    return (meta.attachmentsCount ?? 0) > (meta.attachments?.length ?? 0);
+  };
+  async function syncLatestMessagesFromServer() {
+    try {
+      const latestAsc = await fetchPageAsAsc(1);
+      if (!latestAsc.length) return;
+
+      let changed = false;
+      for (const message of latestAsc) {
+        const state = upsertMessage(message);
+        if (state !== "unchanged") changed = true;
+      }
+
+      if (!changed) return;
+
+      ensureAscOrder();
+      await nextTick();
+      await waitForNextPaint();
+      if (userIsNearBottom.value) {
+        scrollToBottom();
+      }
+      await markVisibleMessagesAsRead();
+    } catch {
+      // noop
+    }
+  }
   function ensureAscOrder() {
     messages.sort((a, b) => a.createdAt - b.createdAt || (a.id > b.id ? 1 : -1));
   }
@@ -2376,7 +2445,7 @@
         author_email: e.author_email,
         author_initials: e.author_initials,
       });
-      messages.push(incomingMessage);
+      upsertMessage(incomingMessage);
       ensureAscOrder();
       emitSupportMessageUpdated(incomingMessage);
       await nextTick();
@@ -2387,6 +2456,9 @@
       }
       if (incomingMessage.userId !== currentUserId.value) {
         await markVisibleMessagesAsRead();
+      }
+      if (messageNeedsAttachmentHydration(incomingMessage)) {
+        void syncLatestMessagesFromServer();
       }
     });
     ch.listen(".Typing", (e: { user_id: string; is_typing: boolean }) => {
