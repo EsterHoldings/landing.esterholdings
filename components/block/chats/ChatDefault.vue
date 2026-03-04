@@ -2753,6 +2753,19 @@
 
   let presenceChan: any = null;
   const onlineMap = reactive<Map<string, PresenceUser>>(new Map());
+  const presenceState = reactive<{
+    onlineAdmins: any[];
+    onlineClient: any | null;
+    participants: any[];
+    actorJoined: boolean;
+    actorParticipantId: string | null;
+  }>({
+    onlineAdmins: [],
+    onlineClient: null,
+    participants: [],
+    actorJoined: false,
+    actorParticipantId: null,
+  });
 
   const isCounterpartyOnline = computed(() => {
     if (onlineMap.size === 0) return false;
@@ -2764,22 +2777,33 @@
     return false;
   });
 
-  watch(
-    () => [props.ticketId, isCounterpartyOnline.value] as const,
-    ([ticketId, counterpartyOnline]) => {
-      useEventBus.emit(SUPPORT_PRESENCE_UPDATED_EVENT, {
-        ticketId,
-        counterparty_online: counterpartyOnline,
-      });
-    },
-    { immediate: true }
-  );
+  const emitSupportPresencePayload = () => {
+    useEventBus.emit(SUPPORT_PRESENCE_UPDATED_EVENT, {
+      ticketId: props.ticketId,
+      counterparty_online: isCounterpartyOnline.value,
+      online_admins: [...presenceState.onlineAdmins],
+      online_client: presenceState.onlineClient ? { ...presenceState.onlineClient } : null,
+      participants: [...presenceState.participants],
+      actor_joined: presenceState.actorJoined,
+      actor_participant_id: presenceState.actorParticipantId,
+    });
+  };
 
   function applyPresencePayload(payload: any) {
     const data = payload?.data ?? payload;
+    const onlineAdmins = data && Array.isArray(data.online_admins) ? [...data.online_admins] : [];
+    const onlineClient = data && data.online_client ? { ...data.online_client } : null;
+    const participants = data && Array.isArray(data.participants) ? [...data.participants] : [];
+
+    presenceState.onlineAdmins = onlineAdmins;
+    presenceState.onlineClient = onlineClient;
+    presenceState.participants = participants;
+    presenceState.actorJoined = Boolean(data?.actor_joined);
+    presenceState.actorParticipantId = data?.actor_participant_id ? String(data.actor_participant_id) : null;
+
     onlineMap.clear();
-    if (data && Array.isArray(data.online_admins)) {
-      data.online_admins.forEach((u: any) => {
+    if (onlineAdmins.length) {
+      onlineAdmins.forEach((u: any) => {
         const id = normalizeUserId(u?.id);
         if (!id) return;
 
@@ -2790,8 +2814,8 @@
         });
       });
     }
-    if (data && data.online_client) {
-      const u = data.online_client;
+    if (onlineClient) {
+      const u = onlineClient;
       const id = normalizeUserId(u?.id);
       if (!id) return;
 
@@ -2801,6 +2825,8 @@
         role: "client",
       });
     }
+
+    emitSupportPresencePayload();
   }
 
   function joinPresence() {
@@ -2816,6 +2842,12 @@
     } catch {}
     presenceChan = null;
     onlineMap.clear();
+    presenceState.onlineAdmins = [];
+    presenceState.onlineClient = null;
+    presenceState.participants = [];
+    presenceState.actorJoined = false;
+    presenceState.actorParticipantId = null;
+    emitSupportPresencePayload();
   }
 
   let hb: any = null;
@@ -2834,6 +2866,14 @@
       apiOpen(ticketId).catch(() => {});
     }, 15000);
   }
+
+  watch(
+    () => props.ticketId,
+    () => {
+      emitSupportPresencePayload();
+    },
+    { immediate: true }
+  );
   function stopPresenceHeartbeat() {
     if (hb) {
       clearInterval(hb);
