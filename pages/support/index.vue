@@ -233,73 +233,70 @@
           <div
             v-for="ticket in filtered"
             :key="ticket.id"
-            :class="[
-              'cabinet-card ticket-card card-with-actions cursor-pointer',
-              viewMode === 'full' ? 'ticket-card--full-row' : '',
-            ]"
+            :class="['cabinet-card ticket-card cursor-pointer', viewMode === 'full' ? 'ticket-card--full-row' : '']"
             @click="handleClickRow(ticket.id)">
-            <div class="card-actions">
-              <button
-                class="copy-btn"
-                @click.stop
-                aria-label="Copy ID">
-                <UiIconCopy :text="ticket.id" />
-              </button>
-              <button
-                class="action-btn"
-                aria-label="More"
-                @click.stop>
-                <UiIconDotsVertical />
-              </button>
+            <div class="ticket-card__header">
+              <div class="min-w-0">
+                <div class="ticket-card__subject truncate">{{ ticket.subject }}</div>
+                <div class="ticket-card__id-row">#{{ ticket.id }}</div>
+              </div>
             </div>
 
-            <div class="cabinet-card__header">
-              <div class="cabinet-card__head-main">
-                <UiTextSmall class="cabinet-card__eyebrow">
-                  {{ t("support.page.subject") }}
-                </UiTextSmall>
-                <div class="cabinet-card__title">{{ ticket.subject }}</div>
-                <div class="cabinet-card__subtitle">#{{ String(ticket.id).slice(0, 8) }}</div>
-              </div>
-
-              <span class="status-inline">
-                <span
-                  class="status-inline__dot"
-                  :class="getTicketStatusDotClass(ticket.status)" />
-                {{ ticket.status }}
-              </span>
-            </div>
-
-            <div class="cabinet-card__grid">
-              <div class="cabinet-card__field">
-                <UiTextSmall class="cabinet-card__label">{{ t("support.page.lastUpdate") }}</UiTextSmall>
-                <div class="cabinet-card__value">{{ ticket.last_message_at }}</div>
-              </div>
-              <div class="cabinet-card__field">
-                <UiTextSmall class="cabinet-card__label">Counterparty</UiTextSmall>
-                <div class="counterparty-inline">
+            <div class="ticket-card__meta-row">
+              <div class="ticket-card__counterparty-col">
+                <div class="ticket-card__avatar">
+                  <img
+                    v-if="getTicketClientAvatarUrl(ticket)"
+                    :src="getTicketClientAvatarUrl(ticket)"
+                    :alt="getTicketClientName(ticket)"
+                    class="h-full w-full object-cover" />
+                  <span v-else>{{ getTicketClientInitials(ticket) }}</span>
+                </div>
+                <span class="ticket-card__presence">
                   <span
-                    class="counterparty-inline__dot"
+                    class="ticket-card__presence-dot"
                     :class="
                       ticket.counterparty_online ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'
                     " />
                   {{ ticket.counterparty_online ? "Online" : "Offline" }}
+                </span>
+                <span class="ticket-card__updated">{{ ticket.last_message_at }}</span>
+              </div>
+
+              <div class="ticket-card__actions-col">
+                <span class="ticket-card__status">
+                  <span
+                    class="ticket-card__status-dot"
+                    :class="getTicketStatusDotClass(ticket.status)" />
+                  {{ ticket.status }}
+                </span>
+
+                <div class="ticket-card__actions">
+                  <button
+                    class="ticket-card__icon-btn"
+                    @click.stop
+                    aria-label="Copy ID">
+                    <UiIconCopy :text="ticket.id" />
+                  </button>
+                  <button
+                    class="ticket-card__icon-btn ticket-card__chat-btn"
+                    @click.stop="handleChatIconClick(ticket.id)"
+                    aria-label="Open chat">
+                    <span
+                      v-if="ticket.unread_messages_count > 0"
+                      class="ticket-card__chat-badge">
+                      {{ ticket.unread_messages_count }}
+                    </span>
+                    <UiIconChat class="!h-[18px] !w-[18px]" />
+                  </button>
+                  <button
+                    class="ticket-card__icon-btn"
+                    aria-label="More"
+                    @click.stop>
+                    <UiIconDotsVertical />
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <div class="cabinet-card__footer">
-              <button
-                class="chat-btn"
-                @click.stop="handleChatIconClick(ticket.id)"
-                aria-label="Open chat">
-                <span
-                  v-if="ticket.unread_messages_count > 0"
-                  class="chat-btn__badge">
-                  {{ ticket.unread_messages_count }}
-                </span>
-                <UiIconChat class="!h-[18px] !w-[18px]" />
-              </button>
             </div>
           </div>
         </div>
@@ -633,6 +630,54 @@
     }
 
     return "bg-[var(--ui-text-secondary)]";
+  };
+
+  const getTicketClientAvatarUrl = (ticket: any): string => {
+    const rawUrl = ticket?.creator?.photo_url ?? ticket?.creator_photo_url ?? "";
+    return typeof rawUrl === "string" ? rawUrl.trim() : "";
+  };
+
+  const extractTicketClientInitials = (ticket: any): string => {
+    const directInitials = String(ticket?.creator?.initials ?? ticket?.creator_initials ?? "")
+      .trim()
+      .toUpperCase();
+    if (directInitials) {
+      return directInitials.slice(0, 2);
+    }
+
+    const firstName = String(ticket?.creator?.first_name ?? "").trim();
+    const lastName = String(ticket?.creator?.last_name ?? "").trim();
+    const fullNameInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim().toUpperCase();
+    if (fullNameInitials) {
+      return fullNameInitials.slice(0, 2);
+    }
+
+    const email = String(ticket?.creator?.email ?? ticket?.creator_email ?? "")
+      .trim()
+      .toUpperCase();
+    if (email) {
+      return email.slice(0, 2);
+    }
+
+    return "CL";
+  };
+
+  const getTicketClientInitials = (ticket: any): string => extractTicketClientInitials(ticket);
+
+  const getTicketClientName = (ticket: any): string => {
+    const firstName = String(ticket?.creator?.first_name ?? "").trim();
+    const lastName = String(ticket?.creator?.last_name ?? "").trim();
+    const fullName = `${firstName} ${lastName}`.trim();
+    if (fullName) {
+      return fullName;
+    }
+
+    const email = String(ticket?.creator?.email ?? ticket?.creator_email ?? "").trim();
+    if (email) {
+      return email;
+    }
+
+    return `Client #${String(ticket?.creator_id ?? ticket?.id ?? "")}`;
   };
 
   definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
@@ -1091,6 +1136,9 @@
     border: 1px solid var(--color-stroke-ui-dark);
     border-radius: 12px;
     padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease,
@@ -1103,71 +1151,13 @@
     transform: translateY(-1px);
   }
 
-  .card-with-actions {
-    padding-right: 86px;
-  }
-
-  .card-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    z-index: 2;
-  }
-
-  .copy-btn,
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 32px;
-    width: 32px;
-    border-radius: 8px;
-    color: var(--ui-text-secondary);
-    background: transparent;
-    border: 1px solid transparent;
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease,
-      background-color 0.2s ease,
-      transform 0.15s ease;
-  }
-
-  .copy-btn:hover,
-  .action-btn:hover {
-    color: var(--ui-text-main);
-    border-color: var(--color-stroke-ui-light);
-    background: color-mix(in srgb, var(--color-stroke-ui-light) 40%, transparent);
-    transform: translateY(-1px);
-  }
-
-  .cabinet-card__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px 12px;
-    min-height: 48px;
-  }
-
-  .cabinet-card__head-main {
+  .ticket-card__header {
     min-width: 0;
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
   }
 
-  .cabinet-card__eyebrow {
-    color: var(--ui-text-secondary);
-    font-size: 11px;
-    line-height: 1.2;
-  }
-
-  .cabinet-card__title {
+  .ticket-card__subject {
     color: var(--ui-text-main);
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.25;
     font-weight: 700;
     overflow: hidden;
@@ -1175,112 +1165,152 @@
     white-space: nowrap;
   }
 
-  .cabinet-card__subtitle {
+  .ticket-card__id-row {
+    margin-top: 2px;
     color: var(--ui-text-secondary);
     font-size: 12px;
-    line-height: 1.25;
-  }
-
-  .status-inline {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--ui-text-main);
-    text-transform: capitalize;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .status-inline__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-  }
-
-  .cabinet-card__grid {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 14px;
-  }
-
-  .cabinet-card__field {
-    min-width: 0;
-  }
-
-  .cabinet-card__label {
-    color: var(--ui-text-secondary);
-    font-size: 11px;
     line-height: 1.2;
   }
 
-  .cabinet-card__value {
-    margin-top: 3px;
-    color: var(--ui-text-main);
-    font-size: 14px;
-    line-height: 1.3;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .ticket-card__meta-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
   }
 
-  .counterparty-inline {
-    margin-top: 3px;
+  .ticket-card__counterparty-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .ticket-card__avatar {
+    height: 34px;
+    width: 34px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--color-stroke-ui-light);
+    background: var(--ui-background);
+    color: var(--ui-text-main);
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+
+  .ticket-card__presence {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     color: var(--ui-text-main);
-    font-size: 13px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1.2;
     font-weight: 500;
+    white-space: nowrap;
   }
 
-  .counterparty-inline__dot {
+  .ticket-card__presence-dot {
     width: 8px;
     height: 8px;
     border-radius: 999px;
   }
 
-  .cabinet-card__footer {
-    margin-top: 12px;
+  .ticket-card__updated {
+    color: var(--ui-text-secondary);
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .ticket-card__actions-col {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ticket-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ui-text-main);
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 600;
+    text-transform: capitalize;
+    white-space: nowrap;
+  }
+
+  .ticket-card__status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+  }
+
+  .ticket-card__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ticket-card__icon-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    color: var(--ui-text-secondary);
+    background: transparent;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .ticket-card__icon-btn:hover {
+    color: var(--ui-text-main);
+    border-color: var(--color-stroke-ui-light);
+    background: color-mix(in srgb, var(--color-stroke-ui-light) 40%, transparent);
+  }
+
+  .ticket-card__chat-badge {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--ui-sticker-danger);
+    color: #fff;
+    font-size: 10px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .ticket-card--full-row {
     display: grid;
-    grid-template-columns: minmax(260px, 1.5fr) minmax(320px, 1.4fr) auto;
+    grid-template-columns: minmax(260px, 1.2fr) minmax(0, 1fr);
     align-items: center;
     column-gap: 16px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .ticket-card--full-row .cabinet-card__header {
-    min-height: 0;
-    align-items: center;
-    gap: 8px 12px;
-  }
-
-  .ticket-card--full-row .cabinet-card__grid {
-    margin-top: 0;
-  }
-
-  .ticket-card--full-row .cabinet-card__footer {
-    margin-top: 0;
+    row-gap: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 
   @media (max-width: 1024px) {
     .ticket-card--full-row {
       grid-template-columns: 1fr;
       row-gap: 10px;
-    }
-
-    .ticket-card--full-row .cabinet-card__grid,
-    .ticket-card--full-row .cabinet-card__footer {
-      margin-top: 0;
     }
   }
 
@@ -1307,39 +1337,15 @@
     background: color-mix(in srgb, var(--color-stroke-ui-light) 40%, transparent);
   }
 
-  .chat-btn__badge {
-    position: absolute;
-    top: 1px;
-    right: 1px;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 999px;
-    background: var(--ui-sticker-danger);
-    color: #fff;
-    font-size: 10px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   @media (max-width: 640px) {
-    .card-with-actions {
-      padding-right: 82px;
-    }
-
-    .ticket-card--full-row {
-      display: block;
-    }
-
-    .cabinet-card__header {
-      flex-direction: column;
+    .ticket-card__meta-row {
+      grid-template-columns: 1fr;
       align-items: flex-start;
     }
 
-    .cabinet-card__grid {
-      grid-template-columns: 1fr;
+    .ticket-card__actions-col {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 </style>
