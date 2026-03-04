@@ -3001,6 +3001,7 @@
   let appResumeListenersAttached = false;
   let socketStateHandler: ((states: any) => void) | null = null;
   let realtimeFallbackTimer: ReturnType<typeof setInterval> | null = null;
+  let lastRealtimeSyncAt = 0;
 
   const reconnectSocketTransport = () => {
     if (!hasEchoClient()) return;
@@ -3064,14 +3065,20 @@
         void subscribeRealtimeForTicket(props.ticketId).catch(() => {});
       }
 
+      const now = Date.now();
+      const syncInterval = socketState === "connected" ? 4000 : 2000;
+      if (now - lastRealtimeSyncAt < syncInterval) return;
+      lastRealtimeSyncAt = now;
+
       void syncLatestMessagesFromServer();
-    }, 10000);
+    }, 2000);
   };
 
   const stopRealtimeFallbackSync = () => {
     if (!realtimeFallbackTimer) return;
     clearInterval(realtimeFallbackTimer);
     realtimeFallbackTimer = null;
+    lastRealtimeSyncAt = 0;
   };
 
   const leavePrivate = (ticketId: string) => {
@@ -3106,6 +3113,7 @@
     if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
 
     await subscribeRealtimeForTicket(props.ticketId).catch(() => {});
+    lastRealtimeSyncAt = Date.now();
     await syncLatestMessagesFromServer();
   };
 
@@ -3396,6 +3404,8 @@
           author_initials: rawMessage.author_initials,
         });
         markPendingMessageServerId(optimisticMessage.id, serverMessage);
+        upsertMessage(serverMessage);
+        emitSupportMessageUpdated(serverMessage);
         ensureAscOrder();
       }
 
