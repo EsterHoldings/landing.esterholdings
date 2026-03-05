@@ -55,7 +55,7 @@
   const appCore = useAppCore();
   const { locale } = useI18n({ useScope: "global" });
   const addCurrentLocaleToPath = (path = "") => `/${locale.value}/${path}`;
-  const SUPPORT_BADGE_REFRESH_MS = 10000;
+  const SUPPORT_BADGE_REFRESH_MS = 3000;
   const SUPPORT_REALTIME_RETRY_MS = 5000;
   const SUPPORT_UNREAD_UPDATED_EVENT = "support-unread-updated";
   const SUPPORT_ACTIVE_TICKET_CHANGED_EVENT = "support-active-ticket-changed";
@@ -67,6 +67,8 @@
   const supportUnreadCount = ref(0);
   const activeSupportTicketId = ref("");
   const isSupportChatOpen = ref(false);
+  const lastUnreadPreviewMessageId = ref("");
+  const unreadSnapshotInitialized = ref(false);
   let supportBadgeTimer: ReturnType<typeof setInterval> | null = null;
   let supportUnreadRafId: number | null = null;
   let supportRealtimeChannel: any = null;
@@ -103,8 +105,23 @@
   const loadSupportUnreadCount = async () => {
     try {
       const response = await appCore.tickets.getUnreadSummary();
-      const count = Number(response?.data?.data?.unread_messages_count ?? response?.data?.unread_messages_count ?? 0);
+      const responseData = response?.data?.data ?? response?.data ?? {};
+      const count = Number(responseData?.unread_messages_count ?? 0);
+      const latestUnreadMessage = responseData?.latest_unread_message ?? null;
+      const latestUnreadMessageId = normalizeText(latestUnreadMessage?.id);
       supportUnreadCount.value = Number.isFinite(count) ? Math.max(0, count) : 0;
+
+      if (!unreadSnapshotInitialized.value) {
+        unreadSnapshotInitialized.value = true;
+        lastUnreadPreviewMessageId.value = latestUnreadMessageId;
+        return;
+      }
+
+      if (latestUnreadMessageId && latestUnreadMessageId !== lastUnreadPreviewMessageId.value) {
+        handleSupportMessageToast(latestUnreadMessage);
+      }
+
+      lastUnreadPreviewMessageId.value = latestUnreadMessageId;
     } catch {}
   };
 
@@ -253,6 +270,11 @@
 
   const handleSupportMessageToast = (payload?: any) => {
     const messagePayload = unwrapSupportMessagePayload(payload);
+    const messageId = normalizeText(messagePayload?.id);
+    if (messageId) {
+      lastUnreadPreviewMessageId.value = messageId;
+    }
+
     const ticketId = normalizeText(messagePayload?.ticket_id ?? messagePayload?.ticketId);
     if (!ticketId) return;
 
