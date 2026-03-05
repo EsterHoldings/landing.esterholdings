@@ -235,7 +235,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
+  import AccountsTransferModal from "~/components/block/modals/AccountsTransferModal.vue";
+  import { computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
   import { navigateTo, useLocalePath } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
@@ -290,6 +291,7 @@
   const localePath = useLocalePath();
   const toast = useToast();
   const appCore = useAppCore();
+  const modalControl = inject("modalControl") as { openModal?: Function } | undefined;
 
   const MENU_WIDTH = 180;
   const MENU_GAP = 8;
@@ -598,7 +600,10 @@
 
   const handleClickTransfer = async (accountId: string | number) => {
     closeMenu();
-    await navigateTo(accountRoute(accountId, 0));
+    modalControl?.openModal?.(AccountsTransferModal, {
+      title: resolveText("cabinet.accounts.transfer.title", "Transfer between my accounts"),
+      fromAccountId: normalizeAccountId(accountId),
+    });
   };
 
   const handleClickHistory = async (accountId: string | number) => {

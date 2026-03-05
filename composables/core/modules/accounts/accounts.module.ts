@@ -52,6 +52,10 @@ export class AccountsModule implements BasicModuleInterface {
   async syncTradeHistory(id: any, data: object = {}): Promise<any> {
     return await this.accountsService.syncTradeHistory(id, data);
   }
+
+  async transfer(data: object = {}): Promise<any> {
+    return await this.accountsService.transfer(data);
+  }
 }
 
 export default AccountsModule;

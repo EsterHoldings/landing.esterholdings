@@ -197,14 +197,14 @@
 
                   <td
                     class="px-4 py-3 truncate max-w-[220px]"
-                    :title="payment.account_number">
-                    <strong>{{ payment?.account_number }}</strong>
+                    :title="displayAccountRoute(payment)">
+                    <strong>{{ displayAccountRoute(payment) }}</strong>
                   </td>
 
                   <td
                     class="px-4 py-3 truncate max-w-[170px]"
-                    :title="payment.payment_system_name">
-                    <span>{{ payment.payment_system_name || "-" }}</span>
+                    :title="displayPaymentSystem(payment)">
+                    <span>{{ displayPaymentSystem(payment) }}</span>
                   </td>
 
                   <td
@@ -286,8 +286,8 @@
                     <UiTextSmall class="cabinet-card__eyebrow">
                       {{ t("cabinet.billing.columns.accountNumber") }}
                     </UiTextSmall>
-                    <div class="cabinet-card__title">{{ payment.account_number }}</div>
-                    <div class="cabinet-card__subtitle">{{ payment.payment_system_name || "-" }}</div>
+                    <div class="cabinet-card__title">{{ displayAccountRoute(payment) }}</div>
+                    <div class="cabinet-card__subtitle">{{ displayPaymentSystem(payment) }}</div>
                   </div>
 
                   <div class="cabinet-card__head-side">
@@ -619,6 +619,12 @@
   const deletePaymentErrorLabel = computed(() =>
     resolveI18nValue("cabinet.billing.deletePaymentError", "Не удалось удалить платеж.")
   );
+  const internalTransferLabel = computed(() =>
+    resolveI18nValue("cabinet.billing.internalTransfer", "Transfer between accounts")
+  );
+  const transferCreatedLabel = computed(() =>
+    resolveI18nValue("cabinet.billing.transferCreated", "Transfer between accounts created.")
+  );
 
   const paymentMenuStyle = computed(() => ({
     top: `${paymentMenuPosition.top}px`,
@@ -678,6 +684,63 @@
   const statusText = (status?: string): string => {
     const value = String(status ?? "").trim();
     return value === "" ? "-" : value;
+  };
+
+  const isInternalTransfer = (payment: any): boolean =>
+    Boolean(payment?.is_internal_transfer || payment?.meta?.is_internal_transfer);
+
+  const displayAccountRoute = (payment: any): string => {
+    if (isInternalTransfer(payment)) {
+      const fromNumber = String(payment?.transfer_from_account_number ?? payment?.account_number ?? "").trim();
+      const toNumber = String(payment?.transfer_to_account_number ?? "").trim();
+      if (fromNumber !== "" && toNumber !== "") {
+        return `${fromNumber} -> ${toNumber}`;
+      }
+    }
+
+    const accountNumber = String(payment?.account_number ?? "").trim();
+    return accountNumber !== "" ? accountNumber : "-";
+  };
+
+  const displayPaymentSystem = (payment: any): string => {
+    if (isInternalTransfer(payment)) {
+      return internalTransferLabel.value;
+    }
+
+    const paymentSystemName = String(payment?.payment_system_name ?? "").trim();
+    return paymentSystemName !== "" ? paymentSystemName : "-";
+  };
+
+  const isTruthyQueryValue = (value: unknown): boolean => {
+    const normalized = String(value ?? "")
+      .trim()
+      .toLowerCase();
+
+    return normalized === "1" || normalized === "true" || normalized === "yes";
+  };
+
+  const clearTransferQuery = async () => {
+    if (route.query?.transferSuccess === undefined && route.query?.transferPaymentId === undefined) {
+      return;
+    }
+
+    const nextQuery = { ...route.query };
+    delete nextQuery.transferSuccess;
+    delete nextQuery.transferPaymentId;
+
+    await router.replace({ query: nextQuery });
+  };
+
+  const maybeShowTransferCreatedToast = async () => {
+    if (!isTruthyQueryValue(route.query?.transferSuccess)) {
+      return;
+    }
+
+    const transferPaymentId = String(route.query?.transferPaymentId ?? "").trim();
+    const paymentShortId = transferPaymentId.split("-").pop() ?? transferPaymentId;
+    const suffix = transferPaymentId !== "" ? ` #${paymentShortId}` : "";
+    toast.success(`${transferCreatedLabel.value}${suffix}`);
+    await clearTransferQuery();
   };
 
   const setPaymentMenuTriggerRef = (paymentId: string | number, el: HTMLElement | null) => {
@@ -911,43 +974,65 @@
     await loadData();
   };
 
+  const isViewModeValue = (value: string | null): value is "table" | "cards" | "full" =>
+    value === "table" || value === "cards" || value === "full";
+
   const initViewMode = () => {
     if (typeof window === "undefined") return;
-    syncViewport();
-
-    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-    if (saved && ["table", "cards", "full"].includes(saved)) {
-      viewMode.value = saved as typeof viewMode.value;
-      return;
-    }
-
-    viewMode.value = resolveDefaultViewMode(window.innerWidth);
+    syncViewModeWithViewport(true);
   };
 
   watch(viewMode, mode => {
     if (typeof window === "undefined") return;
+    if (isMobileViewport.value) return;
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
 
   const handleChangeViewMode = (nextViewMode: string) => {
+    if (isMobileViewport.value) return;
     if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
       viewMode.value = nextViewMode;
     }
   };
 
   const resolveDefaultViewMode = (width: number): "table" | "cards" | "full" => {
-    if (width < 768) return "full";
-    if (width < 1024) return "cards";
+    if (width < 768) return "cards";
+    if (width < 1024) return "full";
     return "table";
   };
 
-  const syncViewport = () => {
-    if (typeof window === "undefined") return;
+  const syncViewport = (): boolean => {
+    if (typeof window === "undefined") return false;
+    const wasMobile = isMobileViewport.value;
     isMobileViewport.value = window.innerWidth < 768;
+    return wasMobile !== isMobileViewport.value;
+  };
+
+  const syncViewModeWithViewport = (forceRestore = false) => {
+    if (typeof window === "undefined") return;
+
+    const viewportChanged = syncViewport();
+
+    if (isMobileViewport.value) {
+      if (viewMode.value !== "cards") {
+        viewMode.value = "cards";
+      }
+      return;
+    }
+
+    if (!forceRestore && !viewportChanged) return;
+
+    const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+    if (isViewModeValue(saved)) {
+      viewMode.value = saved;
+      return;
+    }
+
+    viewMode.value = resolveDefaultViewMode(window.innerWidth);
   };
 
   const handleViewportResize = () => {
-    syncViewport();
+    syncViewModeWithViewport();
     recalcPaymentMenu();
   };
 
@@ -964,6 +1049,8 @@
     } else if (openDeposit === "1" || openDeposit === "true" || openDeposit === "yes") {
       handleClickCreateNewDeposit("deposit");
     }
+
+    await maybeShowTransferCreatedToast();
 
     window.addEventListener("resize", handleViewportResize, { passive: true });
     window.addEventListener("scroll", recalcPaymentMenu, { passive: true, capture: true });

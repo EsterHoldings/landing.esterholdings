@@ -953,40 +953,63 @@
     await loadData();
   };
 
+  const isViewModeValue = (value: string | null): value is "table" | "cards" | "full" =>
+    value === "table" || value === "cards" || value === "full";
+
   const resolveDefaultViewMode = (width: number): "table" | "cards" | "full" => {
-    if (width < 768) return "full";
-    if (width < 1024) return "cards";
+    if (width < 768) return "cards";
+    if (width < 1024) return "full";
     return "table";
   };
 
-  const syncViewport = () => {
-    if (typeof window === "undefined") return;
+  const syncViewport = (): boolean => {
+    if (typeof window === "undefined") return false;
+    const wasMobile = isMobileViewport.value;
     isMobileViewport.value = window.innerWidth < 768;
+    return wasMobile !== isMobileViewport.value;
   };
 
-  const handleViewportResize = () => {
-    syncViewport();
-    recalcActiveMenu();
-  };
-
-  const initViewMode = () => {
+  const syncViewModeWithViewport = (forceRestore = false) => {
     if (typeof window === "undefined") return;
-    syncViewport();
+
+    const viewportChanged = syncViewport();
+
+    if (isMobileViewport.value) {
+      if (viewMode.value !== "cards") {
+        viewMode.value = "cards";
+      }
+      return;
+    }
+
+    if (!forceRestore && !viewportChanged) return;
+
     const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-    if (saved && ["table", "cards", "full"].includes(saved)) {
-      viewMode.value = saved as typeof viewMode.value;
+    if (isViewModeValue(saved)) {
+      viewMode.value = saved;
       return;
     }
 
     viewMode.value = resolveDefaultViewMode(window.innerWidth);
   };
 
+  const handleViewportResize = () => {
+    syncViewModeWithViewport();
+    recalcActiveMenu();
+  };
+
+  const initViewMode = () => {
+    if (typeof window === "undefined") return;
+    syncViewModeWithViewport(true);
+  };
+
   watch(viewMode, mode => {
     if (typeof window === "undefined") return;
+    if (isMobileViewport.value) return;
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
 
   const handleChangeViewMode = (nextViewMode: string) => {
+    if (isMobileViewport.value) return;
     if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
       viewMode.value = nextViewMode;
     }

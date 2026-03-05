@@ -46,6 +46,10 @@ export class AccountsService {
   async syncTradeHistory(id: any, data: object = {}): Promise<any> {
     return await this.useApi.post(`/client/mt4/accounts/${id}/trade-history/sync`, data);
   }
+
+  async transfer(data: object = {}): Promise<any> {
+    return await this.useApi.post("/client/mt4/transfer", data);
+  }
 }
 
 export default AccountsService;

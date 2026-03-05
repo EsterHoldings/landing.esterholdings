@@ -40,7 +40,7 @@
 
           <div class="payment-field">
             <UiTextSmall class="payment-field__label">{{ accountLabel }}</UiTextSmall>
-            <div class="payment-field__value">{{ valueOrDash(payment.account_number) }}</div>
+            <div class="payment-field__value">{{ displayAccountRoute(payment) }}</div>
           </div>
 
           <div class="payment-field">
@@ -60,12 +60,12 @@
 
           <div class="payment-field">
             <UiTextSmall class="payment-field__label">{{ typeLabel }}</UiTextSmall>
-            <div class="payment-field__value capitalize">{{ valueOrDash(payment.type) }}</div>
+            <div class="payment-field__value capitalize">{{ displayType(payment) }}</div>
           </div>
 
           <div class="payment-field">
             <UiTextSmall class="payment-field__label">{{ paymentSystemLabel }}</UiTextSmall>
-            <div class="payment-field__value">{{ valueOrDash(payment.payment_system_name) }}</div>
+            <div class="payment-field__value">{{ displayPaymentSystem(payment) }}</div>
           </div>
 
           <div class="payment-field">
@@ -92,6 +92,17 @@
             <UiTextSmall class="payment-field__label">{{ redirectLinkLabel }}</UiTextSmall>
             <div class="payment-field__value break-all">{{ valueOrDash(payment.redirect_link) }}</div>
           </div>
+
+          <template v-if="isInternalTransfer(payment)">
+            <div class="payment-field">
+              <UiTextSmall class="payment-field__label">{{ transferFromLabel }}</UiTextSmall>
+              <div class="payment-field__value">{{ valueOrDash(payment.transfer_from_account_number) }}</div>
+            </div>
+            <div class="payment-field">
+              <UiTextSmall class="payment-field__label">{{ transferToLabel }}</UiTextSmall>
+              <div class="payment-field__value">{{ valueOrDash(payment.transfer_to_account_number) }}</div>
+            </div>
+          </template>
         </div>
       </div>
     </template>
@@ -148,10 +159,46 @@
   const updatedAtLabel = computed(() => resolveI18nValue("cabinet.billing.updatedAt", "Обновлено"));
   const commentLabel = computed(() => resolveI18nValue("cabinet.billing.comment", "Комментарий"));
   const redirectLinkLabel = computed(() => resolveI18nValue("cabinet.billing.redirectLink", "Ссылка оплаты"));
+  const internalTransferLabel = computed(() =>
+    resolveI18nValue("cabinet.billing.internalTransfer", "Transfer between accounts")
+  );
+  const transferFromLabel = computed(() => resolveI18nValue("cabinet.billing.transferFrom", "From account"));
+  const transferToLabel = computed(() => resolveI18nValue("cabinet.billing.transferTo", "To account"));
 
   const valueOrDash = (value: unknown): string => {
     const stringValue = String(value ?? "").trim();
     return stringValue === "" ? "-" : stringValue;
+  };
+
+  const isInternalTransfer = (paymentItem: any): boolean =>
+    Boolean(paymentItem?.is_internal_transfer || paymentItem?.meta?.is_internal_transfer);
+
+  const displayAccountRoute = (paymentItem: any): string => {
+    if (isInternalTransfer(paymentItem)) {
+      const fromNumber = String(paymentItem?.transfer_from_account_number ?? paymentItem?.account_number ?? "").trim();
+      const toNumber = String(paymentItem?.transfer_to_account_number ?? "").trim();
+      if (fromNumber !== "" && toNumber !== "") {
+        return `${fromNumber} -> ${toNumber}`;
+      }
+    }
+
+    return valueOrDash(paymentItem?.account_number);
+  };
+
+  const displayPaymentSystem = (paymentItem: any): string => {
+    if (isInternalTransfer(paymentItem)) {
+      return internalTransferLabel.value;
+    }
+
+    return valueOrDash(paymentItem?.payment_system_name);
+  };
+
+  const displayType = (paymentItem: any): string => {
+    if (isInternalTransfer(paymentItem)) {
+      return internalTransferLabel.value;
+    }
+
+    return valueOrDash(paymentItem?.type);
   };
 
   const fetchPayment = async () => {
