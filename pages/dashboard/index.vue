@@ -1,14 +1,14 @@
 <template>
   <UiContainer>
     <div class="dashboard-page text-[var(--ui-text-main)]">
-      <div class="mb-6 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <UiTextH4 class="text-[var(--ui-text-main)]">
+      <div class="mb-6 flex w-full min-w-0 items-center justify-between gap-2">
+        <UiTextH4 class="min-w-0 flex-1 truncate text-[var(--ui-text-main)]">
           {{ t("cabinet.dashboard.title") }}
         </UiTextH4>
-        <div class="flex w-full items-center gap-2 sm:w-auto sm:ml-auto">
+        <div class="ml-2 flex shrink-0 items-center">
           <UiButtonDefault
             state="info--small"
-            class="!w-[36px]"
+            class="!w-[36px] shrink-0"
             @click="handleManualRefresh">
             <UiIconUpdate :spinning="isMt4Refreshing" />
           </UiButtonDefault>

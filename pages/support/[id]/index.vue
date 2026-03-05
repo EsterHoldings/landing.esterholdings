@@ -17,18 +17,14 @@
             'is-collapsed': !isSideExpanded,
             'is-mobile': isMobileViewport,
           }"
-          :style="supportSideStyle"
-          @touchstart="handleSidePanelTouchStart"
-          @touchmove="handleSidePanelTouchMove"
-          @touchend="handleSidePanelTouchEnd"
-          @touchcancel="handleSidePanelTouchEnd">
+          :style="supportSideStyle">
           <div
             v-if="isMobileViewport && isMobileFullscreenChat"
             class="support-side__mobile-header">
             <button
               type="button"
               class="support-side__mobile-arrow"
-              aria-label="Close details"
+              :aria-label="supportText.closeDetailsAria"
               @click="collapseSidePanel()">
               <UiIconChevronUp />
             </button>
@@ -38,17 +34,22 @@
             ref="supportSideScrollRef"
             class="support-side__scroll flex flex-col gap-4"
             :class="{ 'is-dragging': isSideScrollDragging }"
-            @mousedown="handleSideScrollMouseDown">
+            @mousedown="handleSideScrollMouseDown"
+            @wheel="handleSideScrollWheel"
+            @touchstart.passive="handleSideScrollTouchStart"
+            @touchmove="handleSideScrollTouchMove"
+            @touchend="handleSideScrollTouchEnd"
+            @touchcancel="handleSideScrollTouchEnd">
             <div
               class="support-side__expand"
-              :class="{ 'is-expanded': isSideExpanded }">
+              :class="{ 'is-expanded': isSideExpanded, 'is-top-collapsed': isSideTopCollapsed }">
               <div class="support-side__collapsible">
                 <div
                   ref="ticketMetaCardRef"
                   class="support-side__card support-side__ticket-meta">
                   <div class="support-side__meta-row">
                     <div class="support-side__meta-item support-side__meta-item--id">
-                      <span class="support-side__meta-label">Ticket</span>
+                      <span class="support-side__meta-label">{{ supportText.ticket }}</span>
                       <div
                         class="support-side__meta-value-wrap"
                         :class="{ 'is-open': activeMetaTooltip === 'id' }">
@@ -69,7 +70,7 @@
                       aria-hidden="true"></span>
 
                     <div class="support-side__meta-item support-side__meta-item--subject">
-                      <span class="support-side__meta-label">Subject</span>
+                      <span class="support-side__meta-label">{{ supportText.subject }}</span>
                       <div
                         class="support-side__meta-value-wrap support-side__meta-value-wrap--subject"
                         :class="{ 'is-open': activeMetaTooltip === 'subject' }">
@@ -87,8 +88,8 @@
                 </div>
 
                 <div class="support-side__card support-side__status-card">
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="text-xs uppercase tracking-wider text-[var(--ui-text-secondary)]">Status</div>
+                    <div class="flex items-center justify-between gap-3">
+                    <div class="text-xs uppercase tracking-wider text-[var(--ui-text-secondary)]">{{ supportText.status }}</div>
                     <div class="support-side__status-pill">
                       <span class="support-side__status-dot"></span>
                       <span class="text-sm font-semibold">{{ status }}</span>
@@ -105,9 +106,9 @@
                     :aria-expanded="isParticipantsPopoverOpen ? 'true' : 'false'"
                     @click="toggleParticipantsPopover">
                     <div class="support-side__participants-head">
-                      <div class="font-semibold">Participants</div>
+                      <div class="font-semibold">{{ supportText.participants }}</div>
                       <span class="text-xs text-[var(--ui-text-secondary)]">
-                        {{ onlineParticipantsCount }} online
+                        {{ onlineParticipantsCount }} {{ supportText.onlineCountSuffix }}
                       </span>
                     </div>
 
@@ -133,7 +134,7 @@
                       </div>
 
                       <span class="support-side__participants-summary-text">
-                        {{ totalParticipantsCount }} in chat
+                        {{ totalParticipantsCount }} {{ supportText.inChatSuffix }}
                       </span>
                     </div>
                   </button>
@@ -141,7 +142,7 @@
                   <div
                     v-if="isParticipantsPopoverOpen"
                     class="support-side__participants-popover">
-                    <div class="support-side__participants-popover-title">Participants details</div>
+                    <div class="support-side__participants-popover-title">{{ supportText.participantsDetails }}</div>
                     <div class="support-side__participants-list">
                       <div
                         v-for="person in participants"
@@ -159,7 +160,7 @@
                           <div class="min-w-0">
                             <div class="text-sm font-medium truncate">
                               {{ person.name }}
-                              <strong v-if="person.isYou">(You)</strong>
+                              <strong v-if="person.isYou">({{ supportText.you }})</strong>
                             </div>
                             <div class="text-xs text-[var(--ui-text-secondary)]">{{ person.role }}</div>
                           </div>
@@ -171,17 +172,18 @@
                               person.online ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'
                             " />
                           <span class="text-xs text-[var(--ui-text-secondary)]">
-                            {{ person.online ? "Online" : "Offline" }}
+                            {{ person.online ? supportText.online : supportText.offline }}
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
                 <div class="support-side__card support-side__library">
                   <div class="support-side__library-header">
-                    <div class="font-semibold">Shared Files</div>
+                    <div class="font-semibold">{{ supportText.sharedFiles }}</div>
                     <button
                       type="button"
                       class="support-side__refresh"
@@ -233,7 +235,7 @@
                       v-if="isLibraryLoading && activeTabItemsCount === 0"
                       class="support-side__library-loading">
                       <UiIconSpinnerDefault class="!h-4 !w-4 !text-[var(--ui-text-main)]" />
-                      <span>Loading {{ activeTabLabel.toLowerCase() }}...</span>
+                      <span>{{ supportText.loading }} {{ activeTabLabel.toLowerCase() }}...</span>
                     </div>
 
                     <div
@@ -245,28 +247,67 @@
                         type="button"
                         class="support-side__media"
                         @click="openLibraryMediaViewer(media.id)">
-                        <img
-                          v-if="media.kind === 'image'"
-                          :src="media.url"
-                          :alt="media.title"
-                          class="support-side__media-preview" />
-                        <div
-                          v-else
-                          class="support-side__video-preview">
+                        <div class="support-side__media-preview-wrap">
+                          <img
+                            v-if="media.kind === 'image'"
+                            :src="media.url"
+                            :alt="media.title"
+                            class="support-side__media-preview" />
                           <video
+                            v-else
                             :src="media.url"
                             muted
                             playsinline
                             preload="metadata"
                             class="support-side__media-preview"></video>
-                          <span class="support-side__video-badge">Video</span>
+                          <span class="support-side__media-kind-badge">
+                            <svg
+                              v-if="media.kind === 'image'"
+                              viewBox="0 0 24 24"
+                              class="h-3.5 w-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round">
+                              <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2" />
+                              <circle
+                                cx="8.5"
+                                cy="8.5"
+                                r="1.5" />
+                              <path d="M21 15l-5-5L5 21" />
+                            </svg>
+                            <svg
+                              v-else
+                              viewBox="0 0 24 24"
+                              class="h-3.5 w-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round">
+                              <rect
+                                x="2.75"
+                                y="4"
+                                width="14.5"
+                                height="16"
+                                rx="2" />
+                              <path d="m17 9 4-2.5v11L17 15z" />
+                            </svg>
+                            <span>{{ mediaTypeLabel(media.kind) }}</span>
+                          </span>
                         </div>
                         <span class="support-side__media-title">{{ media.title }}</span>
                       </button>
                       <div
                         v-if="!mediaItems.length"
                         class="support-side__links-empty">
-                        No media in this chat yet
+                        {{ supportText.emptyMedia }}
                       </div>
                     </div>
 
@@ -291,7 +332,7 @@
                       <div
                         v-else
                         class="support-side__links-empty">
-                        No documents in this chat yet
+                        {{ supportText.emptyDocuments }}
                       </div>
                     </div>
 
@@ -313,20 +354,19 @@
                       <div
                         v-else
                         class="support-side__links-empty">
-                        No links in this chat yet
+                        {{ supportText.emptyLinks }}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
             <button
               v-if="!isMobileViewport"
               class="support-side__toggle"
               :class="{ 'is-static': isSideExpanded }"
               @click="isSideExpanded = !isSideExpanded"
-              aria-label="Toggle details">
+              :aria-label="supportText.toggleDetailsAria">
               <UiIconChevronUp v-if="isSideExpanded" />
               <UiIconChevronDown v-else />
             </button>
@@ -362,7 +402,7 @@
         <button
           type="button"
           class="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-          aria-label="Close media viewer"
+          :aria-label="supportText.closeMediaViewerAria"
           @click="closeLibraryMediaViewer">
           ✕
         </button>
@@ -370,7 +410,7 @@
           v-if="mediaItems.length > 1"
           type="button"
           class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-          aria-label="Previous media"
+          :aria-label="supportText.previousMediaAria"
           @click="moveLibraryMediaViewer(-1)">
           ‹
         </button>
@@ -397,7 +437,7 @@
           v-if="mediaItems.length > 1"
           type="button"
           class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-          aria-label="Next media"
+          :aria-label="supportText.nextMediaAria"
           @click="moveLibraryMediaViewer(1)">
           ›
         </button>
@@ -427,7 +467,72 @@
 
   definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
 
-  const { t } = useI18n({ useScope: "global" });
+  const { t, locale } = useI18n({ useScope: "global" });
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+  const supportText = reactive({
+    ticket: "",
+    subject: "",
+    status: "",
+    participants: "",
+    participantsDetails: "",
+    onlineCountSuffix: "",
+    inChatSuffix: "",
+    online: "",
+    offline: "",
+    you: "",
+    sharedFiles: "",
+    media: "",
+    documents: "",
+    links: "",
+    library: "",
+    loading: "",
+    emptyMedia: "",
+    emptyDocuments: "",
+    emptyLinks: "",
+    roleAdmin: "",
+    roleClient: "",
+    closeDetailsAria: "",
+    toggleDetailsAria: "",
+    closeMediaViewerAria: "",
+    previousMediaAria: "",
+    nextMediaAria: "",
+    mediaPhoto: "",
+    mediaVideo: "",
+  });
+  const syncSupportText = () => {
+    supportText.ticket = resolveText("support.chat.ticket", "Ticket");
+    supportText.subject = resolveText("support.chat.subject", "Subject");
+    supportText.status = resolveText("support.chat.status", "Status");
+    supportText.participants = resolveText("support.chat.participants", "Participants");
+    supportText.participantsDetails = resolveText("support.chat.participantsDetails", "Participants details");
+    supportText.onlineCountSuffix = resolveText("support.chat.onlineCountSuffix", "online");
+    supportText.inChatSuffix = resolveText("support.chat.inChatSuffix", "in chat");
+    supportText.online = resolveText("support.chat.online", "Online");
+    supportText.offline = resolveText("support.chat.offline", "Offline");
+    supportText.you = resolveText("support.chat.you", "You");
+    supportText.sharedFiles = resolveText("support.chat.sharedFiles", "Shared Files");
+    supportText.media = resolveText("support.chat.media", "Media");
+    supportText.documents = resolveText("support.chat.documents", "Documents");
+    supportText.links = resolveText("support.chat.links", "Links");
+    supportText.library = resolveText("support.chat.library", "Library");
+    supportText.loading = resolveText("support.chat.loading", "Loading");
+    supportText.emptyMedia = resolveText("support.chat.emptyMedia", "No media in this chat yet");
+    supportText.emptyDocuments = resolveText("support.chat.emptyDocuments", "No documents in this chat yet");
+    supportText.emptyLinks = resolveText("support.chat.emptyLinks", "No links in this chat yet");
+    supportText.roleAdmin = resolveText("support.chat.roleAdmin", "Admin");
+    supportText.roleClient = resolveText("support.chat.roleClient", "Client");
+    supportText.closeDetailsAria = resolveText("support.chat.closeDetailsAria", "Close details");
+    supportText.toggleDetailsAria = resolveText("support.chat.toggleDetailsAria", "Toggle details");
+    supportText.closeMediaViewerAria = resolveText("support.chat.closeMediaViewerAria", "Close media viewer");
+    supportText.previousMediaAria = resolveText("support.chat.previousMediaAria", "Previous media");
+    supportText.nextMediaAria = resolveText("support.chat.nextMediaAria", "Next media");
+    supportText.mediaPhoto = resolveText("support.chat.photo", "Photo");
+    supportText.mediaVideo = resolveText("support.chat.video", "Video");
+  };
+  syncSupportText();
 
   const route = useRoute();
   const router = useRouter();
@@ -487,6 +592,7 @@
   const documentItems = ref<SupportDocumentItem[]>([]);
   const isSideScrollDragging = ref(false);
   const isSideExpanded = ref(false);
+  const isSideTopCollapsed = ref(false);
   const isMobileViewport = ref(false);
   const isMobileFullscreenChat = ref(true);
   const participantsCardRef = ref<HTMLElement | null>(null);
@@ -511,16 +617,19 @@
   const onlineParticipantsCount = computed(() => participants.value.filter(participant => participant.online).length);
   const totalParticipantsCount = computed(() => participants.value.length);
   const tabs = computed(() => [
-    { id: "media" as SupportTab, label: "Media", count: mediaItems.value.length },
-    { id: "documents" as SupportTab, label: "Documents", count: documentItems.value.length },
-    { id: "links" as SupportTab, label: "Links", count: linkItems.value.length },
+    { id: "media" as SupportTab, label: supportText.media, count: mediaItems.value.length },
+    { id: "documents" as SupportTab, label: supportText.documents, count: documentItems.value.length },
+    { id: "links" as SupportTab, label: supportText.links, count: linkItems.value.length },
   ]);
-  const activeTabLabel = computed(() => tabs.value.find(tab => tab.id === activeTab.value)?.label ?? "Library");
+  const activeTabLabel = computed(() => tabs.value.find(tab => tab.id === activeTab.value)?.label ?? supportText.library);
   const activeTabItemsCount = computed(() => {
     if (activeTab.value === "media") return mediaItems.value.length;
     if (activeTab.value === "documents") return documentItems.value.length;
     return linkItems.value.length;
   });
+  const mediaTypeLabel = (kind: SupportMediaItem["kind"]): string => {
+    return kind === "video" ? supportText.mediaVideo : supportText.mediaPhoto;
+  };
   const normalizeText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
   const firstUpper = (value: string): string => value.charAt(0).toUpperCase();
   const buildFullName = (firstName?: string | null, lastName?: string | null): string => {
@@ -552,7 +661,7 @@
     return normalized === "agent" ? "agent" : "customer";
   };
   const resolveParticipantRoleLabel = (roleKey: "agent" | "customer"): string => {
-    return roleKey === "agent" ? "Admin" : "Client";
+    return roleKey === "agent" ? supportText.roleAdmin : supportText.roleClient;
   };
   const isParticipantCurrentUser = (participantId: string): boolean => {
     const currentId = normalizeText(currentUser.id);
@@ -573,7 +682,7 @@
           normalizeText(raw.name) ||
           buildFullName(firstName, lastName) ||
           email ||
-          (roleKey === "agent" ? "Admin" : "Client");
+          (roleKey === "agent" ? supportText.roleAdmin : supportText.roleClient);
         const initials =
           normalizeText(raw.initials).toUpperCase() ||
           buildParticipantInitials(firstName, lastName, email, roleKey === "agent" ? "AD" : "CL");
@@ -669,6 +778,8 @@
   const MOBILE_PANEL_CLOSE_BOTTOM_THRESHOLD = 0.4;
   const MOBILE_PANEL_HORIZONTAL_DRIFT_LIMIT = 52;
   const MOBILE_PANEL_SNAP_MS = 280;
+  const SIDE_TOP_COLLAPSE_TRIGGER = 42;
+  const SIDE_TOP_HORIZONTAL_DRIFT_LIMIT = 56;
   const LIBRARY_VIEWER_SWIPE_THRESHOLD = 52;
   const LIBRARY_VIEWER_MAX_VERTICAL_DRIFT = 120;
   const LINKS_PAGE_SIZE = 50;
@@ -676,6 +787,11 @@
   const MESSAGE_URL_PATTERN = /\b((?:https?:\/\/|www\.)[^\s<>"'`]+)/gi;
   let sideScrollDragStartY = 0;
   let sideScrollStartTop = 0;
+  const sideScrollTouchStartY = ref<number | null>(null);
+  const sideScrollTouchStartX = ref<number | null>(null);
+  const sideScrollTouchDeltaY = ref(0);
+  const sideScrollTouchDeltaX = ref(0);
+  const sideScrollTouchFromTopSection = ref(false);
   const panelTouchStartY = ref<number | null>(null);
   const panelTouchStartX = ref<number | null>(null);
   const panelTouchDeltaY = ref(0);
@@ -797,6 +913,7 @@
     clearSidePanelCloseTimer();
     panelDragOffset.value = 0;
     isPanelDragging.value = false;
+    isSideTopCollapsed.value = false;
     isSideExpanded.value = true;
   };
 
@@ -807,6 +924,7 @@
       clearSidePanelCloseTimer();
       panelDragOffset.value = 0;
       isPanelDragging.value = false;
+      isSideTopCollapsed.value = false;
       isSideExpanded.value = true;
       return;
     }
@@ -849,6 +967,7 @@
     clearSidePanelCloseTimer();
     isPanelDragging.value = false;
     isSideExpanded.value = false;
+    isSideTopCollapsed.value = false;
     panelDragOffset.value = 0;
     closeMetaTooltip();
     resetSidePanelTouch();
@@ -1303,6 +1422,85 @@
       moveLibraryMediaViewer(1);
     }
   };
+  const isSideScrollAtTop = (): boolean => {
+    const el = supportSideScrollRef.value;
+    if (!el) return true;
+    return el.scrollTop <= 1;
+  };
+  const collapseSideTopSection = () => {
+    if (isSideTopCollapsed.value) return;
+    isSideTopCollapsed.value = true;
+    closeParticipantsPopover();
+    closeMetaTooltip();
+  };
+  const expandSideTopSection = () => {
+    if (!isSideTopCollapsed.value) return;
+    isSideTopCollapsed.value = false;
+  };
+  const resetSideScrollTouchGesture = () => {
+    sideScrollTouchStartY.value = null;
+    sideScrollTouchStartX.value = null;
+    sideScrollTouchDeltaY.value = 0;
+    sideScrollTouchDeltaX.value = 0;
+    sideScrollTouchFromTopSection.value = false;
+  };
+  const isTopSectionGestureTarget = (target: EventTarget | null): boolean => {
+    if (!(target instanceof Element)) return false;
+    return !!target.closest(".support-side__collapsible, .support-side__mobile-header");
+  };
+  const handleSideScrollWheel = (event: WheelEvent) => {
+    if (Math.abs(event.deltaY) < 8) return;
+    if (!isSideScrollAtTop()) return;
+
+    if (event.deltaY > 0 && !isSideTopCollapsed.value) {
+      collapseSideTopSection();
+      event.preventDefault();
+      return;
+    }
+
+    if (event.deltaY < 0 && isSideTopCollapsed.value) {
+      expandSideTopSection();
+      event.preventDefault();
+    }
+  };
+  const handleSideScrollTouchStart = (event: TouchEvent) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    sideScrollTouchStartY.value = touch.clientY;
+    sideScrollTouchStartX.value = touch.clientX;
+    sideScrollTouchDeltaY.value = 0;
+    sideScrollTouchDeltaX.value = 0;
+    sideScrollTouchFromTopSection.value = isTopSectionGestureTarget(event.target);
+  };
+  const handleSideScrollTouchMove = (event: TouchEvent) => {
+    if (sideScrollTouchStartY.value === null || sideScrollTouchStartX.value === null) return;
+    if (!sideScrollTouchFromTopSection.value) return;
+    const touch = event.touches?.[0];
+    if (!touch) return;
+
+    sideScrollTouchDeltaY.value = touch.clientY - sideScrollTouchStartY.value;
+    sideScrollTouchDeltaX.value = touch.clientX - sideScrollTouchStartX.value;
+    const verticalSwipe = Math.abs(sideScrollTouchDeltaY.value) > Math.abs(sideScrollTouchDeltaX.value);
+    const smallHorizontalDrift = Math.abs(sideScrollTouchDeltaX.value) <= SIDE_TOP_HORIZONTAL_DRIFT_LIMIT;
+    if (!verticalSwipe || !smallHorizontalDrift || !isSideScrollAtTop()) return;
+
+    const swipeUpDistance = Math.max(0, -sideScrollTouchDeltaY.value);
+    if (swipeUpDistance >= SIDE_TOP_COLLAPSE_TRIGGER && !isSideTopCollapsed.value) {
+      collapseSideTopSection();
+      resetSideScrollTouchGesture();
+      event.preventDefault();
+      return;
+    }
+
+    if (sideScrollTouchDeltaY.value >= SIDE_TOP_COLLAPSE_TRIGGER && isSideTopCollapsed.value) {
+      expandSideTopSection();
+      resetSideScrollTouchGesture();
+      event.preventDefault();
+    }
+  };
+  const handleSideScrollTouchEnd = () => {
+    resetSideScrollTouchGesture();
+  };
 
   const handleSideScrollMouseMove = (event: MouseEvent) => {
     if (!isSideScrollDragging.value) return;
@@ -1379,8 +1577,8 @@
         fallbackParticipants.push({
           id: currentParticipantId,
           role_key: "customer",
-          role: "Client",
-          name: normalizeText(currentUser.name) || "Client",
+          role: supportText.roleClient,
+          name: normalizeText(currentUser.name) || supportText.roleClient,
           first_name: currentUser.firstName,
           last_name: currentUser.lastName,
           email: currentUser.email,
@@ -1395,8 +1593,8 @@
         fallbackParticipants.push({
           id: creatorId,
           role_key: "agent",
-          role: "Admin",
-          name: creatorFullName || normalizeText(creatorEmail) || "Support Agent",
+          role: supportText.roleAdmin,
+          name: creatorFullName || normalizeText(creatorEmail) || supportText.roleAdmin,
           first_name: creatorFirstName,
           last_name: creatorLastName,
           email: creatorEmail,
@@ -1507,6 +1705,13 @@
   watch(activeTab, () => {
     if (activeTabItemsCount.value > 0 || isLibraryLoading.value) return;
     void loadLibraryFromChat();
+  });
+  watch(locale, () => {
+    syncSupportText();
+    participants.value = participants.value.map(participant => ({
+      ...participant,
+      role: resolveParticipantRoleLabel(participant.roleKey),
+    }));
   });
 
   watch(mediaItems, () => {
@@ -1790,6 +1995,13 @@
   .support-side__expand.is-expanded .support-side__collapsible {
     max-height: 1200px;
     opacity: 1;
+  }
+
+  .support-side__expand.is-top-collapsed .support-side__collapsible {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none;
   }
 
   @media (max-width: 767px) {
@@ -2376,21 +2588,25 @@
     flex: 1;
   }
 
-  .support-side__video-preview {
+  .support-side__media-preview-wrap {
     position: relative;
     display: flex;
     flex: 1;
   }
 
-  .support-side__video-badge {
+  .support-side__media-kind-badge {
     position: absolute;
     right: 6px;
     top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.6);
     color: #fff;
     font-size: 10px;
     padding: 2px 6px;
+    pointer-events: none;
   }
 
   .support-side__media-title {
