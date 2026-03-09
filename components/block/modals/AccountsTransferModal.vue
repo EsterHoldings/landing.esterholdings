@@ -356,21 +356,20 @@
         return;
       }
 
+      const sourceAccountId = normalizeId(fromAccount.value.id);
+      const destinationAccountId = normalizeId(selectedDestinationAccount.value.id);
+
+      await Promise.allSettled([
+        appCore.accounts.refreshBalance(sourceAccountId),
+        appCore.accounts.refreshBalance(destinationAccountId),
+      ]);
+
       useEventBus.emit("loadDataForAccounts");
       useEventBus.emit("dashboardRefresh");
 
-      const query: Record<string, string> = {
-        transferSuccess: "1",
-      };
-
-      const paymentId = String(payload.payment_id ?? "").trim();
-      if (paymentId !== "") {
-        query.transferPaymentId = paymentId;
-      }
-
       closeModal();
       toast.success(transferSuccessLabel.value);
-      await navigateTo(localePath({ path: "/payments", query }));
+      await navigateTo(localePath({ path: "/accounts" }));
     } catch (error: any) {
       toast.error(extractApiErrorMessage(error) ?? transferFailedLabel.value);
     } finally {
