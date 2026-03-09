@@ -539,6 +539,8 @@
   const VIEW_MODE_STORAGE_KEY = "accountsViewMode";
   const BALANCE_REFRESH_EVENT = "accountsBalanceRefreshRequested";
   const BALANCE_REFRESH_STORAGE_KEY = "accountsPendingBalanceRefreshIds";
+  const BALANCE_REFRESH_MAX_ATTEMPTS = 8;
+  const BALANCE_REFRESH_INTERVAL_MS = 1000;
 
   const toast = useToast();
 
@@ -696,6 +698,17 @@
     const parsed = Number.parseFloat(String(value).replace(",", "."));
     return Number.isFinite(parsed) ? parsed : null;
   };
+  const hasMeaningfulBalanceChange = (before: number | null, after: number | null): boolean => {
+    if (before === null || after === null) {
+      return before !== after;
+    }
+
+    return Math.abs(after - before) >= 0.005;
+  };
+  const delay = (ms: number) =>
+    new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
   const clearTimer = (timers: Map<string, ReturnType<typeof setTimeout>>, key: string) => {
     const timer = timers.get(key);
     if (timer !== undefined) {
@@ -756,7 +769,7 @@
   );
   const verificationLink = computed(() => localePath({ path: "/profile", query: { tab: "verification" } }));
 
-  const refreshAccountBalance = async (account: any) => {
+  const refreshAccountBalance = async (account: any, options: { suppressErrorToast?: boolean } = {}) => {
     const key = refreshKey(account.id);
     if (refreshingBalanceIds[key]) return;
 
@@ -784,9 +797,13 @@
         return;
       }
 
-      toast.error("Failed to refresh account balance.");
+      if (!options.suppressErrorToast) {
+        toast.error("Failed to refresh account balance.");
+      }
     } catch {
-      toast.error("Failed to refresh account balance.");
+      if (!options.suppressErrorToast) {
+        toast.error("Failed to refresh account balance.");
+      }
     } finally {
       refreshingBalanceIds[key] = false;
     }
@@ -889,14 +906,47 @@
     } catch {}
   };
 
+  const findAccountById = (id: string) => accounts.find(account => String(account?.id ?? "") === id);
+
+  const waitForAccountBalanceSettlement = async (id: string) => {
+    let baseline: number | null = null;
+    let baselineCaptured = false;
+
+    for (let attempt = 1; attempt <= BALANCE_REFRESH_MAX_ATTEMPTS; attempt++) {
+      const currentAccount = findAccountById(id);
+      if (!currentAccount) {
+        if (attempt < BALANCE_REFRESH_MAX_ATTEMPTS) {
+          await delay(BALANCE_REFRESH_INTERVAL_MS);
+        }
+        continue;
+      }
+
+      if (!baselineCaptured) {
+        baseline = normalizeBalanceValue(currentAccount.balance);
+        baselineCaptured = true;
+      }
+
+      await refreshAccountBalance(currentAccount, {
+        suppressErrorToast: attempt < BALANCE_REFRESH_MAX_ATTEMPTS,
+      });
+
+      const refreshedAccount = findAccountById(id);
+      const currentBalance = normalizeBalanceValue(refreshedAccount?.balance);
+      if (baselineCaptured && hasMeaningfulBalanceChange(baseline, currentBalance)) {
+        return;
+      }
+
+      if (attempt < BALANCE_REFRESH_MAX_ATTEMPTS) {
+        await delay(BALANCE_REFRESH_INTERVAL_MS);
+      }
+    }
+  };
+
   const refreshAccountRowsByIds = async (ids: string[]) => {
     if (ids.length === 0) return;
 
     await nextTick();
-    const relatedAccounts = accounts.filter(account => ids.includes(String(account?.id ?? "")));
-    if (relatedAccounts.length === 0) return;
-
-    await Promise.allSettled(relatedAccounts.map(account => refreshAccountBalance(account)));
+    await Promise.allSettled(ids.map(id => waitForAccountBalanceSettlement(id)));
   };
 
   const handleBalanceRefreshRequested = async (payload: any) => {

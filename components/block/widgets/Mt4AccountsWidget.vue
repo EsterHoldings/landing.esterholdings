@@ -299,6 +299,8 @@
   const VIEWPORT_OFFSET = 8;
   const FALLBACK_MENU_HEIGHT = 260;
   const BALANCE_REFRESH_EVENT = "accountsBalanceRefreshRequested";
+  const BALANCE_REFRESH_MAX_ATTEMPTS = 8;
+  const BALANCE_REFRESH_INTERVAL_MS = 1000;
 
   const activeMenuAccountId = ref<string | null>(null);
   const menuStyle = ref<Record<string, string>>({});
@@ -327,6 +329,11 @@
     const normalized = Number.parseFloat(String(value ?? "0").replace(",", "."));
     return Number.isFinite(normalized) ? normalized : 0;
   };
+  const hasMeaningfulBalanceChange = (before: number, after: number): boolean => Math.abs(after - before) >= 0.005;
+  const delay = (ms: number) =>
+    new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
 
   const emptyTitle = computed(() => resolveText("cabinet.dashboard.mt4.emptyTitle", "Счетов пока нет"));
   const emptySubtitle = computed(() =>
@@ -419,7 +426,7 @@
     return normalizeBalance(account.balance);
   };
 
-  const refreshAccountBalance = async (account: Mt4Account) => {
+  const refreshAccountBalance = async (account: Mt4Account, options: { suppressErrorToast?: boolean } = {}) => {
     const key = refreshKey(account.id);
     if (refreshingBalanceIds[key]) return;
 
@@ -445,9 +452,13 @@
         return;
       }
 
-      toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+      if (!options.suppressErrorToast) {
+        toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+      }
     } catch {
-      toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+      if (!options.suppressErrorToast) {
+        toast.error(resolveText("cabinet.accounts.refreshBalanceError", "Failed to refresh account balance."));
+      }
     } finally {
       refreshingBalanceIds[key] = false;
     }
@@ -459,6 +470,39 @@
     return [...new Set(normalized)];
   };
 
+  const findAccountById = (id: string): Mt4Account | null => {
+    const list = Array.isArray(props.accounts) ? props.accounts : [];
+    return list.find(account => normalizeAccountId(account.id) === id) ?? null;
+  };
+
+  const waitForAccountBalanceSettlement = async (id: string) => {
+    const account = findAccountById(id);
+    if (!account) return;
+
+    const baseline = getDisplayedBalanceValue(account);
+
+    for (let attempt = 1; attempt <= BALANCE_REFRESH_MAX_ATTEMPTS; attempt++) {
+      const currentAccount = findAccountById(id);
+      if (!currentAccount) return;
+
+      await refreshAccountBalance(currentAccount, {
+        suppressErrorToast: attempt < BALANCE_REFRESH_MAX_ATTEMPTS,
+      });
+
+      const refreshedAccount = findAccountById(id);
+      if (!refreshedAccount) return;
+
+      const currentBalance = getDisplayedBalanceValue(refreshedAccount);
+      if (hasMeaningfulBalanceChange(baseline, currentBalance)) {
+        return;
+      }
+
+      if (attempt < BALANCE_REFRESH_MAX_ATTEMPTS) {
+        await delay(BALANCE_REFRESH_INTERVAL_MS);
+      }
+    }
+  };
+
   const handleBalanceRefreshRequested = async (payload: any) => {
     const ids = normalizeRefreshPayloadIds(payload);
     if (ids.length === 0) return;
@@ -466,7 +510,8 @@
     const relatedAccounts = visibleAccounts.value.filter(account => ids.includes(normalizeAccountId(account.id)));
     if (relatedAccounts.length === 0) return;
 
-    await Promise.allSettled(relatedAccounts.map(account => refreshAccountBalance(account)));
+    const relatedIds = relatedAccounts.map(account => normalizeAccountId(account.id));
+    await Promise.allSettled(relatedIds.map(id => waitForAccountBalanceSettlement(id)));
   };
 
   const visibleAccounts = computed(() => {
