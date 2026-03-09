@@ -55,13 +55,13 @@
 
   const menuItems = computed(() => [
     { title: t("cabinet.menu.dashboard"), to: addCurrentLocaleToPath("dashboard"), icon: UiIconHome },
+    { title: t("cabinet.menu.accounts"), to: addCurrentLocaleToPath("accounts"), icon: UiIconUser },
     { title: t("cabinet.menu.billing"), to: addCurrentLocaleToPath("payments"), icon: UiIconPayment },
     {
       title: t("cabinet.menu.payment_details"),
       to: addCurrentLocaleToPath("payments/details"),
       icon: UiIconPaymentDetail,
     },
-    { title: t("cabinet.menu.accounts"), to: addCurrentLocaleToPath("accounts"), icon: UiIconUser },
     { title: t("cabinet.menu.referral_system"), to: addCurrentLocaleToPath("referrals"), icon: UiIconReferral },
   ]);
 

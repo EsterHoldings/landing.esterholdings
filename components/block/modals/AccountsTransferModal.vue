@@ -302,14 +302,24 @@
   };
 
   const extractApiErrorMessage = (error: any): string | null => {
+    const mt4ErrorSource = error?.response?.data?.errors?.mt4;
+    const mt4Error = Array.isArray(mt4ErrorSource)
+      ? String(mt4ErrorSource[0] ?? "").trim()
+      : String(mt4ErrorSource ?? "").trim();
+    if (mt4Error !== "") {
+      return mt4Error;
+    }
+
+    const firstValidationError = Object.values(error?.response?.data?.errors ?? {}).find(
+      (value: any) => Array.isArray(value) && String(value[0] ?? "").trim() !== ""
+    ) as any[] | undefined;
+    if (firstValidationError) {
+      return String(firstValidationError[0] ?? "").trim();
+    }
+
     const apiMessage = String(error?.response?.data?.message ?? "").trim();
     if (apiMessage !== "") {
       return apiMessage;
-    }
-
-    const mt4Error = String(error?.response?.data?.errors?.mt4 ?? "").trim();
-    if (mt4Error !== "") {
-      return mt4Error;
     }
 
     return null;
