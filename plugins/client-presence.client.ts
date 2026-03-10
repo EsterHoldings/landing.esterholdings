@@ -14,8 +14,19 @@ export default defineNuxtPlugin(() => {
   let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   let isMarkedOnline = false;
   let inFlight = false;
+  let supportModeResolved = false;
+  let supportMode: "simple" | "full" = "simple";
+  let supportModeResolvePromise: Promise<void> | null = null;
 
   const hasAccessToken = () => Boolean(String(authStore.accessToken ?? "").trim());
+
+  const normalizeSupportMode = (value: unknown): "simple" | "full" => {
+    return String(value ?? "simple")
+      .trim()
+      .toLowerCase() === "full"
+      ? "full"
+      : "simple";
+  };
 
   const isEligibleRoute = () => {
     const path = String(route.path ?? "");
@@ -24,12 +35,57 @@ export default defineNuxtPlugin(() => {
     return !path.includes("/auth/");
   };
 
+  const isFullSupportEnabled = () => supportMode === "full";
+
   const isTabActive = () => {
     if (typeof document === "undefined") return false;
     return document.visibilityState === "visible";
   };
 
-  const shouldBeOnline = () => hasAccessToken() && isEligibleRoute() && isTabActive();
+  const shouldBeOnline = () => hasAccessToken() && isFullSupportEnabled() && isEligibleRoute() && isTabActive();
+
+  const resolveSupportMode = async () => {
+    const storeSupportMode = authStore.user?.support_mode;
+    if (typeof storeSupportMode === "string") {
+      supportMode = normalizeSupportMode(storeSupportMode);
+      supportModeResolved = true;
+      return;
+    }
+
+    if (supportModeResolved) {
+      return;
+    }
+
+    if (!hasAccessToken()) {
+      supportMode = "simple";
+      supportModeResolved = true;
+      return;
+    }
+
+    if (supportModeResolvePromise) {
+      await supportModeResolvePromise;
+      return;
+    }
+
+    supportModeResolvePromise = (async () => {
+      try {
+        const response = await appCore.auth.getAuthUser();
+        if (response?.data) {
+          authStore.setUser(response.data);
+          supportMode = normalizeSupportMode(response.data?.support_mode);
+        } else {
+          supportMode = "simple";
+        }
+      } catch {
+        supportMode = "simple";
+      } finally {
+        supportModeResolved = true;
+        supportModeResolvePromise = null;
+      }
+    })();
+
+    await supportModeResolvePromise;
+  };
 
   const stopHeartbeat = () => {
     if (!heartbeatTimer) return;
@@ -86,6 +142,8 @@ export default defineNuxtPlugin(() => {
   };
 
   const syncPresenceState = async () => {
+    await resolveSupportMode();
+
     if (shouldBeOnline()) {
       await ensureOnline();
       return;
@@ -119,8 +177,19 @@ export default defineNuxtPlugin(() => {
   document.addEventListener("visibilitychange", handleVisibilityChange);
 
   watch(
-    () => [route.fullPath, authStore.accessToken] as const,
+    () => [route.fullPath, authStore.accessToken, authStore.user?.support_mode] as const,
     () => {
+      const storeSupportMode = authStore.user?.support_mode;
+      if (typeof storeSupportMode === "string") {
+        supportMode = normalizeSupportMode(storeSupportMode);
+        supportModeResolved = true;
+      } else if (!hasAccessToken()) {
+        supportMode = "simple";
+        supportModeResolved = true;
+      } else {
+        supportModeResolved = false;
+      }
+
       void syncPresenceState();
     },
     { immediate: true }

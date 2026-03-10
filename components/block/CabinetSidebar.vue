@@ -65,6 +65,7 @@
   const isOpen = ref(false);
   const isLoading = ref(false);
   const supportUnreadCount = ref(0);
+  const isFullSupportEnabled = ref(false);
   const activeSupportTicketId = ref("");
   const isSupportChatOpen = ref(false);
   const lastUnreadPreviewMessageId = ref("");
@@ -102,7 +103,43 @@
 
   const handleClickNotifications = () => (isOpen.value = !isOpen.value);
 
+  const resolveSupportMode = (value: unknown): "simple" | "full" => {
+    return String(value ?? "simple")
+      .trim()
+      .toLowerCase() === "full"
+      ? "full"
+      : "simple";
+  };
+
+  const resolveFullSupportEnabled = async (): Promise<boolean> => {
+    const storeMode = resolveSupportMode(authStore.user?.support_mode);
+    if (authStore.user) {
+      return storeMode === "full";
+    }
+
+    if (!String(authStore.accessToken ?? "").trim()) {
+      return false;
+    }
+
+    try {
+      const response = await appCore.auth.getAuthUser();
+      if (response?.data) {
+        authStore.setUser(response.data);
+        return resolveSupportMode(response.data?.support_mode) === "full";
+      }
+    } catch {
+      // noop
+    }
+
+    return false;
+  };
+
   const loadSupportUnreadCount = async () => {
+    if (!isFullSupportEnabled.value) {
+      supportUnreadCount.value = 0;
+      return;
+    }
+
     try {
       const response = await appCore.tickets.getUnreadSummary();
       const responseData = response?.data?.data ?? response?.data ?? {};
@@ -126,6 +163,7 @@
   };
 
   const startSupportBadgeRefresh = () => {
+    if (!isFullSupportEnabled.value) return;
     if (supportBadgeTimer) return;
 
     supportBadgeTimer = setInterval(() => {
@@ -141,6 +179,7 @@
   };
 
   const handleSupportUnreadUpdated = () => {
+    if (!isFullSupportEnabled.value) return;
     if (supportUnreadRafId !== null) return;
 
     supportUnreadRafId = window.requestAnimationFrame(() => {
@@ -269,6 +308,8 @@
   };
 
   const handleSupportMessageToast = (payload?: any) => {
+    if (!isFullSupportEnabled.value) return;
+
     const messagePayload = unwrapSupportMessagePayload(payload);
     const messageId = normalizeText(messagePayload?.id);
     if (messageId) {
@@ -362,6 +403,7 @@
   };
 
   const handleSupportGlobalMessage = (payload?: any) => {
+    if (!isFullSupportEnabled.value) return;
     handleSupportUnreadUpdated();
     handleSupportMessageToast(payload);
   };
@@ -393,6 +435,7 @@
   };
 
   const connectSupportRealtime = () => {
+    if (!isFullSupportEnabled.value) return;
     const echoClient = resolveEchoClient();
     if (!echoClient) return;
 
@@ -410,6 +453,7 @@
   };
 
   const bindSupportSocketStateListener = () => {
+    if (!isFullSupportEnabled.value) return;
     if (supportSocketStateHandler) return;
     const echoClient = resolveEchoClient();
     const connection = echoClient?.connector?.pusher?.connection;
@@ -451,6 +495,7 @@
   };
 
   const startSupportRealtimeRetry = () => {
+    if (!isFullSupportEnabled.value) return;
     if (supportRealtimeRetryTimer) return;
 
     supportRealtimeRetryTimer = setInterval(() => {
@@ -468,6 +513,7 @@
   };
 
   const handleSupportRealtimeResume = () => {
+    if (!isFullSupportEnabled.value) return;
     reconnectSupportSocketTransport();
     connectSupportRealtime();
   };
@@ -502,12 +548,21 @@
   };
 
   onMounted(async () => {
-    await loadSupportUnreadCount();
     const routeTicketId = getRouteSupportTicketId();
     activeSupportTicketId.value = routeTicketId;
     isSupportChatOpen.value = Boolean(routeTicketId);
-    useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
     useEventBus.on(SUPPORT_ACTIVE_TICKET_CHANGED_EVENT, handleSupportActiveTicketChanged);
+
+    isFullSupportEnabled.value = await resolveFullSupportEnabled();
+    if (!isFullSupportEnabled.value) {
+      supportUnreadCount.value = 0;
+      unreadSnapshotInitialized.value = false;
+      lastUnreadPreviewMessageId.value = "";
+      return;
+    }
+
+    useEventBus.on(SUPPORT_UNREAD_UPDATED_EVENT, handleSupportUnreadUpdated);
+    await loadSupportUnreadCount();
     startSupportBadgeRefresh();
     connectSupportRealtime();
     bindSupportSocketStateListener();

@@ -1459,6 +1459,12 @@
       "submit": "Send request",
       "createdSuccess": "Your request has been sent successfully.",
       "submitFailed": "Failed to send request. Please try again.",
+      "presignFailed": "Failed to prepare file upload.",
+      "uploadQueued": "Queued",
+      "uploading": "Uploading",
+      "uploaded": "Uploaded",
+      "uploadFailed": "Upload failed",
+      "retryUpload": "Retry upload",
       "linkPrompt": "Insert link URL",
       "tools": {
         "bold": "Bold",
@@ -1474,6 +1480,8 @@
         "subjectRequired": "Subject is required.",
         "subjectMax": "Subject must be 200 characters or less.",
         "messageRequired": "Message or files are required.",
+        "waitUploads": "Please wait until all files finish uploading.",
+        "failedUploads": "Some files failed to upload. Remove or retry them first.",
         "maxFiles": "You can attach up to {max} files.",
         "fileTooLarge": "File is larger than 200 MB:"
       }

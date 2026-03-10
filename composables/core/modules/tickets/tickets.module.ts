@@ -23,6 +23,10 @@ export class TicketsModule implements BasicModuleInterface {
     return await this.ticketsService.getTicketMessages(id, payload);
   }
 
+  async presignSupportAttachment(payload: any = {}): Promise<any> {
+    return await this.ticketsService.presignSupportAttachment(payload);
+  }
+
   async presignTicketAttachment(id: string, payload: any = {}): Promise<any> {
     return await this.ticketsService.presignTicketAttachment(id, payload);
   }
