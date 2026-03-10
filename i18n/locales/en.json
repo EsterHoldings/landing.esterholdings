@@ -1447,7 +1447,7 @@
       "title": "Contact support",
       "subtitle": "Send a request by email and our team will reply to the address you provide.",
       "replyEmailLabel": "Reply email",
-      "replyEmailPlaceholder": "name@example.com",
+      "replyEmailPlaceholder": "name{'@'}example.com",
       "subjectLabel": "Subject",
       "subjectPlaceholder": "Briefly describe your request",
       "messageLabel": "Message",

@@ -1451,7 +1451,7 @@
       "title": "Обращение в поддержку",
       "subtitle": "Отправьте обращение по email, и мы ответим на указанный адрес.",
       "replyEmailLabel": "Email для ответа",
-      "replyEmailPlaceholder": "name@example.com",
+      "replyEmailPlaceholder": "name{'@'}example.com",
       "subjectLabel": "Тема",
       "subjectPlaceholder": "Кратко опишите вопрос",
       "messageLabel": "Текст обращения",
