@@ -1,8 +1,10 @@
 <script setup lang="ts">
+  import type Echo from "laravel-echo";
   import { useRoute } from "vue-router";
-  import { navigateTo } from "nuxt/app";
-  import { computed, reactive, ref, onMounted, onUnmounted } from "vue";
+  import { navigateTo, useNuxtApp } from "nuxt/app";
+  import { computed, ref, onMounted, onUnmounted, watch } from "vue";
   import { useI18n } from "vue-i18n";
+  import useAppCore from "~/composables/useAppCore";
 
   import { useThemeStore } from "~/stores/themeStore.js";
   import { useAuthStore } from "~/stores/authStore";
@@ -19,7 +21,6 @@
   import UiIconUser from "~/components/ui/UiIconUser.vue";
   import UiSpacer from "~/components/ui/UiSpacer.vue";
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
-  import UiIconSuccess from "~/components/ui/UiIconSuccess.vue";
   import UiIconSuccessFull from "~/components/ui/UiIconSuccessFull.vue";
   import UiIconWarningFull from "~/components/ui/UiIconWarningFull.vue";
   import UiIconDangerFull from "~/components/ui/UiIconDangerFull.vue";
@@ -35,6 +36,18 @@
     to?: string;
     icon?: any;
   };
+  type NotificationTone = "info" | "success" | "warning" | "danger";
+  type CabinetNotification = {
+    id: string;
+    type: string;
+    title: string;
+    message: string;
+    payload: Record<string, any> | null;
+    wasRead: boolean;
+    createdAt: string | null;
+    route: string | null;
+    tone: NotificationTone;
+  };
 
   const props = withDefaults(
     defineProps<{
@@ -48,6 +61,8 @@
   );
 
   const authStore = useAuthStore();
+  const appCore = useAppCore();
+  const { $echo } = useNuxtApp() as { $echo?: Echo<any> };
   const uiStore = useUiStore();
   const themeStore = useThemeStore();
   const { t, locale } = useI18n({ useScope: "global" });
@@ -59,28 +74,16 @@
       uiStore.notificationsOpen = value;
     },
   });
-  const isLoading = ref(false);
-  const notificationsRef = ref(null);
-  const notifications = reactive([
-    { type: "info", title: "Email verification was sent!", message: "Please check your mail account!", wasRead: false },
-    { type: "warning", title: "Пройдите верификацию!", message: "Вам необходимо пройти верификацию!", wasRead: false },
-    { type: "success", title: "Фото профиля!", message: "Вы успешно верифицировали фото профиля!", wasRead: false },
-    {
-      type: "danger",
-      title: "Отказ в верификации =(",
-      message: "К сожалению вы не прошли верификацию документов!",
-      wasRead: true,
-    },
-    {
-      type: "info",
-      title: "Вход с нового устройства!",
-      message: "New login detected from Chrome, London.",
-      wasRead: true,
-    },
-    { type: "info", title: "Добро пожаловать!", message: "Приветствую вас! - John Connor", wasRead: true },
-  ]);
 
-  if (!authStore.user) authStore.initAuth();
+  const isLoading = ref(false);
+  const notificationsRef = ref<any>(null);
+  const notifications = ref<CabinetNotification[]>([]);
+  const unreadCount = ref(0);
+  const notificationsLoaded = ref(false);
+  const activeNotificationsChannel = ref<any>(null);
+  const currentNotificationsChannelName = ref("");
+  const isMarkAllInProgress = ref(false);
+  const unreadBadgeLabel = computed(() => (unreadCount.value > 99 ? "99+" : String(unreadCount.value)));
 
   const handleClickLogout = () => {
     authStore.setAccessToken("");
@@ -113,12 +116,271 @@
     }
   };
 
+  const resolveEchoClient = () => {
+    if ($echo && typeof ($echo as any).private === "function") {
+      return $echo as any;
+    }
+
+    if (typeof window !== "undefined") {
+      const fallbackEcho = (window as any).Echo;
+      if (fallbackEcho && typeof fallbackEcho.private === "function") {
+        return fallbackEcho;
+      }
+    }
+
+    return null;
+  };
+
+  const resolveNotificationTone = (raw: any): NotificationTone => {
+    const source = `${raw?.type ?? ""} ${raw?.title ?? ""} ${raw?.message ?? ""}`.toLowerCase();
+    if (source.includes("success")) return "success";
+    if (source.includes("warning")) return "warning";
+    if (source.includes("error") || source.includes("danger") || source.includes("failed")) return "danger";
+    return "info";
+  };
+
+  const normalizeNotification = (raw: any): CabinetNotification | null => {
+    const id = String(raw?.id ?? "").trim();
+    if (id === "") return null;
+
+    const readAt = raw?.read_at ? String(raw.read_at) : null;
+    const isUnread = raw?.is_unread ?? raw?.unread ?? readAt === null;
+    const payload = raw?.payload && typeof raw.payload === "object" ? raw.payload : null;
+    const message = String(raw?.message ?? "").trim();
+    const title = String(raw?.title ?? "").trim();
+
+    return {
+      id,
+      type: String(raw?.type ?? "system"),
+      title: title !== "" ? title : t("cabinet.header.notifications"),
+      message: message !== "" ? message : t("cabinet.header.emptyNotifications"),
+      payload,
+      wasRead: !isUnread,
+      createdAt: raw?.created_at ? String(raw.created_at) : null,
+      route: typeof payload?.route === "string" && payload.route.trim() !== "" ? payload.route.trim() : null,
+      tone: resolveNotificationTone(raw),
+    };
+  };
+
+  const upsertNotification = (notification: CabinetNotification, prepend = true) => {
+    const idx = notifications.value.findIndex(item => item.id === notification.id);
+    if (idx === -1) {
+      if (prepend) {
+        notifications.value.unshift(notification);
+      } else {
+        notifications.value.push(notification);
+      }
+      return;
+    }
+
+    notifications.value.splice(idx, 1, notification);
+  };
+
+  const setAllLocalRead = () => {
+    notifications.value = notifications.value.map(item => ({
+      ...item,
+      wasRead: true,
+    }));
+    unreadCount.value = 0;
+  };
+
+  const loadNotifications = async () => {
+    isLoading.value = true;
+    try {
+      const response = await appCore.notifications.get({ page: 1, perPage: 30 });
+      const payload = response?.data?.data ?? {};
+      const incomingItems = Array.isArray(payload?.data) ? payload.data : [];
+
+      notifications.value = incomingItems
+        .map(normalizeNotification)
+        .filter((item: CabinetNotification | null): item is CabinetNotification => Boolean(item));
+
+      const unreadFromApi = Number(payload?.unread_count ?? NaN);
+      unreadCount.value = Number.isFinite(unreadFromApi)
+        ? unreadFromApi
+        : notifications.value.filter(item => !item.wasRead).length;
+      notificationsLoaded.value = true;
+    } catch (error) {
+      notificationsLoaded.value = false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const loadUnreadSummary = async () => {
+    try {
+      const response = await appCore.notifications.getUnreadSummary();
+      const unread = Number(response?.data?.data?.unread_count ?? NaN);
+      unreadCount.value = Number.isFinite(unread) ? unread : 0;
+    } catch (error) {
+      unreadCount.value = 0;
+    }
+  };
+
+  const markAllRead = async () => {
+    if (isMarkAllInProgress.value) return;
+    if (unreadCount.value <= 0) return;
+
+    isMarkAllInProgress.value = true;
+    const snapshot = [...notifications.value];
+    setAllLocalRead();
+
+    try {
+      const response = await appCore.notifications.markAllRead();
+      const unread = Number(response?.data?.data?.unread_count ?? NaN);
+      if (Number.isFinite(unread)) {
+        unreadCount.value = unread;
+      }
+    } catch (error) {
+      notifications.value = snapshot;
+      unreadCount.value = notifications.value.filter(item => !item.wasRead).length;
+    } finally {
+      isMarkAllInProgress.value = false;
+    }
+  };
+
+  const markNotificationRead = async (notificationId: string, syncWithApi = true) => {
+    const index = notifications.value.findIndex(item => item.id === notificationId);
+    if (index === -1 || notifications.value[index].wasRead) return;
+
+    const prevItem = notifications.value[index];
+    notifications.value.splice(index, 1, { ...prevItem, wasRead: true });
+    unreadCount.value = Math.max(0, unreadCount.value - 1);
+
+    if (!syncWithApi) return;
+
+    try {
+      const response = await appCore.notifications.markRead(notificationId);
+      const unread = Number(response?.data?.data?.unread_count ?? NaN);
+      if (Number.isFinite(unread)) {
+        unreadCount.value = unread;
+      }
+    } catch (error) {
+      notifications.value.splice(index, 1, prevItem);
+      unreadCount.value += 1;
+    }
+  };
+
+  const handleNotificationActionClick = async (notification: CabinetNotification, event?: MouseEvent) => {
+    event?.stopPropagation();
+    await markNotificationRead(notification.id, true);
+  };
+
+  const handleNotificationClick = async (notification: CabinetNotification) => {
+    if (!notification.wasRead) {
+      await markNotificationRead(notification.id, true);
+    }
+
+    if (!notification.route) return;
+    uiStore.closeNotifications();
+    await navigateTo(addCurrentLocaleToPath(notification.route.replace(/^\/+/, "")));
+  };
+
+  const subscribeToNotifications = (userId: string) => {
+    const normalizedUserId = String(userId || "").trim();
+    if (normalizedUserId === "") return;
+
+    const channelName = `notifications.user.${normalizedUserId}`;
+    if (currentNotificationsChannelName.value === channelName && activeNotificationsChannel.value) {
+      return;
+    }
+
+    unsubscribeFromNotifications();
+    const echoClient = resolveEchoClient();
+    if (!echoClient) return;
+
+    currentNotificationsChannelName.value = channelName;
+    activeNotificationsChannel.value = echoClient.private(channelName);
+    activeNotificationsChannel.value.listen(".UserNotificationCreated", async (payload: any) => {
+      const normalized = normalizeNotification(payload?.notification ?? null);
+      if (!normalized) return;
+
+      const previous = notifications.value.find(item => item.id === normalized.id) ?? null;
+      upsertNotification(normalized, true);
+      if (!normalized.wasRead && (!previous || previous.wasRead)) {
+        unreadCount.value += 1;
+      }
+
+      if (isOpen.value) {
+        await markNotificationRead(normalized.id, true);
+      }
+    });
+  };
+
+  const unsubscribeFromNotifications = () => {
+    const channelName = currentNotificationsChannelName.value;
+    currentNotificationsChannelName.value = "";
+    activeNotificationsChannel.value = null;
+
+    if (channelName === "") return;
+    const echoClient = resolveEchoClient();
+    if (!echoClient) return;
+
+    try {
+      echoClient.leave(channelName);
+    } catch (error) {
+      // no-op
+    }
+  };
+
+  const formatNotificationTime = (value: string | null): string => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    return new Intl.DateTimeFormat(locale.value, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  watch(
+    () => isOpen.value,
+    async (opened) => {
+      if (!opened) return;
+
+      if (!notificationsLoaded.value) {
+        await loadNotifications();
+      }
+
+      if (unreadCount.value > 0) {
+        await markAllRead();
+      }
+    }
+  );
+
+  watch(
+    () => authStore.user?.id,
+    (userId) => {
+      const normalized = String(userId || "").trim();
+      if (normalized === "") {
+        unsubscribeFromNotifications();
+        return;
+      }
+
+      subscribeToNotifications(normalized);
+    }
+  );
+
   onMounted(() => {
     document.addEventListener("click", handleClickOutside);
+    authStore.initAuth()
+      .finally(async () => {
+        await loadUnreadSummary();
+        await loadNotifications();
+        const userId = String(authStore.user?.id ?? "").trim();
+        if (userId !== "") {
+          subscribeToNotifications(userId);
+        }
+      });
   });
 
   onUnmounted(() => {
     document.removeEventListener("click", handleClickOutside);
+    unsubscribeFromNotifications();
   });
 </script>
 
@@ -155,8 +417,9 @@
           :aria-label="t('cabinet.header.notifications')">
           <UiIconBell />
           <span
+            v-if="unreadCount > 0"
             class="absolute -top-2 -right-2 h-5 w-5 text-[10px] font-bold rounded-full bg-[var(--color-warning)] text-[var(--ui-text-main)] flex items-center justify-center"
-            >4</span
+            >{{ unreadBadgeLabel }}</span
           >
         </button>
 
@@ -168,6 +431,7 @@
             <div>
               <UiTextSmall
                 state="info--outline--small"
+                @click="markAllRead"
                 class="cursor-pointer"
                 >{{ t("cabinet.header.markAllRead") }}</UiTextSmall
               >
@@ -179,33 +443,40 @@
           <div class="p-3 sm:p-4 lg:p-5 overflow-y-auto flex-1">
             <div
               v-for="notification in notifications"
-              :key="notification.message"
+              :key="notification.id"
               :class="[
-                'relative mb-2.5 p-2 sm:p-3 rounded-xl bg-[var(--color-stroke-ui-light)] border border-[var(--color-stroke-ui-light)]',
-                notification.type === 'info' ? 'text-[var(--ui-text-main)]' : '',
-                notification.type === 'success' ? 'text-[var(--color-success)]' : '',
-                notification.type === 'warning' ? 'text-[var(--color-warning)]' : '',
-                notification.type === 'danger' ? 'text-[var(--color-danger)]' : '',
+                'relative mb-2.5 p-2 sm:p-3 rounded-xl bg-[var(--color-stroke-ui-light)] border border-[var(--color-stroke-ui-light)] cursor-pointer',
+                notification.tone === 'info' ? 'text-[var(--ui-text-main)]' : '',
+                notification.tone === 'success' ? 'text-[var(--color-success)]' : '',
+                notification.tone === 'warning' ? 'text-[var(--color-warning)]' : '',
+                notification.tone === 'danger' ? 'text-[var(--color-danger)]' : '',
                 notification.wasRead ? 'opacity-30 hover:opacity-100' : '',
-              ]">
+              ]"
+              @click="handleNotificationClick(notification)">
               <UiIconSuccessFull
-                v-if="notification.type === 'success'"
+                v-if="notification.tone === 'success'"
                 class="absolute top-2 left-2 sm:top-3 sm:left-3" />
               <UiIconWarningFull
-                v-if="notification.type === 'warning'"
+                v-if="notification.tone === 'warning'"
                 class="absolute top-2 left-2 sm:top-3 sm:left-3" />
               <UiIconDangerFull
-                v-if="notification.type === 'danger'"
+                v-if="notification.tone === 'danger'"
                 class="absolute top-2 left-2 sm:top-3 sm:left-3" />
               <UiIconInfoFull
-                v-if="notification.type === 'info'"
+                v-if="notification.tone === 'info'"
                 class="absolute top-2 left-2 sm:top-3 sm:left-3" />
               <div class="ml-8 sm:ml-10">
                 <div>{{ notification.title }}</div>
                 <div>{{ notification.message }}</div>
-                <div></div>
+                <div
+                  v-if="notification.createdAt"
+                  class="text-[11px] opacity-60 mt-1">
+                  {{ formatNotificationTime(notification.createdAt) }}
+                </div>
               </div>
-              <UiIconDelete class="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-50 hover:opacity-100" />
+              <UiIconDelete
+                class="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-50 hover:opacity-100"
+                @click="handleNotificationActionClick(notification, $event)" />
             </div>
 
             <div

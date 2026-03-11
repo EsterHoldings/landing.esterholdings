@@ -20,6 +20,7 @@ import MessagesModule from "~/composables/core/modules/messages/messages.module"
 import LocationsModule from "~/composables/core/modules/locations/locations.module";
 import TicketsPresenceModule from "~/composables/core/modules/ticketsPresence/ticketsPresence.module";
 import ClientPresenceModule from "~/composables/core/modules/clientPresence/clientPresence.module";
+import NotificationsModule from "~/composables/core/modules/notifications/notifications.module";
 
 export interface ICoreModules {
   accounts: AccountsModule;
@@ -41,6 +42,7 @@ export interface ICoreModules {
   ticketsPresence: TicketsPresenceModule;
   clientPresence: ClientPresenceModule;
   messages: MessagesModule;
+  notifications: NotificationsModule;
   locations: LocationsModule;
   verifications: VerificationsModule;
   news: NewsModule;
@@ -67,6 +69,7 @@ export const useAppCore = (): ICoreModules => {
     ticketsPresence: new TicketsPresenceModule(),
     clientPresence: new ClientPresenceModule(),
     messages: new MessagesModule(),
+    notifications: new NotificationsModule(),
     locations: new LocationsModule(),
     users: new UsersModule(),
     verifications: new VerificationsModule(),
