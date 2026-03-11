@@ -502,7 +502,9 @@
     supportRealtimeRetryTimer = setInterval(() => {
       if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
       reconnectSupportSocketTransport();
+      bindSupportSocketStateListener();
       connectSupportRealtime();
+      loadSupportUnreadCount().catch(() => {});
     }, SUPPORT_REALTIME_RETRY_MS);
   };
 
@@ -516,7 +518,9 @@
   const handleSupportRealtimeResume = () => {
     if (!isFullSupportEnabled.value) return;
     reconnectSupportSocketTransport();
+    bindSupportSocketStateListener();
     connectSupportRealtime();
+    loadSupportUnreadCount().catch(() => {});
   };
 
   const handleSupportVisibilityChange = () => {
@@ -561,6 +565,7 @@
       bindSupportSocketStateListener();
       attachSupportResumeListeners();
       startSupportRealtimeRetry();
+      handleSupportRealtimeResume();
       supportRealtimeInitialized = true;
     } finally {
       supportRealtimeInitInFlight = false;
