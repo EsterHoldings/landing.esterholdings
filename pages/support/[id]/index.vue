@@ -400,6 +400,7 @@
             :as-block="true"
             :ticket-id="id"
             :currentUser="currentUser"
+            :counterparty-online="counterpartyOnline"
             :mobile-controls="isMobileViewport && isMobileFullscreenChat"
             :mobile-panel-expanded="isSideExpanded"
             @mobile-back="handleMobileBack"
@@ -638,6 +639,9 @@
   );
   const onlineParticipantsCount = computed(() => participants.value.filter(participant => participant.online).length);
   const totalParticipantsCount = computed(() => participants.value.length);
+  const counterpartyOnline = computed(() =>
+    participants.value.some(participant => participant.roleKey === "agent" && participant.online)
+  );
   const tabs = computed(() => [
     { id: "media" as SupportTab, label: supportText.media, count: mediaItems.value.length },
     { id: "documents" as SupportTab, label: supportText.documents, count: documentItems.value.length },

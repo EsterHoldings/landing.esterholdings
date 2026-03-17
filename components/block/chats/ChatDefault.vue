@@ -35,8 +35,8 @@
           <div class="flex items-center gap-2 text-sm text-[var(--ui-text-secondary)]">
             <span
               class="inline-flex h-2.5 w-2.5 rounded-full"
-              :class="isCounterpartyOnline ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'" />
-            <span>{{ isCounterpartyOnline ? chatText.online : chatText.offline }}</span>
+              :class="effectiveCounterpartyOnline ? 'bg-[var(--ui-sticker-success)]' : 'bg-[var(--ui-text-secondary)]'" />
+            <span>{{ effectiveCounterpartyOnline ? chatText.online : chatText.offline }}</span>
             <span
               v-if="isCounterpartyTyping"
               class="text-[var(--ui-primary-accent)]">
@@ -1322,11 +1322,13 @@
       asBlock?: boolean;
       ticketId: string;
       currentUser: ChatCurrentUser;
+      counterpartyOnline?: boolean | null;
       mobileControls?: boolean;
       mobilePanelExpanded?: boolean;
     }>(),
     {
       asBlock: false,
+      counterpartyOnline: null,
       mobileControls: false,
       mobilePanelExpanded: false,
     }
@@ -3210,20 +3212,64 @@
     actorParticipantId: null,
   });
 
+  const isCurrentPresenceUserId = (value: unknown): boolean => {
+    const normalized = normalizeUserId(value);
+    if (!normalized) return false;
+    if (isCurrentUserId(normalized)) return true;
+    return normalized === normalizeUserId(presenceState.actorParticipantId);
+  };
+
   const isCounterpartyOnline = computed(() => {
+    const participants = Array.isArray(presenceState.participants) ? presenceState.participants : [];
+
+    const participantAgentOnline = participants.some((participant: any) => {
+      if (!participant || typeof participant !== "object") return false;
+      const roleKey = normalizeText(participant.role_key).toLowerCase();
+      return roleKey === "agent" && Boolean(participant.online);
+    });
+
+    if (participantAgentOnline) {
+      return true;
+    }
+
+    if (presenceState.onlineAdmins.length > 0) {
+      return true;
+    }
+
     if (onlineMap.size === 0) return false;
     for (const u of Array.from(onlineMap.values())) {
-      if (!isCurrentUserId(u.id)) {
+      if (!isCurrentPresenceUserId(u.id)) {
         return true;
       }
     }
     return false;
   });
 
+  const hasLivePresenceState = computed(() => {
+    return (
+      presenceState.participants.length > 0 ||
+      presenceState.onlineAdmins.length > 0 ||
+      Boolean(presenceState.onlineClient) ||
+      onlineMap.size > 0
+    );
+  });
+
+  const effectiveCounterpartyOnline = computed(() => {
+    if (hasLivePresenceState.value) {
+      return isCounterpartyOnline.value;
+    }
+
+    if (typeof props.counterpartyOnline === "boolean") {
+      return props.counterpartyOnline;
+    }
+
+    return isCounterpartyOnline.value;
+  });
+
   const emitSupportPresencePayload = () => {
     useEventBus.emit(SUPPORT_PRESENCE_UPDATED_EVENT, {
       ticketId: props.ticketId,
-      counterparty_online: isCounterpartyOnline.value,
+      counterparty_online: effectiveCounterpartyOnline.value,
       online_admins: [...presenceState.onlineAdmins],
       online_client: presenceState.onlineClient ? { ...presenceState.onlineClient } : null,
       participants: [...presenceState.participants],
@@ -3247,7 +3293,7 @@
     onlineMap.clear();
     if (onlineAdmins.length) {
       onlineAdmins.forEach((u: any) => {
-        const id = normalizeUserId(u?.id);
+        const id = normalizeUserId(u?.participant_user_id) || normalizeUserId(u?.id);
         if (!id) return;
 
         onlineMap.set(id, {
@@ -3277,7 +3323,17 @@
     if (!echoClient) {
       return;
     }
-    presenceChan = echoClient.private(`support.ticket.${ticketId}`).listen(".ticket.presence.updated", (payload: any) => {
+    presenceChan = echoClient.private(`support.ticket.${ticketId}`);
+    presenceChan.listen(".ticket.presence.updated", (payload: any) => {
+      applyPresencePayload(payload);
+    });
+    presenceChan.listen("ticket.presence.updated", (payload: any) => {
+      applyPresencePayload(payload);
+    });
+    presenceChan.listen(".App\\Events\\TicketPresenceUpdated", (payload: any) => {
+      applyPresencePayload(payload);
+    });
+    presenceChan.listen("App\\Events\\TicketPresenceUpdated", (payload: any) => {
       applyPresencePayload(payload);
     });
   }
