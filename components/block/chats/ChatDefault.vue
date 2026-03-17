@@ -3219,12 +3219,19 @@
     return normalized === normalizeUserId(presenceState.actorParticipantId);
   };
 
+  const normalizePresenceParticipantRoleKey = (participant: any): string => {
+    const normalizedRole = normalizeText(participant?.role_key ?? participant?.roleKey ?? participant?.role).toLowerCase();
+    if (normalizedRole === "admin" || normalizedRole === "agent") return "agent";
+    if (normalizedRole === "client" || normalizedRole === "customer") return "customer";
+    return normalizedRole;
+  };
+
   const isCounterpartyOnline = computed(() => {
     const participants = Array.isArray(presenceState.participants) ? presenceState.participants : [];
 
     const participantAgentOnline = participants.some((participant: any) => {
       if (!participant || typeof participant !== "object") return false;
-      const roleKey = normalizeText(participant.role_key).toLowerCase();
+      const roleKey = normalizePresenceParticipantRoleKey(participant);
       return roleKey === "agent" && Boolean(participant.online);
     });
 
@@ -3255,12 +3262,14 @@
   });
 
   const effectiveCounterpartyOnline = computed(() => {
+    const propCounterpartyOnline = typeof props.counterpartyOnline === "boolean" ? props.counterpartyOnline : null;
+
     if (hasLivePresenceState.value) {
       return isCounterpartyOnline.value;
     }
 
-    if (typeof props.counterpartyOnline === "boolean") {
-      return props.counterpartyOnline;
+    if (propCounterpartyOnline !== null) {
+      return propCounterpartyOnline;
     }
 
     return isCounterpartyOnline.value;

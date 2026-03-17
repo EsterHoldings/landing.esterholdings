@@ -473,7 +473,7 @@
 
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
-  import { definePageMeta, useAuthStore, useHead } from "~/.nuxt/imports";
+  import { definePageMeta, useAuthStore, useHead, useNuxtApp } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
   import { useRoute, useRouter } from "vue-router";
@@ -559,6 +559,7 @@
 
   const route = useRoute();
   const router = useRouter();
+  const { $echo } = useNuxtApp() as { $echo?: any };
 
   const appCore = useAppCore();
   const SUPPORT_PRESENCE_UPDATED_EVENT = "support-presence-updated";
@@ -642,6 +643,8 @@
   const counterpartyOnline = computed(() =>
     participants.value.some(participant => participant.roleKey === "agent" && participant.online)
   );
+  let participantsPresencePollTimer: ReturnType<typeof setInterval> | null = null;
+  let supportTicketChannel: any = null;
   const tabs = computed(() => [
     { id: "media" as SupportTab, label: supportText.media, count: mediaItems.value.length },
     { id: "documents" as SupportTab, label: supportText.documents, count: documentItems.value.length },
@@ -1740,6 +1743,20 @@
     }
   };
 
+  const stopParticipantsPresencePoll = () => {
+    if (!participantsPresencePollTimer) return;
+    clearInterval(participantsPresencePollTimer);
+    participantsPresencePollTimer = null;
+  };
+
+  const startParticipantsPresencePoll = () => {
+    stopParticipantsPresencePoll();
+    participantsPresencePollTimer = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+      void refreshParticipantsFromTicket();
+    }, 5000);
+  };
+
   const handleSupportPresenceUpdated = (payload?: any) => {
     if (!payload || typeof payload !== "object") return;
 
@@ -1757,6 +1774,48 @@
     }
 
     updateParticipantsOnlineFromPresence(payload as Record<string, unknown>);
+  };
+
+  const resolveEchoClient = () => {
+    if ($echo && typeof $echo.private === "function") {
+      return $echo;
+    }
+
+    if (typeof window !== "undefined") {
+      const fallbackEcho = (window as any).Echo;
+      if (fallbackEcho && typeof fallbackEcho.private === "function") {
+        return fallbackEcho;
+      }
+    }
+
+    return null;
+  };
+
+  const disconnectSupportPresenceRealtime = () => {
+    if (!supportTicketChannel) return;
+
+    supportTicketChannel.stopListening(".ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening("ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening(".App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening("App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
+    supportTicketChannel = null;
+  };
+
+  const connectSupportPresenceRealtime = () => {
+    if (!id.value || supportTicketChannel) return;
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) return;
+
+    supportTicketChannel = echoClient.private(`support.ticket.${id.value}`);
+    supportTicketChannel.stopListening(".ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening("ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening(".App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
+    supportTicketChannel.stopListening("App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
+    supportTicketChannel.listen(".ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.listen("ticket.presence.updated", handleSupportPresenceUpdated);
+    supportTicketChannel.listen(".App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
+    supportTicketChannel.listen("App\\Events\\TicketPresenceUpdated", handleSupportPresenceUpdated);
   };
 
   const handleSupportMessageUpdated = (payload?: any) => {
@@ -1819,6 +1878,8 @@
 
     await loadData();
     await loadLibraryFromChat();
+    connectSupportPresenceRealtime();
+    startParticipantsPresencePoll();
     scheduleDesktopGridMeasure();
     window.addEventListener("pointerdown", handleParticipantsPointerDown);
   });
@@ -1855,11 +1916,13 @@
     window.removeEventListener("pointerdown", handleParticipantsPointerDown);
     clearSidePanelCloseTimer();
     clearSideTopWheelSnapTimer();
+    stopParticipantsPresencePoll();
     if (desktopGridRafId !== null) {
       window.cancelAnimationFrame(desktopGridRafId);
       desktopGridRafId = null;
     }
     handleSideScrollMouseUp();
+    disconnectSupportPresenceRealtime();
     closeLibraryMediaViewer();
   });
 </script>
