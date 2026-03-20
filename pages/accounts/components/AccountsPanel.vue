@@ -184,7 +184,8 @@
               :style="tableMenuStyle">
               <button
                 class="card-menu__item"
-                type="button">
+                type="button"
+                @click="handleClickDeposit(activeTableAccount.id)">
                 <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
                 <UiTextSmall class="whitespace-nowrap">{{
                   t("cabinet.accounts.actions.deposit") || "Deposit"
@@ -192,7 +193,8 @@
               </button>
               <button
                 class="card-menu__item"
-                type="button">
+                type="button"
+                @click="handleClickWithdraw(activeTableAccount.id)">
                 <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
                 <UiTextSmall class="whitespace-nowrap">{{
                   t("cabinet.accounts.actions.withdraw") || "Withdraw"
@@ -305,7 +307,8 @@
                     :style="cardMenuStyle">
                     <button
                       class="card-menu__item"
-                      type="button">
+                      type="button"
+                      @click="handleClickDeposit(account.id)">
                       <UiIconPayment class="!h-4 !w-4 text-[var(--ui-text-main)] stroke-[var(--ui-sticker-success)]" />
                       <UiTextSmall class="whitespace-nowrap">{{
                         t("cabinet.accounts.actions.deposit") || "Deposit"
@@ -313,7 +316,8 @@
                     </button>
                     <button
                       class="card-menu__item"
-                      type="button">
+                      type="button"
+                      @click="handleClickWithdraw(account.id)">
                       <UiIconWithdraw class="!h-4 !w-4 text-[var(--ui-text-main)]" />
                       <UiTextSmall class="whitespace-nowrap">{{
                         t("cabinet.accounts.actions.withdraw") || "Withdraw"
@@ -484,6 +488,7 @@
 <script lang="ts" setup>
   import AccountsCreateNew from "~/pages/accounts/components/AccountsCreateNew.vue";
   import AccountsTransferModal from "~/components/block/modals/AccountsTransferModal.vue";
+  import CreateNewDeposit from "~/pages/payments/create/index.vue";
 
   import PageStructureContent from "~/components/block/pages/PageStructureContent.vue";
   import PaginationMain from "~/components/block/paginations/PaginationMain.vue";
@@ -1208,6 +1213,41 @@
       title: resolveText("cabinet.accounts.transfer.title", "Transfer between my accounts"),
       fromAccountId: String(accountId),
     });
+  };
+
+  const resolvePaymentModalTitle = (initialTab: "deposit" | "withdrawal"): string => {
+    if (initialTab === "withdrawal") {
+      return resolveText("cabinet.accounts.actions.withdraw", "Withdraw");
+    }
+
+    return resolveText("cabinet.accounts.actions.deposit", "Deposit");
+  };
+
+  const handleOpenPaymentModal = async (
+    initialTab: "deposit" | "withdrawal",
+    accountId: string | number
+  ): Promise<void> => {
+    closeOptions();
+    closeCardMenu();
+
+    if (isVerificationRequired.value) {
+      await handleClickGoToVerification();
+      return;
+    }
+
+    openModal(CreateNewDeposit, {
+      title: resolvePaymentModalTitle(initialTab),
+      initialTab,
+      initialAccountId: String(accountId),
+    });
+  };
+
+  const handleClickDeposit = async (accountId: string | number) => {
+    await handleOpenPaymentModal("deposit", accountId);
+  };
+
+  const handleClickWithdraw = async (accountId: string | number) => {
+    await handleOpenPaymentModal("withdrawal", accountId);
   };
 
   const handleClickHistory = (accountId: string | number, tab: number | string = "history") => {

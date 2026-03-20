@@ -236,6 +236,7 @@
 
 <script lang="ts" setup>
   import AccountsTransferModal from "~/components/block/modals/AccountsTransferModal.vue";
+  import CreateNewDeposit from "~/pages/payments/create/index.vue";
   import { computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
   import { navigateTo, useLocalePath } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
@@ -654,14 +655,52 @@
     await navigateTo(accountRoute(accountId));
   };
 
-  const handleClickDeposit = async (_accountId: string | number) => {
-    closeMenu();
-    await navigateTo(localePath({ path: "/payments", query: { openDeposit: "1" } }));
+  const resolvePaymentModalTitle = (initialTab: "deposit" | "withdrawal"): string => {
+    if (initialTab === "withdrawal") {
+      return resolveText("cabinet.accounts.actions.withdraw", "Withdraw");
+    }
+
+    return resolveText("cabinet.accounts.actions.deposit", "Deposit");
   };
 
-  const handleClickWithdraw = async (_accountId: string | number) => {
+  const openPaymentModal = async (
+    initialTab: "deposit" | "withdrawal",
+    accountId: string | number
+  ): Promise<void> => {
     closeMenu();
-    await navigateTo(localePath({ path: "/payments", query: { openWithdrawal: "1" } }));
+
+    if (!canCreateAccount.value) {
+      await navigateTo(profileVerificationLink.value);
+      return;
+    }
+
+    const normalizedAccountId = normalizeAccountId(accountId);
+    if (modalControl?.openModal) {
+      modalControl.openModal(CreateNewDeposit, {
+        title: resolvePaymentModalTitle(initialTab),
+        initialTab,
+        initialAccountId: normalizedAccountId,
+      });
+      return;
+    }
+
+    await navigateTo(
+      localePath({
+        path: "/payments",
+        query: {
+          [initialTab === "withdrawal" ? "openWithdrawal" : "openDeposit"]: "1",
+          accountId: normalizedAccountId,
+        },
+      })
+    );
+  };
+
+  const handleClickDeposit = async (accountId: string | number) => {
+    await openPaymentModal("deposit", accountId);
+  };
+
+  const handleClickWithdraw = async (accountId: string | number) => {
+    await openPaymentModal("withdrawal", accountId);
   };
 
   const handleClickTransfer = async (accountId: string | number) => {

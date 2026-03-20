@@ -131,6 +131,7 @@
 
   const props = defineProps<{
     paymentSystem?: PaymentSystem | null;
+    initialAccountId?: string | null;
   }>();
 
   const appCore = useAppCore();
@@ -256,6 +257,15 @@
     }
   };
 
+  const resolveInitialAccountId = (): string => {
+    const preferredAccountId = String(props.initialAccountId ?? "").trim();
+    if (preferredAccountId !== "" && accounts.value.some(item => item.id === preferredAccountId)) {
+      return preferredAccountId;
+    }
+
+    return accounts.value[0]?.id ?? "";
+  };
+
   const handleAccountChange = (value: string | null): void => {
     form.accountId = String(value ?? "");
     clearError("accountId");
@@ -302,7 +312,7 @@
       });
 
       if (accounts.value.length > 0) {
-        form.accountId = accounts.value[0]?.id ?? "";
+        form.accountId = resolveInitialAccountId();
       }
     } finally {
       isLoadingAccounts.value = false;

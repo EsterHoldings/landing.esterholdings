@@ -68,9 +68,7 @@
                 key="payment-form">
                 <component
                   :is="activePaymentSystemForm"
-                  :paymentSystem="
-                    paymentSystems.find(ps => ps.config_key === activePaymentSystem.cfgKey)
-                  " />
+                  v-bind="activePaymentSystemFormProps" />
               </div>
             </Transition>
           </div>
@@ -117,10 +115,12 @@
     defineProps<{
       title?: string;
       initialTab?: "deposit" | "withdrawal";
+      initialAccountId?: string;
     }>(),
     {
       title: "",
       initialTab: "deposit",
+      initialAccountId: "",
     }
   );
 
@@ -222,6 +222,11 @@
       ? activePaymentSystem.value.withdrawalComponentForm
       : activePaymentSystem.value.depositComponentForm;
   });
+
+  const activePaymentSystemFormProps = computed(() => ({
+    paymentSystem: paymentSystems.find(ps => ps.config_key === activePaymentSystem.value?.cfgKey) ?? null,
+    initialAccountId: tabActiveIndex.value === 1 ? props.initialAccountId : undefined,
+  }));
 
   const isSelected = computed(() => activePaymentSystemIndex.value !== null);
 

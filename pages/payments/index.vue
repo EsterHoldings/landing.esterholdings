@@ -952,7 +952,18 @@
     await navigateTo(localePath({ path: "/profile", query: { tab: "verification" } }));
   };
 
-  const handleClickCreateNewDeposit = async (initialTab: "deposit" | "withdrawal" = "deposit") => {
+  const resolveQueryString = (value: unknown): string => {
+    if (Array.isArray(value)) {
+      return String(value[0] ?? "").trim();
+    }
+
+    return String(value ?? "").trim();
+  };
+
+  const handleClickCreateNewDeposit = async (
+    initialTab: "deposit" | "withdrawal" = "deposit",
+    initialAccountId = ""
+  ) => {
     if (isVerificationRequired.value) {
       await handleGoToVerification();
       return;
@@ -961,6 +972,7 @@
     openModal(CreateNewDeposit, {
       title: t("cabinet.billing.create"),
       initialTab,
+      initialAccountId,
     });
   };
 
@@ -1041,13 +1053,14 @@
     useEventBus.on("loadDataForPayments", loadData);
     await Promise.all([loadData(), refreshAccountCreationEligibility()]);
     await nextTick();
-    const openDeposit = route.query?.openDeposit;
-    const openWithdrawal = route.query?.openWithdrawal;
+    const openDeposit = resolveQueryString(route.query?.openDeposit);
+    const openWithdrawal = resolveQueryString(route.query?.openWithdrawal);
+    const initialAccountId = resolveQueryString(route.query?.accountId || route.query?.account_id);
 
     if (openWithdrawal === "1" || openWithdrawal === "true" || openWithdrawal === "yes") {
-      handleClickCreateNewDeposit("withdrawal");
+      await handleClickCreateNewDeposit("withdrawal", initialAccountId);
     } else if (openDeposit === "1" || openDeposit === "true" || openDeposit === "yes") {
-      handleClickCreateNewDeposit("deposit");
+      await handleClickCreateNewDeposit("deposit", initialAccountId);
     }
 
     await maybeShowTransferCreatedToast();
