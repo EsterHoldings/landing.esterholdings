@@ -37,12 +37,8 @@
 
         <div
           v-if="selectedAccount"
-          class="withdrawal-form__account-preview">
-          <div class="withdrawal-form__panel-caption">{{ accountLabel }}</div>
-          <div class="withdrawal-form__panel-title">{{ selectedAccount.number || "-" }}</div>
-          <div class="withdrawal-form__panel-text">
-            {{ accountBalanceLabel }}: {{ formatBalance(selectedAccount.balance, selectedAccount.currency) }}
-          </div>
+          class="withdrawal-form__hint">
+          {{ accountBalanceLabel }}: {{ formatBalance(selectedAccount.balance, selectedAccount.currency) }}
         </div>
 
         <UiFormControl
@@ -61,28 +57,14 @@
         <div
           v-if="paymentDetailOptions.length === 0"
           class="withdrawal-form__empty-state">
-          <div class="withdrawal-form__panel-title">{{ noPaymentDetailsTitle }}</div>
-          <div class="withdrawal-form__panel-text">{{ noPaymentDetailsText }}</div>
+          <div class="withdrawal-form__empty-title">{{ noPaymentDetailsTitle }}</div>
+          <div class="withdrawal-form__empty-text">{{ noPaymentDetailsText }}</div>
           <UiButtonDefault state="info--outline" @click="handleGoToPaymentDetails">
             {{ openPaymentDetailsLabel }}
           </UiButtonDefault>
         </div>
 
         <template v-else>
-          <div
-            v-if="selectedPaymentDetail"
-            class="withdrawal-form__detail-preview">
-            <div class="withdrawal-form__panel-caption">{{ paymentDetailLabel }}</div>
-            <div class="withdrawal-form__detail-title">{{ selectedPaymentDetail.name || "-" }}</div>
-            <div
-              v-for="row in paymentDetailRows"
-              :key="row.key"
-              class="withdrawal-form__detail-row">
-              <span class="withdrawal-form__detail-key">{{ row.key }}</span>
-              <span class="withdrawal-form__detail-value">{{ row.value }}</span>
-            </div>
-          </div>
-
           <UiFormControl
             class="withdrawal-form__field"
             :label="amountLabel"
@@ -94,12 +76,6 @@
               @input="handleAmountInput"
             />
           </UiFormControl>
-
-          <div
-            v-if="selectedAccount"
-            class="withdrawal-form__hint">
-            {{ accountBalanceLabel }}: {{ formatBalance(selectedAccount.balance, selectedAccount.currency) }}
-          </div>
 
           <UiFormControl
             class="withdrawal-form__field"
@@ -165,6 +141,7 @@
     text: string;
     name: string;
     payment_system_id: string;
+    paymentSystemName: string;
     data: Record<string, unknown>;
   };
 
@@ -229,8 +206,13 @@
     resolveText("cabinet.billing.withdrawalForm.created", "Withdrawal request created successfully.")
   );
   const paymentSystemTitle = computed(() => {
-    const value = String(props.paymentSystem?.name ?? "").trim();
-    return value !== "" ? value : resolveText("cabinet.billing.withdrawalForm.title", "Withdrawal");
+    const selectedValue = String(selectedPaymentDetail.value?.paymentSystemName ?? "").trim();
+    if (selectedValue !== "") {
+      return selectedValue;
+    }
+
+    const propValue = String(props.paymentSystem?.name ?? "").trim();
+    return propValue !== "" ? propValue : resolveText("cabinet.billing.withdrawalForm.title", "Withdrawal request");
   });
   const processingLabel = computed(() =>
     resolveText("cabinet.billing.withdrawalForm.processing", "Processing...")
@@ -245,29 +227,6 @@
   const selectedPaymentDetail = computed(
     () => paymentDetails.value.find(item => item.id === form.paymentDetailId) ?? null
   );
-
-  const paymentDetailRows = computed(() => {
-    const data = selectedPaymentDetail.value?.data;
-    if (!data || typeof data !== "object") {
-      return [];
-    }
-
-    return Object.entries(data)
-      .map(([key, value]) => ({
-        key: humanizeKey(key),
-        value: String(value ?? "-"),
-      }))
-      .filter(row => row.value.trim() !== "");
-  });
-
-  const humanizeKey = (value: string): string => {
-    const normalized = value
-      .replace(/([a-z])([A-Z])/g, "$1 $2")
-      .replace(/[_-]+/g, " ")
-      .trim();
-
-    return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : value;
-  };
 
   const extractRows = (response: any): any[] => {
     const root = response?.data;
@@ -376,26 +335,28 @@
         orderDirection: "desc",
       });
 
-      const targetPaymentSystemId = String(props.paymentSystem?.id ?? "");
       const rows = extractRows(response);
 
       paymentDetails.value = rows
         .filter((row: any) => String(row?.status ?? "").toLowerCase() === "approved")
-        .filter((row: any) => {
-          if (!targetPaymentSystemId) return true;
-          return String(row?.payment_system_id ?? row?.paymentSystem?.id ?? "") === targetPaymentSystemId;
-        })
         .map((row: any) => {
           const data = row?.data && typeof row.data === "object" ? row.data : {};
-          const firstValue = Object.values(data)[0];
-          const suffix = firstValue ? ` • ${String(firstValue)}` : "";
+          const paymentSystemName = String(
+            row?.payment_system_name ?? row?.payment_system?.name ?? row?.paymentSystem?.name ?? ""
+          ).trim();
+          const detailName = String(row?.name ?? "").trim();
+          const textParts = [detailName || paymentSystemName || "Payment detail"];
+          if (paymentSystemName !== "" && paymentSystemName !== detailName) {
+            textParts.push(paymentSystemName);
+          }
 
           return {
             id: String(row?.id ?? ""),
             value: String(row?.id ?? ""),
-            text: `${String(row?.name ?? "Payment detail")}${suffix}`,
-            name: String(row?.name ?? ""),
+            text: textParts.join(" • "),
+            name: detailName,
             payment_system_id: String(row?.payment_system_id ?? ""),
+            paymentSystemName,
             data,
           };
         });
@@ -534,80 +495,11 @@
     background: color-mix(in srgb, var(--ui-background-panel) 88%, transparent);
   }
 
-  .withdrawal-form__account-preview,
-  .withdrawal-form__detail-preview,
-  .withdrawal-form__empty-state {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--color-stroke-ui-light);
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--ui-background-panel) 94%, transparent) 0%,
-        color-mix(in srgb, var(--ui-control-bg) 92%, transparent) 100%
-      );
-  }
-
-  .withdrawal-form__panel-caption {
-    color: var(--ui-text-secondary);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .withdrawal-form__panel-title {
-    color: var(--ui-text-main);
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .withdrawal-form__panel-text {
+  .withdrawal-form__hint {
+    margin-top: -4px;
     color: var(--ui-text-secondary);
     font-size: 13px;
     line-height: 1.45;
-  }
-
-  .withdrawal-form__detail-preview {
-    gap: 0;
-  }
-
-  .withdrawal-form__detail-title {
-    color: var(--ui-text-main);
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-
-  .withdrawal-form__detail-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 13px;
-    padding-top: 10px;
-    border-top: 1px solid color-mix(in srgb, var(--color-stroke-ui-light) 82%, transparent);
-  }
-
-  .withdrawal-form__detail-key {
-    color: var(--ui-text-secondary);
-  }
-
-  .withdrawal-form__detail-value {
-    color: var(--ui-text-main);
-    font-weight: 600;
-    text-align: right;
-    word-break: break-word;
-  }
-
-  .withdrawal-form__hint {
-    margin-top: -2px;
-    padding: 0 2px;
-    color: var(--ui-text-secondary);
-    font-size: 12px;
   }
 
   .withdrawal-form__textarea {
@@ -623,16 +515,29 @@
     min-width: 240px;
   }
 
+  .withdrawal-form__empty-state {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--color-stroke-ui-light);
+    background: color-mix(in srgb, var(--ui-background-panel) 90%, transparent);
+  }
+
+  .withdrawal-form__empty-title {
+    color: var(--ui-text-main);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .withdrawal-form__empty-text {
+    color: var(--ui-text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
   @media (max-width: 768px) {
-    .withdrawal-form__detail-row {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .withdrawal-form__detail-value {
-      text-align: left;
-    }
-
     .withdrawal-form__submit {
       width: 100%;
     }

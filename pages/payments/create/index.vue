@@ -16,63 +16,71 @@
     <div
       class="payments-create-modal__content"
       :class="{ 'without-top': !props.title }">
-      <div class="payments-create-modal__center">
-        <div
-          v-if="isSelected"
-          class="payments-create-modal__back-row">
-          <button
-            type="button"
-            class="payments-create-modal__back-btn"
-            @click="goBackToSelect"
-            :aria-label="backToMethodLabel">
-            <span class="payments-create-modal__back-icon">
-              <svg
-                viewBox="0 0 24 24"
-                class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
-                fill="none">
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="payments-create-modal__back-text">{{ backToMethodLabel }}</span>
-          </button>
-        </div>
+      <div
+        class="payments-create-modal__center"
+        :class="{ 'payments-create-modal__center--form': isWithdrawalMode }">
+        <template v-if="isWithdrawalMode">
+          <TabWithdrawalForm :initialAccountId="props.initialAccountId" />
+        </template>
 
-        <div class="grid grid-cols-1 gap-5 items-start">
-          <div>
-            <UiTextH5 class="mb-5"># Вибір платіжного способу</UiTextH5>
-
-            <component
-              :is="componentIs.component"
-              :paymentSystemsList="paymentSystemsForUi"
-              :activePaymentSystemIndex="activePaymentSystemIndexForUi"
-              @select="handleSelectPaymentSystem"
-              :isLoading="paymentSystemsListIsLoading" />
+        <template v-else>
+          <div
+            v-if="isSelected"
+            class="payments-create-modal__back-row">
+            <button
+              type="button"
+              class="payments-create-modal__back-btn"
+              @click="goBackToSelect"
+              :aria-label="backToMethodLabel">
+              <span class="payments-create-modal__back-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  class="h-[18px] w-[18px] text-[var(--ui-text-main)]"
+                  fill="none">
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="payments-create-modal__back-text">{{ backToMethodLabel }}</span>
+            </button>
           </div>
 
-          <div>
-            <Transition
-              enter-active-class="transition duration-300 ease-out"
-              enter-from-class="opacity-0 translate-y-2"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-200 ease-in"
-              leave-from-class="opacity-100 translate-y-0"
-              leave-to-class="opacity-0 translate-y-2">
-              <!-- wrapper ВАЖЛИВИЙ: гарантує 1 root для Transition -->
-              <div
-                v-if="isFormVisible && activePaymentSystemForm"
-                key="payment-form">
-                <component
-                  :is="activePaymentSystemForm"
-                  v-bind="activePaymentSystemFormProps" />
-              </div>
-            </Transition>
+          <div class="grid grid-cols-1 gap-5 items-start">
+            <div>
+              <UiTextH5 class="mb-5"># Вибір платіжного способу</UiTextH5>
+
+              <component
+                :is="componentIs.component"
+                :paymentSystemsList="paymentSystemsForUi"
+                :activePaymentSystemIndex="activePaymentSystemIndexForUi"
+                @select="handleSelectPaymentSystem"
+                :isLoading="paymentSystemsListIsLoading" />
+            </div>
+
+            <div>
+              <Transition
+                enter-active-class="transition duration-300 ease-out"
+                enter-from-class="opacity-0 translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition duration-200 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 translate-y-2">
+                <!-- wrapper ВАЖЛИВИЙ: гарантує 1 root для Transition -->
+                <div
+                  v-if="isFormVisible && activePaymentSystemForm"
+                  key="payment-form">
+                  <component
+                    :is="activePaymentSystemForm"
+                    v-bind="activePaymentSystemFormProps" />
+                </div>
+              </Transition>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -127,6 +135,7 @@
   const appCore = useAppCore();
   const { closeModal } = inject("modalControl") as { closeModal: () => void };
   const { t } = useI18n({ useScope: "global" });
+  const isWithdrawalMode = computed(() => props.initialTab === "withdrawal");
   const backToMethodLabel = computed(() => {
     const key = "cabinet.billing.backToMethodSelection";
     const translated = t(key);
@@ -285,6 +294,10 @@
   onMounted(async () => {
     tabActiveIndex.value = props.initialTab === "withdrawal" ? 1 : 0;
 
+    if (isWithdrawalMode.value) {
+      return;
+    }
+
     paymentSystemsListIsLoading.value = true;
     const { data } = await appCore.paymentSystems.get();
 
@@ -355,6 +368,10 @@
     flex-direction: column;
     justify-content: center;
     padding: 24px 40px;
+  }
+
+  .payments-create-modal__center--form {
+    justify-content: flex-start;
   }
 
   .payments-create-modal__back-row {
