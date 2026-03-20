@@ -643,9 +643,7 @@
   const onlineParticipantsCount = computed(() => participants.value.filter(participant => participant.online).length);
   const totalParticipantsCount = computed(() => participants.value.length);
   const counterpartyOnline = computed(() => {
-    if (presenceOnlineAdmins.value.length > 0) return true;
-
-    return participants.value.some(participant => participant.roleKey === "agent" && participant.online);
+    return participants.value.some(participant => participant.online && !participant.isYou);
   });
   let participantsPresencePollTimer: ReturnType<typeof setInterval> | null = null;
   let supportTicketChannel: any = null;
