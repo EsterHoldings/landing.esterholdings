@@ -745,6 +745,10 @@
       "markAllRead": "Позначити все прочитаним",
       "emptyNotifications": "У вас поки немає сповіщень",
       "notificationTemplates": {
+        "verificationStatusUpdated": {
+          "title": "Статус верифікації оновлено",
+          "message": "{step} • {status}{comment}"
+        },
         "withdrawalStatusUpdated": {
           "title": "Статус заявки на виведення оновлено",
           "message": "{status} • {amount} {currency} • рахунок {account}"
@@ -757,8 +761,18 @@
           "title": "Тікет підтримки оновлено",
           "message": "{preview}"
         },
+        "verificationSteps": {
+          "info": "Дані профілю",
+          "photo": "Фото профілю",
+          "email": "Email",
+          "address": "Адреса",
+          "documents": "Документи",
+          "deposit": "Перший депозит"
+        },
         "statuses": {
           "pending": "Очікує",
+          "approved": "Підтверджена",
+          "rejected": "Відхилена",
           "processing": "В обробці",
           "successful": "Успішно",
           "failed": "Помилка",

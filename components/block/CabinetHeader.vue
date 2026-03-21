@@ -60,6 +60,7 @@
     "App\\Events\\UserNotificationCreated",
   ];
   const SUPPORT_USER_NOTIFICATION_TYPES = ["support.message"];
+  const VERIFICATION_USER_NOTIFICATION_TYPES = ["verification.status-updated"];
   const BILLING_USER_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated"];
 
   const props = withDefaults(
@@ -118,6 +119,11 @@
   const route = useRoute();
   const isSupportRoute = computed(() => String(route.path ?? "").includes("/support"));
   const isPaymentsRoute = computed(() => String(route.path ?? "").includes("/payments"));
+  const isVerificationRoute = computed(
+    () =>
+      String(route.path ?? "").includes("/profile") &&
+      String(route.query?.tab ?? "").trim().toLowerCase() === "verification"
+  );
   const isProfileRoute = computed(() => route.path.split("/").pop() === "profile");
   const profileMenuIsOpen = ref(false);
   const profileMenuRef = ref(null);
@@ -155,9 +161,10 @@
 
   const resolveNotificationTone = (raw: any): NotificationTone => {
     const source = `${raw?.type ?? ""} ${raw?.title ?? ""} ${raw?.message ?? ""} ${raw?.payload?.status ?? raw?.status ?? ""}`.toLowerCase();
+    if (source.includes("approved") || source.includes("successful")) return "success";
+    if (source.includes("pending") || source.includes("processing") || source.includes("warning")) return "warning";
+    if (source.includes("rejected") || source.includes("cancelled") || source.includes("error") || source.includes("danger") || source.includes("failed")) return "danger";
     if (source.includes("success")) return "success";
-    if (source.includes("warning")) return "warning";
-    if (source.includes("error") || source.includes("danger") || source.includes("failed")) return "danger";
     return "info";
   };
 
@@ -181,6 +188,31 @@
         return resolveText(key, "Failed");
       case "cancelled":
         return resolveText(key, "Cancelled");
+      default:
+        return normalized || "-";
+    }
+  };
+
+  const verificationStepText = (value: string, fallback = "-"): string => {
+    const normalized = String(value ?? "").trim().toLowerCase();
+    if (normalized === "") {
+      return fallback;
+    }
+
+    return resolveText(`cabinet.header.notificationTemplates.verificationSteps.${normalized}`, fallback);
+  };
+
+  const verificationStatusText = (value: string): string => {
+    const normalized = String(value ?? "").trim().toLowerCase();
+    const key = `cabinet.header.notificationTemplates.statuses.${normalized}`;
+
+    switch (normalized) {
+      case "approved":
+        return resolveText(key, "Approved");
+      case "rejected":
+        return resolveText(key, "Rejected");
+      case "pending":
+        return resolveText(key, "Pending");
       default:
         return normalized || "-";
     }
@@ -248,6 +280,37 @@
     return { title, message };
   };
 
+  const buildVerificationStatusNotification = (
+    raw: any,
+    payload: Record<string, any> | null
+  ): { title: string; message: string } => {
+    const step = verificationStepText(
+      String(payload?.step || ""),
+      String(payload?.step_label || "").trim() || "-"
+    );
+    const status = verificationStatusText(String(payload?.status || raw?.status || ""));
+    const comment = String(payload?.comment || "").trim();
+    const defaultTitle = String(raw?.title ?? "").trim() || "Verification status updated";
+    const defaultMessage = String(raw?.message ?? "").trim();
+
+    const title = resolveText("cabinet.header.notificationTemplates.verificationStatusUpdated.title", defaultTitle);
+    const fallbackMessage =
+      defaultMessage !== ""
+        ? defaultMessage
+        : [step, status, comment !== "" ? comment : null].filter(Boolean).join(" • ");
+    const message = resolveText(
+      "cabinet.header.notificationTemplates.verificationStatusUpdated.message",
+      fallbackMessage,
+      {
+        step,
+        status,
+        comment: comment !== "" ? ` • ${comment}` : "",
+      }
+    );
+
+    return { title, message };
+  };
+
   const shouldToastNotification = (notification: CabinetNotification): boolean =>
     !SUPPORT_USER_NOTIFICATION_TYPES.includes(String(notification.type ?? "").trim());
 
@@ -264,6 +327,12 @@
 
     if (type === "payments.withdrawal.status-updated") {
       const localized = buildWithdrawalStatusNotification(raw, payload);
+      title = localized.title;
+      message = localized.message;
+    }
+
+    if (type === "verification.status-updated") {
+      const localized = buildVerificationStatusNotification(raw, payload);
       title = localized.title;
       message = localized.message;
     }
@@ -338,6 +407,7 @@
     }));
     notificationsStore.applySummary({
       unread_count: 0,
+      unread_verification_notifications_count: 0,
       unread_withdrawal_notifications_count: 0,
       unread_support_notifications_count: 0,
     });
@@ -421,6 +491,9 @@
       notifications.value = snapshot;
       notificationsStore.applySummary({
         unread_count: notifications.value.filter(item => !item.wasRead).length,
+        unread_verification_notifications_count: notifications.value.filter(
+          item => !item.wasRead && item.type === "verification.status-updated"
+        ).length,
         unread_withdrawal_notifications_count: notifications.value.filter(
           item => !item.wasRead && item.type === "payments.withdrawal.status-updated"
         ).length,
@@ -469,6 +542,11 @@
   };
 
   const markCurrentSectionNotificationsSeen = async () => {
+    if (isVerificationRoute.value && notificationsStore.unreadVerificationNotificationsCount > 0) {
+      await markNotificationsByTypes(VERIFICATION_USER_NOTIFICATION_TYPES);
+      return;
+    }
+
     if (isSupportRoute.value && notificationsStore.unreadSupportNotificationsCount > 0) {
       await markNotificationsByTypes(SUPPORT_USER_NOTIFICATION_TYPES);
       return;
@@ -515,6 +593,11 @@
     }
 
     if (isSupportRoute.value && SUPPORT_USER_NOTIFICATION_TYPES.includes(normalized.type)) {
+      await markNotificationRead(normalized.id, true);
+      return;
+    }
+
+    if (isVerificationRoute.value && VERIFICATION_USER_NOTIFICATION_TYPES.includes(normalized.type)) {
       await markNotificationRead(normalized.id, true);
       return;
     }
@@ -649,6 +732,16 @@
       }
 
       if (
+        isVerificationRoute.value &&
+        newUnreadItems.some(
+          item => VERIFICATION_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead
+        )
+      ) {
+        await markNotificationsByTypes(VERIFICATION_USER_NOTIFICATION_TYPES);
+        return;
+      }
+
+      if (
         isSupportRoute.value &&
         newUnreadItems.some(item => SUPPORT_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead)
       ) {
@@ -702,7 +795,7 @@
   );
 
   watch(
-    () => route.path,
+    () => [route.path, route.query?.tab],
     () => {
       void markCurrentSectionNotificationsSeen();
     }
