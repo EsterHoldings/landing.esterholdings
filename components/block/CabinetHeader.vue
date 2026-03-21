@@ -311,8 +311,15 @@
     return { title, message };
   };
 
-  const shouldToastNotification = (notification: CabinetNotification): boolean =>
-    !SUPPORT_USER_NOTIFICATION_TYPES.includes(String(notification.type ?? "").trim());
+  const shouldToastNotification = (notification: CabinetNotification): boolean => {
+    const type = String(notification.type ?? "").trim();
+
+    if (SUPPORT_USER_NOTIFICATION_TYPES.includes(type)) {
+      return !isSupportRoute.value;
+    }
+
+    return true;
+  };
 
   const normalizeNotification = (raw: any): CabinetNotification | null => {
     const id = String(raw?.id ?? "").trim();
