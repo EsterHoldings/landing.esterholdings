@@ -19,6 +19,10 @@ export class NotificationsModule {
     return await this.notificationsService.markAllRead();
   }
 
+  async markReadByTypes(types: string[]): Promise<any> {
+    return await this.notificationsService.markReadByTypes(types);
+  }
+
   async markRead(notificationId: string): Promise<any> {
     return await this.notificationsService.markRead(notificationId);
   }

@@ -19,6 +19,10 @@ export class NotificationsService {
     return await this.useApi.post("/client/notifications/read-all");
   }
 
+  async markReadByTypes(types: string[]): Promise<any> {
+    return await this.useApi.post("/client/notifications/read-by-types", { types });
+  }
+
   async markRead(notificationId: string): Promise<any> {
     return await this.useApi.post(`/client/notifications/${notificationId}/read`);
   }

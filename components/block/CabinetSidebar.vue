@@ -11,7 +11,9 @@
     </div>
 
     <div class="flex-1 w-full flex items-start justify-center p-2">
-      <CabinetSidebarMenu :supportUnreadCount="supportUnreadCount" />
+      <CabinetSidebarMenu
+        :supportUnreadCount="supportMenuUnreadCount"
+        :billingNotificationsCount="notificationsStore.unreadWithdrawalNotificationsCount" />
     </div>
   </aside>
 
@@ -20,7 +22,8 @@
     <div class="h-full px-2 flex items-center justify-start gap-1 overflow-x-auto overflow-y-hidden no-scrollbar">
       <CabinetSidebarMenu
         class="mobile-bottom-menu flex-1"
-        :supportUnreadCount="supportUnreadCount" />
+        :supportUnreadCount="supportMenuUnreadCount"
+        :billingNotificationsCount="notificationsStore.unreadWithdrawalNotificationsCount" />
     </div>
   </nav>
 </template>
@@ -36,6 +39,7 @@
 
   import { useThemeStore } from "~/stores/themeStore.js";
   import { useAuthStore } from "~/stores/authStore";
+  import { useNotificationsStore } from "~/stores/notificationsStore";
 
   import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
   import CabinetSidebarMenu from "~/components/block/CabinetSidebarMenu.vue";
@@ -51,6 +55,7 @@
   import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
 
   const authStore = useAuthStore();
+  const notificationsStore = useNotificationsStore();
   const themeStore = useThemeStore();
   const appCore = useAppCore();
   const { locale } = useI18n({ useScope: "global" });
@@ -97,6 +102,9 @@
   };
 
   const isThemeLight = computed(() => themeStore.currentTheme !== "dark");
+  const supportMenuUnreadCount = computed(() =>
+    Math.max(supportUnreadCount.value, notificationsStore.unreadSupportNotificationsCount)
+  );
 
   const route = useRoute();
   const isProfileRoute = computed(() => route.path.split("/").pop() === "profile");

@@ -6,6 +6,7 @@
       :title="menuItem.title"
       :to="menuItem.to"
       :icon="menuItem.icon"
+      :notificationsCount="menuItem.notificationsCount ?? null"
       :sideBarIsOpen="sideBarIsOpen"
       @click="handleClickMenuItem" />
 
@@ -41,9 +42,11 @@
   const props = withDefaults(
     defineProps<{
       supportUnreadCount?: number;
+      billingNotificationsCount?: number;
     }>(),
     {
       supportUnreadCount: 0,
+      billingNotificationsCount: 0,
     }
   );
 
@@ -56,7 +59,12 @@
   const menuItems = computed(() => [
     { title: t("cabinet.menu.dashboard"), to: addCurrentLocaleToPath("dashboard"), icon: UiIconHome },
     { title: t("cabinet.menu.accounts"), to: addCurrentLocaleToPath("accounts"), icon: UiIconUser },
-    { title: t("cabinet.menu.billing"), to: addCurrentLocaleToPath("payments"), icon: UiIconPayment },
+    {
+      title: t("cabinet.menu.billing"),
+      to: addCurrentLocaleToPath("payments"),
+      icon: UiIconPayment,
+      notificationsCount: props.billingNotificationsCount,
+    },
     {
       title: t("cabinet.menu.payment_details"),
       to: addCurrentLocaleToPath("payments/details"),

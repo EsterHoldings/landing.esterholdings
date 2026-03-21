@@ -9,6 +9,7 @@
 
   import { useThemeStore } from "~/stores/themeStore.js";
   import { useAuthStore } from "~/stores/authStore";
+  import { useNotificationsStore } from "~/stores/notificationsStore";
   import { useUiStore } from "~/stores/uiStore";
 
   import LanguageSwitcher from "~/components/block/LandingHeader/components/LanguageSwitcher.vue";
@@ -59,6 +60,7 @@
     "App\\Events\\UserNotificationCreated",
   ];
   const SUPPORT_USER_NOTIFICATION_TYPES = ["support.message"];
+  const BILLING_USER_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated"];
 
   const props = withDefaults(
     defineProps<{
@@ -72,6 +74,7 @@
   );
 
   const authStore = useAuthStore();
+  const notificationsStore = useNotificationsStore();
   const appCore = useAppCore();
   const toast = useToast();
   const { $echo } = useNuxtApp() as { $echo?: Echo<any> };
@@ -90,7 +93,7 @@
   const isLoading = ref(false);
   const notificationsRef = ref<any>(null);
   const notifications = ref<CabinetNotification[]>([]);
-  const unreadCount = ref(0);
+  const unreadCount = computed(() => notificationsStore.unreadCount);
   const notificationsLoaded = ref(false);
   const activeNotificationsChannel = ref<any>(null);
   const currentNotificationsChannelName = ref("");
@@ -113,6 +116,8 @@
   };
 
   const route = useRoute();
+  const isSupportRoute = computed(() => String(route.path ?? "").includes("/support"));
+  const isPaymentsRoute = computed(() => String(route.path ?? "").includes("/payments"));
   const isProfileRoute = computed(() => route.path.split("/").pop() === "profile");
   const profileMenuIsOpen = ref(false);
   const profileMenuRef = ref(null);
@@ -331,7 +336,11 @@
       ...item,
       wasRead: true,
     }));
-    unreadCount.value = 0;
+    notificationsStore.applySummary({
+      unread_count: 0,
+      unread_withdrawal_notifications_count: 0,
+      unread_support_notifications_count: 0,
+    });
   };
 
   const loadNotifications = async (options: { showToastsForNew?: boolean } = {}): Promise<CabinetNotification[]> => {
@@ -339,6 +348,7 @@
       notifications.value = [];
       notificationsLoaded.value = false;
       knownNotificationIds.value = new Set();
+      notificationsStore.reset();
       return [];
     }
 
@@ -357,9 +367,12 @@
       rememberNotifications(normalizedItems);
 
       const unreadFromApi = Number(payload?.unread_count ?? NaN);
-      unreadCount.value = Number.isFinite(unreadFromApi)
-        ? unreadFromApi
-        : notifications.value.filter(item => !item.wasRead).length;
+      notificationsStore.applySummary({
+        ...payload,
+        unread_count: Number.isFinite(unreadFromApi)
+          ? unreadFromApi
+          : notifications.value.filter(item => !item.wasRead).length,
+      });
       notificationsLoaded.value = true;
 
       if (options.showToastsForNew) {
@@ -381,16 +394,15 @@
 
   const loadUnreadSummary = async () => {
     if (!hasAccessToken()) {
-      unreadCount.value = 0;
+      notificationsStore.reset();
       return;
     }
 
     try {
       const response = await appCore.notifications.getUnreadSummary();
-      const unread = Number(response?.data?.data?.unread_count ?? NaN);
-      unreadCount.value = Number.isFinite(unread) ? unread : 0;
+      notificationsStore.applySummary(response?.data?.data ?? {});
     } catch (error) {
-      unreadCount.value = 0;
+      notificationsStore.reset();
     }
   };
 
@@ -404,13 +416,18 @@
 
     try {
       const response = await appCore.notifications.markAllRead();
-      const unread = Number(response?.data?.data?.unread_count ?? NaN);
-      if (Number.isFinite(unread)) {
-        unreadCount.value = unread;
-      }
+      notificationsStore.applySummary(response?.data?.data ?? {});
     } catch (error) {
       notifications.value = snapshot;
-      unreadCount.value = notifications.value.filter(item => !item.wasRead).length;
+      notificationsStore.applySummary({
+        unread_count: notifications.value.filter(item => !item.wasRead).length,
+        unread_withdrawal_notifications_count: notifications.value.filter(
+          item => !item.wasRead && item.type === "payments.withdrawal.status-updated"
+        ).length,
+        unread_support_notifications_count: notifications.value.filter(
+          item => !item.wasRead && item.type === "support.message"
+        ).length,
+      });
     } finally {
       isMarkAllInProgress.value = false;
     }
@@ -422,19 +439,43 @@
 
     const prevItem = notifications.value[index];
     notifications.value.splice(index, 1, { ...prevItem, wasRead: true });
-    unreadCount.value = Math.max(0, unreadCount.value - 1);
+    notificationsStore.decrementForNotification(prevItem.type);
 
     if (!syncWithApi) return;
 
     try {
       const response = await appCore.notifications.markRead(notificationId);
-      const unread = Number(response?.data?.data?.unread_count ?? NaN);
-      if (Number.isFinite(unread)) {
-        unreadCount.value = unread;
-      }
+      notificationsStore.applySummary(response?.data?.data ?? {});
     } catch (error) {
       notifications.value.splice(index, 1, prevItem);
-      unreadCount.value += 1;
+      notificationsStore.incrementForNotification(prevItem.type);
+    }
+  };
+
+  const markNotificationsByTypes = async (types: string[]) => {
+    const normalizedTypes = types.map(item => String(item ?? "").trim()).filter(Boolean);
+    if (normalizedTypes.length === 0) return;
+
+    notifications.value = notifications.value.map(item =>
+      normalizedTypes.includes(item.type) ? { ...item, wasRead: true } : item
+    );
+
+    try {
+      const response = await appCore.notifications.markReadByTypes(normalizedTypes);
+      notificationsStore.applySummary(response?.data?.data ?? {});
+    } catch {
+      await loadNotifications();
+    }
+  };
+
+  const markCurrentSectionNotificationsSeen = async () => {
+    if (isSupportRoute.value && notificationsStore.unreadSupportNotificationsCount > 0) {
+      await markNotificationsByTypes(SUPPORT_USER_NOTIFICATION_TYPES);
+      return;
+    }
+
+    if (isPaymentsRoute.value && notificationsStore.unreadWithdrawalNotificationsCount > 0) {
+      await markNotificationsByTypes(BILLING_USER_NOTIFICATION_TYPES);
     }
   };
 
@@ -462,13 +503,23 @@
     rememberNotifications([normalized]);
 
     if (!normalized.wasRead && !wasKnown) {
-      unreadCount.value += 1;
+      notificationsStore.incrementForNotification(normalized.type);
       if (shouldToastNotification(normalized)) {
         showNotificationToast(normalized);
       }
     }
 
     if (isOpen.value) {
+      await markNotificationRead(normalized.id, true);
+      return;
+    }
+
+    if (isSupportRoute.value && SUPPORT_USER_NOTIFICATION_TYPES.includes(normalized.type)) {
+      await markNotificationRead(normalized.id, true);
+      return;
+    }
+
+    if (isPaymentsRoute.value && BILLING_USER_NOTIFICATION_TYPES.includes(normalized.type)) {
       await markNotificationRead(normalized.id, true);
     }
   };
@@ -594,6 +645,22 @@
       const newUnreadItems = await loadNotifications({ showToastsForNew: true });
       if (isOpen.value && newUnreadItems.length > 0) {
         await markAllRead();
+        return;
+      }
+
+      if (
+        isSupportRoute.value &&
+        newUnreadItems.some(item => SUPPORT_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead)
+      ) {
+        await markNotificationsByTypes(SUPPORT_USER_NOTIFICATION_TYPES);
+        return;
+      }
+
+      if (
+        isPaymentsRoute.value &&
+        newUnreadItems.some(item => BILLING_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead)
+      ) {
+        await markNotificationsByTypes(BILLING_USER_NOTIFICATION_TYPES);
       }
     }, NOTIFICATIONS_POLL_MS);
   };
@@ -635,12 +702,20 @@
   );
 
   watch(
+    () => route.path,
+    () => {
+      void markCurrentSectionNotificationsSeen();
+    }
+  );
+
+  watch(
     () => authStore.user?.id,
     (userId) => {
       const normalized = String(userId || "").trim();
       if (normalized === "") {
         unsubscribeFromNotifications();
         knownNotificationIds.value = new Set();
+        notificationsStore.reset();
         stopNotificationsPolling();
         return;
       }
@@ -664,6 +739,7 @@
 
       await loadNotifications();
       await loadUnreadSummary();
+      await markCurrentSectionNotificationsSeen();
       const userId = String(authStore.user?.id ?? "").trim();
       if (userId !== "") {
         subscribeToNotifications(userId);
