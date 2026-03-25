@@ -69,13 +69,11 @@
   import TabsAsList from "~/components/block/tabs/TabsAsList.vue";
 
   import TabGeneral from "~/pages/profile/components/TabGeneral.vue";
-  import TabUserPhoto from "~/pages/profile/components/TabUserPhoto.vue";
   import TabUserDocuments from "~/pages/profile/components/TabUserDocuments.vue";
   import TabChangePassword from "~/pages/profile/components/TabChangePassword.vue";
   import TabUserVerification from "~/pages/profile/components/TabUserVerification.vue";
 
   import UiIconSetting from "~/components/ui/UiIconSetting.vue";
-  import UiIconImage from "~/components/ui/UiIconImage.vue";
   import UiIconDocuments from "~/components/ui/UiIconDocuments.vue";
   import UiIconUser from "~/components/ui/UiIconUser.vue";
 
@@ -99,11 +97,6 @@
       label: t("cabinet.profile.index.tabs.general"),
       component: TabGeneral,
     },
-    // {
-    //   icon: UiIconImage,
-    //   label: t("cabinet.profile.index.tabs.photo"),
-    //   component: TabUserPhoto,
-    // },
     {
       icon: UiIconDocuments,
       label: t("cabinet.profile.index.tabs.documents"),

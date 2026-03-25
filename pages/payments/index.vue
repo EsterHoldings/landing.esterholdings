@@ -6,20 +6,29 @@
           {{ t("cabinet.billing.title") }}
         </UiTextH4>
 
-        <UiButtonDefault
-          v-if="canCreatePayment"
-          state="success--outline"
-          class="w-full md:w-auto"
-          @click="handleClickCreateNewDeposit">
-          {{ createPaymentLabel }}
-        </UiButtonDefault>
-        <UiButtonDefault
-          v-else
-          state="info--outline"
-          class="w-full md:w-auto"
-          @click="handleGoToVerification">
-          {{ verifyActionLabel }}
-        </UiButtonDefault>
+        <div class="payments-header__actions">
+          <template v-if="canCreatePayment">
+            <UiButtonDefault
+              state="success--outline"
+              class="w-full md:w-auto"
+              @click="handleClickCreateNewDeposit">
+              {{ createDepositLabel }}
+            </UiButtonDefault>
+            <UiButtonDefault
+              state="info--outline"
+              class="w-full md:w-auto"
+              @click="handleClickCreateNewWithdrawal">
+              {{ createWithdrawalLabel }}
+            </UiButtonDefault>
+          </template>
+          <UiButtonDefault
+            v-else
+            state="info--outline"
+            class="w-full md:w-auto"
+            @click="handleGoToVerification">
+            {{ verifyActionLabel }}
+          </UiButtonDefault>
+        </div>
       </div>
       <div
         v-if="isVerificationRequired"
@@ -389,13 +398,22 @@
             {{ paymentCreationBlockedReason }}
           </UiTextSmall>
 
-          <UiButtonDefault
+          <div
             v-if="canCreatePayment"
-            state="success--outline"
-            class="payments-empty-state__button"
-            @click="handleClickCreateNewDeposit">
-            {{ createPaymentLabel }}
-          </UiButtonDefault>
+            class="payments-empty-state__actions">
+            <UiButtonDefault
+              state="success--outline"
+              class="payments-empty-state__button"
+              @click="handleClickCreateNewDeposit">
+              {{ createDepositLabel }}
+            </UiButtonDefault>
+            <UiButtonDefault
+              state="info--outline"
+              class="payments-empty-state__button"
+              @click="handleClickCreateNewWithdrawal">
+              {{ createWithdrawalLabel }}
+            </UiButtonDefault>
+          </div>
           <UiButtonDefault
             v-else
             state="info--outline"
@@ -584,7 +602,12 @@
 
   const canCreatePayment = computed(() => canCreateAccount.value);
   const isVerificationRequired = computed(() => isEligibilityLoaded.value && !canCreateAccount.value);
-  const createPaymentLabel = computed(() => resolveI18nValue("cabinet.billing.create", "Создать"));
+  const createDepositLabel = computed(() =>
+    resolveI18nValue("cabinet.accounts.actions.deposit", "Пополнить счет")
+  );
+  const createWithdrawalLabel = computed(() =>
+    resolveI18nValue("cabinet.accounts.actions.withdraw", "Вывести средства")
+  );
   const verifyActionLabel = computed(() =>
     resolveI18nValue("cabinet.dashboard.accountVerification.goToVerification", "Перейти к верификации")
   );
@@ -970,10 +993,14 @@
     }
 
     openModal(CreateNewDeposit, {
-      title: t("cabinet.billing.create"),
+      title: initialTab === "withdrawal" ? createWithdrawalLabel.value : createDepositLabel.value,
       initialTab,
       initialAccountId,
     });
+  };
+
+  const handleClickCreateNewWithdrawal = async () => {
+    await handleClickCreateNewDeposit("withdrawal");
   };
 
   const handleClickUpdate = async () => {
@@ -1127,6 +1154,14 @@
     padding: 12px;
   }
 
+  .payments-header__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+  }
+
   .payments-header__notice {
     margin-top: 8px;
     color: var(--color-warning);
@@ -1188,8 +1223,21 @@
     justify-content: center;
   }
 
+  .payments-empty-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+
   @media (max-width: 767px) {
     .payments-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .payments-header__actions {
       flex-direction: column;
       align-items: stretch;
     }

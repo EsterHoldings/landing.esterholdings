@@ -232,17 +232,13 @@
   const depositStatus = ref<VerificationStatus>("pending");
   const emailStatus = ref<VerificationStatus>("pending");
   const infoStatus = ref<VerificationStatus>("pending");
-  const photoStatus = ref<VerificationStatus>("pending");
-
   const documentsComment = ref<string>("");
   const depositComment = ref<string>("");
   const emailComment = ref<string>("");
   const infoComment = ref<string>("");
-  const photoComment = ref<string>("");
 
   const items = computed(() => [
     { key: "email", title: "Email", subtitle: "Confirm your email", status: emailStatus, comment: emailComment },
-    { key: "photo", title: "Photo", subtitle: "Upload photo", status: photoStatus, comment: photoComment },
     { key: "documents", title: "Document", subtitle: "", status: documentsStatus, comment: documentsComment },
     {
       key: "deposit",
@@ -304,13 +300,11 @@
       Object.assign(verificationRequestData, response.data.data);
 
       emailStatus.value = normalizeStatus(verificationRequestData["email"]?.["verification_status"]);
-      photoStatus.value = normalizeStatus(verificationRequestData["photo"]?.["verification_status"]);
       infoStatus.value = normalizeStatus(verificationRequestData["info"]?.["verification_status"]);
       documentsStatus.value = normalizeStatus(verificationRequestData["documents"]?.["verification_status"]);
       depositStatus.value = normalizeStatus(verificationRequestData["deposit"]?.["verification_status"]);
 
       emailComment.value = verificationRequestData["email"]?.["comment"] ?? "";
-      photoComment.value = verificationRequestData["photo"]?.["comment"] ?? "";
       infoComment.value = verificationRequestData["info"]?.["comment"] ?? "";
       documentsComment.value = verificationRequestData["documents"]?.["comment"] ?? "";
       depositComment.value = verificationRequestData["deposit"]?.["comment"] ?? "";

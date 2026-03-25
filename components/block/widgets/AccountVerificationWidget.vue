@@ -158,7 +158,6 @@
   import CreateNewDeposit from "~/pages/payments/create/index.vue";
   import UiImageCircle from "~/components/ui/UiImageCircle.vue";
   import UiBadge from "~/components/ui/UiBadge.vue";
-  import UiIconImage from "~/components/ui/UiIconImage.vue";
   import UiIconProfile from "~/components/ui/UiIconProfile.vue";
   import UiIconMails from "~/components/ui/UiIconMails.vue";
   import UiIconDocuments from "~/components/ui/UiIconDocuments.vue";
@@ -170,7 +169,7 @@
 
   type VerificationStatus = "pending" | "approved" | "rejected";
   type BadgeState = "warning" | "success" | "danger";
-  type VerificationStepKey = "photo" | "profile" | "email" | "documents" | "deposit";
+  type VerificationStepKey = "profile" | "email" | "documents" | "deposit";
 
   const { t } = useI18n({ useScope: "global" });
   const localePath = useLocalePath();
@@ -197,7 +196,6 @@
 
   const emailStatus = ref<VerificationStatus>("pending");
   const infoStatus = ref<VerificationStatus>("pending");
-  const photoStatus = ref<VerificationStatus>("pending");
   const documentsStatus = ref<VerificationStatus>("pending");
   const depositStatus = ref<VerificationStatus>("pending");
 
@@ -235,16 +233,6 @@
   };
 
   const allSteps = computed(() => [
-    {
-      key: "photo" as VerificationStepKey,
-      title: resolveText("cabinet.dashboard.accountVerification.steps.photo", "Profile photo"),
-      status: photoStatus.value,
-      statusLabel: statusLabel(photoStatus.value),
-      stateClass: stateClass(photoStatus.value),
-      badgeState: badgeState(photoStatus.value),
-      comment: getComment("photo"),
-      icon: UiIconImage,
-    },
     {
       key: "profile" as VerificationStepKey,
       title: resolveText("cabinet.dashboard.accountVerification.steps.profile", "Profile data"),
@@ -294,11 +282,10 @@
   };
 
   const keyPriority: Record<VerificationStepKey, number> = {
-    photo: 0,
-    profile: 1,
-    email: 2,
-    documents: 3,
-    deposit: 4,
+    profile: 0,
+    email: 1,
+    documents: 2,
+    deposit: 3,
   };
 
   const orderedSteps = computed(() =>
@@ -376,7 +363,6 @@
       Object.assign(verificationRequestData, response.data.data);
 
       emailStatus.value = normalizeStatus(verificationRequestData.email?.verification_status, "pending");
-      photoStatus.value = normalizeStatus(verificationRequestData.photo?.verification_status, "pending");
       infoStatus.value = normalizeStatus(verificationRequestData.info?.verification_status, "pending");
       documentsStatus.value = normalizeStatus(verificationRequestData.documents?.verification_status, "pending");
       depositStatus.value = normalizeStatus(verificationRequestData.deposit?.verification_status, "pending");
