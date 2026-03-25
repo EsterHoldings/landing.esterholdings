@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {onMounted} from "vue";
-import {useRouter, useRoute} from "vue-router";
+import {useRouter} from "vue-router";
 import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+import { useAuthStore } from "~/stores/authStore";
 
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 
 onMounted(async () => {
@@ -13,6 +15,8 @@ onMounted(async () => {
 
   const code = queryParams.get("code");
   const idToken = hashParams.get("id_token");
+  const impersonationToken = hashParams.get("impersonation_token") || queryParams.get("impersonation_token");
+  const redirect = hashParams.get("redirect") || queryParams.get("redirect");
   const error = queryParams.get("error") || hashParams.get("error");
   const loginType = localStorage.getItem("social_login_type");
 
@@ -23,6 +27,23 @@ onMounted(async () => {
     if (window.opener) {
       window.opener.postMessage({error}, window.location.origin);
       window.close();
+    }
+
+    return;
+  }
+
+  if (impersonationToken) {
+    try {
+      authStore.setAccessToken(impersonationToken);
+      await authStore.initAuth(true);
+      localStorage.removeItem("social_login_type");
+
+      const nextPath = typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/dashboard";
+      await router.replace(nextPath);
+    } catch (e) {
+      authStore.setAccessToken("");
+      console.error("Impersonation login failed:", e);
+      await router.replace("/auth/login");
     }
 
     return;
@@ -76,5 +97,4 @@ onMounted(async () => {
   }
 }
 </style>
-
 
