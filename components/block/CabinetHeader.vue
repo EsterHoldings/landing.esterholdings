@@ -20,7 +20,6 @@
   import UiIconMoon from "~/components/ui/UiIconMoon.vue";
   import UiIconSetting from "~/components/ui/UiIconSetting.vue";
   import UiIconSun from "~/components/ui/UiIconSun.vue";
-  import UiIconUser from "~/components/ui/UiIconUser.vue";
   import UiSpacer from "~/components/ui/UiSpacer.vue";
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
   import UiIconSuccessFull from "~/components/ui/UiIconSuccessFull.vue";
@@ -128,6 +127,33 @@
   const profileMenuIsOpen = ref(false);
   const profileMenuRef = ref(null);
   const profileContainerRef = ref(null);
+  const normalizeText = (value: unknown): string => String(value ?? "").trim();
+
+  const profileDisplayName = computed(() => {
+    const firstName = normalizeText(authStore.user?.first_name);
+    const lastName = normalizeText(authStore.user?.last_name);
+    const fallback = normalizeText(authStore.user?.email);
+    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+    return fullName !== "" ? fullName : fallback;
+  });
+
+  const profileInitials = computed(() => {
+    const firstName = normalizeText(authStore.user?.first_name);
+    const lastName = normalizeText(authStore.user?.last_name);
+    const email = normalizeText(authStore.user?.email);
+
+    const initialsFromName = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim().toUpperCase();
+    if (initialsFromName !== "") {
+      return initialsFromName.slice(0, 2);
+    }
+
+    if (email !== "") {
+      return email.replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "U";
+    }
+
+    return "U";
+  });
 
   const handleClickNotifications = () => uiStore.toggleNotifications();
 
@@ -983,9 +1009,12 @@
             'mx-auto h-[32px] w-[32px] rounded-full flex items-center justify-center overflow-hidden',
             isProfileRoute ? 'ring-2 ring-[var(--ui-primary-main)]' : 'ring-2 ring-[var(--ui-text-main)]',
           ]">
-          <UiIconUser
+          <span
             v-if="!authStore.photoUrl"
-            class="text-[--ui-text-main]" />
+            class="profile-avatar-fallback"
+          >
+            {{ profileInitials }}
+          </span>
           <img
             v-else
             :src="authStore.photoUrl"
@@ -994,7 +1023,7 @@
         </div>
 
         <div class="text-[var(--ui-text-main)] flex items-center justify-center gap-2 relative">
-          <span class="hidden sm:inline">Родіон Максименко</span>
+          <span class="hidden sm:inline">{{ profileDisplayName || "User" }}</span>
           <UiIconArrowDown
             :class="{ 'rotate-180': profileMenuIsOpen, 'sm:block': true }"
             class="hidden" />
@@ -1080,5 +1109,19 @@
     width: 18px;
     height: 18px;
     flex: 0 0 18px;
+  }
+
+  .profile-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ui-primary-main);
+    color: var(--ui-text-main);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 </style>
