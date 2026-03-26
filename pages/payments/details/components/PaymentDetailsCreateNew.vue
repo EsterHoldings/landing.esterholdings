@@ -90,12 +90,38 @@
                 <div class="payment-documents__meta">
                   <div class="payment-documents__name">{{ selectedFile.file.name }}</div>
                   <div class="payment-documents__size">{{ formatFileSize(selectedFile.file.size) }}</div>
+                  <div
+                    class="payment-documents__status"
+                    :class="`is-${selectedFile.uploadStatus}`">
+                    <UiIconSpinnerDefault
+                      v-if="selectedFile.uploadStatus === 'uploading'"
+                      class="payment-documents__status-spinner" />
+                    <span>{{ resolveUploadStatusLabel(selectedFile) }}</span>
+                  </div>
+                  <div
+                    v-if="selectedFile.uploadStatus === 'uploading' || selectedFile.uploadStatus === 'uploaded'"
+                    class="payment-documents__progress">
+                    <div class="payment-documents__progress-track">
+                      <div
+                        class="payment-documents__progress-fill"
+                        :style="{ width: `${Math.max(0, Math.min(100, selectedFile.uploadProgress))}%` }"></div>
+                    </div>
+                    <div class="payment-documents__progress-value">
+                      {{ Math.max(0, Math.min(100, selectedFile.uploadProgress)) }}%
+                    </div>
+                  </div>
+                  <div
+                    v-if="selectedFile.uploadError"
+                    class="payment-documents__error">
+                    {{ selectedFile.uploadError }}
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   class="payment-documents__remove"
                   aria-label="Удалить файл"
+                  :disabled="selectedFile.uploadStatus === 'uploading'"
                   @click="removeSelectedFile(index)">
                   <UiIconTrash class="payment-documents__remove-icon" />
                 </button>
@@ -168,6 +194,10 @@
   type SelectedUploadFile = {
     file: File;
     previewUrl: string;
+    uploadStatus: "idle" | "uploading" | "uploaded" | "failed";
+    uploadProgress: number;
+    uploadError: string | null;
+    uploadedDocument: Record<string, any> | null;
   };
 
   const MAX_DOCUMENT_SIZE_BYTES = 5 * 1024 * 1024;
@@ -381,6 +411,10 @@
       selectedFiles.value.push({
         file,
         previewUrl: URL.createObjectURL(file),
+        uploadStatus: "idle",
+        uploadProgress: 0,
+        uploadError: null,
+        uploadedDocument: null,
       });
       alreadyAdded.add(uniq);
     });
@@ -398,6 +432,85 @@
 
     URL.revokeObjectURL(file.previewUrl);
     selectedFiles.value.splice(index, 1);
+  };
+
+  const resolveUploadErrorMessage = (error: unknown): string => {
+    const anyError = error as any;
+    const status = Number(anyError?.response?.status ?? 0);
+    if (status === 413) {
+      return "Файл слишком большой.";
+    }
+
+    const message = String(anyError?.response?.data?.message ?? anyError?.message ?? "").trim();
+    return message || "Не удалось загрузить файл в S3.";
+  };
+
+  const resolveUploadStatusLabel = (selectedFile: SelectedUploadFile): string => {
+    if (selectedFile.uploadStatus === "uploading") {
+      return "Загрузка...";
+    }
+
+    if (selectedFile.uploadStatus === "uploaded") {
+      return "Загружено";
+    }
+
+    if (selectedFile.uploadStatus === "failed") {
+      return "Ошибка загрузки";
+    }
+
+    return "Готов к загрузке";
+  };
+
+  const uploadSingleDocument = async (selectedFile: SelectedUploadFile): Promise<Record<string, any>> => {
+    if (selectedFile.uploadedDocument) {
+      return selectedFile.uploadedDocument;
+    }
+
+    selectedFile.uploadStatus = "uploading";
+    selectedFile.uploadProgress = 0;
+    selectedFile.uploadError = null;
+
+    try {
+      const presignResponse = await apiClient.post("client/s3/presign", {
+        filename: selectedFile.file.name,
+        contentType: selectedFile.file.type,
+        path: "payment-details",
+      });
+
+      const payload = presignResponse?.data?.data ?? presignResponse?.data ?? null;
+      const url = String(payload?.url ?? "").trim();
+      const key = String(payload?.key ?? "").trim();
+
+      if (!url || !key) {
+        throw new Error("Не удалось получить ссылку для загрузки.");
+      }
+
+      await axios.put(url, selectedFile.file, {
+        headers: { "Content-Type": selectedFile.file.type },
+        onUploadProgress(event) {
+          const total = Number(event.total ?? selectedFile.file.size ?? 0);
+          const loaded = Number(event.loaded ?? 0);
+          selectedFile.uploadProgress = total > 0 ? Math.round((loaded / total) * 100) : 0;
+        },
+      });
+
+      selectedFile.uploadedDocument = {
+        name: selectedFile.file.name,
+        path: key,
+        mime_type: selectedFile.file.type,
+        size: selectedFile.file.size,
+        uploaded_at: new Date().toISOString(),
+      };
+      selectedFile.uploadStatus = "uploaded";
+      selectedFile.uploadProgress = 100;
+
+      return selectedFile.uploadedDocument;
+    } catch (error) {
+      selectedFile.uploadStatus = "failed";
+      selectedFile.uploadProgress = 0;
+      selectedFile.uploadError = resolveUploadErrorMessage(error);
+      throw error;
+    }
   };
 
   const validatePaymentFields = (): boolean => {
@@ -418,28 +531,19 @@
 
   const uploadPaymentDetailDocuments = async () => {
     const uploadedDocuments: Array<Record<string, any>> = [];
+    let failedUploads = 0;
 
-    for (const item of selectedFiles.value) {
-      const file = item.file;
-      const presignResponse = await apiClient.post("client/s3/presign", {
-        filename: file.name,
-        contentType: file.type,
-        path: "payment-details",
-      });
+    for (const selectedFile of selectedFiles.value) {
+      try {
+        const uploadedDocument = await uploadSingleDocument(selectedFile);
+        uploadedDocuments.push(uploadedDocument);
+      } catch {
+        failedUploads++;
+      }
+    }
 
-      const { url, key } = presignResponse.data as { url: string; key: string };
-
-      await axios.put(url, file, {
-        headers: { "Content-Type": file.type },
-      });
-
-      uploadedDocuments.push({
-        name: file.name,
-        path: key,
-        mime_type: file.type,
-        size: file.size,
-        uploaded_at: new Date().toISOString(),
-      });
+    if (failedUploads > 0) {
+      throw new Error(`Не удалось загрузить ${failedUploads} файл(ов).`);
     }
 
     return uploadedDocuments;
@@ -477,6 +581,7 @@
         useEventBus.emit("loadDataForPaymentDetails");
       } catch (errorResponse: any) {
         const errorMessage = errorResponse?.response?.data?.message || "Не удалось сохранить платежные реквизиты.";
+        documentsError.value = errorMessage;
         toast.error(errorMessage);
       } finally {
         isLoading.value = false;
@@ -638,6 +743,65 @@
     font-size: 12px;
   }
 
+  .payment-documents__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ui-text-secondary);
+  }
+
+  .payment-documents__status.is-uploading {
+    color: var(--ui-primary-main);
+  }
+
+  .payment-documents__status.is-uploaded {
+    color: var(--color-success);
+  }
+
+  .payment-documents__status.is-failed {
+    color: var(--color-danger);
+  }
+
+  .payment-documents__status-spinner {
+    width: 14px;
+    height: 14px;
+  }
+
+  .payment-documents__progress {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .payment-documents__progress-track {
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--ui-primary-main) 12%, transparent);
+  }
+
+  .payment-documents__progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--ui-primary-main), color-mix(in srgb, var(--ui-primary-main) 70%, white));
+    transition: width 0.2s ease;
+  }
+
+  .payment-documents__progress-value {
+    color: var(--ui-text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .payment-documents__error {
+    color: var(--color-danger);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
   .payment-documents__remove {
     width: 28px;
     height: 28px;
@@ -649,6 +813,11 @@
     justify-content: center;
     color: var(--ui-sticker-danger);
     transition: background-color 0.2s ease;
+  }
+
+  .payment-documents__remove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .payment-documents__remove:hover {
