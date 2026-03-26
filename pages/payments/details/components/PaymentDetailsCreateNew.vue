@@ -72,24 +72,24 @@
               class="payment-documents__list">
               <div
                 v-for="(selectedFile, index) in selectedFiles"
-                :key="selectedFile.file.name + selectedFile.file.lastModified"
+                :key="selectedFile.uniqueKey"
                 class="payment-documents__item">
                 <div class="payment-documents__preview">
                   <UiImage
-                    v-if="isImageFile(selectedFile.file)"
+                    v-if="resolveSelectedFilePreviewMeta(selectedFile).type === 'image' && resolveSelectedFilePreviewMeta(selectedFile).src"
                     :src="selectedFile.previewUrl"
                     fitContain
                     fitPosition="center" />
                   <div
                     v-else
                     class="payment-documents__preview-file">
-                    PDF
+                    {{ resolveSelectedFilePreviewMeta(selectedFile).label }}
                   </div>
                 </div>
 
                 <div class="payment-documents__meta">
-                  <div class="payment-documents__name">{{ selectedFile.file.name }}</div>
-                  <div class="payment-documents__size">{{ formatFileSize(selectedFile.file.size) }}</div>
+                  <div class="payment-documents__name">{{ selectedFile.displayName }}</div>
+                  <div class="payment-documents__size">{{ formatFileSize(selectedFile.size) }}</div>
                   <div
                     class="payment-documents__status"
                     :class="`is-${selectedFile.uploadStatus}`">
@@ -136,7 +136,7 @@
             state="info"
             :disabled="isLoading"
             @click="handleSubmitForm">
-            <span v-if="!isLoading">{{ t("cabinet.accounts.accounts-form.actions.submit") }}</span>
+            <span v-if="!isLoading">{{ submitButtonLabel }}</span>
             <UiIconSpinnerDefault v-if="isLoading" />
           </UiButtonDefault>
         </div>
@@ -147,7 +147,7 @@
 
 <script lang="ts" setup>
   import axios from "axios";
-  import { computed, inject, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+  import { computed, inject, onBeforeUnmount, onMounted, reactive, ref, type PropType } from "vue";
   import { useI18n } from "vue-i18n";
   import { useToast } from "vue-toastification";
 
@@ -192,12 +192,17 @@
   };
 
   type SelectedUploadFile = {
-    file: File;
+    source: "new" | "existing";
+    uniqueKey: string;
+    file: File | null;
     previewUrl: string;
     uploadStatus: "idle" | "uploading" | "uploaded" | "failed";
     uploadProgress: number;
     uploadError: string | null;
     uploadedDocument: Record<string, any> | null;
+    displayName: string;
+    size: number;
+    mimeType: string;
   };
 
   const MAX_DOCUMENT_SIZE_BYTES = 5 * 1024 * 1024;
@@ -213,6 +218,14 @@
     title: {
       type: String,
       default: "",
+    },
+    mode: {
+      type: String as PropType<"create" | "edit">,
+      default: "create",
+    },
+    paymentDetail: {
+      type: Object as PropType<Record<string, any> | null>,
+      default: null,
     },
   });
 
@@ -246,6 +259,10 @@
     const translated = t(key);
     return translated === key ? "Платежный метод" : translated;
   });
+
+  const submitButtonLabel = computed(() =>
+    props.mode === "edit" ? "Сохранить изменения" : t("cabinet.accounts.accounts-form.actions.submit")
+  );
 
   const humanizeFieldKey = (key: string): string => {
     const formatted = key
@@ -309,11 +326,17 @@
     });
   };
 
-  const initializePaymentFields = () => {
+  const initializePaymentFields = (initialValues: Record<string, string> = {}) => {
     const nextData: Record<string, string> = {};
 
     selectedPaymentFields.value.forEach(field => {
-      nextData[field.key] = field.defaultValue;
+      nextData[field.key] = String(initialValues[field.key] ?? field.defaultValue ?? "");
+    });
+
+    Object.entries(initialValues).forEach(([key, value]) => {
+      if (!(key in nextData)) {
+        nextData[key] = String(value ?? "");
+      }
     });
 
     formData.data = nextData;
@@ -357,7 +380,60 @@
     );
   };
 
-  const isImageFile = (file: File): boolean => file.type.startsWith("image/");
+  const textExtensions = ["txt", "text", "md", "csv", "json", "xml", "log"];
+  const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "avif"];
+
+  const extractFileExtension = (value: string): string => {
+    const normalized = String(value || "").split("?")[0].split("#")[0].trim().toLowerCase();
+    const segments = normalized.split(".");
+
+    return segments.length > 1 ? segments.pop() || "" : "";
+  };
+
+  const resolvePreviewMeta = (
+    mimeType: string,
+    previewUrl: string,
+    path: string,
+    name: string
+  ): { type: "image" | "pdf" | "text" | "file"; src: string; label: string } => {
+    const normalizedMimeType = String(mimeType || "").trim().toLowerCase();
+    let type: "image" | "pdf" | "text" | "file" = "file";
+
+    if (normalizedMimeType.startsWith("image/")) {
+      type = "image";
+    } else if (normalizedMimeType.includes("pdf")) {
+      type = "pdf";
+    } else if (
+      normalizedMimeType.startsWith("text/") ||
+      normalizedMimeType.includes("json") ||
+      normalizedMimeType.includes("xml")
+    ) {
+      type = "text";
+    } else {
+      const extension = extractFileExtension(previewUrl || path || name);
+      if (imageExtensions.includes(extension)) {
+        type = "image";
+      } else if (extension === "pdf") {
+        type = "pdf";
+      } else if (textExtensions.includes(extension)) {
+        type = "text";
+      }
+    }
+
+    return {
+      type,
+      src: type === "image" ? previewUrl || path : "",
+      label: type === "pdf" ? "PDF" : type === "text" ? "TXT" : type === "file" ? "FILE" : "IMG",
+    };
+  };
+
+  const resolveSelectedFilePreviewMeta = (selectedFile: SelectedUploadFile) =>
+    resolvePreviewMeta(
+      selectedFile.mimeType,
+      selectedFile.previewUrl,
+      String(selectedFile.uploadedDocument?.path ?? ""),
+      selectedFile.displayName
+    );
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) {
@@ -373,10 +449,104 @@
 
   const cleanupSelectedFiles = () => {
     selectedFiles.value.forEach(item => {
-      URL.revokeObjectURL(item.previewUrl);
+      if (item.source === "new" && item.previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(item.previewUrl);
+      }
     });
 
     selectedFiles.value = [];
+  };
+
+  const normalizeExistingDocument = (item: any): Record<string, any> | null => {
+    if (!item || typeof item !== "object") {
+      return null;
+    }
+
+    const path = String(item.path ?? "").trim();
+    if (!path) {
+      return null;
+    }
+
+    return {
+      name: String(item.name ?? "Document"),
+      path,
+      mime_type: String(item.mime_type ?? item.mimeType ?? ""),
+      size: Number(item.size ?? 0),
+      uploaded_at: item.uploaded_at ?? item.uploadedAt ?? null,
+      preview_url: String(item.preview_url ?? item.previewUrl ?? path),
+    };
+  };
+
+  const hydrateSelectedFiles = (documents: any[] = []) => {
+    cleanupSelectedFiles();
+
+    selectedFiles.value = documents
+      .map(normalizeExistingDocument)
+      .filter((item): item is Record<string, any> => Boolean(item))
+      .map((document, index) => ({
+        source: "existing" as const,
+        uniqueKey: `existing:${document.path}:${index}`,
+        file: null,
+        previewUrl: String(document.preview_url ?? document.path ?? ""),
+        uploadStatus: "uploaded" as const,
+        uploadProgress: 100,
+        uploadError: null,
+        uploadedDocument: {
+          name: document.name,
+          path: document.path,
+          mime_type: document.mime_type,
+          size: document.size,
+          uploaded_at: document.uploaded_at,
+        },
+        displayName: String(document.name ?? "Document"),
+        size: Number(document.size ?? 0),
+        mimeType: String(document.mime_type ?? ""),
+      }));
+  };
+
+  const extractEditablePaymentData = (rawData: unknown): Record<string, string> => {
+    if (!rawData || typeof rawData !== "object") {
+      return {};
+    }
+
+    const paymentData = rawData as Record<string, any>;
+    const scopedFields = paymentData.fields;
+    const source =
+      scopedFields && typeof scopedFields === "object" && !Array.isArray(scopedFields)
+        ? (scopedFields as Record<string, any>)
+        : paymentData;
+
+    return Object.entries(source).reduce<Record<string, string>>((carry, [key, value]) => {
+      if (key === "legacy" || key === "fields") {
+        return carry;
+      }
+
+      if (value === null || value === undefined) {
+        carry[key] = "";
+        return carry;
+      }
+
+      if (typeof value === "object") {
+        return carry;
+      }
+
+      carry[key] = String(value);
+      return carry;
+    }, {});
+  };
+
+  const applyEditPayload = () => {
+    if (!props.paymentDetail) {
+      return;
+    }
+
+    formData.name = String(props.paymentDetail.name ?? "");
+    formData.paymentSystemId = String(
+      props.paymentDetail.payment_system_id ?? props.paymentDetail.paymentSystemId ?? props.paymentDetail.payment_system?.id ?? ""
+    );
+    selectedPaymentSystem.value = paymentSystems.find(system => system.id === formData.paymentSystemId) ?? null;
+    initializePaymentFields(extractEditablePaymentData(props.paymentDetail.data));
+    hydrateSelectedFiles(Array.isArray(props.paymentDetail.documents) ? props.paymentDetail.documents : []);
   };
 
   const handleFilesSelected = (files: File[] = []) => {
@@ -409,12 +579,17 @@
       }
 
       selectedFiles.value.push({
+        source: "new",
+        uniqueKey: `new:${uniq}`,
         file,
         previewUrl: URL.createObjectURL(file),
         uploadStatus: "idle",
         uploadProgress: 0,
         uploadError: null,
         uploadedDocument: null,
+        displayName: file.name,
+        size: file.size,
+        mimeType: file.type,
       });
       alreadyAdded.add(uniq);
     });
@@ -430,7 +605,9 @@
       return;
     }
 
-    URL.revokeObjectURL(file.previewUrl);
+    if (file.source === "new" && file.previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(file.previewUrl);
+    }
     selectedFiles.value.splice(index, 1);
   };
 
@@ -463,7 +640,13 @@
 
   const uploadSingleDocument = async (selectedFile: SelectedUploadFile): Promise<Record<string, any>> => {
     if (selectedFile.uploadedDocument) {
+      selectedFile.uploadStatus = "uploaded";
+      selectedFile.uploadProgress = 100;
       return selectedFile.uploadedDocument;
+    }
+
+    if (!selectedFile.file) {
+      throw new Error("Не удалось получить файл для загрузки.");
     }
 
     selectedFile.uploadStatus = "uploading";
@@ -574,9 +757,17 @@
           documents: uploadedDocuments,
         };
 
-        const response = await app.paymentDetails.post(payload);
+        const response =
+          props.mode === "edit" && props.paymentDetail?.id
+            ? await app.paymentDetails.put(props.paymentDetail.id, payload)
+            : await app.paymentDetails.post(payload);
 
-        toast.success(response.data.message || "Платёжные реквизиты созданы успешно.");
+        toast.success(
+          response.data.message ||
+            (props.mode === "edit"
+              ? "Платёжные реквизиты обновлены и повторно отправлены на проверку."
+              : "Платёжные реквизиты созданы успешно.")
+        );
         closeModal();
         useEventBus.emit("loadDataForPaymentDetails");
       } catch (errorResponse: any) {
@@ -597,6 +788,9 @@
     clearFieldErrors();
 
     await getPaymentTypes();
+    if (props.mode === "edit") {
+      applyEditPayload();
+    }
   });
 
   onBeforeUnmount(() => {

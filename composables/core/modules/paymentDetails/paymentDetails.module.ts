@@ -40,6 +40,10 @@ export class PaymentDetailsModule implements BasicModuleInterface {
   async delete(id: any): Promise<any> {
     return await this.paymentDetailsService.delete(id);
   }
+
+  async restore(id: any): Promise<any> {
+    return await this.paymentDetailsService.restore(id);
+  }
 }
 
 export default PaymentDetailsModule;

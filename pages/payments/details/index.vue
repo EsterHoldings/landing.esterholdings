@@ -56,6 +56,13 @@
 
             <div class="cabinet-controls-row__right">
               <UiSelect
+                class="min-w-[170px] sm:w-[180px]"
+                :value="archivedFilter"
+                :data="archivedFilterOptions"
+                :withoutNoSelect="true"
+                @change="handleChangeArchivedFilter" />
+
+              <UiSelect
                 class="min-w-[180px] sm:w-[200px]"
                 :value="orderBy"
                 :data="sortByFilterData"
@@ -152,7 +159,14 @@
                     class="px-5 py-3 align-middle font-bold truncate"
                     :title="paymentDetail?.name">
                     <div class="payment-row-name">
-                      <span class="payment-row-name__title">{{ paymentDetail?.name }}</span>
+                      <span class="payment-row-name__title">
+                        {{ paymentDetail?.name }}
+                        <span
+                          v-if="paymentDetail?.is_archived"
+                          class="payment-row-name__archive-pill">
+                          Archived
+                        </span>
+                      </span>
                       <div
                         v-if="resolvePaymentDetailDocuments(paymentDetail).length > 0"
                         class="payment-row-docs">
@@ -231,11 +245,24 @@
                         </div>
 
                         <div
+                          v-if="!paymentDetail.is_archived"
                           class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          @click="handleDeletePaymentDetail(paymentDetail.id)">
-                          <UiIconTrash class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]" />
+                          @click="handleEditPaymentDetail(paymentDetail)">
+                          <UiIconUpdate class="!h-[14px] !w-[14px]" />
+                          <UiTextSmall class="whitespace-nowrap">Edit</UiTextSmall>
+                        </div>
+
+                        <div
+                          class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
+                          @click="paymentDetail.is_archived ? handleRestorePaymentDetail(paymentDetail.id) : handleDeletePaymentDetail(paymentDetail.id)">
+                          <UiIconTrash
+                            v-if="!paymentDetail.is_archived"
+                            class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]" />
+                          <UiIconUpdate
+                            v-else
+                            class="!h-[14px] !w-[14px]" />
                           <UiTextSmall class="whitespace-nowrap">{{
-                            t("cabinet.payments.details.delete")
+                            paymentDetail.is_archived ? "Restore" : "Archive"
                           }}</UiTextSmall>
                         </div>
                       </div>
@@ -295,13 +322,27 @@
                         }}</UiTextSmall>
                       </button>
                       <button
+                        v-if="!paymentDetail.is_archived"
                         class="flex w-full items-center justify-start gap-2 rounded px-2 py-1 hover:bg-[var(--color-stroke-ui-light)]"
                         type="button"
-                        :title="t('cabinet.payments.details.delete', 'Delete')"
-                        @click="handleDeletePaymentDetail(paymentDetail.id)">
-                        <UiIconTrash class="!h-4 !w-4 shrink-0 stroke-[var(--ui-sticker-danger)]" />
+                        title="Edit"
+                        @click="handleEditPaymentDetail(paymentDetail)">
+                        <UiIconUpdate class="!h-4 !w-4 shrink-0" />
+                        <UiTextSmall class="whitespace-nowrap">Edit</UiTextSmall>
+                      </button>
+                      <button
+                        class="flex w-full items-center justify-start gap-2 rounded px-2 py-1 hover:bg-[var(--color-stroke-ui-light)]"
+                        type="button"
+                        :title="paymentDetail.is_archived ? 'Restore' : 'Archive'"
+                        @click="paymentDetail.is_archived ? handleRestorePaymentDetail(paymentDetail.id) : handleDeletePaymentDetail(paymentDetail.id)">
+                        <UiIconTrash
+                          v-if="!paymentDetail.is_archived"
+                          class="!h-4 !w-4 shrink-0 stroke-[var(--ui-sticker-danger)]" />
+                        <UiIconUpdate
+                          v-else
+                          class="!h-4 !w-4 shrink-0" />
                         <UiTextSmall class="whitespace-nowrap">{{
-                          t("cabinet.payments.details.delete") || "Delete"
+                          paymentDetail.is_archived ? "Restore" : "Archive"
                         }}</UiTextSmall>
                       </button>
                     </div>
@@ -315,6 +356,11 @@
                     </UiTextSmall>
                     <div class="cabinet-card__title">{{ paymentDetail.name }}</div>
                     <div class="cabinet-card__subtitle">{{ paymentDetail.payment_system_name }}</div>
+                    <div
+                      v-if="paymentDetail.is_archived"
+                      class="payment-row-name__archive-pill mt-2">
+                      Archived
+                    </div>
                   </div>
 
                   <div class="cabinet-card__head-side">
@@ -521,6 +567,7 @@
   const currentPage = ref(1);
   const orderBy = ref("created_at");
   const orderDirection = ref<typeof ORDER_DIRECTION_ASC | typeof ORDER_DIRECTION_DESC>(ORDER_DIRECTION_DESC);
+  const archivedFilter = ref<"active" | "archived" | "all">("active");
 
   const paymentDetails = reactive<any[]>([]);
 
@@ -550,20 +597,28 @@
     )
   );
   const emptyStateTitle = computed(() =>
-    isVerificationRequired.value
-      ? resolveText("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для добавления реквизита")
-      : resolveText("cabinet.payments.details.emptyTitle", "Платёжных реквизитов пока нет")
+    archivedFilter.value === "archived"
+      ? "Архивных реквизитов пока нет"
+      : archivedFilter.value === "all"
+        ? "Реквизиты не найдены"
+        : isVerificationRequired.value
+          ? resolveText("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для добавления реквизита")
+          : resolveText("cabinet.payments.details.emptyTitle", "Платёжных реквизитов пока нет")
   );
   const emptyStateSubtitle = computed(() =>
-    isVerificationRequired.value
-      ? resolveText(
-          "cabinet.dashboard.mt4.verifySubtitle",
-          "Подтвердите данные профиля и документы, после этого сможете добавить платёжный реквизит."
-        )
-      : resolveText(
-          "cabinet.payments.details.emptySubtitle",
-          "Добавьте первый платёжный реквизит, чтобы получать выплаты."
-        )
+    archivedFilter.value === "archived"
+      ? "Здесь будут отображаться архивные реквизиты, которые можно восстановить."
+      : archivedFilter.value === "all"
+        ? "Попробуйте изменить поиск или фильтры."
+        : isVerificationRequired.value
+          ? resolveText(
+              "cabinet.dashboard.mt4.verifySubtitle",
+              "Подтвердите данные профиля и документы, после этого сможете добавить платёжный реквизит."
+            )
+          : resolveText(
+              "cabinet.payments.details.emptySubtitle",
+              "Добавьте первый платёжный реквизит, чтобы получать выплаты."
+            )
   );
 
   const tableRef = ref<any>(null);
@@ -660,6 +715,12 @@
     { id: "status", value: "status", text: "Status" },
     { id: "created_at", value: "created_at", text: "Created at" },
     { id: "updated_at", value: "updated_at", text: "Updated at" },
+  ]);
+
+  const archivedFilterOptions = reactive([
+    { id: "active", value: "active", text: "Active" },
+    { id: "archived", value: "archived", text: "Archived" },
+    { id: "all", value: "all", text: "All" },
   ]);
 
   const viewOptions = [
@@ -908,18 +969,40 @@
   const handleDeletePaymentDetail = async (id: string | number) => {
     closeAllMenus();
 
-    const confirmed = window.confirm("Удалить платёжный реквизит?");
+    const confirmed = window.confirm("Архивировать платёжный реквизит?");
     if (!confirmed) {
       return;
     }
 
     try {
       await appCore.paymentDetails.delete(id);
-      toast.success("Платёжный реквизит удалён.");
+      toast.success("Платёжный реквизит перемещён в архив.");
       await loadData();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Не удалось удалить платёжный реквизит.");
+      toast.error(error?.response?.data?.message || "Не удалось архивировать платёжный реквизит.");
     }
+  };
+
+  const handleRestorePaymentDetail = async (id: string | number) => {
+    closeAllMenus();
+
+    try {
+      await appCore.paymentDetails.restore(id);
+      toast.success("Платёжный реквизит восстановлен.");
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Не удалось восстановить платёжный реквизит.");
+    }
+  };
+
+  const handleEditPaymentDetail = async (paymentDetail: any) => {
+    closeAllMenus();
+
+    openModal(PaymentDetailsCreateNew, {
+      title: "Редактировать платёжный реквизит",
+      mode: "edit",
+      paymentDetail,
+    });
   };
 
   const toggleCardMenu = (id: string | number) => {
@@ -950,6 +1033,14 @@
     await loadData();
   };
 
+  const handleChangeArchivedFilter = async (value: string) => {
+    if (value === "active" || value === "archived" || value === "all") {
+      archivedFilter.value = value;
+      currentPage.value = 1;
+      await loadData();
+    }
+  };
+
   const loadData = async () => {
     isLoading.value = true;
 
@@ -960,6 +1051,7 @@
         page: currentPage.value,
         orderBy: orderBy.value,
         orderDirection: orderDirection.value,
+        archived: archivedFilter.value,
       });
 
       perPage.value = response.data.data.per_page;
@@ -1503,9 +1595,27 @@
   }
 
   .payment-row-name__title {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .payment-row-name__archive-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 0 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--ui-text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
     white-space: nowrap;
   }
 

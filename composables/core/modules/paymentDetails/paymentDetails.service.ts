@@ -33,6 +33,10 @@ export class PaymentDetailsService {
   async delete(id: any): Promise<any> {
     return await this.useApi.delete(`/client/payment-details/${id}`);
   }
+
+  async restore(id: any): Promise<any> {
+    return await this.useApi.post(`/client/payment-details/${id}/restore`);
+  }
 }
 
 export default PaymentDetailsService;
