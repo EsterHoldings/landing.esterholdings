@@ -4,7 +4,7 @@ import { formData } from "./index";
 
 export const validatorLoginForm: any = useValidation(formData, {
   email: ["required", "isEmail"],
-  password: ["required", "min:6", "max:32"],
+  password: ["required", "max:255"],
 });
 
 export const validateLoginForm = (doSendFormCallback: any): void =>
