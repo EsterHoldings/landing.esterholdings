@@ -64,7 +64,18 @@
             </div>
 
             <div class="payment-documents__hint">
-              Загрузите скриншот реквизитов из платежной системы (PNG, JPG, PDF, до 5 МБ).
+              Можно оставить уже прикрепленные документы и догрузить новые. Новые файлы отправятся в S3 при сохранении формы.
+            </div>
+
+            <div
+              v-if="selectedFiles.length > 0"
+              class="payment-documents__summary">
+              <span v-if="existingSelectedFiles.length > 0">
+                Уже прикреплено: {{ existingSelectedFiles.length }}
+              </span>
+              <span v-if="newSelectedFiles.length > 0">
+                Новые файлы: {{ newSelectedFiles.length }}
+              </span>
             </div>
 
             <div
@@ -77,7 +88,7 @@
                 <div class="payment-documents__preview">
                   <UiImage
                     v-if="resolveSelectedFilePreviewMeta(selectedFile).type === 'image' && resolveSelectedFilePreviewMeta(selectedFile).src"
-                    :src="selectedFile.previewUrl"
+                    :src="resolveSelectedFilePreviewMeta(selectedFile).src"
                     fitContain
                     fitPosition="center" />
                   <div
@@ -88,7 +99,14 @@
                 </div>
 
                 <div class="payment-documents__meta">
-                  <div class="payment-documents__name">{{ selectedFile.displayName }}</div>
+                  <div class="payment-documents__meta-top">
+                    <div class="payment-documents__name">{{ selectedFile.displayName }}</div>
+                    <span
+                      class="payment-documents__origin"
+                      :class="`is-${selectedFile.source}`">
+                      {{ selectedFile.source === "existing" ? "Уже прикреплён" : "Новый файл" }}
+                    </span>
+                  </div>
                   <div class="payment-documents__size">{{ formatFileSize(selectedFile.size) }}</div>
                   <div
                     class="payment-documents__status"
@@ -98,8 +116,11 @@
                       class="payment-documents__status-spinner" />
                     <span>{{ resolveUploadStatusLabel(selectedFile) }}</span>
                   </div>
+                  <div class="payment-documents__status-caption">
+                    {{ resolveUploadStatusCaption(selectedFile) }}
+                  </div>
                   <div
-                    v-if="selectedFile.uploadStatus === 'uploading' || selectedFile.uploadStatus === 'uploaded'"
+                    v-if="selectedFile.source === 'new'"
                     class="payment-documents__progress">
                     <div class="payment-documents__progress-track">
                       <div
@@ -120,7 +141,7 @@
                 <button
                   type="button"
                   class="payment-documents__remove"
-                  aria-label="Удалить файл"
+                  :aria-label="selectedFile.source === 'existing' ? 'Убрать уже прикреплённый файл' : 'Убрать новый файл'"
                   :disabled="selectedFile.uploadStatus === 'uploading'"
                   @click="removeSelectedFile(index)">
                   <UiIconTrash class="payment-documents__remove-icon" />
@@ -263,6 +284,9 @@
   const submitButtonLabel = computed(() =>
     props.mode === "edit" ? "Сохранить изменения" : t("cabinet.accounts.accounts-form.actions.submit")
   );
+
+  const existingSelectedFiles = computed(() => selectedFiles.value.filter(file => file.source === "existing"));
+  const newSelectedFiles = computed(() => selectedFiles.value.filter(file => file.source === "new"));
 
   const humanizeFieldKey = (key: string): string => {
     const formatted = key
@@ -568,12 +592,15 @@
       return true;
     });
 
+    const buildFileSignature = (file: File): string => `${file.name}:${file.size}:${file.lastModified}`;
     const alreadyAdded = new Set(
-      selectedFiles.value.map(item => `${item.file.name}:${item.file.size}:${item.file.lastModified}`)
+      selectedFiles.value
+        .filter(item => item.file instanceof File)
+        .map(item => buildFileSignature(item.file as File))
     );
 
     uploadableFiles.forEach(file => {
-      const uniq = `${file.name}:${file.size}:${file.lastModified}`;
+      const uniq = buildFileSignature(file);
       if (alreadyAdded.has(uniq)) {
         return;
       }
@@ -623,6 +650,10 @@
   };
 
   const resolveUploadStatusLabel = (selectedFile: SelectedUploadFile): string => {
+    if (selectedFile.source === "existing") {
+      return "Сохранён";
+    }
+
     if (selectedFile.uploadStatus === "uploading") {
       return "Загрузка...";
     }
@@ -636,6 +667,26 @@
     }
 
     return "Готов к загрузке";
+  };
+
+  const resolveUploadStatusCaption = (selectedFile: SelectedUploadFile): string => {
+    if (selectedFile.source === "existing") {
+      return "Этот документ уже сохранён и останется прикреплённым, если вы его не удалите.";
+    }
+
+    if (selectedFile.uploadStatus === "uploading") {
+      return "Файл сейчас загружается в Amazon S3.";
+    }
+
+    if (selectedFile.uploadStatus === "uploaded") {
+      return "Файл уже загружен и будет сохранён вместе с реквизитом.";
+    }
+
+    if (selectedFile.uploadStatus === "failed") {
+      return "Загрузка не завершилась. Исправьте ошибку или уберите файл.";
+    }
+
+    return "Файл выбран и будет загружен после нажатия на сохранение.";
   };
 
   const uploadSingleDocument = async (selectedFile: SelectedUploadFile): Promise<Record<string, any>> => {
@@ -878,6 +929,15 @@
     font-size: 12px;
   }
 
+  .payment-documents__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    color: var(--ui-text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
   .payment-documents__list {
     display: flex;
     flex-direction: column;
@@ -923,6 +983,13 @@
     gap: 2px;
   }
 
+  .payment-documents__meta-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
   .payment-documents__name {
     color: var(--ui-text-main);
     font-size: 13px;
@@ -930,6 +997,26 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .payment-documents__origin {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    border: 1px solid var(--color-stroke-ui-light);
+  }
+
+  .payment-documents__origin.is-existing {
+    color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 10%, transparent);
+  }
+
+  .payment-documents__origin.is-new {
+    color: var(--ui-primary-main);
+    background: color-mix(in srgb, var(--ui-primary-main) 12%, transparent);
   }
 
   .payment-documents__size {
@@ -956,6 +1043,12 @@
 
   .payment-documents__status.is-failed {
     color: var(--color-danger);
+  }
+
+  .payment-documents__status-caption {
+    color: var(--ui-text-secondary);
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .payment-documents__status-spinner {
