@@ -117,7 +117,7 @@
       },
       {
         icon: UiIconHistory,
-        label: resolveText("cabinet.accounts.tabs.history", "История"),
+        label: resolveText("cabinet.accounts.tabs.history", "Транзакции"),
         component: TabHistory,
       },
       {

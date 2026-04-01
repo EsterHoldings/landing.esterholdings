@@ -35,8 +35,6 @@
     total: number;
   };
 
-  type ProfitFilter = "all" | "positive" | "negative";
-
   const appCore = useAppCore();
   const { t, locale } = useI18n({ useScope: "global" });
 
@@ -45,7 +43,6 @@
   const lastPage = ref(1);
   const searchQuery = ref("");
   const debouncedSearchQuery = ref("");
-  const profitFilter = ref<ProfitFilter>("all");
 
   const isListLoading = ref(false);
   const isLoadingMore = ref(false);
@@ -67,9 +64,6 @@
   const searchPlaceholder = computed(() =>
     resolveText("cabinet.accounts.tradeHistory.searchPlaceholder", "Search by all trade fields")
   );
-  const filterAllLabel = computed(() => resolveText("cabinet.accounts.tradeHistory.filterAll", "All"));
-  const filterPositiveLabel = computed(() => resolveText("cabinet.accounts.tradeHistory.filterPositive", "Profitable"));
-  const filterNegativeLabel = computed(() => resolveText("cabinet.accounts.tradeHistory.filterNegative", "Losing"));
   const syncLabel = computed(() => resolveText("cabinet.accounts.tradeHistory.sync", "Sync history"));
   const syncingLabel = computed(() => resolveText("cabinet.accounts.tradeHistory.syncing", "Syncing..."));
 
@@ -107,10 +101,6 @@
 
     if (debouncedSearchQuery.value !== "") {
       params.search = debouncedSearchQuery.value;
-    }
-
-    if (profitFilter.value !== "all") {
-      params.profit_filter = profitFilter.value;
     }
 
     const response = await appCore.accounts.getTradeHistory(props.id, params);
@@ -264,7 +254,7 @@
     }, 300);
   });
 
-  watch([debouncedSearchQuery, profitFilter], async () => {
+  watch(debouncedSearchQuery, async () => {
     if (!hasLoadedOnce.value) return;
     await applyFilters();
   });
@@ -291,31 +281,6 @@
           class="account-history__search-input"
           :placeholder="searchPlaceholder" />
       </div>
-
-      <div class="account-history__filters">
-        <button
-          type="button"
-          class="account-history__filter"
-          :class="profitFilter === 'all' ? 'is-active' : ''"
-          @click="profitFilter = 'all'">
-          {{ filterAllLabel }}
-        </button>
-        <button
-          type="button"
-          class="account-history__filter"
-          :class="profitFilter === 'positive' ? 'is-active' : ''"
-          @click="profitFilter = 'positive'">
-          {{ filterPositiveLabel }}
-        </button>
-        <button
-          type="button"
-          class="account-history__filter"
-          :class="profitFilter === 'negative' ? 'is-active' : ''"
-          @click="profitFilter = 'negative'">
-          {{ filterNegativeLabel }}
-        </button>
-      </div>
-
       <button
         type="button"
         class="account-history__sync-btn"
@@ -409,34 +374,6 @@
 
   .account-history__search-input:focus {
     border-color: color-mix(in srgb, var(--ui-primary-main) 55%, var(--color-stroke-ui-light));
-  }
-
-  .account-history__filters {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .account-history__filter {
-    border: 1px solid var(--color-stroke-ui-light);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--ui-background-card) 70%, transparent);
-    color: var(--ui-text-secondary);
-    padding: 5px 10px;
-    font-size: 12px;
-    line-height: 1.2;
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      color 0.15s ease,
-      border-color 0.15s ease;
-  }
-
-  .account-history__filter.is-active {
-    color: var(--ui-text-main);
-    border-color: color-mix(in srgb, var(--ui-primary-main) 50%, var(--color-stroke-ui-light));
-    background: color-mix(in srgb, var(--ui-primary-main) 14%, var(--ui-background-card));
   }
 
   .account-history__sync-btn {
@@ -552,10 +489,6 @@
       min-width: 0;
       width: 100%;
       flex: 1 1 100%;
-    }
-
-    .account-history__filters {
-      flex: 1 1 auto;
     }
 
     .account-history__sync-btn {
