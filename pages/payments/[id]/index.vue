@@ -90,16 +90,14 @@
 
           <div
             v-if="payment.payment_detail_name"
-            class="payment-field md:col-span-2"
-          >
+            class="payment-field md:col-span-2">
             <UiTextSmall class="payment-field__label">{{ paymentDetailLabel }}</UiTextSmall>
             <div class="payment-field__value">{{ valueOrDash(payment.payment_detail_name) }}</div>
           </div>
 
           <div
             v-if="payment.admin_comment"
-            class="payment-field md:col-span-2"
-          >
+            class="payment-field md:col-span-2">
             <UiTextSmall class="payment-field__label">{{ adminCommentLabel }}</UiTextSmall>
             <div class="payment-field__value">{{ valueOrDash(payment.admin_comment) }}</div>
           </div>
@@ -126,9 +124,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref } from "vue";
+  import type Echo from "laravel-echo";
+  import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
   import { useRoute } from "vue-router";
-  import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
+  import { definePageMeta, useLocalePath, useNuxtApp } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
 
   import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
@@ -137,6 +136,8 @@
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
   import useAppCore from "~/composables/useAppCore";
+  import useEventBus from "~/composables/useEventBus";
+  import { useAuthStore } from "~/stores/authStore";
 
   definePageMeta({
     layout: "cabinet",
@@ -144,13 +145,27 @@
   });
 
   const appCore = useAppCore();
+  const CLIENT_NOTIFICATION_RECEIVED_EVENT = "client-notification-received";
+  const BILLING_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated", "payments.deposit.status-updated"];
+  const PAYMENT_REALTIME_EVENT_NAMES = [
+    ".user.payment.updated",
+    "user.payment.updated",
+    ".Modules\\Billing\\Events\\UserPaymentUpdated",
+    "Modules\\Billing\\Events\\UserPaymentUpdated",
+    ".UserPaymentUpdated",
+    "UserPaymentUpdated",
+  ];
   const route = useRoute();
   const localePath = useLocalePath();
   const { t } = useI18n({ useScope: "global" });
+  const authStore = useAuthStore();
+  const { $echo } = useNuxtApp() as { $echo?: Echo<any> };
 
   const isLoading = ref(true);
   const errorMessage = ref<string | null>(null);
   const payment = ref<any | null>(null);
+  const paymentRealtimeChannel = ref<any>(null);
+  const currentPaymentRealtimeChannelName = ref("");
 
   const paymentId = computed(() => String(route.params.id ?? "").trim());
   const paymentsListLink = computed(() => localePath("/payments"));
@@ -249,7 +264,110 @@
     }
   };
 
-  onMounted(fetchPayment);
+  const handleClientNotificationReceived = async (payload: any) => {
+    const notification = payload?.notification;
+    const type = String(notification?.type ?? "").trim();
+    const notifiedPaymentId = String(notification?.payload?.payment_id ?? "").trim();
+
+    if (!BILLING_NOTIFICATION_TYPES.includes(type)) {
+      return;
+    }
+
+    if (notifiedPaymentId !== "" && notifiedPaymentId !== paymentId.value) {
+      return;
+    }
+
+    await fetchPayment();
+  };
+
+  const resolveEchoClient = () => {
+    if ($echo && typeof ($echo as any).private === "function") {
+      return $echo as any;
+    }
+
+    if (typeof window !== "undefined") {
+      const fallbackEcho = (window as any).Echo;
+      if (fallbackEcho && typeof fallbackEcho.private === "function") {
+        return fallbackEcho;
+      }
+    }
+
+    return null;
+  };
+
+  const handlePaymentRealtimeUpdated = async (payload: any) => {
+    const paymentIdFromEvent = String(payload?.payment_id ?? "").trim();
+    if (paymentIdFromEvent !== "" && paymentIdFromEvent !== paymentId.value) {
+      return;
+    }
+
+    await fetchPayment();
+  };
+
+  const subscribeToPaymentRealtime = () => {
+    const userId = String(authStore.user?.id ?? "").trim();
+    if (userId === "") {
+      return;
+    }
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    const channelName = `payments.user.${userId}`;
+    if (currentPaymentRealtimeChannelName.value === channelName && paymentRealtimeChannel.value) {
+      return;
+    }
+
+    unsubscribeFromPaymentRealtime();
+    currentPaymentRealtimeChannelName.value = channelName;
+    paymentRealtimeChannel.value = echoClient.private(channelName);
+
+    PAYMENT_REALTIME_EVENT_NAMES.forEach(eventName => {
+      paymentRealtimeChannel.value.stopListening(eventName, handlePaymentRealtimeUpdated);
+      paymentRealtimeChannel.value.listen(eventName, handlePaymentRealtimeUpdated);
+    });
+  };
+
+  const unsubscribeFromPaymentRealtime = () => {
+    const channelName = currentPaymentRealtimeChannelName.value;
+    currentPaymentRealtimeChannelName.value = "";
+    paymentRealtimeChannel.value = null;
+
+    if (channelName === "") {
+      return;
+    }
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    try {
+      echoClient.leave(channelName);
+    } catch {
+      // no-op
+    }
+  };
+
+  watch(
+    () => authStore.user?.id,
+    () => {
+      subscribeToPaymentRealtime();
+    }
+  );
+
+  onMounted(async () => {
+    useEventBus.on(CLIENT_NOTIFICATION_RECEIVED_EVENT, handleClientNotificationReceived);
+    subscribeToPaymentRealtime();
+    await fetchPayment();
+  });
+
+  onBeforeUnmount(() => {
+    useEventBus.off(CLIENT_NOTIFICATION_RECEIVED_EVENT, handleClientNotificationReceived);
+    unsubscribeFromPaymentRealtime();
+  });
 </script>
 
 <style scoped>

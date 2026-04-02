@@ -63,7 +63,7 @@
     "App\\Events\\UserNotificationCreated",
   ];
   const SUPPORT_USER_NOTIFICATION_TYPES = ["support.message"];
-  const BILLING_USER_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated"];
+  const BILLING_USER_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated", "payments.deposit.status-updated"];
   const CLIENT_NOTIFICATIONS_MARKED_BY_TYPES_EVENT = "client-notifications-marked-by-types";
 
   const props = withDefaults(
@@ -151,7 +151,12 @@
     }
 
     if (email !== "") {
-      return email.replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "U";
+      return (
+        email
+          .replace(/[^a-zA-Z0-9]/g, "")
+          .slice(0, 2)
+          .toUpperCase() || "U"
+      );
     }
 
     return "U";
@@ -188,10 +193,18 @@
   };
 
   const resolveNotificationTone = (raw: any): NotificationTone => {
-    const source = `${raw?.type ?? ""} ${raw?.title ?? ""} ${raw?.message ?? ""} ${raw?.payload?.status ?? raw?.status ?? ""}`.toLowerCase();
+    const source =
+      `${raw?.type ?? ""} ${raw?.title ?? ""} ${raw?.message ?? ""} ${raw?.payload?.status ?? raw?.status ?? ""}`.toLowerCase();
     if (source.includes("approved") || source.includes("successful")) return "success";
     if (source.includes("pending") || source.includes("processing") || source.includes("warning")) return "warning";
-    if (source.includes("rejected") || source.includes("cancelled") || source.includes("error") || source.includes("danger") || source.includes("failed")) return "danger";
+    if (
+      source.includes("rejected") ||
+      source.includes("cancelled") ||
+      source.includes("error") ||
+      source.includes("danger") ||
+      source.includes("failed")
+    )
+      return "danger";
     if (source.includes("success")) return "success";
     return "info";
   };
@@ -211,7 +224,9 @@
   };
 
   const statusText = (value: string): string => {
-    const normalized = String(value ?? "").trim().toLowerCase();
+    const normalized = String(value ?? "")
+      .trim()
+      .toLowerCase();
     const key = `cabinet.header.notificationTemplates.statuses.${normalized}`;
 
     switch (normalized) {
@@ -231,7 +246,9 @@
   };
 
   const verificationStepText = (value: string, fallback = "-"): string => {
-    const normalized = String(value ?? "").trim().toLowerCase();
+    const normalized = String(value ?? "")
+      .trim()
+      .toLowerCase();
     if (normalized === "") {
       return fallback;
     }
@@ -240,7 +257,9 @@
   };
 
   const verificationStatusText = (value: string): string => {
-    const normalized = String(value ?? "").trim().toLowerCase();
+    const normalized = String(value ?? "")
+      .trim()
+      .toLowerCase();
     const key = `cabinet.header.notificationTemplates.statuses.${normalized}`;
 
     switch (normalized) {
@@ -285,17 +304,57 @@
     return { title, message };
   };
 
+  const buildDepositStatusNotification = (
+    raw: any,
+    payload: Record<string, any> | null
+  ): { title: string; message: string } => {
+    const status = statusText(String(payload?.status ?? raw?.status ?? ""));
+    const amount = Number(payload?.amount ?? 0);
+    const currency = String(payload?.currency || "USD").trim();
+    const accountNumber = String(payload?.account_number || "").trim();
+    const paymentSystemName = String(payload?.payment_system_name || "").trim();
+    const defaultTitle = String(raw?.title ?? "").trim() || "Deposit status updated";
+    const defaultMessage = String(raw?.message ?? "").trim();
+
+    const title = resolveText("cabinet.header.notificationTemplates.depositStatusUpdated.title", defaultTitle);
+    const fallbackMessage =
+      defaultMessage !== ""
+        ? defaultMessage
+        : [
+            status,
+            paymentSystemName !== "" ? paymentSystemName : null,
+            amount > 0 ? `${amount.toFixed(2)} ${currency}` : null,
+            accountNumber !== "" ? accountNumber : null,
+          ]
+            .filter(Boolean)
+            .join(" • ");
+    const message = resolveText("cabinet.header.notificationTemplates.depositStatusUpdated.message", fallbackMessage, {
+      status,
+      method: paymentSystemName || "-",
+      amount: amount.toFixed(2),
+      currency,
+      account: accountNumber || "-",
+    });
+
+    return { title, message };
+  };
+
   const buildSupportNotification = (
     raw: any,
     payload: Record<string, any> | null
   ): { title: string; message: string } => {
     const preview = truncateText(payload?.preview || raw?.message || "");
-    const messageType = String(payload?.message_type || "").trim().toLowerCase();
+    const messageType = String(payload?.message_type || "")
+      .trim()
+      .toLowerCase();
     const defaultTitle = String(raw?.title ?? "").trim() || "New support message";
     const defaultMessage = truncateText(raw?.message);
 
     if (messageType === "system") {
-      const title = resolveText("cabinet.header.notificationTemplates.supportTicketUpdated.title", "Support ticket updated");
+      const title = resolveText(
+        "cabinet.header.notificationTemplates.supportTicketUpdated.title",
+        "Support ticket updated"
+      );
       const fallbackMessage = defaultMessage !== "" ? defaultMessage : preview || "Support ticket updated";
       const message = resolveText(
         "cabinet.header.notificationTemplates.supportTicketUpdated.message",
@@ -308,11 +367,9 @@
 
     const title = resolveText("cabinet.header.notificationTemplates.supportMessage.title", defaultTitle);
     const fallbackMessage = defaultMessage !== "" ? defaultMessage : preview || "New support message";
-    const message = resolveText(
-      "cabinet.header.notificationTemplates.supportMessage.message",
-      fallbackMessage,
-      { preview: preview || "-" }
-    );
+    const message = resolveText("cabinet.header.notificationTemplates.supportMessage.message", fallbackMessage, {
+      preview: preview || "-",
+    });
 
     return { title, message };
   };
@@ -321,10 +378,7 @@
     raw: any,
     payload: Record<string, any> | null
   ): { title: string; message: string } => {
-    const step = verificationStepText(
-      String(payload?.step || ""),
-      String(payload?.step_label || "").trim() || "-"
-    );
+    const step = verificationStepText(String(payload?.step || ""), String(payload?.step_label || "").trim() || "-");
     const status = verificationStatusText(String(payload?.status || raw?.status || ""));
     const comment = String(payload?.comment || "").trim();
     const defaultTitle = String(raw?.title ?? "").trim() || "Verification status updated";
@@ -371,6 +425,12 @@
 
     if (type === "payments.withdrawal.status-updated") {
       const localized = buildWithdrawalStatusNotification(raw, payload);
+      title = localized.title;
+      message = localized.message;
+    }
+
+    if (type === "payments.deposit.status-updated") {
+      const localized = buildDepositStatusNotification(raw, payload);
       title = localized.title;
       message = localized.message;
     }
@@ -490,11 +550,7 @@
       notificationsLoaded.value = true;
 
       if (options.showToastsForNew) {
-        newUnreadItems
-          .slice()
-          .reverse()
-          .filter(shouldToastNotification)
-          .forEach(showNotificationToast);
+        newUnreadItems.slice().reverse().filter(shouldToastNotification).forEach(showNotificationToast);
       }
 
       newUnreadItems.forEach(item => {
@@ -773,7 +829,9 @@
 
       if (
         isSupportRoute.value &&
-        newUnreadItems.some(item => SUPPORT_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead)
+        newUnreadItems.some(
+          item => SUPPORT_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead
+        )
       ) {
         await markNotificationsByTypes(SUPPORT_USER_NOTIFICATION_TYPES);
         return;
@@ -781,7 +839,9 @@
 
       if (
         isPaymentsRoute.value &&
-        newUnreadItems.some(item => BILLING_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead)
+        newUnreadItems.some(
+          item => BILLING_USER_NOTIFICATION_TYPES.includes(String(item.type ?? "").trim()) && !item.wasRead
+        )
       ) {
         await markNotificationsByTypes(BILLING_USER_NOTIFICATION_TYPES);
       }
@@ -810,7 +870,9 @@
   };
 
   const handleMarkedByTypes = (payload?: { types?: string[]; summary?: Record<string, unknown> }) => {
-    const types = Array.isArray(payload?.types) ? payload.types.map(item => String(item ?? "").trim()).filter(Boolean) : [];
+    const types = Array.isArray(payload?.types)
+      ? payload.types.map(item => String(item ?? "").trim()).filter(Boolean)
+      : [];
 
     if (types.length > 0) {
       notifications.value = notifications.value.map(item =>
@@ -822,15 +884,11 @@
   };
 
   const handleMarkedNotifications = (payload?: { ids?: string[]; summary?: Record<string, unknown> }) => {
-    const ids = Array.isArray(payload?.ids)
-      ? payload.ids.map(item => String(item ?? "").trim()).filter(Boolean)
-      : [];
+    const ids = Array.isArray(payload?.ids) ? payload.ids.map(item => String(item ?? "").trim()).filter(Boolean) : [];
 
     if (ids.length > 0) {
       const idSet = new Set(ids);
-      notifications.value = notifications.value.map(item =>
-        idSet.has(item.id) ? { ...item, wasRead: true } : item
-      );
+      notifications.value = notifications.value.map(item => (idSet.has(item.id) ? { ...item, wasRead: true } : item));
     }
 
     notificationsStore.applySummary(payload?.summary ?? {});
@@ -841,10 +899,7 @@
       return;
     }
 
-    await Promise.all([
-      loadNotifications({ showToastsForNew }),
-      loadUnreadSummary(),
-    ]);
+    await Promise.all([loadNotifications({ showToastsForNew }), loadUnreadSummary()]);
 
     if (isOpen.value && unreadCount.value > 0) {
       await markAllRead();
@@ -887,7 +942,7 @@
 
   watch(
     () => isOpen.value,
-    async (opened) => {
+    async opened => {
       if (!opened) return;
 
       if (!notificationsLoaded.value) {
@@ -909,7 +964,7 @@
 
   watch(
     () => authStore.user?.id,
-    (userId) => {
+    userId => {
       const normalized = String(userId || "").trim();
       if (normalized === "") {
         unsubscribeFromNotifications();
@@ -1093,8 +1148,7 @@
           ]">
           <span
             v-if="!authStore.photoUrl"
-            class="profile-avatar-fallback"
-          >
+            class="profile-avatar-fallback">
             {{ profileInitials }}
           </span>
           <img

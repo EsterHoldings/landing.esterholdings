@@ -6,7 +6,10 @@ const normalizeCount = (value: unknown): number => {
   return Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
 };
 
-export const CLIENT_WITHDRAWAL_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated"];
+export const CLIENT_WITHDRAWAL_NOTIFICATION_TYPES = [
+  "payments.withdrawal.status-updated",
+  "payments.deposit.status-updated",
+];
 export const CLIENT_VERIFICATION_NOTIFICATION_TYPES = ["verification.status-updated"];
 export const CLIENT_SUPPORT_NOTIFICATION_TYPES = ["support.message"];
 

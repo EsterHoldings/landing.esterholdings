@@ -430,6 +430,7 @@
 </template>
 
 <script lang="ts" setup>
+  import type Echo from "laravel-echo";
   import CreateNewDeposit from "~/pages/payments/create/index.vue";
   import PageStructureContent from "~/components/block/pages/PageStructureContent.vue";
   import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
@@ -453,8 +454,9 @@
   import useAccountCreationEligibility from "~/composables/useAccountCreationEligibility";
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
+  import { useAuthStore } from "~/stores/authStore";
 
-  import { definePageMeta, navigateTo, useLocalePath } from "~/.nuxt/imports";
+  import { definePageMeta, navigateTo, useLocalePath, useNuxtApp } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import { computed, h, inject, onBeforeUnmount, onMounted, reactive, ref, watch, nextTick } from "vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
@@ -472,6 +474,8 @@
   const router = useRouter();
   const localePath = useLocalePath();
   const toast = useToast();
+  const authStore = useAuthStore();
+  const { $echo } = useNuxtApp() as { $echo?: Echo<any> };
 
   const appCore = useAppCore();
   const { canCreateAccount, isEligibilityLoaded, refreshAccountCreationEligibility } = useAccountCreationEligibility();
@@ -479,6 +483,16 @@
   const ORDER_DIRECTION_ASC = "asc";
   const ORDER_DIRECTION_DESC = "desc";
   const VIEW_MODE_STORAGE_KEY = "paymentsViewMode";
+  const CLIENT_NOTIFICATION_RECEIVED_EVENT = "client-notification-received";
+  const BILLING_NOTIFICATION_TYPES = ["payments.withdrawal.status-updated", "payments.deposit.status-updated"];
+  const PAYMENT_REALTIME_EVENT_NAMES = [
+    ".user.payment.updated",
+    "user.payment.updated",
+    ".Modules\\Billing\\Events\\UserPaymentUpdated",
+    "Modules\\Billing\\Events\\UserPaymentUpdated",
+    ".UserPaymentUpdated",
+    "UserPaymentUpdated",
+  ];
 
   const search = ref("");
   const total = ref(0);
@@ -582,6 +596,8 @@
   const paymentMenuRef = ref<HTMLElement | null>(null);
   const paymentMenuTriggerRefs = ref<Record<string, HTMLElement | null>>({});
   const paymentMenuPosition = reactive({ top: 0, left: 0 });
+  const paymentRealtimeChannel = ref<any>(null);
+  const currentPaymentRealtimeChannelName = ref("");
 
   const resolveI18nValue = (key: string, fallback: string): string => {
     const translated = t(key);
@@ -926,28 +942,124 @@
     await loadData();
   };
 
-  const loadData = async () => {
-    isLoading.value = true;
-    const response = await appCore.payments.get({
-      search: search.value,
-      perPage: perPage.value,
-      page: currentPage.value,
-      orderBy: orderBy.value,
-      orderDirection: orderDirection.value,
+  const loadData = async (options: { silent?: boolean } = {}) => {
+    const { silent = false } = options;
+    const shouldShowLoader = !silent || isInitialLoading.value;
+
+    if (shouldShowLoader) {
+      isLoading.value = true;
+    }
+
+    try {
+      const response = await appCore.payments.get({
+        search: search.value,
+        perPage: perPage.value,
+        page: currentPage.value,
+        orderBy: orderBy.value,
+        orderDirection: orderDirection.value,
+      });
+
+      perPage.value = response.data.data.per_page;
+      currentPage.value = response.data.data.current_page;
+      total.value = response.data.data.total;
+
+      const paymentsData = response.data.data.data.map((x: any) => {
+        x.isSpinning = false;
+        return x;
+      });
+
+      payments.splice(0, payments.length, ...paymentsData);
+    } finally {
+      if (shouldShowLoader) {
+        isLoading.value = false;
+      }
+      isInitialLoading.value = false;
+    }
+  };
+
+  const handleClientNotificationReceived = async (payload: any) => {
+    const notification = payload?.notification;
+    const type = String(notification?.type ?? "").trim();
+
+    if (!BILLING_NOTIFICATION_TYPES.includes(type)) {
+      return;
+    }
+
+    try {
+      await loadData({ silent: true });
+    } catch {
+      // no-op
+    }
+  };
+
+  const resolveEchoClient = () => {
+    if ($echo && typeof ($echo as any).private === "function") {
+      return $echo as any;
+    }
+
+    if (typeof window !== "undefined") {
+      const fallbackEcho = (window as any).Echo;
+      if (fallbackEcho && typeof fallbackEcho.private === "function") {
+        return fallbackEcho;
+      }
+    }
+
+    return null;
+  };
+
+  const handlePaymentRealtimeUpdated = async () => {
+    try {
+      await loadData({ silent: true });
+    } catch {
+      // no-op
+    }
+  };
+
+  const subscribeToPaymentRealtime = () => {
+    const userId = String(authStore.user?.id ?? "").trim();
+    if (userId === "") {
+      return;
+    }
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    const channelName = `payments.user.${userId}`;
+    if (currentPaymentRealtimeChannelName.value === channelName && paymentRealtimeChannel.value) {
+      return;
+    }
+
+    unsubscribeFromPaymentRealtime();
+    currentPaymentRealtimeChannelName.value = channelName;
+    paymentRealtimeChannel.value = echoClient.private(channelName);
+
+    PAYMENT_REALTIME_EVENT_NAMES.forEach(eventName => {
+      paymentRealtimeChannel.value.stopListening(eventName, handlePaymentRealtimeUpdated);
+      paymentRealtimeChannel.value.listen(eventName, handlePaymentRealtimeUpdated);
     });
+  };
 
-    perPage.value = response.data.data.per_page;
-    currentPage.value = response.data.data.current_page;
-    total.value = response.data.data.total;
+  const unsubscribeFromPaymentRealtime = () => {
+    const channelName = currentPaymentRealtimeChannelName.value;
+    currentPaymentRealtimeChannelName.value = "";
+    paymentRealtimeChannel.value = null;
 
-    const paymentsData = response.data.data.data.map((x: any) => {
-      x.isSpinning = false;
-      return x;
-    });
+    if (channelName === "") {
+      return;
+    }
 
-    payments.splice(0, payments.length, ...paymentsData);
-    isLoading.value = false;
-    isInitialLoading.value = false;
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    try {
+      echoClient.leave(channelName);
+    } catch {
+      // no-op
+    }
   };
 
   const shortId = (uuid: string) => uuid.split("-").pop();
@@ -1009,6 +1121,13 @@
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   });
 
+  watch(
+    () => authStore.user?.id,
+    () => {
+      subscribeToPaymentRealtime();
+    }
+  );
+
   const handleChangeViewMode = (nextViewMode: string) => {
     if (isMobileViewport.value) return;
     if (nextViewMode === "table" || nextViewMode === "cards" || nextViewMode === "full") {
@@ -1060,6 +1179,8 @@
   onMounted(async () => {
     initViewMode();
     useEventBus.on("loadDataForPayments", loadData);
+    useEventBus.on(CLIENT_NOTIFICATION_RECEIVED_EVENT, handleClientNotificationReceived);
+    subscribeToPaymentRealtime();
     await Promise.all([loadData(), refreshAccountCreationEligibility()]);
     await nextTick();
     const openDeposit = resolveQueryString(route.query?.openDeposit);
@@ -1082,6 +1203,8 @@
 
   onBeforeUnmount(() => {
     useEventBus.off("loadDataForPayments", loadData);
+    useEventBus.off(CLIENT_NOTIFICATION_RECEIVED_EVENT, handleClientNotificationReceived);
+    unsubscribeFromPaymentRealtime();
     window.removeEventListener("resize", handleViewportResize);
     window.removeEventListener("scroll", recalcPaymentMenu, true);
     window.removeEventListener("mousedown", handlePaymentMenuOutside, true);
