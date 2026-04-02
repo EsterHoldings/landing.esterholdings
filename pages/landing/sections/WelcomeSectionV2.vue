@@ -236,6 +236,17 @@
       transform 0.45s ease;
   }
 
+  .hero-slide-shift-leave-active {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-slide-shift-enter-active {
+    position: relative;
+    z-index: 1;
+  }
+
   .hero-slide-shift-enter-from,
   .hero-slide-shift-leave-to {
     opacity: 0;
@@ -255,7 +266,7 @@
     // max-width: 1440px;
     margin: 0 auto;
     // overflow: hidden;
-    padding: 174px 40px 146px;
+    padding: 100px 40px 146px;
     display: grid;
     grid-template-columns: 635px minmax(520px, 1fr);
     gap: 30px;
@@ -321,12 +332,10 @@
 
     &__content {
       position: relative;
-      min-height: 458px;
     }
 
     &__content-slide {
-      position: absolute;
-      inset: 0;
+      position: relative;
     }
 
     &__visual {
