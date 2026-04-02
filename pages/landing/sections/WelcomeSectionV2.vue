@@ -6,7 +6,9 @@
       <span class="hero__glow hero__glow--orange-1" />
       <span class="hero__glow hero__glow--orange-2" />
       <div class="hero__content">
-        <Transition name="hero-slide-shift">
+        <Transition
+          name="hero-slide-shift"
+          mode="out-in">
           <div
             :key="activeSlide.id"
             class="hero__content-slide">
@@ -39,7 +41,9 @@
       <div
         class="hero__visual"
         aria-hidden="true">
-        <Transition name="hero-slide-shift">
+        <Transition
+          name="hero-slide-shift"
+          mode="out-in">
           <div
             :key="activeSlide.id"
             class="hero__visual-slide">
@@ -70,15 +74,11 @@
           </div>
         </Transition>
       </div>
-      <Transition name="hero-slide-shift">
-        <UiButtonV2
-          v-if="activeSlide.showCta"
-          :key="activeSlide.id + '-cta'"
-          to="/auth/registration"
-          class="hero__cta">
-          {{ t("landing.sections.welcomeV2.cta") }}
-        </UiButtonV2>
-      </Transition>
+      <UiButtonV2
+        to="/auth/registration"
+        class="hero__cta">
+        {{ t("landing.sections.welcomeV2.cta") }}
+      </UiButtonV2>
     </div>
   </section>
 </template>
@@ -231,33 +231,13 @@
 
   .hero-slide-shift-enter-active,
   .hero-slide-shift-leave-active {
-    transition:
-      opacity 0.45s ease,
-      transform 0.45s ease;
-  }
-
-  .hero-slide-shift-leave-active {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-
-  .hero-slide-shift-enter-active {
-    position: relative;
-    z-index: 1;
+    transition: opacity 0.28s ease;
+    will-change: opacity;
   }
 
   .hero-slide-shift-enter-from,
   .hero-slide-shift-leave-to {
     opacity: 0;
-  }
-
-  .hero-slide-shift-enter-from {
-    transform: translateX(56px);
-  }
-
-  .hero-slide-shift-leave-to {
-    transform: translateX(-56px);
   }
 
   .hero {
@@ -332,6 +312,7 @@
 
     &__content {
       position: relative;
+      min-height: 420px;
     }
 
     &__content-slide {
@@ -586,6 +567,10 @@
         transform: scale(0.82);
         transform-origin: top center;
       }
+
+      &__content {
+        min-height: 360px;
+      }
     }
   }
 
@@ -631,10 +616,26 @@
         margin-top: 32px;
       }
 
+      &__content {
+        min-height: 280px;
+      }
+
       &__visual {
         min-height: 500px;
         transform: scale(0.75);
         transform-origin: top left;
+      }
+
+      &__asset--slide2-city {
+        top: 40px;
+        width: 640px;
+        right: revert-layer;
+      }
+
+      &__asset--slide3-monitor {
+        top: -60px;
+        right: -100px;
+        width: 800px;
       }
     }
   }
@@ -653,6 +654,10 @@
         width: 100%;
       }
 
+      &__content {
+        min-height: 240px;
+      }
+
       &__visual {
         min-height: 340px;
         transform: scale(0.5);
@@ -660,6 +665,18 @@
 
       &__glow {
         display: none;
+      }
+
+      &__asset--slide2-city {
+        top: 40px;
+        width: 640px;
+        right: revert-layer;
+      }
+
+      &__asset--slide3-monitor {
+        top: -40px;
+        right: -80px;
+        width: 750px;
       }
     }
   }

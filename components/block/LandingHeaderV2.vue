@@ -71,7 +71,7 @@
               :name="link.name"
               :activeLink="activeLink"
               :isInvertColor="useDarkHeaderIcons"
-              @click.stop="handleClick(link.key)" />
+              @click.stop="handleClick(link.key, $event)" />
           </nav>
 
           <div class="actions">
@@ -119,7 +119,8 @@
       class="desktop-menu">
       <div
         ref="menuRef"
-        class="desktop-menu__content">
+        class="desktop-menu__content"
+        :style="menuContentStyle">
         <TradingMenu
           v-if="activeLink === 'Trading'"
           :activeLink="activeLink" />
@@ -210,6 +211,7 @@
   const isMobileMenuOpen = ref(false);
   const menuRef = ref(null);
   const windowWidth = ref(0);
+  const menuOffsetLeft = ref(0);
 
   const closeMobileMenu = () => {
     isMobileMenuOpen.value = false;
@@ -271,10 +273,19 @@
     if (process.client) windowWidth.value = window.innerWidth;
   };
 
-  const handleClick = name => {
+  const menuContentStyle = computed(() => {
+    if (activeLink.value === "Trading") return { left: "50%", transform: "translateX(-50%)" };
+    return { left: `${menuOffsetLeft.value}px` };
+  });
+
+  const handleClick = (name, event) => {
     if (activeLink.value !== name) {
       activeLink.value = name;
       uiStore.showMenu = true;
+      if (event?.currentTarget) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        menuOffsetLeft.value = rect.left;
+      }
     } else {
       activeLink.value = "";
       uiStore.showMenu = false;
@@ -507,10 +518,8 @@
     pointer-events: none;
 
     &__content {
-      max-width: 1240px;
-      margin: 0 auto;
+      position: absolute;
       pointer-events: auto;
-      padding: 0 20px;
     }
   }
 
@@ -614,6 +623,19 @@
     filter: invert(1);
   }
 
+  .dropdown-enter-active,
+  .dropdown-leave-active {
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .dropdown-enter-from,
+  .dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
   @media (max-width: 991px) {
     .header-v2 {
       &__fixed {
@@ -630,6 +652,5 @@
     .burger {
       display: inline-flex;
     }
-
   }
 </style>

@@ -67,14 +67,23 @@ function buildItems(sections, sectionIndex) {
 .menu-wrapper {
   width: 225px;
   padding: 30px;
-  background: var(--ui-background);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 16px;
-
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.85), 0 0 60px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(0, 128, 255, 0.2), 0 0 6px rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 3px 2px rgba(190, 181, 181, 0.1),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.08);
 
   &-mobile {
-    padding: 0px;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
   }
 }
 

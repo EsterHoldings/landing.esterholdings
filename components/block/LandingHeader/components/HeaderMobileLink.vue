@@ -107,16 +107,20 @@
     }
 
     :deep(.menu-category_link_mobile) {
-      margin-bottom: 18px;
+      margin-bottom: 8px;
       padding-left: 0;
       text-align: right;
       color: #1a1a1a;
-      font-size: 38px;
-      line-height: 1.2;
-      font-weight: 700;
 
       a {
         display: inline-block;
+        font-weight: 700;
+      }
+
+      .h5 {
+        font-size: 24px;
+        line-height: 1.2;
+        font-weight: 700;
       }
     }
 
