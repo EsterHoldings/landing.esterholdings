@@ -44,6 +44,10 @@ const API_MESSAGE_TRANSLATIONS: Record<string, ApiMessageTranslation> = {
     key: "cabinet.billing.syncPaymentSuccess",
     fallback: "Payment synchronized successfully.",
   },
+  "account payments synchronized successfully": {
+    key: "cabinet.accounts.syncPaymentsSuccess",
+    fallback: "Account payments synchronized successfully.",
+  },
   "payment deleted successfully": {
     key: "cabinet.billing.deletePaymentSuccess",
     fallback: "Payment deleted.",

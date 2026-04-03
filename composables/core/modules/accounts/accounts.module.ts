@@ -49,6 +49,10 @@ export class AccountsModule implements BasicModuleInterface {
     return await this.accountsService.refreshAllBalances();
   }
 
+  async syncPayments(id: any): Promise<any> {
+    return await this.accountsService.syncPayments(id);
+  }
+
   async getTradeHistory(id: any, params: object = {}): Promise<any> {
     return await this.accountsService.getTradeHistory(id, params);
   }

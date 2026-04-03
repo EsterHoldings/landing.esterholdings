@@ -42,6 +42,10 @@ export class AccountsService {
     return await this.useApi.post("/client/mt4/accounts/balances/refresh", {});
   }
 
+  async syncPayments(id: any): Promise<any> {
+    return await this.useApi.post(`/client/accounts/${id}/payments/sync`, {});
+  }
+
   async getTradeHistory(id: any, params: object = {}): Promise<any> {
     return await this.useApi.get(`/client/mt4/accounts/${id}/trade-history`, params);
   }
