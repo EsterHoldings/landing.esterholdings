@@ -80,9 +80,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { definePageMeta, useLocalePath, useRoute, useRouter } from "~/.nuxt/imports";
+  import type Echo from "laravel-echo";
+  import { definePageMeta, useLocalePath, useNuxtApp, useRoute, useRouter } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
-  import { computed, onMounted, ref } from "vue";
+  import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
   import { useToast } from "vue-toastification";
 
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -114,6 +115,7 @@
   const uiStore = useUiStore();
   const appCore = useAppCore();
   const { canCreateAccount, refreshAccountCreationEligibility } = useAccountCreationEligibility();
+  const { $echo } = useNuxtApp() as { $echo?: Echo<any> };
 
   type DashboardSummary = {
     totalAmount: number;
@@ -131,6 +133,8 @@
     currency: "USD",
   });
   const isSummaryLoading = ref(false);
+  const paymentRealtimeChannel = ref<any>(null);
+  const currentPaymentRealtimeChannelName = ref("");
 
   const EMAIL_VERIFY_QUERY_FLAG = "verify_email";
   const EMAIL_VERIFY_QUERY_ID = "verify_id";
@@ -166,6 +170,15 @@
       signature,
     };
   };
+
+  const PAYMENT_REALTIME_EVENT_NAMES = [
+    ".user.payment.updated",
+    "user.payment.updated",
+    ".Modules\\Billing\\Events\\UserPaymentUpdated",
+    "Modules\\Billing\\Events\\UserPaymentUpdated",
+    ".UserPaymentUpdated",
+    "UserPaymentUpdated",
+  ];
 
   const clearEmailVerificationQuery = async () => {
     const nextQuery = { ...route.query };
@@ -209,10 +222,88 @@
     }
   };
 
+  const resolveEchoClient = () => {
+    if ($echo && typeof ($echo as any).private === "function") {
+      return $echo as any;
+    }
+
+    if (typeof window !== "undefined") {
+      const fallbackEcho = (window as any).Echo;
+      if (fallbackEcho && typeof fallbackEcho.private === "function") {
+        return fallbackEcho;
+      }
+    }
+
+    return null;
+  };
+
+  const handlePaymentRealtimeUpdated = async () => {
+    try {
+      await handleRefreshDashboard({ suppressBalanceErrorToast: true });
+    } catch {
+      // no-op
+    }
+  };
+
+  const subscribeToPaymentRealtime = () => {
+    const userId = String(authStore.user?.id ?? "").trim();
+    if (userId === "") {
+      return;
+    }
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    const channelName = `payments.user.${userId}`;
+    if (currentPaymentRealtimeChannelName.value === channelName && paymentRealtimeChannel.value) {
+      return;
+    }
+
+    unsubscribeFromPaymentRealtime();
+    currentPaymentRealtimeChannelName.value = channelName;
+    paymentRealtimeChannel.value = echoClient.private(channelName);
+
+    PAYMENT_REALTIME_EVENT_NAMES.forEach(eventName => {
+      paymentRealtimeChannel.value.stopListening(eventName, handlePaymentRealtimeUpdated);
+      paymentRealtimeChannel.value.listen(eventName, handlePaymentRealtimeUpdated);
+    });
+  };
+
+  const unsubscribeFromPaymentRealtime = () => {
+    const channelName = currentPaymentRealtimeChannelName.value;
+    currentPaymentRealtimeChannelName.value = "";
+    paymentRealtimeChannel.value = null;
+
+    if (channelName === "") {
+      return;
+    }
+
+    const echoClient = resolveEchoClient();
+    if (!echoClient) {
+      return;
+    }
+
+    try {
+      echoClient.leave(channelName);
+    } catch {
+      // no-op
+    }
+  };
+
   onMounted(async () => {
     await handleEmailVerificationFromQuery();
+    subscribeToPaymentRealtime();
     await handleRefreshDashboard({ suppressBalanceErrorToast: true });
   });
+
+  watch(
+    () => authStore.user?.id,
+    () => {
+      subscribeToPaymentRealtime();
+    }
+  );
 
   type Mt4Status = "active" | "inactive";
 
@@ -391,6 +482,10 @@
   const handleManualRefresh = () => {
     handleRefreshDashboard();
   };
+
+  onBeforeUnmount(() => {
+    unsubscribeFromPaymentRealtime();
+  });
 </script>
 
 <style scoped>
