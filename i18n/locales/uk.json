@@ -871,9 +871,9 @@
       }
     },
     "payments": {
-      "title": "Платіжні дані",
+      "title": "Платіжні реквізити",
       "search": "Пошук",
-      "create": "Створити нові платіжні дані",
+      "create": "Створити платіжний реквізит",
       "columns": {
         "title": "Назва",
         "paysystem": "Платіжна система",
@@ -881,15 +881,167 @@
         "createdAt": "Створено"
       },
       "details": {
+        "view": "Переглянути",
+        "confirm": "Підтвердити",
+        "delete": "Видалити",
+        "cardLabel": "Платіжний реквізит",
+        "archivedBadge": "В архіві",
+        "emptyTitle": "Платіжних реквізитів ще немає",
+        "emptySubtitle": "Додайте перший платіжний реквізит, щоб отримувати виплати.",
+        "emptyArchivedTitle": "Архівних реквізитів ще немає",
+        "emptyArchivedSubtitle": "Тут відображатимуться архівні реквізити, які можна буде відновити.",
+        "emptyFilteredTitle": "Платіжні реквізити не знайдено",
+        "emptyFilteredSubtitle": "Спробуйте змінити пошук або фільтри.",
+        "columns": {
+          "name": "Назва",
+          "paymentSystem": "Платіжна система",
+          "status": "Статус",
+          "updatedAt": "Оновлено",
+          "id": "ID"
+        },
+        "statuses": {
+          "approved": "Підтверджено",
+          "pending": "На перевірці",
+          "rejected": "Відхилено"
+        },
+        "filters": {
+          "active": "Активні",
+          "archived": "Архів",
+          "all": "Усі"
+        },
+        "sort": {
+          "name": "Назва",
+          "status": "Статус",
+          "createdAt": "Створено",
+          "updatedAt": "Оновлено"
+        },
+        "views": {
+          "table": "Список",
+          "cards": "Плитка",
+          "full": "На всю ширину"
+        },
+        "actions": {
+          "edit": "Редагувати",
+          "archive": "Архівувати",
+          "restore": "Відновити",
+          "copyId": "Скопіювати ID",
+          "openMenu": "Відкрити меню",
+          "archiveConfirm": "Архівувати цей платіжний реквізит?",
+          "archiveSuccess": "Платіжний реквізит переміщено до архіву.",
+          "archiveError": "Не вдалося архівувати платіжний реквізит.",
+          "restoreSuccess": "Платіжний реквізит відновлено.",
+          "restoreError": "Не вдалося відновити платіжний реквізит."
+        },
+        "documents": {
+          "label": "Скріншоти реквізитів",
+          "previewAlt": "Превʼю #{count}"
+        },
+        "relative": {
+          "justNow": "щойно",
+          "minutesAgo": "{count} хв тому",
+          "hoursAgo": "{count} год тому",
+          "daysAgo": "{count} дн тому"
+        },
         "createNew": {
           "title": "Створити новий платіжний реквізит",
+          "editTitle": "Редагувати платіжний реквізит",
           "name": "Назва платіжного реквізиту",
           "namePlaceholder": "Назва платіжного реквізиту",
-          "recipientAddress": "Будь ласка, оберіть платіжну систему."
+          "paymentMethod": "Платіжний метод",
+          "recipientAddress": "Спочатку оберіть платіжний метод.",
+          "recipientAddressLabel": "Адреса отримувача",
+          "recipientAddressPlaceholder": "Введіть реквізити для виплат",
+          "selectMethodHint": "Спочатку оберіть платіжний метод, а потім заповніть реквізити для виплат.",
+          "submitCreate": "Зберегти реквізит",
+          "submitUpdate": "Зберегти зміни",
+          "fieldFallback": "Поле",
+          "fieldPlaceholder": "Введіть значення",
+          "validationRequired": "Поле обовʼязкове для заповнення.",
+          "createdSuccess": "Платіжні реквізити успішно створено.",
+          "updatedSuccess": "Платіжні реквізити оновлено та повторно надіслано на перевірку.",
+          "saveError": "Не вдалося зберегти платіжні реквізити.",
+          "documents": {
+            "label": "Скріншоти реквізитів",
+            "warningTitle": "Що має бути на скріншотах",
+            "warningText": "Завантажте скріншоти з платіжного кабінету, де чітко видно email, номер гаманця або рахунку та QR-код.",
+            "dropTitle": "Перетягніть файл",
+            "dropSeparator": "або",
+            "dropAction": "натисніть для завантаження",
+            "dropHint": "PNG, JPG, WEBP або PDF. Максимальний розмір файлу 5 МБ.",
+            "disabledHint": "Оберіть платіжний метод, щоб розблокувати завантаження документів.",
+            "hint": "Можна залишити вже прикріплені документи й додати нові. Нові файли завантажаться в S3 під час збереження форми.",
+            "initialHint": "Завантаження документів стане доступним після вибору платіжного методу.",
+            "summaryExisting": "Уже прикріплено: {count}",
+            "summaryNew": "Нових файлів: {count}",
+            "originExisting": "Прикріплено",
+            "originNew": "Новий файл",
+            "removeExisting": "Прибрати прикріплений файл",
+            "removeNew": "Прибрати новий файл",
+            "documentFallback": "Документ",
+            "invalidFormat": "Файл {name} має непідтримуваний формат.",
+            "tooLarge": "Файл {name} перевищує 5 МБ.",
+            "serverTooLarge": "Файл занадто великий.",
+            "uploadFailed": "Не вдалося завантажити файл до S3.",
+            "statusExisting": "Збережено",
+            "statusUploading": "Завантаження...",
+            "statusUploaded": "Завантажено",
+            "statusFailed": "Помилка завантаження",
+            "statusIdle": "Готовий до завантаження",
+            "captionExisting": "Цей документ уже збережено і він залишиться прикріпленим, доки ви його не видалите.",
+            "captionUploading": "Файл зараз завантажується в Amazon S3.",
+            "captionUploaded": "Файл уже завантажено і його буде збережено разом із цим реквізитом.",
+            "captionFailed": "Завантаження не завершилося. Виправте помилку або видаліть файл.",
+            "captionIdle": "Файл вибрано і його буде завантажено після збереження форми.",
+            "fileMissing": "Не вдалося отримати файл для завантаження.",
+            "presignFailed": "Не вдалося отримати посилання для завантаження.",
+            "uploadBatchFailed": "Не вдалося завантажити файлів: {count}.",
+            "required": "Додайте щонайменше один скріншот реквізитів для верифікації."
+          }
         },
-        "view": "View",
-        "confirm": "Confirm",
-        "delete": "Delete"
+        "detail": {
+          "title": "Реквізит #{id}",
+          "back": "До списку реквізитів",
+          "total": "Усього: {count}",
+          "commentEmpty": "Коментар відсутній.",
+          "fieldsTitle": "Поля реквізиту",
+          "noData": "Немає даних.",
+          "copyValue": "Скопіювати значення",
+          "documentsEmpty": "Документи не завантажені.",
+          "historyTitle": "Історія змін реквізиту",
+          "historyLoading": "Завантаження історії...",
+          "historyEmpty": "Історія поки відсутня.",
+          "documentFallback": "Документ",
+          "historyDocumentAlt": "Документ історії #{count}",
+          "notFound": "Реквізит не знайдено.",
+          "loadError": "Не вдалося завантажити реквізит.",
+          "booleanYes": "Так",
+          "booleanNo": "Ні",
+          "valueLabel": "Значення",
+          "labels": {
+            "name": "Назва",
+            "paymentSystem": "Платіжна система",
+            "updatedAt": "Оновлено",
+            "createdAt": "Створено",
+            "id": "ID",
+            "adminComment": "Коментар адміністратора"
+          },
+          "groups": {
+            "fields": "Основні поля",
+            "legacy": "Legacy дані"
+          },
+          "fieldLabels": {
+            "old_requisite_id": "Legacy ID",
+            "type": "Тип",
+            "status": "Статус",
+            "active": "Активність",
+            "comment": "Коментар",
+            "paysystem": "Платіжна система",
+            "config_name": "Конфігурація",
+            "name": "Назва",
+            "shortname": "Коротка назва",
+            "merchant": "Мерчант"
+          }
+        }
       },
       "nothingToShow": "Нічого показати =(",
       "pagination": {
@@ -1638,6 +1790,22 @@
       "addAdminAlready": "Адмін уже є в чаті",
       "addAdminFailed": "Не вдалося додати адміна до чату"
     }
+  },
+  "apiMessages": {
+    "unauthorized": "Потрібна авторизація.",
+    "forbidden": "Доступ заборонено.",
+    "validationError": "Помилка валідації.",
+    "methodNotAllowed": "Метод не підтримується.",
+    "notFound": "Нічого не знайдено.",
+    "mt4RequestFailed": "Помилка запиту до MT4.",
+    "requiredField": "Поле обовʼязкове для заповнення.",
+    "paymentDetailCreated": "Платіжні реквізити успішно створено.",
+    "paymentDetailUpdated": "Платіжні реквізити успішно оновлено.",
+    "paymentDetailDeleted": "Платіжні реквізити видалено.",
+    "paymentDetailRestored": "Платіжні реквізити відновлено.",
+    "paymentDetailNotFound": "Платіжний реквізит не знайдено.",
+    "accountCreated": "Рахунок успішно створено.",
+    "invalidCallbackSignature": "Некоректний підпис callback."
   },
   "cabinetExtra": {
     "transactions": {

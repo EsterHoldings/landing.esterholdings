@@ -88,6 +88,26 @@ const API_MESSAGE_TRANSLATIONS: Record<string, ApiMessageTranslation> = {
     key: "apiMessages.paymentDetailRestored",
     fallback: "Payment detail restored successfully.",
   },
+  "the name field is required": {
+    key: "apiMessages.requiredField",
+    fallback: "This field is required.",
+  },
+  "the payment system id field is required": {
+    key: "apiMessages.requiredField",
+    fallback: "This field is required.",
+  },
+  "the data field is required": {
+    key: "apiMessages.requiredField",
+    fallback: "This field is required.",
+  },
+  "the documents field is required": {
+    key: "apiMessages.requiredField",
+    fallback: "This field is required.",
+  },
+  "payment detail not found": {
+    key: "apiMessages.paymentDetailNotFound",
+    fallback: "Payment detail not found.",
+  },
   "account deleted successfully": {
     key: "cabinet.accounts.deleteSuccess",
     fallback: "Account archived!",
@@ -115,7 +135,7 @@ const toDisplayString = (value: unknown): string => String(value ?? "").trim();
 const normalizeApiMessage = (value: unknown): string =>
   toDisplayString(value)
     .replace(/\s+/g, " ")
-    .replace(/[.!?]+$/u, "")
+    .replace(/[.!?]+$/, "")
     .toLowerCase();
 
 const translateKey = (key: string, fallback: string): string => {

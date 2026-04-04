@@ -98,7 +98,7 @@
                     type="button"
                     class="flex items-center gap-2"
                     @click="handleOrderByAndDirection('name')">
-                    <UiTextSmall>Name</UiTextSmall>
+                    <UiTextSmall>{{ resolveText("cabinet.payments.details.columns.name", "Name") }}</UiTextSmall>
                     <UiIconSort
                       :active="orderBy === 'name'"
                       :direction="orderDirection" />
@@ -110,7 +110,9 @@
                     type="button"
                     class="flex items-center gap-2"
                     @click="handleOrderByAndDirection('payment_system')">
-                    <UiTextSmall>Payment system</UiTextSmall>
+                    <UiTextSmall>{{
+                      resolveText("cabinet.payments.details.columns.paymentSystem", "Payment system")
+                    }}</UiTextSmall>
                   </button>
                 </th>
 
@@ -119,7 +121,7 @@
                     type="button"
                     class="flex items-center gap-2"
                     @click="handleOrderByAndDirection('status')">
-                    <UiTextSmall>Status</UiTextSmall>
+                    <UiTextSmall>{{ resolveText("cabinet.payments.details.columns.status", "Status") }}</UiTextSmall>
                     <UiIconSort
                       :active="orderBy === 'status'"
                       :direction="orderDirection" />
@@ -131,7 +133,9 @@
                     type="button"
                     class="flex items-center gap-2"
                     @click="handleOrderByAndDirection('updated_at')">
-                    <UiTextSmall>UpdatedAt</UiTextSmall>
+                    <UiTextSmall>{{
+                      resolveText("cabinet.payments.details.columns.updatedAt", "Updated at")
+                    }}</UiTextSmall>
                     <UiIconSort
                       :active="orderBy === 'updated_at'"
                       :direction="orderDirection" />
@@ -164,7 +168,7 @@
                         <span
                           v-if="paymentDetail?.is_archived"
                           class="payment-row-name__archive-pill">
-                          Archived
+                          {{ resolveText("cabinet.payments.details.archivedBadge", "Archived") }}
                         </span>
                       </span>
                       <div
@@ -175,9 +179,16 @@
                           :key="paymentDetail.id + ':table-doc:' + docIndex"
                           class="payment-row-docs__thumb">
                           <img
-                            v-if="resolveDocumentPreviewMeta(document).type === 'image' && resolveDocumentPreviewMeta(document).src"
+                            v-if="
+                              resolveDocumentPreviewMeta(document).type === 'image' &&
+                              resolveDocumentPreviewMeta(document).src
+                            "
                             :src="resolveDocumentPreviewMeta(document).src"
-                            :alt="`Preview #${docIndex + 1}`"
+                            :alt="
+                              interpolateText('cabinet.payments.details.documents.previewAlt', 'Preview #{count}', {
+                                count: docIndex + 1,
+                              })
+                            "
                             class="payment-row-docs__thumb-img" />
                           <span
                             v-else
@@ -249,12 +260,18 @@
                           class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
                           @click="handleEditPaymentDetail(paymentDetail)">
                           <UiIconUpdate class="!h-[14px] !w-[14px]" />
-                          <UiTextSmall class="whitespace-nowrap">Edit</UiTextSmall>
+                          <UiTextSmall class="whitespace-nowrap">{{
+                            resolveText("cabinet.payments.details.actions.edit", "Edit")
+                          }}</UiTextSmall>
                         </div>
 
                         <div
                           class="flex h-8 cursor-pointer items-center justify-start gap-2 rounded-md px-2 hover:bg-[var(--color-stroke-ui-light)] hover:opacity-70"
-                          @click="paymentDetail.is_archived ? handleRestorePaymentDetail(paymentDetail.id) : handleDeletePaymentDetail(paymentDetail.id)">
+                          @click="
+                            paymentDetail.is_archived
+                              ? handleRestorePaymentDetail(paymentDetail.id)
+                              : handleDeletePaymentDetail(paymentDetail.id)
+                          ">
                           <UiIconTrash
                             v-if="!paymentDetail.is_archived"
                             class="!h-[14px] !w-[14px] stroke-[var(--ui-sticker-danger)]" />
@@ -262,7 +279,9 @@
                             v-else
                             class="!h-[14px] !w-[14px]" />
                           <UiTextSmall class="whitespace-nowrap">{{
-                            paymentDetail.is_archived ? "Restore" : "Archive"
+                            paymentDetail.is_archived
+                              ? resolveText("cabinet.payments.details.actions.restore", "Restore")
+                              : resolveText("cabinet.payments.details.actions.archive", "Archive")
                           }}</UiTextSmall>
                         </div>
                       </div>
@@ -298,7 +317,7 @@
                   aria-hidden="true">
                   <button
                     class="copy-btn"
-                    aria-label="Copy id"
+                    :aria-label="resolveText('cabinet.payments.details.actions.copyId', 'Copy ID')"
                     @click.stop>
                     <UiIconCopy :text="paymentDetail.id" />
                   </button>
@@ -306,7 +325,7 @@
                     type="button"
                     class="action-btn"
                     @click.stop="toggleCardMenu(paymentDetail.id)"
-                    aria-label="Open menu">
+                    :aria-label="resolveText('cabinet.payments.details.actions.openMenu', 'Open menu')">
                     <UiIconDotsVertical class="h-4 w-4" />
                     <div
                       v-if="cardMenuOpenId === paymentDetail.id"
@@ -314,27 +333,37 @@
                       <button
                         class="flex w-full items-center justify-start gap-2 rounded px-2 py-1 hover:bg-[var(--color-stroke-ui-light)]"
                         type="button"
-                        :title="t('cabinet.payments.details.view', 'View')"
+                        :title="resolveText('cabinet.payments.details.view', 'View')"
                         @click="handleClickViewPaymentDetail(paymentDetail.id)">
                         <UiIconEye class="!h-4 !w-4 shrink-0" />
                         <UiTextSmall class="whitespace-nowrap">{{
-                          t("cabinet.payments.details.view") || "View"
+                          resolveText("cabinet.payments.details.view", "View")
                         }}</UiTextSmall>
                       </button>
                       <button
                         v-if="!paymentDetail.is_archived"
                         class="flex w-full items-center justify-start gap-2 rounded px-2 py-1 hover:bg-[var(--color-stroke-ui-light)]"
                         type="button"
-                        title="Edit"
+                        :title="resolveText('cabinet.payments.details.actions.edit', 'Edit')"
                         @click="handleEditPaymentDetail(paymentDetail)">
                         <UiIconUpdate class="!h-4 !w-4 shrink-0" />
-                        <UiTextSmall class="whitespace-nowrap">Edit</UiTextSmall>
+                        <UiTextSmall class="whitespace-nowrap">{{
+                          resolveText("cabinet.payments.details.actions.edit", "Edit")
+                        }}</UiTextSmall>
                       </button>
                       <button
                         class="flex w-full items-center justify-start gap-2 rounded px-2 py-1 hover:bg-[var(--color-stroke-ui-light)]"
                         type="button"
-                        :title="paymentDetail.is_archived ? 'Restore' : 'Archive'"
-                        @click="paymentDetail.is_archived ? handleRestorePaymentDetail(paymentDetail.id) : handleDeletePaymentDetail(paymentDetail.id)">
+                        :title="
+                          paymentDetail.is_archived
+                            ? resolveText('cabinet.payments.details.actions.restore', 'Restore')
+                            : resolveText('cabinet.payments.details.actions.archive', 'Archive')
+                        "
+                        @click="
+                          paymentDetail.is_archived
+                            ? handleRestorePaymentDetail(paymentDetail.id)
+                            : handleDeletePaymentDetail(paymentDetail.id)
+                        ">
                         <UiIconTrash
                           v-if="!paymentDetail.is_archived"
                           class="!h-4 !w-4 shrink-0 stroke-[var(--ui-sticker-danger)]" />
@@ -342,7 +371,9 @@
                           v-else
                           class="!h-4 !w-4 shrink-0" />
                         <UiTextSmall class="whitespace-nowrap">{{
-                          paymentDetail.is_archived ? "Restore" : "Archive"
+                          paymentDetail.is_archived
+                            ? resolveText("cabinet.payments.details.actions.restore", "Restore")
+                            : resolveText("cabinet.payments.details.actions.archive", "Archive")
                         }}</UiTextSmall>
                       </button>
                     </div>
@@ -352,14 +383,14 @@
                 <div class="cabinet-card__header">
                   <div class="cabinet-card__head-main">
                     <UiTextSmall class="cabinet-card__eyebrow">
-                      {{ t("cabinet.billing.columns.account") }}
+                      {{ resolveText("cabinet.payments.details.cardLabel", "Payment detail") }}
                     </UiTextSmall>
                     <div class="cabinet-card__title">{{ paymentDetail.name }}</div>
                     <div class="cabinet-card__subtitle">{{ paymentDetail.payment_system_name }}</div>
                     <div
                       v-if="paymentDetail.is_archived"
                       class="payment-row-name__archive-pill mt-2">
-                      Archived
+                      {{ resolveText("cabinet.payments.details.archivedBadge", "Archived") }}
                     </div>
                   </div>
 
@@ -378,13 +409,13 @@
                   :class="viewMode === 'full' ? 'cabinet-card__grid--full' : ''">
                   <div class="cabinet-card__field">
                     <UiTextSmall class="cabinet-card__label">
-                      {{ t("cabinet.billing.columns.paymentSystem") }}
+                      {{ resolveText("cabinet.payments.details.columns.paymentSystem", "Payment system") }}
                     </UiTextSmall>
                     <div class="cabinet-card__value">{{ paymentDetail.payment_system_name }}</div>
                   </div>
                   <div class="cabinet-card__field">
                     <UiTextSmall class="cabinet-card__label">
-                      {{ t("cabinet.billing.updatedAt") || "Updated at" }}
+                      {{ resolveText("cabinet.payments.details.columns.updatedAt", "Updated at") }}
                     </UiTextSmall>
                     <div class="updated-at-cell">
                       <span class="updated-at-cell__relative">{{ formatRelativeDate(paymentDetail.updated_at) }}</span>
@@ -393,7 +424,7 @@
                   </div>
                   <div class="cabinet-card__field">
                     <UiTextSmall class="cabinet-card__label">
-                      {{ t("cabinet.payments.details.documents", "Documents") }}
+                      {{ resolveText("cabinet.payments.details.documents.label", "Documents") }}
                     </UiTextSmall>
                     <div
                       v-if="resolvePaymentDetailDocuments(paymentDetail).length > 0"
@@ -403,9 +434,16 @@
                         :key="paymentDetail.id + ':card-doc:' + docIndex"
                         class="payment-row-docs__thumb">
                         <img
-                          v-if="resolveDocumentPreviewMeta(document).type === 'image' && resolveDocumentPreviewMeta(document).src"
+                          v-if="
+                            resolveDocumentPreviewMeta(document).type === 'image' &&
+                            resolveDocumentPreviewMeta(document).src
+                          "
                           :src="resolveDocumentPreviewMeta(document).src"
-                          :alt="`Preview #${docIndex + 1}`"
+                          :alt="
+                            interpolateText('cabinet.payments.details.documents.previewAlt', 'Preview #{count}', {
+                              count: docIndex + 1,
+                            })
+                          "
                           class="payment-row-docs__thumb-img" />
                         <span
                           v-else
@@ -429,7 +467,9 @@
                   <div
                     v-if="viewMode === 'full'"
                     class="cabinet-card__field">
-                    <UiTextSmall class="cabinet-card__label">ID</UiTextSmall>
+                    <UiTextSmall class="cabinet-card__label">{{
+                      resolveText("cabinet.payments.details.columns.id", "ID")
+                    }}</UiTextSmall>
                     <div
                       class="cabinet-card__value"
                       :title="String(paymentDetail.id)">
@@ -530,6 +570,7 @@
   import useAppCore from "~/composables/useAppCore";
   import useAccountCreationEligibility from "~/composables/useAccountCreationEligibility";
   import useEventBus from "~/composables/useEventBus";
+  import { extractApiErrorMessage, resolveApiMessage } from "~/composables/useApiMessages";
 
   import { definePageMeta, navigateTo, useLocalePath, useRoute, useRouter } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
@@ -571,16 +612,24 @@
 
   const paymentDetails = reactive<any[]>([]);
 
-  const statusTextMap: Record<string, string> = {
-    approved: "Approved",
-    pending: "Pending",
-    rejected: "Rejected",
-  };
-
   const resolveText = (key: string, fallback: string): string => {
     const translated = t(key);
     return translated === key ? fallback : translated;
   };
+
+  const interpolateText = (key: string, fallback: string, values: Record<string, string | number>): string => {
+    const base = resolveText(key, fallback);
+
+    return Object.entries(values).reduce((result, [token, value]) => {
+      return result.split(`{${token}}`).join(String(value));
+    }, base);
+  };
+
+  const statusTextMap = computed<Record<string, string>>(() => ({
+    approved: resolveText("cabinet.payments.details.statuses.approved", "Approved"),
+    pending: resolveText("cabinet.payments.details.statuses.pending", "Pending"),
+    rejected: resolveText("cabinet.payments.details.statuses.rejected", "Rejected"),
+  }));
 
   const canCreatePaymentDetail = computed(() => canCreateAccount.value);
   const isVerificationRequired = computed(() => isEligibilityLoaded.value && !canCreatePaymentDetail.value);
@@ -598,27 +647,27 @@
   );
   const emptyStateTitle = computed(() =>
     archivedFilter.value === "archived"
-      ? "Архивных реквизитов пока нет"
+      ? resolveText("cabinet.payments.details.emptyArchivedTitle", "No archived payment details yet")
       : archivedFilter.value === "all"
-        ? "Реквизиты не найдены"
+        ? resolveText("cabinet.payments.details.emptyFilteredTitle", "Payment details were not found")
         : isVerificationRequired.value
-          ? resolveText("cabinet.dashboard.mt4.verifyTitle", "Завершите верификацию для добавления реквизита")
-          : resolveText("cabinet.payments.details.emptyTitle", "Платёжных реквизитов пока нет")
+          ? resolveText("cabinet.dashboard.mt4.verifyTitle", "Complete verification to add a payment detail")
+          : resolveText("cabinet.payments.details.emptyTitle", "No payment details yet")
   );
   const emptyStateSubtitle = computed(() =>
     archivedFilter.value === "archived"
-      ? "Здесь будут отображаться архивные реквизиты, которые можно восстановить."
+      ? resolveText(
+          "cabinet.payments.details.emptyArchivedSubtitle",
+          "Archived payment details will appear here, and you will be able to restore them."
+        )
       : archivedFilter.value === "all"
-        ? "Попробуйте изменить поиск или фильтры."
+        ? resolveText("cabinet.payments.details.emptyFilteredSubtitle", "Try changing the search query or filters.")
         : isVerificationRequired.value
           ? resolveText(
               "cabinet.dashboard.mt4.verifySubtitle",
-              "Подтвердите данные профиля и документы, после этого сможете добавить платёжный реквизит."
+              "Verify your profile details and documents, then you will be able to add a payment detail."
             )
-          : resolveText(
-              "cabinet.payments.details.emptySubtitle",
-              "Добавьте первый платёжный реквизит, чтобы получать выплаты."
-            )
+          : resolveText("cabinet.payments.details.emptySubtitle", "Add your first payment detail to receive payouts.")
   );
 
   const tableRef = ref<any>(null);
@@ -710,23 +759,35 @@
     if (e.key === "Escape") currentRowActiveOptions.value = null;
   };
 
-  const sortByFilterData = reactive([
-    { id: "name", value: "name", text: "Name" },
-    { id: "status", value: "status", text: "Status" },
-    { id: "created_at", value: "created_at", text: "Created at" },
-    { id: "updated_at", value: "updated_at", text: "Updated at" },
+  const sortByFilterData = computed(() => [
+    { id: "name", value: "name", text: resolveText("cabinet.payments.details.sort.name", "Name") },
+    { id: "status", value: "status", text: resolveText("cabinet.payments.details.sort.status", "Status") },
+    {
+      id: "created_at",
+      value: "created_at",
+      text: resolveText("cabinet.payments.details.sort.createdAt", "Created at"),
+    },
+    {
+      id: "updated_at",
+      value: "updated_at",
+      text: resolveText("cabinet.payments.details.sort.updatedAt", "Updated at"),
+    },
   ]);
 
-  const archivedFilterOptions = reactive([
-    { id: "active", value: "active", text: "Active" },
-    { id: "archived", value: "archived", text: "Archived" },
-    { id: "all", value: "all", text: "All" },
+  const archivedFilterOptions = computed(() => [
+    { id: "active", value: "active", text: resolveText("cabinet.payments.details.filters.active", "Active") },
+    {
+      id: "archived",
+      value: "archived",
+      text: resolveText("cabinet.payments.details.filters.archived", "Archived"),
+    },
+    { id: "all", value: "all", text: resolveText("cabinet.payments.details.filters.all", "All") },
   ]);
 
-  const viewOptions = [
+  const viewOptions = computed(() => [
     {
       value: "table" as const,
-      label: "Список",
+      label: resolveText("cabinet.payments.details.views.table", "List"),
       icon: {
         render() {
           return h(
@@ -753,7 +814,7 @@
     },
     {
       value: "cards" as const,
-      label: "Картки",
+      label: resolveText("cabinet.payments.details.views.cards", "Cards"),
       icon: {
         render() {
           return h(
@@ -778,7 +839,7 @@
     },
     {
       value: "full" as const,
-      label: "На всю ширину",
+      label: resolveText("cabinet.payments.details.views.full", "Full width"),
       icon: {
         render() {
           return h(
@@ -799,7 +860,7 @@
         },
       },
     },
-  ];
+  ]);
 
   const totalPages = computed(() => Math.ceil(total.value / perPage.value));
 
@@ -878,14 +939,22 @@
   const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "avif"];
 
   const extractFileExtension = (value: string): string => {
-    const normalized = String(value || "").split("?")[0].split("#")[0].trim().toLowerCase();
+    const normalized = String(value || "")
+      .split("?")[0]
+      .split("#")[0]
+      .trim()
+      .toLowerCase();
     const segments = normalized.split(".");
 
     return segments.length > 1 ? segments.pop() || "" : "";
   };
 
-  const resolveDocumentPreviewMeta = (document: any): { type: "image" | "pdf" | "text" | "file"; src: string; label: string } => {
-    const mimeType = String(document?.mime_type ?? document?.mimeType ?? "").trim().toLowerCase();
+  const resolveDocumentPreviewMeta = (
+    document: any
+  ): { type: "image" | "pdf" | "text" | "file"; src: string; label: string } => {
+    const mimeType = String(document?.mime_type ?? document?.mimeType ?? "")
+      .trim()
+      .toLowerCase();
     const previewUrl = String(document?.preview_url ?? document?.previewUrl ?? "").trim();
     const path = String(document?.path ?? "").trim();
     const name = String(document?.name ?? "").trim();
@@ -924,7 +993,7 @@
 
   const statusText = (value: unknown): string => {
     const normalized = normalizeStatus(value);
-    return statusTextMap[normalized] ?? normalized;
+    return statusTextMap.value[normalized] ?? normalized;
   };
 
   const formatDateTime = (value: unknown): string => {
@@ -946,14 +1015,18 @@
     const diffMs = now - date.getTime();
     const diffMinutes = Math.round(diffMs / (1000 * 60));
 
-    if (diffMinutes < 1) return "just now";
-    if (diffMinutes < 60) return `${diffMinutes} min ago`;
+    if (diffMinutes < 1) return resolveText("cabinet.payments.details.relative.justNow", "just now");
+    if (diffMinutes < 60) {
+      return interpolateText("cabinet.payments.details.relative.minutesAgo", "{count} min ago", { count: diffMinutes });
+    }
 
     const diffHours = Math.round(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours} h ago`;
+    if (diffHours < 24) {
+      return interpolateText("cabinet.payments.details.relative.hoursAgo", "{count} h ago", { count: diffHours });
+    }
 
     const diffDays = Math.round(diffHours / 24);
-    return `${diffDays} d ago`;
+    return interpolateText("cabinet.payments.details.relative.daysAgo", "{count} d ago", { count: diffDays });
   };
 
   const closeAllMenus = () => {
@@ -969,17 +1042,27 @@
   const handleDeletePaymentDetail = async (id: string | number) => {
     closeAllMenus();
 
-    const confirmed = window.confirm("Архивировать платёжный реквизит?");
+    const confirmed = window.confirm(
+      resolveText("cabinet.payments.details.actions.archiveConfirm", "Archive this payment detail?")
+    );
     if (!confirmed) {
       return;
     }
 
     try {
-      await appCore.paymentDetails.delete(id);
-      toast.success("Платёжный реквизит перемещён в архив.");
+      const response = await appCore.paymentDetails.delete(id);
+      const fallback = resolveText(
+        "cabinet.payments.details.actions.archiveSuccess",
+        "Payment detail moved to the archive."
+      );
+      toast.success(resolveApiMessage(response?.data?.message, fallback) ?? fallback);
       await loadData();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Не удалось архивировать платёжный реквизит.");
+      const fallback = resolveText(
+        "cabinet.payments.details.actions.archiveError",
+        "Failed to archive the payment detail."
+      );
+      toast.error(extractApiErrorMessage(error, fallback) ?? fallback);
     }
   };
 
@@ -987,11 +1070,18 @@
     closeAllMenus();
 
     try {
-      await appCore.paymentDetails.restore(id);
-      toast.success("Платёжный реквизит восстановлен.");
+      const response = await appCore.paymentDetails.restore(id);
+      const fallback = resolveText("cabinet.payments.details.actions.restoreSuccess", "Payment detail restored.");
+      toast.success(
+        resolveApiMessage(response?.data?.message ?? "payment detail restored successfully", fallback) ?? fallback
+      );
       await loadData();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Не удалось восстановить платёжный реквизит.");
+      const fallback = resolveText(
+        "cabinet.payments.details.actions.restoreError",
+        "Failed to restore the payment detail."
+      );
+      toast.error(extractApiErrorMessage(error, fallback) ?? fallback);
     }
   };
 
@@ -999,7 +1089,7 @@
     closeAllMenus();
 
     openModal(PaymentDetailsCreateNew, {
-      title: "Редактировать платёжный реквизит",
+      title: resolveText("cabinet.payments.details.createNew.editTitle", "Edit payment detail"),
       mode: "edit",
       paymentDetail,
     });

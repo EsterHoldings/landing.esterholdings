@@ -1,14 +1,14 @@
 <template>
   <div class="accounts__edit">
     <div
-      v-if="props.title"
+      v-if="modalTitle"
       class="accounts__edit__top">
-      <UiTextH4>{{ props.title }}</UiTextH4>
+      <UiTextH4>{{ modalTitle }}</UiTextH4>
     </div>
 
     <div
       class="accounts__edit__content"
-      :class="{ 'without-top': !props.title }">
+      :class="{ 'without-top': !modalTitle }">
       <div class="accounts__edit__content__fields">
         <UiFormControl
           :label="t('cabinet.payments.details.createNew.name')"
@@ -50,31 +50,60 @@
         <div
           v-else
           class="accounts__edit__description">
-          Выберите платежную систему, чтобы заполнить реквизиты для выплат.
+          {{ paymentMethodSelectionHint }}
         </div>
 
         <UiFormControl
-          label="Скриншоты реквизитов"
+          :label="documentsLabel"
           :errors="documentsError ? [documentsError] : []">
           <div class="payment-documents">
-            <div class="payment-documents__dropzone">
+            <Transition name="payment-documents-fade">
+              <div
+                v-if="isDocumentsEnabled"
+                class="payment-documents__warning">
+                <div class="payment-documents__warning-title">
+                  {{ documentsWarningTitle }}
+                </div>
+                <div class="payment-documents__warning-text">
+                  {{ documentsWarningText }}
+                </div>
+              </div>
+            </Transition>
+
+            <div
+              class="payment-documents__dropzone"
+              :class="{ 'is-disabled': !isDocumentsEnabled }">
               <UiDragAndDrop
                 class="payment-documents__drag"
+                :title-text="documentsDropTitle"
+                :separator-text="documentsDropSeparator"
+                :action-text="documentsDropAction"
+                :hint-text="documentsDropHint"
+                :disabled-hint-text="documentsDisabledHint"
+                :disabled="!isDocumentsEnabled"
                 @files="handleFilesSelected" />
             </div>
 
             <div class="payment-documents__hint">
-              Можно оставить уже прикрепленные документы и догрузить новые. Новые файлы отправятся в S3 при сохранении формы.
+              {{ documentsHintText }}
             </div>
 
             <div
               v-if="selectedFiles.length > 0"
               class="payment-documents__summary">
               <span v-if="existingSelectedFiles.length > 0">
-                Уже прикреплено: {{ existingSelectedFiles.length }}
+                {{
+                  interpolateText("cabinet.payments.details.createNew.documents.summaryExisting", "Attached: {count}", {
+                    count: existingSelectedFiles.length,
+                  })
+                }}
               </span>
               <span v-if="newSelectedFiles.length > 0">
-                Новые файлы: {{ newSelectedFiles.length }}
+                {{
+                  interpolateText("cabinet.payments.details.createNew.documents.summaryNew", "New files: {count}", {
+                    count: newSelectedFiles.length,
+                  })
+                }}
               </span>
             </div>
 
@@ -87,7 +116,10 @@
                 class="payment-documents__item">
                 <div class="payment-documents__preview">
                   <UiImage
-                    v-if="resolveSelectedFilePreviewMeta(selectedFile).type === 'image' && resolveSelectedFilePreviewMeta(selectedFile).src"
+                    v-if="
+                      resolveSelectedFilePreviewMeta(selectedFile).type === 'image' &&
+                      resolveSelectedFilePreviewMeta(selectedFile).src
+                    "
                     :src="resolveSelectedFilePreviewMeta(selectedFile).src"
                     fitContain
                     fitPosition="center" />
@@ -104,7 +136,7 @@
                     <span
                       class="payment-documents__origin"
                       :class="`is-${selectedFile.source}`">
-                      {{ selectedFile.source === "existing" ? "Уже прикреплён" : "Новый файл" }}
+                      {{ selectedFile.source === "existing" ? documentsOriginExisting : documentsOriginNew }}
                     </span>
                   </div>
                   <div class="payment-documents__size">{{ formatFileSize(selectedFile.size) }}</div>
@@ -141,7 +173,7 @@
                 <button
                   type="button"
                   class="payment-documents__remove"
-                  :aria-label="selectedFile.source === 'existing' ? 'Убрать уже прикреплённый файл' : 'Убрать новый файл'"
+                  :aria-label="selectedFile.source === 'existing' ? removeExistingFileLabel : removeNewFileLabel"
                   :disabled="selectedFile.uploadStatus === 'uploading'"
                   @click="removeSelectedFile(index)">
                   <UiIconTrash class="payment-documents__remove-icon" />
@@ -185,6 +217,7 @@
   import useApi from "~/composables/useApi";
   import useAppCore from "~/composables/useAppCore";
   import useEventBus from "~/composables/useEventBus";
+  import { extractApiErrorMessage, resolveApiMessage } from "~/composables/useApiMessages";
   import { formData } from "~/pages/payments/details/composables";
   import {
     resetValidationUPaymentDetailForm,
@@ -258,10 +291,24 @@
   const paymentTypes = reactive<PaymentTypeOption[]>([]);
   const paymentSystems = reactive<PaymentSystem[]>([]);
   const selectedPaymentSystem = ref<PaymentSystem | null>(null);
+
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const interpolateText = (key: string, fallback: string, values: Record<string, string | number>): string => {
+    const base = resolveText(key, fallback);
+
+    return Object.entries(values).reduce((result, [token, value]) => {
+      return result.split(`{${token}}`).join(String(value));
+    }, base);
+  };
+
   const fallbackPaymentField: PaymentSystemField = {
     key: "recipientAddress",
-    label: "Recipient Address",
-    placeholder: "Введите реквизиты для выплат",
+    label: resolveText("cabinet.payments.details.createNew.recipientAddressLabel", "Recipient address"),
+    placeholder: resolveText("cabinet.payments.details.createNew.recipientAddressPlaceholder", "Enter payout details"),
     required: true,
     defaultValue: "",
   };
@@ -275,14 +322,83 @@
     return current.fields.length > 0 ? current.fields : [fallbackPaymentField];
   });
 
-  const paymentMethodLabel = computed(() => {
-    const key = "cabinet.payments.details.createNew.paymentMethod";
-    const translated = t(key);
-    return translated === key ? "Платежный метод" : translated;
-  });
-
+  const isDocumentsEnabled = computed(() => Boolean(String(formData.paymentSystemId ?? "").trim()));
+  const modalTitle = computed(
+    () =>
+      props.title ||
+      (props.mode === "edit"
+        ? resolveText("cabinet.payments.details.createNew.editTitle", "Edit payment detail")
+        : resolveText("cabinet.payments.details.createNew.title", "Create new payment detail"))
+  );
+  const paymentMethodLabel = computed(() =>
+    resolveText("cabinet.payments.details.createNew.paymentMethod", "Payment method")
+  );
   const submitButtonLabel = computed(() =>
-    props.mode === "edit" ? "Сохранить изменения" : t("cabinet.accounts.accounts-form.actions.submit")
+    props.mode === "edit"
+      ? resolveText("cabinet.payments.details.createNew.submitUpdate", "Save changes")
+      : resolveText("cabinet.payments.details.createNew.submitCreate", "Save payment detail")
+  );
+  const paymentMethodSelectionHint = computed(() =>
+    resolveText(
+      "cabinet.payments.details.createNew.selectMethodHint",
+      "Choose a payment method first, then fill in the payout details."
+    )
+  );
+  const documentsLabel = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.label", "Payment proof screenshots")
+  );
+  const documentsWarningTitle = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.warningTitle", "What we need in the screenshots")
+  );
+  const documentsWarningText = computed(() =>
+    resolveText(
+      "cabinet.payments.details.createNew.documents.warningText",
+      "Upload screenshots from your payment account where we can clearly see the email address, the wallet or account number, and the QR code."
+    )
+  );
+  const documentsDropTitle = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.dropTitle", "Drag and drop")
+  );
+  const documentsDropAction = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.dropAction", "click to upload")
+  );
+  const documentsDropSeparator = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.dropSeparator", "or")
+  );
+  const documentsDropHint = computed(() =>
+    resolveText(
+      "cabinet.payments.details.createNew.documents.dropHint",
+      "PNG, JPG, WEBP or PDF. Maximum file size is 5 MB."
+    )
+  );
+  const documentsDisabledHint = computed(() =>
+    resolveText(
+      "cabinet.payments.details.createNew.documents.disabledHint",
+      "Choose a payment method to unlock document upload."
+    )
+  );
+  const documentsHintText = computed(() =>
+    isDocumentsEnabled.value
+      ? resolveText(
+          "cabinet.payments.details.createNew.documents.hint",
+          "You can keep attached documents and add new ones. New files will be uploaded to S3 when you save the form."
+        )
+      : resolveText(
+          "cabinet.payments.details.createNew.documents.initialHint",
+          "Document upload will become available after you choose a payment method."
+        )
+  );
+  const documentsOriginExisting = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.originExisting", "Attached")
+  );
+  const documentsOriginNew = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.originNew", "New file")
+  );
+  const removeExistingFileLabel = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.removeExisting", "Remove attached file")
+  );
+  const removeNewFileLabel = computed(() =>
+    resolveText("cabinet.payments.details.createNew.documents.removeNew", "Remove new file")
   );
 
   const existingSelectedFiles = computed(() => selectedFiles.value.filter(file => file.source === "existing"));
@@ -294,7 +410,9 @@
       .replace(/[_-]+/g, " ")
       .trim();
 
-    return formatted ? formatted.charAt(0).toUpperCase() + formatted.slice(1) : "Field";
+    return formatted
+      ? formatted.charAt(0).toUpperCase() + formatted.slice(1)
+      : resolveText("cabinet.payments.details.createNew.fieldFallback", "Field");
   };
 
   const normalizePaymentSystemFields = (rawPdfc: unknown): PaymentSystemField[] => {
@@ -312,7 +430,9 @@
           const value = item as Record<string, any>;
           const key = String(value.key ?? value.id ?? `field_${index + 1}`);
           const label = String(value.label ?? humanizeFieldKey(key));
-          const placeholder = String(value.placeholder ?? "Введите значение");
+          const placeholder = String(
+            value.placeholder ?? resolveText("cabinet.payments.details.createNew.fieldPlaceholder", "Enter value")
+          );
           const defaultValue = String(value.value ?? "");
           const required = value.required !== false;
 
@@ -326,7 +446,9 @@
         .map(([key, item]) => {
           const value = typeof item === "object" && item !== null ? item : {};
           const label = String(value.label ?? humanizeFieldKey(key));
-          const placeholder = String(value.placeholder ?? "Введите значение");
+          const placeholder = String(
+            value.placeholder ?? resolveText("cabinet.payments.details.createNew.fieldPlaceholder", "Enter value")
+          );
           const defaultValue = String(value.value ?? "");
           const required = value.required !== false;
 
@@ -378,6 +500,7 @@
     validatorPaymentDetailForm.doValidateField("paymentSystemId", val);
     formData.paymentSystemId = val;
     selectedPaymentSystem.value = paymentSystems.find(x => x.id === String(val)) ?? null;
+    documentsError.value = "";
     initializePaymentFields();
   };
 
@@ -408,7 +531,11 @@
   const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "avif"];
 
   const extractFileExtension = (value: string): string => {
-    const normalized = String(value || "").split("?")[0].split("#")[0].trim().toLowerCase();
+    const normalized = String(value || "")
+      .split("?")[0]
+      .split("#")[0]
+      .trim()
+      .toLowerCase();
     const segments = normalized.split(".");
 
     return segments.length > 1 ? segments.pop() || "" : "";
@@ -420,7 +547,9 @@
     path: string,
     name: string
   ): { type: "image" | "pdf" | "text" | "file"; src: string; label: string } => {
-    const normalizedMimeType = String(mimeType || "").trim().toLowerCase();
+    const normalizedMimeType = String(mimeType || "")
+      .trim()
+      .toLowerCase();
     let type: "image" | "pdf" | "text" | "file" = "file";
 
     if (normalizedMimeType.startsWith("image/")) {
@@ -492,7 +621,9 @@
     }
 
     return {
-      name: String(item.name ?? "Document"),
+      name: String(
+        item.name ?? resolveText("cabinet.payments.details.createNew.documents.documentFallback", "Document")
+      ),
       path,
       mime_type: String(item.mime_type ?? item.mimeType ?? ""),
       size: Number(item.size ?? 0),
@@ -522,7 +653,9 @@
           size: document.size,
           uploaded_at: document.uploaded_at,
         },
-        displayName: String(document.name ?? "Document"),
+        displayName: String(
+          document.name ?? resolveText("cabinet.payments.details.createNew.documents.documentFallback", "Document")
+        ),
         size: Number(document.size ?? 0),
         mimeType: String(document.mime_type ?? ""),
       }));
@@ -566,7 +699,10 @@
 
     formData.name = String(props.paymentDetail.name ?? "");
     formData.paymentSystemId = String(
-      props.paymentDetail.payment_system_id ?? props.paymentDetail.paymentSystemId ?? props.paymentDetail.payment_system?.id ?? ""
+      props.paymentDetail.payment_system_id ??
+        props.paymentDetail.paymentSystemId ??
+        props.paymentDetail.payment_system?.id ??
+        ""
     );
     selectedPaymentSystem.value = paymentSystems.find(system => system.id === formData.paymentSystemId) ?? null;
     initializePaymentFields(extractEditablePaymentData(props.paymentDetail.data));
@@ -574,18 +710,28 @@
   };
 
   const handleFilesSelected = (files: File[] = []) => {
-    if (!Array.isArray(files) || files.length === 0) {
+    if (!isDocumentsEnabled.value || !Array.isArray(files) || files.length === 0) {
       return;
     }
 
     const uploadableFiles = files.filter(file => {
       if (!ALLOWED_DOCUMENT_TYPES.includes(file.type)) {
-        toast.error(`Файл ${file.name} имеет недопустимый формат.`);
+        toast.error(
+          interpolateText(
+            "cabinet.payments.details.createNew.documents.invalidFormat",
+            "File {name} has an unsupported format.",
+            { name: file.name }
+          )
+        );
         return false;
       }
 
       if (file.size > MAX_DOCUMENT_SIZE_BYTES) {
-        toast.error(`Файл ${file.name} превышает 5 МБ.`);
+        toast.error(
+          interpolateText("cabinet.payments.details.createNew.documents.tooLarge", "File {name} exceeds 5 MB.", {
+            name: file.name,
+          })
+        );
         return false;
       }
 
@@ -594,9 +740,7 @@
 
     const buildFileSignature = (file: File): string => `${file.name}:${file.size}:${file.lastModified}`;
     const alreadyAdded = new Set(
-      selectedFiles.value
-        .filter(item => item.file instanceof File)
-        .map(item => buildFileSignature(item.file as File))
+      selectedFiles.value.filter(item => item.file instanceof File).map(item => buildFileSignature(item.file as File))
     );
 
     uploadableFiles.forEach(file => {
@@ -642,51 +786,70 @@
     const anyError = error as any;
     const status = Number(anyError?.response?.status ?? 0);
     if (status === 413) {
-      return "Файл слишком большой.";
+      return resolveText("cabinet.payments.details.createNew.documents.serverTooLarge", "File is too large.");
     }
 
-    const message = String(anyError?.response?.data?.message ?? anyError?.message ?? "").trim();
-    return message || "Не удалось загрузить файл в S3.";
+    return (
+      extractApiErrorMessage(
+        error,
+        resolveText("cabinet.payments.details.createNew.documents.uploadFailed", "Failed to upload the file to S3.")
+      ) ?? resolveText("cabinet.payments.details.createNew.documents.uploadFailed", "Failed to upload the file to S3.")
+    );
   };
 
   const resolveUploadStatusLabel = (selectedFile: SelectedUploadFile): string => {
     if (selectedFile.source === "existing") {
-      return "Сохранён";
+      return resolveText("cabinet.payments.details.createNew.documents.statusExisting", "Saved");
     }
 
     if (selectedFile.uploadStatus === "uploading") {
-      return "Загрузка...";
+      return resolveText("cabinet.payments.details.createNew.documents.statusUploading", "Uploading...");
     }
 
     if (selectedFile.uploadStatus === "uploaded") {
-      return "Загружено";
+      return resolveText("cabinet.payments.details.createNew.documents.statusUploaded", "Uploaded");
     }
 
     if (selectedFile.uploadStatus === "failed") {
-      return "Ошибка загрузки";
+      return resolveText("cabinet.payments.details.createNew.documents.statusFailed", "Upload error");
     }
 
-    return "Готов к загрузке";
+    return resolveText("cabinet.payments.details.createNew.documents.statusIdle", "Ready to upload");
   };
 
   const resolveUploadStatusCaption = (selectedFile: SelectedUploadFile): string => {
     if (selectedFile.source === "existing") {
-      return "Этот документ уже сохранён и останется прикреплённым, если вы его не удалите.";
+      return resolveText(
+        "cabinet.payments.details.createNew.documents.captionExisting",
+        "This document is already saved and will remain attached until you remove it."
+      );
     }
 
     if (selectedFile.uploadStatus === "uploading") {
-      return "Файл сейчас загружается в Amazon S3.";
+      return resolveText(
+        "cabinet.payments.details.createNew.documents.captionUploading",
+        "The file is being uploaded to Amazon S3 right now."
+      );
     }
 
     if (selectedFile.uploadStatus === "uploaded") {
-      return "Файл уже загружен и будет сохранён вместе с реквизитом.";
+      return resolveText(
+        "cabinet.payments.details.createNew.documents.captionUploaded",
+        "The file has been uploaded and will be saved together with this payment detail."
+      );
     }
 
     if (selectedFile.uploadStatus === "failed") {
-      return "Загрузка не завершилась. Исправьте ошибку или уберите файл.";
+      return resolveText(
+        "cabinet.payments.details.createNew.documents.captionFailed",
+        "Upload was not completed. Fix the error or remove the file."
+      );
     }
 
-    return "Файл выбран и будет загружен после нажатия на сохранение.";
+    return resolveText(
+      "cabinet.payments.details.createNew.documents.captionIdle",
+      "The file has been selected and will be uploaded after you save the form."
+    );
   };
 
   const uploadSingleDocument = async (selectedFile: SelectedUploadFile): Promise<Record<string, any>> => {
@@ -697,7 +860,9 @@
     }
 
     if (!selectedFile.file) {
-      throw new Error("Не удалось получить файл для загрузки.");
+      throw new Error(
+        resolveText("cabinet.payments.details.createNew.documents.fileMissing", "Unable to access the file for upload.")
+      );
     }
 
     selectedFile.uploadStatus = "uploading";
@@ -716,13 +881,15 @@
       const key = String(payload?.key ?? "").trim();
 
       if (!url || !key) {
-        throw new Error("Не удалось получить ссылку для загрузки.");
+        throw new Error(
+          resolveText("cabinet.payments.details.createNew.documents.presignFailed", "Failed to get an upload link.")
+        );
       }
 
       await axios.put(url, selectedFile.file, {
         headers: { "Content-Type": selectedFile.file.type },
         onUploadProgress(event) {
-          const total = Number(event.total ?? selectedFile.file.size ?? 0);
+          const total = Number(event.total ?? selectedFile.file?.size ?? 0);
           const loaded = Number(event.loaded ?? 0);
           selectedFile.uploadProgress = total > 0 ? Math.round((loaded / total) * 100) : 0;
         },
@@ -755,7 +922,10 @@
     selectedPaymentFields.value.forEach(field => {
       const value = String(formData.data[field.key] || "").trim();
       if (field.required && !value) {
-        fieldErrors[field.key] = "Поле обязательно для заполнения";
+        fieldErrors[field.key] = resolveText(
+          "cabinet.payments.details.createNew.validationRequired",
+          "This field is required."
+        );
         isValid = false;
       }
     });
@@ -777,7 +947,13 @@
     }
 
     if (failedUploads > 0) {
-      throw new Error(`Не удалось загрузить ${failedUploads} файл(ов).`);
+      throw new Error(
+        interpolateText(
+          "cabinet.payments.details.createNew.documents.uploadBatchFailed",
+          "Failed to upload {count} file(s).",
+          { count: failedUploads }
+        )
+      );
     }
 
     return uploadedDocuments;
@@ -791,7 +967,10 @@
       }
 
       if (selectedFiles.value.length === 0) {
-        documentsError.value = "Добавьте минимум один скриншот реквизитов для верификации.";
+        documentsError.value = resolveText(
+          "cabinet.payments.details.createNew.documents.required",
+          "Add at least one payment account screenshot for verification."
+        );
         return;
       }
 
@@ -813,16 +992,23 @@
             ? await app.paymentDetails.put(props.paymentDetail.id, payload)
             : await app.paymentDetails.post(payload);
 
-        toast.success(
-          response.data.message ||
-            (props.mode === "edit"
-              ? "Платёжные реквизиты обновлены и повторно отправлены на проверку."
-              : "Платёжные реквизиты созданы успешно.")
-        );
+        const fallbackSuccess =
+          props.mode === "edit"
+            ? resolveText(
+                "cabinet.payments.details.createNew.updatedSuccess",
+                "Payment details were updated and sent for verification again."
+              )
+            : resolveText("cabinet.payments.details.createNew.createdSuccess", "Payment details created successfully.");
+
+        toast.success(resolveApiMessage(response?.data?.message, fallbackSuccess) ?? fallbackSuccess);
         closeModal();
         useEventBus.emit("loadDataForPaymentDetails");
       } catch (errorResponse: any) {
-        const errorMessage = errorResponse?.response?.data?.message || "Не удалось сохранить платежные реквизиты.";
+        const fallbackError = resolveText(
+          "cabinet.payments.details.createNew.saveError",
+          "Failed to save payment details."
+        );
+        const errorMessage = extractApiErrorMessage(errorResponse, fallbackError) ?? fallbackError;
         documentsError.value = errorMessage;
         toast.error(errorMessage);
       } finally {
@@ -857,9 +1043,8 @@
     flex-direction: column;
 
     &__top {
-      min-height: 50px;
-      padding-left: 40px;
-      padding-right: 20px;
+      min-height: 0;
+      padding: 0 72px 14px 24px;
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -877,7 +1062,7 @@
       }
 
       &__fields {
-        padding: 40px;
+        padding: 28px 24px 32px;
 
         .ui-form-control {
           margin-bottom: 20px;
@@ -893,6 +1078,7 @@
       margin-bottom: 16px;
       color: var(--ui-text-secondary);
       font-size: 13px;
+      line-height: 1.45;
     }
 
     &__actions {
@@ -914,9 +1100,39 @@
     gap: 12px;
   }
 
+  .payment-documents__warning {
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--ui-primary-main) 22%, transparent);
+    background: color-mix(in srgb, var(--ui-primary-main) 10%, var(--ui-background-panel));
+    padding: 14px 16px;
+  }
+
+  .payment-documents__warning-title {
+    color: var(--ui-text-main);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .payment-documents__warning-text {
+    color: var(--ui-text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
   .payment-documents__dropzone {
     position: relative;
     min-height: 120px;
+    border-radius: 14px;
+    transition:
+      opacity 0.25s ease,
+      filter 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .payment-documents__dropzone.is-disabled {
+    opacity: 0.72;
+    filter: saturate(0.85);
   }
 
   .payment-documents__drag {
@@ -927,6 +1143,7 @@
   .payment-documents__hint {
     color: var(--ui-text-secondary);
     font-size: 12px;
+    line-height: 1.45;
   }
 
   .payment-documents__summary {
@@ -1116,11 +1333,23 @@
     height: 14px;
   }
 
+  .payment-documents-fade-enter-active,
+  .payment-documents-fade-leave-active {
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease;
+  }
+
+  .payment-documents-fade-enter-from,
+  .payment-documents-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
   @media (max-width: 768px) {
     .accounts__edit {
       &__top {
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0 64px 12px 20px;
       }
 
       &__content {

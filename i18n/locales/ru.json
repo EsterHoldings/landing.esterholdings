@@ -888,26 +888,177 @@
       }
     },
     "payments": {
-      "title": "Детали платежей",
+      "title": "Платёжные реквизиты",
       "search": "Поиск",
-      "create": "Добавить новый платёж",
+      "create": "Создать платёжный реквизит",
       "columns": {
         "title": "Название",
         "paysystem": "Платёжная система",
         "currency": "Валюта",
-        "createdAt": "Дата создания"
+        "createdAt": "Создано"
       },
       "details": {
-        "createNew": {
-          "title": "Создать новый платёжный реквизит",
-          "name": "Название платёжного реквизита",
-          "namePlaceholder": "Название платёжного реквизита",
-          "paymentMethod": "Платежный метод",
-          "recipientAddress": "Пожалуйста, выберите платёжную систему."
-        },
         "view": "Просмотр",
         "confirm": "Подтвердить",
-        "delete": "Удалить"
+        "delete": "Удалить",
+        "cardLabel": "Платёжный реквизит",
+        "archivedBadge": "В архиве",
+        "emptyTitle": "Платёжных реквизитов пока нет",
+        "emptySubtitle": "Добавьте первый платёжный реквизит, чтобы получать выплаты.",
+        "emptyArchivedTitle": "Архивных реквизитов пока нет",
+        "emptyArchivedSubtitle": "Здесь будут отображаться архивные реквизиты, которые можно восстановить.",
+        "emptyFilteredTitle": "Платёжные реквизиты не найдены",
+        "emptyFilteredSubtitle": "Попробуйте изменить поиск или фильтры.",
+        "columns": {
+          "name": "Название",
+          "paymentSystem": "Платёжная система",
+          "status": "Статус",
+          "updatedAt": "Обновлено",
+          "id": "ID"
+        },
+        "statuses": {
+          "approved": "Подтверждено",
+          "pending": "На проверке",
+          "rejected": "Отклонено"
+        },
+        "filters": {
+          "active": "Активные",
+          "archived": "Архив",
+          "all": "Все"
+        },
+        "sort": {
+          "name": "Название",
+          "status": "Статус",
+          "createdAt": "Создано",
+          "updatedAt": "Обновлено"
+        },
+        "views": {
+          "table": "Список",
+          "cards": "Плитка",
+          "full": "На всю ширину"
+        },
+        "actions": {
+          "edit": "Редактировать",
+          "archive": "Архивировать",
+          "restore": "Восстановить",
+          "copyId": "Скопировать ID",
+          "openMenu": "Открыть меню",
+          "archiveConfirm": "Архивировать этот платёжный реквизит?",
+          "archiveSuccess": "Платёжный реквизит перемещён в архив.",
+          "archiveError": "Не удалось архивировать платёжный реквизит.",
+          "restoreSuccess": "Платёжный реквизит восстановлен.",
+          "restoreError": "Не удалось восстановить платёжный реквизит."
+        },
+        "documents": {
+          "label": "Скриншоты реквизитов",
+          "previewAlt": "Превью #{count}"
+        },
+        "relative": {
+          "justNow": "только что",
+          "minutesAgo": "{count} мин назад",
+          "hoursAgo": "{count} ч назад",
+          "daysAgo": "{count} дн назад"
+        },
+        "createNew": {
+          "title": "Создать новый платёжный реквизит",
+          "editTitle": "Редактировать платёжный реквизит",
+          "name": "Название платёжного реквизита",
+          "namePlaceholder": "Название платёжного реквизита",
+          "paymentMethod": "Платёжный метод",
+          "recipientAddress": "Сначала выберите платёжный метод.",
+          "recipientAddressLabel": "Адрес получателя",
+          "recipientAddressPlaceholder": "Введите реквизиты для выплат",
+          "selectMethodHint": "Сначала выберите платёжный метод, а затем заполните реквизиты для выплат.",
+          "submitCreate": "Сохранить реквизит",
+          "submitUpdate": "Сохранить изменения",
+          "fieldFallback": "Поле",
+          "fieldPlaceholder": "Введите значение",
+          "validationRequired": "Поле обязательно для заполнения.",
+          "createdSuccess": "Платёжные реквизиты успешно созданы.",
+          "updatedSuccess": "Платёжные реквизиты обновлены и повторно отправлены на проверку.",
+          "saveError": "Не удалось сохранить платёжные реквизиты.",
+          "documents": {
+            "label": "Скриншоты реквизитов",
+            "warningTitle": "Что должно быть на скриншотах",
+            "warningText": "Загрузите скриншоты из платёжного кабинета, где отчётливо видны email, номер кошелька или счёта и QR-код.",
+            "dropTitle": "Перетащите файл",
+            "dropSeparator": "или",
+            "dropAction": "нажмите для загрузки",
+            "dropHint": "PNG, JPG, WEBP или PDF. Максимальный размер файла 5 МБ.",
+            "disabledHint": "Выберите платёжный метод, чтобы разблокировать загрузку документов.",
+            "hint": "Можно оставить уже прикреплённые документы и добавить новые. Новые файлы загрузятся в S3 при сохранении формы.",
+            "initialHint": "Загрузка документов станет доступна после выбора платёжного метода.",
+            "summaryExisting": "Уже прикреплено: {count}",
+            "summaryNew": "Новых файлов: {count}",
+            "originExisting": "Прикреплён",
+            "originNew": "Новый файл",
+            "removeExisting": "Убрать прикреплённый файл",
+            "removeNew": "Убрать новый файл",
+            "documentFallback": "Документ",
+            "invalidFormat": "Файл {name} имеет неподдерживаемый формат.",
+            "tooLarge": "Файл {name} превышает 5 МБ.",
+            "serverTooLarge": "Файл слишком большой.",
+            "uploadFailed": "Не удалось загрузить файл в S3.",
+            "statusExisting": "Сохранён",
+            "statusUploading": "Загрузка...",
+            "statusUploaded": "Загружен",
+            "statusFailed": "Ошибка загрузки",
+            "statusIdle": "Готов к загрузке",
+            "captionExisting": "Этот документ уже сохранён и останется прикреплённым, пока вы его не удалите.",
+            "captionUploading": "Файл сейчас загружается в Amazon S3.",
+            "captionUploaded": "Файл уже загружен и будет сохранён вместе с этим реквизитом.",
+            "captionFailed": "Загрузка не завершилась. Исправьте ошибку или удалите файл.",
+            "captionIdle": "Файл выбран и будет загружен после сохранения формы.",
+            "fileMissing": "Не удалось получить файл для загрузки.",
+            "presignFailed": "Не удалось получить ссылку для загрузки.",
+            "uploadBatchFailed": "Не удалось загрузить файлов: {count}.",
+            "required": "Добавьте хотя бы один скриншот реквизитов для верификации."
+          }
+        },
+        "detail": {
+          "title": "Реквизит #{id}",
+          "back": "К списку реквизитов",
+          "total": "Всего: {count}",
+          "commentEmpty": "Комментарий отсутствует.",
+          "fieldsTitle": "Поля реквизита",
+          "noData": "Нет данных.",
+          "copyValue": "Скопировать значение",
+          "documentsEmpty": "Документы не загружены.",
+          "historyTitle": "История изменений реквизита",
+          "historyLoading": "Загрузка истории...",
+          "historyEmpty": "История пока отсутствует.",
+          "documentFallback": "Документ",
+          "historyDocumentAlt": "Документ истории #{count}",
+          "notFound": "Реквизит не найден.",
+          "loadError": "Не удалось загрузить реквизит.",
+          "booleanYes": "Да",
+          "booleanNo": "Нет",
+          "valueLabel": "Значение",
+          "labels": {
+            "name": "Название",
+            "paymentSystem": "Платёжная система",
+            "updatedAt": "Обновлено",
+            "createdAt": "Создано",
+            "id": "ID",
+            "adminComment": "Комментарий администратора"
+          },
+          "groups": {
+            "fields": "Основные поля",
+            "legacy": "Legacy данные"
+          },
+          "fieldLabels": {
+            "old_requisite_id": "Legacy ID",
+            "type": "Тип",
+            "status": "Статус",
+            "active": "Активность",
+            "comment": "Комментарий",
+            "paysystem": "Платёжная система",
+            "config_name": "Конфигурация",
+            "name": "Название",
+            "shortname": "Короткое имя",
+            "merchant": "Мерчант"
+          }
+        }
       },
       "nothingToShow": "Нет данных =(",
       "pagination": {
@@ -1678,10 +1829,12 @@
     "methodNotAllowed": "Метод не поддерживается.",
     "notFound": "Ничего не найдено.",
     "mt4RequestFailed": "Ошибка запроса к MT4.",
+    "requiredField": "Поле обязательно для заполнения.",
     "paymentDetailCreated": "Платёжные реквизиты успешно созданы.",
     "paymentDetailUpdated": "Платёжные реквизиты успешно обновлены.",
     "paymentDetailDeleted": "Платёжные реквизиты удалены.",
     "paymentDetailRestored": "Платёжные реквизиты восстановлены.",
+    "paymentDetailNotFound": "Платёжный реквизит не найден.",
     "accountCreated": "Счёт успешно создан.",
     "invalidCallbackSignature": "Некорректная подпись callback."
   },

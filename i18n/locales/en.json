@@ -886,24 +886,175 @@
     "payments": {
       "title": "Payment details",
       "search": "Search",
-      "create": "Create new payment detail",
+      "create": "Create payment detail",
       "columns": {
         "title": "Title",
-        "paysystem": "Paysystem",
+        "paysystem": "Payment system",
         "currency": "Currency",
-        "createdAt": "Created At"
+        "createdAt": "Created at"
       },
       "details": {
+        "view": "View",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "cardLabel": "Payment detail",
+        "archivedBadge": "Archived",
+        "emptyTitle": "No payment details yet",
+        "emptySubtitle": "Add your first payment detail to receive payouts.",
+        "emptyArchivedTitle": "No archived payment details yet",
+        "emptyArchivedSubtitle": "Archived payment details will appear here, and you will be able to restore them.",
+        "emptyFilteredTitle": "Payment details were not found",
+        "emptyFilteredSubtitle": "Try changing the search query or filters.",
+        "columns": {
+          "name": "Name",
+          "paymentSystem": "Payment system",
+          "status": "Status",
+          "updatedAt": "Updated at",
+          "id": "ID"
+        },
+        "statuses": {
+          "approved": "Approved",
+          "pending": "Pending",
+          "rejected": "Rejected"
+        },
+        "filters": {
+          "active": "Active",
+          "archived": "Archived",
+          "all": "All"
+        },
+        "sort": {
+          "name": "Name",
+          "status": "Status",
+          "createdAt": "Created at",
+          "updatedAt": "Updated at"
+        },
+        "views": {
+          "table": "List",
+          "cards": "Cards",
+          "full": "Full width"
+        },
+        "actions": {
+          "edit": "Edit",
+          "archive": "Archive",
+          "restore": "Restore",
+          "copyId": "Copy ID",
+          "openMenu": "Open menu",
+          "archiveConfirm": "Archive this payment detail?",
+          "archiveSuccess": "Payment detail moved to the archive.",
+          "archiveError": "Failed to archive the payment detail.",
+          "restoreSuccess": "Payment detail restored.",
+          "restoreError": "Failed to restore the payment detail."
+        },
+        "documents": {
+          "label": "Payment account screenshots",
+          "previewAlt": "Preview #{count}"
+        },
+        "relative": {
+          "justNow": "just now",
+          "minutesAgo": "{count} min ago",
+          "hoursAgo": "{count} h ago",
+          "daysAgo": "{count} d ago"
+        },
         "createNew": {
           "title": "Create new payment detail",
+          "editTitle": "Edit payment detail",
           "name": "Payment detail name",
           "namePlaceholder": "Payment detail name",
           "paymentMethod": "Payment method",
-          "recipientAddress": "Please select a payment system."
+          "recipientAddress": "Please choose a payment method first.",
+          "recipientAddressLabel": "Recipient address",
+          "recipientAddressPlaceholder": "Enter payout details",
+          "selectMethodHint": "Choose a payment method first, then fill in the payout details.",
+          "submitCreate": "Save payment detail",
+          "submitUpdate": "Save changes",
+          "fieldFallback": "Field",
+          "fieldPlaceholder": "Enter value",
+          "validationRequired": "This field is required.",
+          "createdSuccess": "Payment details created successfully.",
+          "updatedSuccess": "Payment details were updated and sent for verification again.",
+          "saveError": "Failed to save payment details.",
+          "documents": {
+            "label": "Payment account screenshots",
+            "warningTitle": "What we need in the screenshots",
+            "warningText": "Upload screenshots from your payment account where we can clearly see the email address, the wallet or account number, and the QR code.",
+            "dropTitle": "Drag and drop",
+            "dropSeparator": "or",
+            "dropAction": "click to upload",
+            "dropHint": "PNG, JPG, WEBP or PDF. Maximum file size is 5 MB.",
+            "disabledHint": "Choose a payment method to unlock document upload.",
+            "hint": "You can keep attached documents and add new ones. New files will be uploaded to S3 when you save the form.",
+            "initialHint": "Document upload will become available after you choose a payment method.",
+            "summaryExisting": "Attached: {count}",
+            "summaryNew": "New files: {count}",
+            "originExisting": "Attached",
+            "originNew": "New file",
+            "removeExisting": "Remove attached file",
+            "removeNew": "Remove new file",
+            "documentFallback": "Document",
+            "invalidFormat": "File {name} has an unsupported format.",
+            "tooLarge": "File {name} exceeds 5 MB.",
+            "serverTooLarge": "File is too large.",
+            "uploadFailed": "Failed to upload the file to S3.",
+            "statusExisting": "Saved",
+            "statusUploading": "Uploading...",
+            "statusUploaded": "Uploaded",
+            "statusFailed": "Upload error",
+            "statusIdle": "Ready to upload",
+            "captionExisting": "This document is already saved and will remain attached until you remove it.",
+            "captionUploading": "The file is being uploaded to Amazon S3 right now.",
+            "captionUploaded": "The file has been uploaded and will be saved together with this payment detail.",
+            "captionFailed": "Upload was not completed. Fix the error or remove the file.",
+            "captionIdle": "The file has been selected and will be uploaded after you save the form.",
+            "fileMissing": "Unable to access the file for upload.",
+            "presignFailed": "Failed to get an upload link.",
+            "uploadBatchFailed": "Failed to upload {count} file(s).",
+            "required": "Add at least one payment account screenshot for verification."
+          }
         },
-        "view": "View",
-        "confirm": "Confirm",
-        "delete": "Delete"
+        "detail": {
+          "title": "Payment detail #{id}",
+          "back": "Back to payment details",
+          "total": "Total: {count}",
+          "commentEmpty": "No comment.",
+          "fieldsTitle": "Payment detail fields",
+          "noData": "No data.",
+          "copyValue": "Copy value",
+          "documentsEmpty": "Documents were not uploaded.",
+          "historyTitle": "Payment detail history",
+          "historyLoading": "Loading history...",
+          "historyEmpty": "No history yet.",
+          "documentFallback": "Document",
+          "historyDocumentAlt": "History document #{count}",
+          "notFound": "Payment detail was not found.",
+          "loadError": "Failed to load the payment detail.",
+          "booleanYes": "Yes",
+          "booleanNo": "No",
+          "valueLabel": "Value",
+          "labels": {
+            "name": "Name",
+            "paymentSystem": "Payment system",
+            "updatedAt": "Updated at",
+            "createdAt": "Created at",
+            "id": "ID",
+            "adminComment": "Admin comment"
+          },
+          "groups": {
+            "fields": "Main fields",
+            "legacy": "Legacy data"
+          },
+          "fieldLabels": {
+            "old_requisite_id": "Legacy ID",
+            "type": "Type",
+            "status": "Status",
+            "active": "Active",
+            "comment": "Comment",
+            "paysystem": "Payment system",
+            "config_name": "Configuration",
+            "name": "Name",
+            "shortname": "Short name",
+            "merchant": "Merchant"
+          }
+        }
       },
       "nothingToShow": "Nothing to show =(",
       "pagination": {
@@ -1674,10 +1825,12 @@
     "methodNotAllowed": "Method not allowed.",
     "notFound": "Not found.",
     "mt4RequestFailed": "MT4 request failed.",
+    "requiredField": "This field is required.",
     "paymentDetailCreated": "Payment detail created successfully.",
     "paymentDetailUpdated": "Payment detail updated successfully.",
     "paymentDetailDeleted": "Payment detail deleted successfully.",
     "paymentDetailRestored": "Payment detail restored successfully.",
+    "paymentDetailNotFound": "Payment detail not found.",
     "accountCreated": "Account created successfully.",
     "invalidCallbackSignature": "Invalid callback signature."
   },

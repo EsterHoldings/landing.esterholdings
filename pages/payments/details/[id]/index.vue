@@ -36,7 +36,9 @@
           <section class="payment-detail-card payment-detail-card--main">
             <div class="payment-detail-card__header">
               <div>
-                <UiTextSmall class="payment-detail-card__label">Название</UiTextSmall>
+                <UiTextSmall class="payment-detail-card__label">{{
+                  resolveText("cabinet.payments.details.detail.labels.name", "Name")
+                }}</UiTextSmall>
                 <h3 class="payment-detail-card__title">{{ paymentDetail.name || "-" }}</h3>
               </div>
               <div class="status-inline">
@@ -49,12 +51,16 @@
 
             <div class="payment-detail-card__meta-grid">
               <div class="meta-item">
-                <UiTextSmall class="meta-item__label">Платежная система</UiTextSmall>
+                <UiTextSmall class="meta-item__label">{{
+                  resolveText("cabinet.payments.details.detail.labels.paymentSystem", "Payment system")
+                }}</UiTextSmall>
                 <div class="meta-item__value">{{ paymentSystemName }}</div>
               </div>
 
               <div class="meta-item">
-                <UiTextSmall class="meta-item__label">Обновлено</UiTextSmall>
+                <UiTextSmall class="meta-item__label">{{
+                  resolveText("cabinet.payments.details.detail.labels.updatedAt", "Updated at")
+                }}</UiTextSmall>
                 <div class="updated-at-cell">
                   <span class="updated-at-cell__relative">{{ formatRelativeDate(paymentDetail.updated_at) }}</span>
                   <span class="updated-at-cell__absolute">{{ formatDateTime(paymentDetail.updated_at) }}</span>
@@ -62,12 +68,16 @@
               </div>
 
               <div class="meta-item">
-                <UiTextSmall class="meta-item__label">Создано</UiTextSmall>
+                <UiTextSmall class="meta-item__label">{{
+                  resolveText("cabinet.payments.details.detail.labels.createdAt", "Created at")
+                }}</UiTextSmall>
                 <div class="meta-item__value">{{ formatDateTime(paymentDetail.created_at) }}</div>
               </div>
 
               <div class="meta-item">
-                <UiTextSmall class="meta-item__label">ID</UiTextSmall>
+                <UiTextSmall class="meta-item__label">{{
+                  resolveText("cabinet.payments.details.detail.labels.id", "ID")
+                }}</UiTextSmall>
                 <div class="meta-item__value break-all">{{ paymentDetail.id || "-" }}</div>
               </div>
             </div>
@@ -75,19 +85,26 @@
             <div
               class="payment-detail-card__comment-section"
               :class="{ 'payment-detail-card__comment-section--has-value': hasAdminComment }">
-              <UiTextSmall class="payment-detail-card__comment-label">Комментарий администратора</UiTextSmall>
+              <UiTextSmall class="payment-detail-card__comment-label">{{
+                resolveText("cabinet.payments.details.detail.labels.adminComment", "Admin comment")
+              }}</UiTextSmall>
               <div class="payment-detail-card__comment">
-                {{ paymentDetail.admin_comment || "Комментарий отсутствует." }}
+                {{
+                  paymentDetail.admin_comment ||
+                  resolveText("cabinet.payments.details.detail.commentEmpty", "No comment.")
+                }}
               </div>
             </div>
           </section>
 
           <section class="payment-detail-card">
-            <UiTextSmall class="payment-detail-card__label">Поля реквизита</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__label">{{
+              resolveText("cabinet.payments.details.detail.fieldsTitle", "Payment detail fields")
+            }}</UiTextSmall>
             <div
               v-if="dataGroups.length === 0"
               class="payment-detail-card__empty">
-              Нет данных.
+              {{ resolveText("cabinet.payments.details.detail.noData", "No data.") }}
             </div>
             <div
               v-else
@@ -108,7 +125,7 @@
                     </div>
                     <div
                       class="details-field__copy"
-                      :title="'Скопировать значение'">
+                      :title="resolveText('cabinet.payments.details.detail.copyValue', 'Copy value')">
                       <UiIconCopy :text="row.value" />
                     </div>
                   </div>
@@ -120,14 +137,18 @@
 
         <section class="payment-detail-card payment-detail-card--full">
           <div class="payment-detail-card__documents-header">
-            <UiTextSmall class="payment-detail-card__label">Скриншоты реквизитов</UiTextSmall>
-            <UiTextSmall class="payment-detail-card__counter">Всего: {{ documents.length }}</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__label">{{
+              resolveText("cabinet.payments.details.documents.label", "Documents")
+            }}</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__counter">{{
+              interpolateText("cabinet.payments.details.detail.total", "Total: {count}", { count: documents.length })
+            }}</UiTextSmall>
           </div>
 
           <div
             v-if="documents.length === 0"
             class="payment-detail-card__empty">
-            Документы не загружены.
+            {{ resolveText("cabinet.payments.details.detail.documentsEmpty", "Documents were not uploaded.") }}
           </div>
           <div
             v-else
@@ -141,7 +162,11 @@
               <img
                 v-if="resolveDocumentPreviewMeta(document).type === 'image' && resolveDocumentPreviewMeta(document).src"
                 :src="resolveDocumentPreviewMeta(document).src"
-                :alt="`Документ #${index + 1}`"
+                :alt="
+                  interpolateText('cabinet.payments.details.documents.previewAlt', 'Preview #{count}', {
+                    count: index + 1,
+                  })
+                "
                 class="document-card__image" />
               <div
                 v-else
@@ -155,7 +180,9 @@
                 <span
                   class="document-card__name"
                   :title="document.name"
-                  >{{ document.name || "Документ" }}</span
+                  >{{
+                    document.name || resolveText("cabinet.payments.details.detail.documentFallback", "Document")
+                  }}</span
                 >
               </div>
             </button>
@@ -164,19 +191,25 @@
 
         <section class="payment-detail-card payment-detail-card--full">
           <div class="payment-detail-card__documents-header">
-            <UiTextSmall class="payment-detail-card__label">История изменений реквизита</UiTextSmall>
-            <UiTextSmall class="payment-detail-card__counter">Всего: {{ payoutHistoryRows.length }}</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__label">{{
+              resolveText("cabinet.payments.details.detail.historyTitle", "Payment detail history")
+            }}</UiTextSmall>
+            <UiTextSmall class="payment-detail-card__counter">{{
+              interpolateText("cabinet.payments.details.detail.total", "Total: {count}", {
+                count: payoutHistoryRows.length,
+              })
+            }}</UiTextSmall>
           </div>
 
           <div
             v-if="isHistoryLoading"
             class="payment-detail-card__empty">
-            Загрузка истории...
+            {{ resolveText("cabinet.payments.details.detail.historyLoading", "Loading history...") }}
           </div>
           <div
             v-else-if="payoutHistoryRows.length === 0"
             class="payment-detail-card__empty">
-            История пока отсутствует.
+            {{ resolveText("cabinet.payments.details.detail.historyEmpty", "No history yet.") }}
           </div>
           <div
             v-else
@@ -217,9 +250,18 @@
                   class="history-item__doc"
                   @click="openDocument(historyDocument)">
                   <img
-                    v-if="resolveDocumentPreviewMeta(historyDocument).type === 'image' && resolveDocumentPreviewMeta(historyDocument).src"
+                    v-if="
+                      resolveDocumentPreviewMeta(historyDocument).type === 'image' &&
+                      resolveDocumentPreviewMeta(historyDocument).src
+                    "
                     :src="resolveDocumentPreviewMeta(historyDocument).src"
-                    :alt="`History document #${docIndex + 1}`"
+                    :alt="
+                      interpolateText(
+                        'cabinet.payments.details.detail.historyDocumentAlt',
+                        'History document #{count}',
+                        { count: docIndex + 1 }
+                      )
+                    "
                     class="history-item__doc-img" />
                   <span
                     v-else
@@ -240,6 +282,7 @@
 <script lang="ts" setup>
   import { computed, onMounted, ref } from "vue";
   import { useRoute } from "vue-router";
+  import { useI18n } from "vue-i18n";
   import { definePageMeta, useLocalePath } from "~/.nuxt/imports";
 
   import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
@@ -249,6 +292,7 @@
   import UiTextH4 from "~/components/ui/UiTextH4.vue";
   import UiTextSmall from "~/components/ui/UiTextSmall.vue";
   import useAppCore from "~/composables/useAppCore";
+  import { extractApiErrorMessage } from "~/composables/useApiMessages";
 
   definePageMeta({
     layout: "cabinet",
@@ -294,6 +338,7 @@
   const appCore = useAppCore();
   const route = useRoute();
   const localePath = useLocalePath();
+  const { t } = useI18n({ useScope: "global" });
 
   const paymentDetail = ref<any | null>(null);
   const isLoading = ref(true);
@@ -301,10 +346,25 @@
   const errorMessage = ref("");
   const payoutHistoryRows = ref<PayoutHistoryRow[]>([]);
 
+  const resolveText = (key: string, fallback: string): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+  };
+
+  const interpolateText = (key: string, fallback: string, values: Record<string, string | number>): string => {
+    const base = resolveText(key, fallback);
+
+    return Object.entries(values).reduce((result, [token, value]) => {
+      return result.split(`{${token}}`).join(String(value));
+    }, base);
+  };
+
   const paymentDetailId = computed(() => String(route.params.id ?? "").trim());
   const backLink = computed(() => localePath("/payments/details"));
-  const backLabel = computed(() => "К списку реквизитов");
-  const pageTitle = computed(() => `Реквизит #${paymentDetailId.value}`);
+  const backLabel = computed(() => resolveText("cabinet.payments.details.detail.back", "Back to payment details"));
+  const pageTitle = computed(() =>
+    interpolateText("cabinet.payments.details.detail.title", "Payment detail #{id}", { id: paymentDetailId.value })
+  );
   const hasAdminComment = computed(() => String(paymentDetail.value?.admin_comment ?? "").trim().length > 0);
 
   const paymentSystemName = computed(() => {
@@ -319,29 +379,29 @@
     return raw;
   });
 
-  const dataGroupLabelMap: Record<string, string> = {
-    fields: "Основные поля",
-    legacy: "Legacy данные",
-  };
+  const dataGroupLabelMap = computed<Record<string, string>>(() => ({
+    fields: resolveText("cabinet.payments.details.detail.groups.fields", "Main fields"),
+    legacy: resolveText("cabinet.payments.details.detail.groups.legacy", "Legacy data"),
+  }));
 
-  const dataFieldLabelMap: Record<string, string> = {
-    old_requisite_id: "Legacy ID",
-    type: "Тип",
-    status: "Статус",
-    active: "Активность",
-    comment: "Комментарий",
-    paysystem: "Платёжная система",
-    config_name: "Конфигурация",
-    name: "Название",
-    shortname: "Короткое имя",
-    merchant: "Мерчант",
-  };
+  const dataFieldLabelMap = computed<Record<string, string>>(() => ({
+    old_requisite_id: resolveText("cabinet.payments.details.detail.fieldLabels.old_requisite_id", "Legacy ID"),
+    type: resolveText("cabinet.payments.details.detail.fieldLabels.type", "Type"),
+    status: resolveText("cabinet.payments.details.detail.fieldLabels.status", "Status"),
+    active: resolveText("cabinet.payments.details.detail.fieldLabels.active", "Active"),
+    comment: resolveText("cabinet.payments.details.detail.fieldLabels.comment", "Comment"),
+    paysystem: resolveText("cabinet.payments.details.detail.fieldLabels.paysystem", "Payment system"),
+    config_name: resolveText("cabinet.payments.details.detail.fieldLabels.config_name", "Configuration"),
+    name: resolveText("cabinet.payments.details.detail.fieldLabels.name", "Name"),
+    shortname: resolveText("cabinet.payments.details.detail.fieldLabels.shortname", "Short name"),
+    merchant: resolveText("cabinet.payments.details.detail.fieldLabels.merchant", "Merchant"),
+  }));
 
   const humanizeDataKey = (value: string): string => {
     const normalized = String(value ?? "").trim();
     if (!normalized) return "-";
 
-    const mapped = dataFieldLabelMap[normalized];
+    const mapped = dataFieldLabelMap.value[normalized];
     if (mapped) return mapped;
 
     return normalized
@@ -353,7 +413,11 @@
 
   const normalizeLeafValue = (value: unknown): string => {
     if (value === null || value === undefined || value === "") return "-";
-    if (typeof value === "boolean") return value ? "Yes" : "No";
+    if (typeof value === "boolean") {
+      return value
+        ? resolveText("cabinet.payments.details.detail.booleanYes", "Yes")
+        : resolveText("cabinet.payments.details.detail.booleanNo", "No");
+    }
     if (typeof value === "number") return Number.isFinite(value) ? String(value) : "-";
 
     return String(value);
@@ -379,7 +443,7 @@
     return [
       {
         id: path.join("."),
-        label: labelPath.join(" / ") || "Значение",
+        label: labelPath.join(" / ") || resolveText("cabinet.payments.details.detail.valueLabel", "Value"),
         value: normalizeLeafValue(value),
       },
     ];
@@ -396,7 +460,7 @@
 
         return {
           key: groupKey,
-          label: dataGroupLabelMap[groupKey] ?? humanizeDataKey(groupKey),
+          label: dataGroupLabelMap.value[groupKey] ?? humanizeDataKey(groupKey),
           rows,
         };
       })
@@ -407,7 +471,11 @@
   const textExtensions = ["txt", "text", "md", "csv", "json", "xml", "log"];
 
   const extractFileExtension = (value: string): string => {
-    const normalized = String(value || "").split("?")[0].split("#")[0].trim().toLowerCase();
+    const normalized = String(value || "")
+      .split("?")[0]
+      .split("#")[0]
+      .trim()
+      .toLowerCase();
     const segments = normalized.split(".");
 
     return segments.length > 1 ? segments.pop() || "" : "";
@@ -416,7 +484,9 @@
   const resolveDocumentPreviewMeta = (
     document: PaymentDetailDocument
   ): { type: "image" | "pdf" | "text" | "file"; src: string; label: string } => {
-    const mimeType = String(document.mime_type ?? "").trim().toLowerCase();
+    const mimeType = String(document.mime_type ?? "")
+      .trim()
+      .toLowerCase();
     const previewUrl = String(document.preview_url ?? "").trim();
     const path = String(document.path ?? "").trim();
     const name = String(document.name ?? "").trim();
@@ -466,9 +536,9 @@
 
   const statusText = (value: unknown): string => {
     const normalized = normalizeStatus(value);
-    if (normalized === "approved") return "Approved";
-    if (normalized === "rejected") return "Rejected";
-    return "Pending";
+    if (normalized === "approved") return resolveText("cabinet.payments.details.statuses.approved", "Approved");
+    if (normalized === "rejected") return resolveText("cabinet.payments.details.statuses.rejected", "Rejected");
+    return resolveText("cabinet.payments.details.statuses.pending", "Pending");
   };
 
   const formatDateTime = (value: unknown): string => {
@@ -484,14 +554,18 @@
     const diffMs = Date.now() - date.getTime();
     const diffMinutes = Math.round(diffMs / (1000 * 60));
 
-    if (diffMinutes < 1) return "just now";
-    if (diffMinutes < 60) return `${diffMinutes} min ago`;
+    if (diffMinutes < 1) return resolveText("cabinet.payments.details.relative.justNow", "just now");
+    if (diffMinutes < 60) {
+      return interpolateText("cabinet.payments.details.relative.minutesAgo", "{count} min ago", { count: diffMinutes });
+    }
 
     const diffHours = Math.round(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours} h ago`;
+    if (diffHours < 24) {
+      return interpolateText("cabinet.payments.details.relative.hoursAgo", "{count} h ago", { count: diffHours });
+    }
 
     const diffDays = Math.round(diffHours / 24);
-    return `${diffDays} d ago`;
+    return interpolateText("cabinet.payments.details.relative.daysAgo", "{count} d ago", { count: diffDays });
   };
 
   const openDocument = (document: PaymentDetailDocument) => {
@@ -502,7 +576,7 @@
 
   const loadPaymentDetail = async () => {
     if (!paymentDetailId.value) {
-      errorMessage.value = "Реквизит не найден.";
+      errorMessage.value = resolveText("cabinet.payments.details.detail.notFound", "Payment detail was not found.");
       isLoading.value = false;
       return;
     }
@@ -514,13 +588,17 @@
       const response = await appCore.paymentDetails.getById(paymentDetailId.value);
       paymentDetail.value = response?.data?.data ?? null;
       if (!paymentDetail.value) {
-        errorMessage.value = "Реквизит не найден.";
+        errorMessage.value = resolveText("cabinet.payments.details.detail.notFound", "Payment detail was not found.");
         payoutHistoryRows.value = [];
       } else {
         await loadPaymentDetailHistory();
       }
     } catch (error: any) {
-      errorMessage.value = error?.response?.data?.message || "Не удалось загрузить реквизит.";
+      errorMessage.value =
+        extractApiErrorMessage(
+          error,
+          resolveText("cabinet.payments.details.detail.loadError", "Failed to load the payment detail.")
+        ) ?? resolveText("cabinet.payments.details.detail.loadError", "Failed to load the payment detail.");
       payoutHistoryRows.value = [];
     } finally {
       isLoading.value = false;

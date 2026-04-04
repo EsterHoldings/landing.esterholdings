@@ -172,7 +172,7 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    padding-top: max(56px, calc(env(safe-area-inset-top, 0px) + 42px));
+    padding-top: max(16px, calc(env(safe-area-inset-top, 0px) + 8px));
     padding-bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 8px));
     scrollbar-gutter: stable;
   }
