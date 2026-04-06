@@ -106,19 +106,19 @@
       "advantages": [
         {
           "value": "10+",
-          "label": "Years of experience in field"
+          "label": "Years Market Experience"
         },
         {
-          "value": "1 160 000+",
-          "label": "Clients"
+          "value": "Institutional",
+          "label": "Liquidity Providers"
         },
         {
-          "value": "5* Rated",
-          "label": "Customer service"
+          "value": "Ultra-Fast",
+          "label": "Order Execution"
         },
         {
-          "value": "24/7",
-          "label": "Support"
+          "value": "Multi-Asset",
+          "label": "Trading"
         }
       ],
       "platform__title": "Legendary platform for successful\nForex and CFD trading",
@@ -339,10 +339,11 @@
         ]
       },
       "banner_section": {
-        "title": "Trade the Markets",
+        "title": "One World.\nOne Platform.\nOne Account.",
         "title_highlight": "Like a Pro!",
+        "tag": "Multi-Asset",
         "subtitle": "Whether you're a beginner or a pro, our advanced tools and resources help you make informed trading decisions.",
-        "button_primary": "Start trading",
+        "button_primary": "Start Trading",
         "button_secondary": "Try Demo Account"
       },
       "latest_updates__title": "Latest updates",
@@ -393,9 +394,63 @@
           "description": "We offer a wide range of instruments including Forex, CFDs, commodities, indices, and cryptocurrencies."
         }
       ],
-      "accounts__badge_recommended": "Recommended",
+      "accounts__badge_recommended": "RECOMMENDED",
+      "faqs__title": "FAQs",
+      "faqs__dropzone_text": "Drag 'n' drop some files here, or click to select files",
+      "faqs__dropzone_aria": "Upload file",
+      "news_row__items": [
+        { "title": "Bitcoin crashes 12% after SEC announces ban on stablecoins" },
+        { "title": "Tesla announced a 1:10 stock split - quotes rose by 12%" },
+        { "title": "Dow Jones plummets 1,200 points after unexpected rise in US inflation" },
+        { "title": "NVIDIA shares soared 15% after the report" }
+      ],
       "helpSection": "Need Help? Visit our",
-      "helpLinkText": "Help Section"
+      "helpLinkText": "Help Section",
+      "welcomeV2": {
+        "cta": "Let's Try",
+        "slides": [
+          {
+            "line1Prefix": "Trade ",
+            "line1Accent": "10 asset",
+            "line1Suffix": " classes from one",
+            "line2Prefix": "",
+            "line2Accent": "margin",
+            "line2Suffix": " account",
+            "subtitle": "One platform for FX, Crypto, Metals, Commodities, Indices, Stocks and more — with institutional-grade execution.",
+            "benefits": [
+              "Multi-asset access in a single workflow",
+              "Deep liquidity & stable fills for active trading",
+              "Built on 10 years of company experience"
+            ]
+          },
+          {
+            "line1Prefix": "Institutional ",
+            "line1Accent": "liquidity",
+            "line1Suffix": ".",
+            "line2Prefix": "Clean execution.",
+            "line2Accent": "",
+            "line2Suffix": "",
+            "subtitle": "Deep aggregated liquidity pools designed for stable fills and scalable order flow.",
+            "benefits": [
+              "Tier-1 liquidity aggregation",
+              "Depth across venues"
+            ]
+          },
+          {
+            "line1Prefix": "",
+            "line1Accent": "Fast",
+            "line1Suffix": " infrastructure",
+            "line2Prefix": "for active ",
+            "line2Accent": "trading",
+            "line2Suffix": "",
+            "subtitle": "High order processing speeds, 0 limit/stop levels — built for active trading flow.",
+            "benefits": [
+              "Fast server technologies",
+              "Institutional liquidity setup"
+            ]
+          }
+        ]
+      }
     },
     "pages": {
       "company": {
