@@ -1,13 +1,6 @@
 <template>
   <section class="welcome-v2">
-    <div
-      ref="heroRef"
-      class="hero"
-      :class="{ 'hero--dragging': isDragging }"
-      @pointerdown="onPointerDown"
-      @pointermove="onPointerMove"
-      @pointerup="onPointerUp"
-      @pointercancel="onPointerCancel">
+    <div class="hero">
       <div
         class="hero__glows"
         aria-hidden="true">
@@ -17,15 +10,27 @@
         <span class="hero__glow hero__glow--orange-2"></span>
       </div>
 
-      <div class="hero__content">
-        <div class="hero__content-stage">
-          <div
-            v-for="(slide, index) in slides"
-            :key="slide.id"
-            class="hero__content-slide"
-            :class="{ 'is-active': index === currentSlide }"
-            :style="getSlideStyle(index)"
-            :aria-hidden="index !== currentSlide">
+      <Swiper
+        class="hero__slider"
+        :modules="swiperModules"
+        :slides-per-view="1"
+        :loop="slides.length > 1"
+        :speed="900"
+        :allow-touch-move="slides.length > 1"
+        :grab-cursor="slides.length > 1"
+        :simulate-touch="slides.length > 1"
+        :threshold="8"
+        :touch-angle="30"
+        :long-swipes-ratio="0.18"
+        :watch-overflow="true"
+        :prevent-clicks="true"
+        :prevent-clicks-propagation="true"
+        :autoplay="autoplayOptions">
+        <SwiperSlide
+          v-for="slide in slides"
+          :key="slide.id"
+          class="hero__slide">
+          <div class="hero__content">
             <h1 class="hero__title">
               <span
                 class="hero__shimmer hero__shimmer--title"
@@ -93,57 +98,52 @@
               {{ t("landing.sections.welcomeV2.cta") }}
             </UiButtonV2>
           </div>
-        </div>
-      </div>
 
-      <div
-        class="hero__visual"
-        aria-hidden="true">
-        <div class="hero__visual-stage">
           <div
-            v-for="(slide, index) in slides"
-            :key="slide.id"
-            class="hero__visual-slide"
-            :class="{ 'is-active': index === currentSlide }"
-            :style="getSlideStyle(index)">
-            <template v-if="slide.assets.length || slide.showBanner">
-              <UiHomeBannerV2
-                v-if="slide.showBanner"
-                class="hero__asset hero__asset--slide2-city" />
+            class="hero__visual"
+            aria-hidden="true">
+            <div class="hero__visual-stage">
+              <template v-if="slide.assets.length || slide.showBanner">
+                <UiHomeBannerV2
+                  v-if="slide.showBanner"
+                  class="hero__asset hero__asset--slide2-city" />
 
-              <img
-                v-for="asset in slide.assets"
-                :key="asset.className"
-                :src="asset.src"
-                alt=""
-                aria-hidden="true"
-                :class="asset.className" />
+                <img
+                  v-for="asset in slide.assets"
+                  :key="asset.className"
+                  :src="asset.src"
+                  alt=""
+                  aria-hidden="true"
+                  :class="asset.className" />
+
+                <div
+                  v-if="slide.showLogo"
+                  class="hero__logo-wrap">
+                  <img
+                    :src="FrameLogo"
+                    alt=""
+                    class="hero__asset hero__asset--center" />
+                  <UiIconLogo class="hero__logo" />
+                </div>
+              </template>
 
               <div
-                v-if="slide.showLogo"
-                class="hero__logo-wrap">
-                <img
-                  :src="FrameLogo"
-                  alt=""
-                  class="hero__asset hero__asset--center" />
-                <UiIconLogo class="hero__logo" />
-              </div>
-            </template>
-
-            <div
-              v-else
-              class="hero__visual-empty" />
+                v-else
+                class="hero__visual-empty" />
+            </div>
           </div>
-        </div>
-      </div>
+        </SwiperSlide>
+      </Swiper>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref } from "vue";
-  import type { CSSProperties } from "vue";
+  import { computed } from "vue";
   import { useI18n } from "vue-i18n";
+  import { Swiper, SwiperSlide } from "swiper/vue";
+  import { Autoplay } from "swiper/modules";
+  import "swiper/css";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiHomeBannerV2 from "~/components/ui/UiHomeBannerV2.vue";
@@ -256,125 +256,16 @@
   ]);
 
   const AUTO_PLAY_DELAY = 10000;
-  const SWIPE_THRESHOLD_RATIO = 0.14;
-
-  const heroRef = ref<HTMLElement | null>(null);
-  const currentSlide = ref(0);
-  const isDragging = ref(false);
-  const dragOffsetPx = ref(0);
-  const activePointerId = ref<number | null>(null);
-  const dragStartX = ref(0);
-  let slideIntervalId: ReturnType<typeof setInterval> | null = null;
-
-  const normalizeIndex = (index: number) => {
-    const total = slides.value.length;
-    return ((index % total) + total) % total;
-  };
-
-  const goLeft = () => {
-    currentSlide.value = normalizeIndex(currentSlide.value + 1);
-  };
-
-  const goRight = () => {
-    currentSlide.value = normalizeIndex(currentSlide.value - 1);
-  };
-
-  const stopAutoPlay = () => {
-    if (!slideIntervalId) return;
-    clearInterval(slideIntervalId);
-    slideIntervalId = null;
-  };
-
-  const startAutoPlay = () => {
-    if (slides.value.length <= 1) return;
-    stopAutoPlay();
-    slideIntervalId = setInterval(() => {
-      goRight();
-    }, AUTO_PLAY_DELAY);
-  };
-
-  const resetAutoPlay = () => {
-    startAutoPlay();
-  };
-
-  const getRelativePosition = (index: number) => {
-    const total = slides.value.length;
-    let delta = index - currentSlide.value;
-    const half = total / 2;
-
-    if (delta > half) delta -= total;
-    if (delta < -half) delta += total;
-
-    return delta;
-  };
-
-  const getSlideStyle = (index: number): CSSProperties => {
-    const offset = getRelativePosition(index);
-    const isVisible = Math.abs(offset) <= 1;
-
-    return {
-      transform: `translate3d(calc(${offset * 100}% + ${dragOffsetPx.value}px), 0, 0)`,
-      opacity: isVisible || index === currentSlide.value ? "1" : "0",
-      zIndex: index === currentSlide.value ? "2" : "1",
-      pointerEvents: index === currentSlide.value ? "auto" : "none",
-    };
-  };
-
-  const finishDrag = (deltaX = 0) => {
-    const width = heroRef.value?.clientWidth ?? 1;
-    const threshold = width * SWIPE_THRESHOLD_RATIO;
-
-    if (deltaX >= threshold) {
-      goRight();
-    } else if (deltaX <= -threshold) {
-      goLeft();
-    }
-
-    dragOffsetPx.value = 0;
-    isDragging.value = false;
-    activePointerId.value = null;
-    resetAutoPlay();
-  };
-
-  const onPointerDown = (event: PointerEvent) => {
-    if (slides.value.length <= 1) return;
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-
-    const target = event.target as HTMLElement | null;
-    if (target?.closest("a, button, input, textarea, select, label")) return;
-
-    activePointerId.value = event.pointerId;
-    dragStartX.value = event.clientX;
-    dragOffsetPx.value = 0;
-    isDragging.value = true;
-    stopAutoPlay();
-    heroRef.value?.setPointerCapture?.(event.pointerId);
-  };
-
-  const onPointerMove = (event: PointerEvent) => {
-    if (activePointerId.value !== event.pointerId || !isDragging.value) return;
-    dragOffsetPx.value = event.clientX - dragStartX.value;
-  };
-
-  const onPointerUp = (event: PointerEvent) => {
-    if (activePointerId.value !== event.pointerId) return;
-    heroRef.value?.releasePointerCapture?.(event.pointerId);
-    finishDrag(event.clientX - dragStartX.value);
-  };
-
-  const onPointerCancel = (event: PointerEvent) => {
-    if (activePointerId.value !== event.pointerId) return;
-    heroRef.value?.releasePointerCapture?.(event.pointerId);
-    finishDrag();
-  };
-
-  onMounted(() => {
-    startAutoPlay();
-  });
-
-  onUnmounted(() => {
-    stopAutoPlay();
-  });
+  const swiperModules = [Autoplay];
+  const autoplayOptions = computed(() =>
+    slides.value.length > 1
+      ? {
+          delay: AUTO_PLAY_DELAY,
+          disableOnInteraction: false,
+          reverseDirection: true,
+        }
+      : false
+  );
 </script>
 
 <style lang="scss" scoped>
@@ -408,26 +299,9 @@
     z-index: 0;
     width: 100%;
     margin: 0 auto;
-    padding: 0 40px 0;
-    display: grid;
-    grid-template-columns: minmax(635px, 1fr) minmax(520px, 1fr);
-    gap: 10px;
-    min-height: calc(100vh - 230px);
     background: #f6f6f6;
-    align-items: center;
     overflow: visible;
     isolation: auto;
-    touch-action: pan-y;
-    cursor: grab;
-
-    &--dragging {
-      cursor: grabbing;
-      user-select: none;
-    }
-
-    > * {
-      min-width: 0;
-    }
 
     &__glows {
       position: absolute;
@@ -435,6 +309,32 @@
       z-index: -2;
       pointer-events: none;
       overflow: visible;
+    }
+
+    &__slider {
+      overflow: visible;
+
+      :deep(.swiper-wrapper) {
+        align-items: stretch;
+      }
+
+      :deep(.swiper-slide) {
+        height: auto;
+      }
+    }
+
+    &__slide {
+      display: grid;
+      grid-template-columns: minmax(635px, 1fr) minmax(520px, 1fr);
+      gap: 10px;
+      min-height: calc(100vh - 230px);
+      padding: 0 40px 0;
+      box-sizing: border-box;
+      align-items: center;
+
+      > * {
+        min-width: 0;
+      }
     }
 
     &__shimmer {
@@ -580,45 +480,22 @@
       position: relative;
       min-height: 420px;
       z-index: 2;
-      overflow: hidden;
-    }
-
-    &__content-stage {
-      position: relative;
-      min-height: inherit;
-    }
-
-    &__content-slide {
-      position: absolute;
-      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      transition:
-        transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 0.45s ease;
-      will-change: transform, opacity;
     }
 
     &__visual {
       position: relative;
       min-height: 615px;
       z-index: 1;
+      overflow: visible;
     }
 
     &__visual-stage {
       position: relative;
       min-height: inherit;
-      clip-path: inset(-340px -240px -120px -120px);
-    }
-
-    &__visual-slide {
-      position: absolute;
-      inset: 0;
-      transition:
-        transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 0.45s ease;
-      will-change: transform, opacity;
+      overflow: visible;
     }
 
     &__visual-empty {
@@ -864,11 +741,6 @@
     }
   }
 
-  .hero--dragging .hero__content-slide,
-  .hero--dragging .hero__visual-slide {
-    transition: none;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .hero__shimmer::after,
     .hero__asset--main,
@@ -887,11 +759,6 @@
     .hero__logo-wrap {
       animation: none !important;
     }
-
-    .hero__content-slide,
-    .hero__visual-slide {
-      transition: none !important;
-    }
   }
 
   @media (max-width: 1279px) {
@@ -901,9 +768,11 @@
     }
 
     .hero {
-      min-height: calc(100vh - 230px);
-      padding: 0 24px 0;
-      grid-template-columns: minmax(420px, 560px) minmax(420px, 1fr);
+      &__slide {
+        min-height: calc(100vh - 230px);
+        padding: 0 24px 0;
+        grid-template-columns: minmax(420px, 560px) minmax(420px, 1fr);
+      }
 
       &__asset--gray-shadow {
         display: none;
@@ -930,10 +799,12 @@
     }
 
     .hero {
-      min-height: auto;
-      padding: 48px 20px 20px;
-      grid-template-columns: 1fr;
-      gap: 12px;
+      &__slide {
+        min-height: auto;
+        padding: 48px 20px 20px;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
 
       &__title {
         font-size: 44px;
