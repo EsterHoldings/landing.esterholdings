@@ -87,11 +87,11 @@
                 v-else
                 :class="{ 'svg-invert': useDarkHeaderIcons }" />
             </button>
-            <NuxtLink
-              to="/auth/login"
+            <a
+              href="https://my.esterholdings.website"
               class="auth-link auth-link--login">
               {{ t("landing.header.auth.login") }}
-            </NuxtLink>
+            </a>
             <NuxtLink to="/auth/registration">
               <UiButtonDefault
                 state="primary"
