@@ -309,6 +309,7 @@ onUnmounted(() => {
 .welcome-v2 {
   position: relative;
   padding-top: 118px;
+  z-index: 0;
 }
 
 .hero-slide-shift-enter-active,
@@ -324,6 +325,7 @@ onUnmounted(() => {
 
 .hero {
   position: relative;
+  z-index: 0;
   width: 100%;
   margin: 0 auto;
   padding: 0 40px 0;
@@ -333,8 +335,8 @@ onUnmounted(() => {
   min-height: calc(100vh - 230px);
   background: #f6f6f6;
   align-items: center;
-  overflow: hidden;
-  isolation: isolate;
+  overflow: visible;
+  isolation: auto;
 
   > * {
     min-width: 0;
@@ -343,9 +345,9 @@ onUnmounted(() => {
   &__glows {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: -2;
     pointer-events: none;
-    overflow: hidden;
+    overflow: visible;
   }
 
   &__shimmer {
@@ -490,7 +492,7 @@ onUnmounted(() => {
   &__content {
     position: relative;
     min-height: 420px;
-    z-index: 1;
+    z-index: 2;
   }
 
   &__content-slide {
@@ -530,6 +532,7 @@ onUnmounted(() => {
       top: -300px;
       right: -160px;
       width: 622px;
+      z-index: -1;
       pointer-events: none;
     }
 
@@ -573,7 +576,7 @@ onUnmounted(() => {
       top: -40px;
       right: -110px;
       width: 640px;
-      z-index: 0;
+      z-index: -1;
       pointer-events: none;
     }
 
@@ -599,7 +602,7 @@ onUnmounted(() => {
       top: -86px;
       right: -136px;
       width: 690px;
-      z-index: 0;
+      z-index: -1;
       pointer-events: none;
     }
 
@@ -692,16 +695,13 @@ onUnmounted(() => {
   }
 
   &__logo-wrap {
-    animation: levitate 4s ease-in-out infinite;
-    animation-delay: -0.3s;
-  }
-
-  &__logo-wrap {
     position: absolute;
     left: 272px;
     top: 212px;
     width: 217px;
     height: 240px;
+    animation: levitate 4s ease-in-out infinite;
+    animation-delay: -0.3s;
   }
 
   &__logo {
@@ -715,7 +715,7 @@ onUnmounted(() => {
   &__glow {
     position: absolute;
     border-radius: 50%;
-    z-index: 0;
+    z-index: -2;
     pointer-events: none;
 
     &--blue-1 {
