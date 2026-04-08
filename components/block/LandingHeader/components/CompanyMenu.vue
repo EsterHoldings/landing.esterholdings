@@ -62,8 +62,8 @@
     width: 225px;
     padding: 30px;
     background: var(--landing-surface-glass);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     border: 1px solid var(--landing-border-strong);
     border-radius: 16px;
     box-shadow: var(--landing-shadow-glass-raised);
