@@ -362,7 +362,7 @@
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid #fff;
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: space-between;

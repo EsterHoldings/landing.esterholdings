@@ -71,7 +71,6 @@
 
 <style lang="scss" scoped>
   .news-row-v2 {
-    margin-top: 160px;
     overflow: hidden;
 
     &__track {
