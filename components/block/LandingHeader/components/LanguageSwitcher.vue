@@ -4,10 +4,7 @@
     ref="wrapperRef">
     <UiIconGlobe
       class="icon"
-      @click="toggleDropdown"
-      :class="{
-        'svg-invert': props.isInvert,
-      }" />
+      @click="toggleDropdown" />
 
     <transition name="fade">
       <ul
@@ -124,10 +121,14 @@
 <style scoped lang="scss">
   .language-wrapper {
     position: relative;
+    color: inherit;
 
     .icon {
       cursor: pointer;
       font-size: 20px;
+      color: inherit;
+      display: inline-flex;
+      transition: color 0.2s ease;
     }
 
     .dropdown {
@@ -205,9 +206,5 @@
         }
       }
     }
-  }
-
-  .svg-invert {
-    filter: invert(1);
   }
 </style>

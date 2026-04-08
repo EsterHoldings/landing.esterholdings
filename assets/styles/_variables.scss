@@ -99,6 +99,11 @@
   --landing-glow-orange: #f75709;
   --landing-blob-left: radial-gradient(circle, rgba(247, 87, 9, 0.35) 0%, transparent 70%);
   --landing-blob-right: radial-gradient(circle, rgba(100, 60, 200, 0.25) 0%, transparent 70%);
+  --landing-hero-backdrop-opacity: 1;
+  --landing-hero-backdrop-filter: none;
+  --landing-hero-backdrop-blend: normal;
+  --landing-hero-screen-opacity: 1;
+  --landing-hero-screen-filter: none;
 
   //MAIN COLOR VAR-----
   // Ui elements settings
@@ -142,6 +147,11 @@
   --landing-glow-orange: #ff7a30;
   --landing-blob-left: radial-gradient(circle, rgba(255, 122, 48, 0.28) 0%, transparent 72%);
   --landing-blob-right: radial-gradient(circle, rgba(88, 121, 255, 0.22) 0%, transparent 72%);
+  --landing-hero-backdrop-opacity: 0.38;
+  --landing-hero-backdrop-filter: brightness(0.46) saturate(0.78) contrast(1.04);
+  --landing-hero-backdrop-blend: screen;
+  --landing-hero-screen-opacity: 0.78;
+  --landing-hero-screen-filter: brightness(0.74) saturate(0.86) contrast(1.03);
 }
 
 @media (prefers-color-scheme: light) {

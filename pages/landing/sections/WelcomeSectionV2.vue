@@ -519,6 +519,12 @@
         width: 622px;
         z-index: -1;
         pointer-events: none;
+        opacity: var(--landing-hero-backdrop-opacity);
+        filter: var(--landing-hero-backdrop-filter);
+        mix-blend-mode: var(--landing-hero-backdrop-blend);
+        transition:
+          opacity 0.3s ease,
+          filter 0.3s ease;
       }
 
       &--card-1 {
@@ -563,6 +569,12 @@
         width: 640px;
         z-index: -1;
         pointer-events: none;
+        opacity: var(--landing-hero-backdrop-opacity);
+        filter: var(--landing-hero-backdrop-filter);
+        mix-blend-mode: var(--landing-hero-backdrop-blend);
+        transition:
+          opacity 0.3s ease,
+          filter 0.3s ease;
       }
 
       &--slide2-card-top {
@@ -589,6 +601,11 @@
         width: 690px;
         z-index: -1;
         pointer-events: none;
+        opacity: var(--landing-hero-screen-opacity);
+        filter: var(--landing-hero-screen-filter);
+        transition:
+          opacity 0.3s ease,
+          filter 0.3s ease;
       }
 
       &--slide3-card-main {
