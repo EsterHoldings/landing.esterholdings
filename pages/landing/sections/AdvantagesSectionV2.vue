@@ -33,7 +33,7 @@
 
     .title {
       margin: 0 0 40px;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 400;
       line-height: 1.5;
@@ -55,14 +55,14 @@
       margin: 0;
       font-size: 90px;
       font-weight: 400;
-      color: #8b97a8;
+      color: var(--landing-text-accent-soft);
       line-height: 1;
       letter-spacing: -0.02em;
     }
 
     .label {
       margin: 0;
-      color: #0051ff;
+      color: var(--landing-accent);
       text-transform: uppercase;
       font-size: 18px;
       font-weight: 700;

@@ -299,7 +299,7 @@
     z-index: 0;
     width: 100%;
     margin: 0 auto;
-    background: #f6f6f6;
+    background: var(--landing-bg);
     overflow: visible;
     isolation: auto;
 
@@ -358,7 +358,7 @@
       }
 
       &--title {
-        color: #111111;
+        color: var(--landing-text-strong);
 
         &::after {
           background-image: linear-gradient(
@@ -375,7 +375,7 @@
       }
 
       &--accent {
-        color: #0051ff;
+        color: var(--landing-accent);
 
         &::after {
           background-image: linear-gradient(
@@ -392,7 +392,7 @@
       }
 
       &--muted {
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
 
         &::after {
           background-image: linear-gradient(
@@ -409,7 +409,7 @@
       }
 
       &--benefit {
-        color: #111111;
+        color: var(--landing-text-strong);
 
         &::after {
           background-image: linear-gradient(
@@ -706,7 +706,7 @@
       &--blue-1 {
         width: 183px;
         height: 183px;
-        background: #0052fe;
+        background: var(--landing-glow-blue);
         left: -105px;
         top: 752px;
         filter: blur(200px);
@@ -715,7 +715,7 @@
       &--blue-2 {
         width: 105px;
         height: 105px;
-        background: #0052fe;
+        background: var(--landing-glow-blue);
         left: calc(100% - 355px);
         top: 451px;
         filter: blur(120px);
@@ -724,7 +724,7 @@
       &--orange-1 {
         width: 58px;
         height: 58px;
-        background: #f75709;
+        background: var(--landing-glow-orange);
         left: calc(100% - 670px);
         top: 233px;
         filter: blur(75px);
@@ -733,7 +733,7 @@
       &--orange-2 {
         width: 58px;
         height: 58px;
-        background: #f75709;
+        background: var(--landing-glow-orange);
         left: calc(100% - 380px);
         top: 845px;
         filter: blur(75px);

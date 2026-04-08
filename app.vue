@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, provide, onMounted } from "vue";
+  import { ref, provide, onMounted, computed } from "vue";
   import { useHead } from "#imports";
 
   import ModalRightSideDefault from "./components/block/modals/ModalRightSideDefault.vue";
@@ -25,6 +25,8 @@
   const modalContent = ref(null);
   const modalProps = ref({});
   const modalKey = ref(0);
+  const themeStore = useThemeStore();
+  const browserThemeColor = computed(() => (themeStore.currentTheme === "dark" ? "#07111d" : "#f6f6f6"));
 
   const openModal = (component: any, props = {}) => {
     modalContent.value = component;
@@ -37,15 +39,17 @@
 
   provide("modalControl", { openModal, closeModal });
 
-  useHead({
+  useHead(() => ({
     meta: [
-      { name: "theme-color", content: "#000028" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
+      { name: "theme-color", content: browserThemeColor.value },
+      {
+        name: "apple-mobile-web-app-status-bar-style",
+        content: themeStore.currentTheme === "dark" ? "black" : "default",
+      },
     ],
-  });
+  }));
 
   onMounted(() => {
-    const themeStore = useThemeStore();
     themeStore.initTheme();
   });
 </script>

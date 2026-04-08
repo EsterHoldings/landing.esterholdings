@@ -57,7 +57,7 @@
     justify-content: flex-end;
     gap: 16px;
     width: 100%;
-    color: #101010;
+    color: var(--landing-text-primary);
     text-decoration: none;
     padding-bottom: 22px;
     text-align: right;
@@ -76,11 +76,11 @@
     }
 
     &:hover {
-      color: #0051ff;
+      color: var(--landing-accent);
     }
 
     &_active {
-      color: #0051ff;
+      color: var(--landing-accent);
     }
   }
 
@@ -110,7 +110,7 @@
       margin-bottom: 8px;
       padding-left: 0;
       text-align: right;
-      color: #1a1a1a;
+      color: var(--landing-text-primary);
 
       a {
         display: inline-block;

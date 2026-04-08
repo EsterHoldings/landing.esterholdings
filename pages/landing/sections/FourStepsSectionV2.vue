@@ -56,13 +56,13 @@
 
     h2 {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       line-height: 1.302;
       font-weight: 500;
 
       span {
-        color: #0051ff;
+        color: var(--landing-accent);
       }
     }
   }
@@ -84,8 +84,8 @@
       width: 80px;
       height: 80px;
       border-radius: 20px;
-      background: #fff;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      background: var(--landing-surface-elevated);
+      box-shadow: var(--landing-shadow-card);
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
@@ -96,7 +96,7 @@
       span {
         position: relative;
         z-index: 1;
-        color: #0051ff;
+        color: var(--landing-accent);
         font-size: 42px;
         font-weight: 500;
         line-height: 1;
@@ -121,7 +121,7 @@
 
     h3 {
       margin: 0;
-      color: #0051ff;
+      color: var(--landing-accent);
       font-size: 28px;
       font-weight: 500;
       line-height: normal;
@@ -129,7 +129,7 @@
 
     p {
       margin: 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       font-size: 16px;
       font-weight: 400;
       line-height: normal;

@@ -3,7 +3,10 @@
     <UiContainer>
       <div class="range-v2__inner">
         <h2 class="range-v2__title">{{ t("landing.sections.wide_range__title") }}</h2>
-        <div ref="listRef" class="range-v2__list" :class="{ 'range-v2__list--visible': isVisible }">
+        <div
+          ref="listRef"
+          class="range-v2__list"
+          :class="{ 'range-v2__list--visible': isVisible }">
           <NuxtLink
             v-for="(item, index) in items"
             :key="index"
@@ -98,7 +101,7 @@
 
     &__title {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 500;
       line-height: 1.302;
@@ -118,16 +121,16 @@
       gap: 30px;
       padding-right: 30px;
       height: 140px;
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 20px;
-      background: linear-gradient(-9.47deg, #f1f1f1 0%, #fff 42.48%);
+      background: linear-gradient(-9.47deg, var(--landing-surface-muted) 0%, var(--landing-surface) 42.48%);
       text-decoration: none;
       transition: box-shadow 0.25s ease;
       opacity: 0;
       transform: translateX(80px);
 
       &:hover {
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        box-shadow: var(--landing-shadow-soft);
       }
     }
 
@@ -139,7 +142,7 @@
     &__thumb {
       width: 180px;
       height: 140px;
-      background: #fff;
+      background: var(--landing-surface-elevated);
       border-radius: 12px;
       overflow: hidden;
       flex-shrink: 0;
@@ -169,7 +172,7 @@
 
     &__name {
       margin: 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       font-size: 42px;
       font-weight: 400;
       line-height: normal;
@@ -179,7 +182,7 @@
 
     &__desc {
       margin: 0;
-      color: #0051ff;
+      color: var(--landing-accent);
       font-size: 18px;
       font-weight: 700;
       line-height: 1.302;

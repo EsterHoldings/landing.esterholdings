@@ -26,7 +26,9 @@
               <span>{{ feat.text }}</span>
             </div>
           </div>
-          <NuxtLink to="/auth/registration" class="accounts-v2__link">
+          <NuxtLink
+            to="/auth/registration"
+            class="accounts-v2__link">
             <button class="accounts-v2__btn">{{ card.buttonText }}</button>
           </NuxtLink>
         </article>
@@ -102,7 +104,7 @@
 
     &__title {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 500;
       line-height: 1.302;
@@ -117,10 +119,10 @@
 
     &__card {
       position: relative;
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 20px;
       padding: 30px;
-      background: linear-gradient(-22deg, #fff 16.6%, #f1f1f1 84.4%);
+      background: linear-gradient(-22deg, var(--landing-surface) 16.6%, var(--landing-surface-muted) 84.4%);
       display: flex;
       flex-direction: column;
       gap: 30px;
@@ -129,21 +131,21 @@
         border-top-right-radius: 0;
 
         .accounts-v2__card-desc {
-          color: #f75709;
+          color: var(--landing-accent-secondary);
         }
 
         .accounts-v2__btn {
-          background: #f75709;
+          background: var(--landing-accent-secondary);
         }
       }
 
       &--blue {
         .accounts-v2__card-desc {
-          color: #0051ff;
+          color: var(--landing-accent);
         }
 
         .accounts-v2__btn {
-          background: #0051ff;
+          background: var(--landing-accent);
         }
       }
     }
@@ -157,10 +159,10 @@
       justify-content: center;
       height: 30px;
       padding: 0 10px;
-      background: #f75709;
-      border: 6px solid #fff;
+      background: var(--landing-accent-secondary);
+      border: 6px solid var(--landing-border-strong);
       border-radius: 100px;
-      color: #fff;
+      color: var(--landing-on-accent);
       font-size: 14px;
       font-weight: 700;
       white-space: nowrap;
@@ -177,7 +179,7 @@
       margin: 0;
       font-size: 28px;
       font-weight: 500;
-      color: #000;
+      color: var(--landing-text-primary);
       line-height: 1.302;
     }
 
@@ -207,7 +209,7 @@
       span {
         font-size: 16px;
         font-weight: 700;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         line-height: 1.302;
       }
     }
@@ -225,7 +227,7 @@
       padding: 10px 16px;
       border: none;
       border-radius: 12px;
-      color: #fff;
+      color: var(--landing-on-accent);
       font-size: 16px;
       font-weight: 700;
       line-height: 1.3;
@@ -250,7 +252,7 @@
         left: -60px;
         width: 200px;
         height: 200px;
-        background: radial-gradient(circle, rgba(247, 87, 9, 0.35) 0%, transparent 70%);
+        background: var(--landing-blob-left);
         filter: blur(40px);
       }
 
@@ -259,7 +261,7 @@
         right: 160px;
         width: 140px;
         height: 140px;
-        background: radial-gradient(circle, rgba(100, 60, 200, 0.25) 0%, transparent 70%);
+        background: var(--landing-blob-right);
         filter: blur(30px);
       }
     }

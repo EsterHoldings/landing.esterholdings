@@ -55,10 +55,10 @@
     position: relative;
     margin-top: 160px;
     border-radius: 20px;
-    border: 6px solid #fff;
+    border: 6px solid var(--landing-border-strong);
     overflow: hidden;
     padding: 34px;
-    background: linear-gradient(-20deg, #fff 55%, #f1f1f1 100%);
+    background: linear-gradient(-20deg, var(--landing-surface) 55%, var(--landing-surface-muted) 100%);
     display: flex;
     flex-direction: column;
     min-height: 550px;
@@ -93,7 +93,7 @@
       font-size: 28px;
       font-weight: 500;
       line-height: 1.3;
-      color: #000;
+      color: var(--landing-text-primary);
     }
 
     &__logo {
@@ -122,7 +122,7 @@
       font-weight: 400;
       line-height: 0.976;
       letter-spacing: -0.03em;
-      color: #000;
+      color: var(--landing-text-primary);
       white-space: pre-line;
     }
 
@@ -132,7 +132,7 @@
       font-size: 42px;
       font-weight: 500;
       line-height: 1;
-      color: #0051ff;
+      color: var(--landing-accent);
     }
 
     &__actions {
@@ -142,7 +142,6 @@
       gap: 10px;
       align-items: center;
     }
-
   }
 
   @media (max-width: 991px) {

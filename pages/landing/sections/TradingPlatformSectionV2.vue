@@ -1,7 +1,10 @@
 <template>
   <section class="platform-v2">
     <UiContainer class="platform">
-      <div ref="leftRef" class="platform__left" :class="{ 'platform__left--visible': isVisible }">
+      <div
+        ref="leftRef"
+        class="platform__left"
+        :class="{ 'platform__left--visible': isVisible }">
         <h2 class="platform__title">
           {{ t("landing.sections.platform__title") }}
         </h2>
@@ -108,7 +111,7 @@
 
     &__title {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 500;
       line-height: 1.2;
@@ -145,7 +148,7 @@
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: #0051ff;
+      background: var(--landing-accent);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -153,7 +156,7 @@
     }
 
     &__card-name {
-      color: #0051ff;
+      color: var(--landing-accent);
       font-size: 18px;
       font-weight: 600;
       line-height: 1.3;
@@ -163,7 +166,7 @@
 
     &__card-desc {
       margin: 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       font-size: 16px;
       line-height: 1.4;
     }
@@ -194,7 +197,7 @@
 
     &__label {
       position: absolute;
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--landing-surface-glass);
       border-radius: 20px;
       padding: 20px;
       backdrop-filter: blur(8px);
@@ -204,7 +207,7 @@
       z-index: 2;
 
       strong {
-        color: #0051ff;
+        color: var(--landing-accent);
         font-size: 20px;
         font-weight: 700;
         line-height: 1.2;
@@ -212,7 +215,7 @@
       }
 
       span {
-        color: #4d4d4d;
+        color: var(--landing-text-muted);
         font-size: 16px;
         font-weight: 500;
         line-height: 1.4;
@@ -344,7 +347,7 @@
       &__label {
         padding: 14px 18px;
         border-radius: 22px;
-        background: rgba(255, 255, 255, 0.42);
+        background: var(--landing-surface-glass-strong);
 
         strong {
           font-size: 16px;

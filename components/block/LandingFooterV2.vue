@@ -107,7 +107,7 @@
 
     .brand p {
       margin: 20px 0 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       max-width: 325px;
       font-size: 14px;
       line-height: 1.302;
@@ -125,11 +125,11 @@
         align-items: center;
         width: 22px;
         height: 22px;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         transition: color 0.2s;
 
         &:hover {
-          color: #000;
+          color: var(--landing-text-primary);
         }
 
         svg {
@@ -142,7 +142,7 @@
     .line {
       margin: 40px 0 0;
       height: 1px;
-      background: #a1a1a1;
+      background: var(--landing-line);
     }
 
     .contacts {
@@ -150,14 +150,14 @@
       display: grid;
       grid-template-columns: 487px auto auto auto;
       gap: 20px;
-      background: #fff;
+      background: var(--landing-surface);
       border-radius: 20px;
       min-height: 101px;
       padding: 20px;
 
       p {
         margin: 0;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         font-size: 14px;
         line-height: 1.302;
       }
@@ -167,7 +167,7 @@
       }
 
       strong {
-        color: #000;
+        color: var(--landing-text-primary);
         font-weight: 500;
       }
     }

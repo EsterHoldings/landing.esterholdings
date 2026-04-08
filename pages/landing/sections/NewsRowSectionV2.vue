@@ -85,8 +85,8 @@
     &__card {
       width: 399px;
       border-radius: 20px;
-      border: 1px solid #fff;
-      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--landing-border-strong);
+      background: var(--landing-surface-glass);
       padding: 10px;
       display: flex;
       align-items: center;
@@ -96,7 +96,7 @@
 
       p {
         margin: 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 14px;
         line-height: 1.302;
         font-weight: 700;
@@ -108,7 +108,7 @@
       height: 70px;
       border-radius: 12px;
       flex-shrink: 0;
-      border: 1px solid #fff;
+      border: 1px solid var(--landing-border-strong);
       object-fit: cover;
     }
   }

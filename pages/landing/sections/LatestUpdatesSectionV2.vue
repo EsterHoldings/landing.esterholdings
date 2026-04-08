@@ -54,7 +54,7 @@
 
     h2 {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       line-height: 1.302;
       font-weight: 500;
@@ -68,10 +68,10 @@
     }
 
     .card {
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 20px;
       overflow: hidden;
-      background: linear-gradient(-32deg, #fff 12%, #f1f1f1 89%);
+      background: linear-gradient(-32deg, var(--landing-surface) 12%, var(--landing-surface-muted) 89%);
       display: flex;
       flex-direction: column;
 
@@ -91,7 +91,7 @@
 
       h3 {
         margin: 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 22px;
         line-height: 1.302;
         font-weight: 700;
@@ -99,7 +99,7 @@
 
       p {
         margin: 10px 0 0;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         font-size: 14px;
         line-height: 1.302;
         font-weight: 500;
@@ -108,7 +108,7 @@
       time {
         margin-top: 30px;
         display: block;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         font-size: 14px;
         line-height: 1.302;
         font-weight: 700;

@@ -79,7 +79,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f6f6f6;
+    background: var(--landing-bg);
     overflow: hidden;
   }
 

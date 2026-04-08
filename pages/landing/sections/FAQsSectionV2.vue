@@ -121,7 +121,7 @@
 
     h2 {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       line-height: 1.302;
       font-weight: 500;
@@ -142,14 +142,14 @@
 
   .help {
     margin: 30px 0 0;
-    color: #000;
+    color: var(--landing-text-primary);
     font-size: 16px;
     line-height: 1.302;
     font-weight: 700;
 
     a {
       font-weight: 700;
-      color: #f75709;
+      color: var(--landing-accent-secondary);
       text-decoration: underline;
 
       &:hover {
@@ -164,7 +164,7 @@
   }
 
   :deep(.faq-title) {
-    color: #0051ff !important;
+    color: var(--landing-accent) !important;
     font-size: 22px !important;
     font-weight: 700 !important;
   }
@@ -174,13 +174,13 @@
   }
 
   :deep(.faq-answer p) {
-    color: #7b7b7b !important;
+    color: var(--landing-text-secondary) !important;
     font-size: 16px !important;
     font-weight: 400 !important;
   }
 
   :deep(.faq-divider) {
-    background: #a1a1a1 !important;
+    background: var(--landing-line) !important;
     margin: 0 !important;
   }
 
@@ -191,7 +191,7 @@
 
   /* ---- Form card ---- */
   .form {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--landing-surface-glass);
     border-radius: 20px;
     padding: 40px;
     display: flex;
@@ -199,10 +199,8 @@
     gap: 20px;
     min-height: 630px;
 
-    box-shadow:
-      inset 0 3px 2px rgba(190, 181, 181, 0.1),
-      inset 0 -2px 4px rgba(255, 255, 255, 0.5);
-    border: 1px solid #fff;
+    box-shadow: var(--landing-shadow-glass);
+    border: 1px solid var(--landing-border-strong);
 
     &__header {
       display: flex;
@@ -212,7 +210,7 @@
 
     h3 {
       margin: 0;
-      color: #f75709;
+      color: var(--landing-accent-secondary);
       font-size: 42px;
       line-height: 1.302;
       font-weight: 400;
@@ -220,7 +218,7 @@
 
     p {
       margin: 0;
-      color: #4d4d4d;
+      color: var(--landing-text-muted);
       font-size: 18px;
       line-height: 1.302;
       font-weight: 700;
@@ -228,26 +226,26 @@
 
     &__input {
       width: 100%;
-      border: 1px solid #a1a1a1;
+      border: 1px solid var(--landing-border);
       border-radius: 12px;
       padding: 16px;
       font-size: 16px;
-      color: #111;
+      color: var(--landing-text-strong);
       background: transparent;
       outline: none;
       transition: border-color 0.2s;
 
       &::placeholder {
-        color: #6b7280;
+        color: var(--landing-text-tertiary);
         font-weight: 400;
       }
 
       &:focus {
-        border-color: #0051ff;
+        border-color: var(--landing-accent);
       }
 
       &:hover:not(:focus) {
-        border-color: #888;
+        border-color: var(--landing-text-secondary);
       }
     }
 
@@ -255,11 +253,11 @@
       flex: 1 0 0;
       width: 100%;
       min-height: 100px;
-      border: 1px solid #a1a1a1;
+      border: 1px solid var(--landing-border);
       border-radius: 12px;
       padding: 16px;
       font-size: 16px;
-      color: #111;
+      color: var(--landing-text-strong);
       background: transparent;
       outline: none;
       resize: none;
@@ -267,16 +265,16 @@
       font-family: inherit;
 
       &::placeholder {
-        color: #6b7280;
+        color: var(--landing-text-tertiary);
         font-weight: 400;
       }
 
       &:focus {
-        border-color: #0051ff;
+        border-color: var(--landing-accent);
       }
 
       &:hover:not(:focus) {
-        border-color: #888;
+        border-color: var(--landing-text-secondary);
       }
     }
 
@@ -284,7 +282,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px dashed #0051ff;
+      border: 1px dashed var(--landing-accent);
       border-radius: 12px;
       padding: 16px;
       cursor: pointer;
@@ -295,11 +293,11 @@
 
       &:hover,
       &--hover {
-        background: rgba(0, 81, 255, 0.04);
+        background: color-mix(in srgb, var(--landing-accent) 8%, transparent);
       }
 
       span {
-        color: #6b7280;
+        color: var(--landing-text-tertiary);
         font-size: 16px;
         line-height: 1.302;
         pointer-events: none;
@@ -313,8 +311,8 @@
     &__btn {
       width: 170px;
       height: 53px;
-      background: #0051ff;
-      color: #fff;
+      background: var(--landing-accent);
+      color: var(--landing-on-accent);
       font-size: 16px;
       font-weight: 700;
       border: none;
@@ -326,7 +324,7 @@
       font-family: inherit;
 
       &:hover {
-        background: #003ecc;
+        background: var(--landing-accent-hover);
       }
 
       &:active {

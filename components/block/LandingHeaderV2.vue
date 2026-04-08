@@ -355,13 +355,11 @@
     }
 
     &__bar {
-      box-shadow:
-        inset 0 3px 2px rgba(190, 181, 181, 0.1),
-        inset 0 -2px 4px rgba(255, 255, 255, 0.5);
+      box-shadow: var(--landing-shadow-glass);
       min-height: 79px;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid #fff;
+      background: var(--landing-surface-glass);
+      border: 1px solid var(--landing-border-strong);
       backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
@@ -395,20 +393,20 @@
 
     :deep(.header__link) {
       gap: 4px;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
     }
 
     :deep(.h5) {
       font-size: 16px;
       line-height: normal;
       font-weight: 700;
-      color: #7b7b7b !important;
+      color: var(--landing-text-secondary) !important;
     }
 
     :deep(svg) {
       width: 20px;
       height: 20px;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
     }
   }
 
@@ -439,7 +437,7 @@
   .theme-inline {
     border: 0;
     background: transparent;
-    color: var(--ui-text-main);
+    color: var(--landing-text-primary);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -449,12 +447,12 @@
     :deep(svg) {
       width: 16px;
       height: 16px;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
     }
   }
 
   .auth-link {
-    color: #7b7b7b;
+    color: var(--landing-text-secondary);
     text-decoration: none;
     font-size: 16px;
     line-height: normal;
@@ -469,12 +467,12 @@
     font-size: 16px;
     font-weight: 700;
     line-height: normal;
-    background: #0051ff !important;
-    color: #fff !important;
+    background: var(--landing-accent) !important;
+    color: var(--landing-on-accent) !important;
   }
 
   :deep(.auth-register.btn:hover) {
-    background: #0048e5 !important;
+    background: var(--landing-accent-hover) !important;
   }
 
   .burger {
@@ -492,7 +490,7 @@
       display: block;
       width: 100%;
       height: 2px;
-      background: var(--ui-text-main);
+      background: var(--landing-text-primary);
       transition: transform 0.2s ease;
     }
 
@@ -527,7 +525,7 @@
     position: fixed;
     inset: 0;
     z-index: 9997;
-    background: color-mix(in srgb, #fff 24%, transparent);
+    background: var(--landing-overlay);
     backdrop-filter: blur(12px);
   }
 
@@ -539,9 +537,10 @@
     &__panel {
       height: 100%;
       border-radius: 0 0 20px 20px;
-      // background: color-mix(in srgb, #fff 66%, transparent);
-      // backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.75);
+      background: var(--landing-surface-glass-strong);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--landing-border-strong);
+      box-shadow: var(--landing-shadow-glass-raised);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -568,7 +567,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      color: #6b6b6b;
+      color: var(--landing-text-tertiary);
       text-decoration: none;
       font-size: 16px;
       line-height: normal;
@@ -589,7 +588,7 @@
   }
 
   .auth-link--mobile {
-    color: #6b6b6b;
+    color: var(--landing-text-tertiary);
 
     .login-icon {
       transform: rotate(180deg);
@@ -612,7 +611,7 @@
   }
 
   .mobile-menu .theme-inline {
-    color: #6b6b6b;
+    color: var(--landing-text-tertiary);
     border: 0;
     background: transparent;
     padding: 0;

@@ -3,16 +3,25 @@
     <UiContainer>
       <h2>{{ t("landing.sections.feature__title") }}</h2>
       <div class="grid">
-        <article class="item" v-for="(feature, index) in features" :key="index">
+        <article
+          class="item"
+          v-for="(feature, index) in features"
+          :key="index">
           <div class="icon-sm">
-            <img :src="feature.iconSm" alt="" />
+            <img
+              :src="feature.iconSm"
+              alt="" />
           </div>
           <div class="text-block">
             <h3>{{ feature.title }}</h3>
             <p>{{ feature.description }}</p>
           </div>
-          <div class="icon-bg" aria-hidden="true">
-            <img :src="feature.iconBg" alt="" />
+          <div
+            class="icon-bg"
+            aria-hidden="true">
+            <img
+              :src="feature.iconBg"
+              alt="" />
           </div>
         </article>
       </div>
@@ -52,7 +61,7 @@
 
     h2 {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 42px;
       line-height: 1.302;
       font-weight: 500;
@@ -71,11 +80,11 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 281px;
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 20px;
       padding: 30px;
       overflow: hidden;
-      background: linear-gradient(-17.68deg, #fff 16.6%, #f1f1f1 84.4%);
+      background: linear-gradient(-17.68deg, var(--landing-surface) 16.6%, var(--landing-surface-muted) 84.4%);
     }
 
     .icon-sm {
@@ -102,7 +111,7 @@
 
       h3 {
         margin: 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 28px;
         font-weight: 500;
         line-height: 1.302;
@@ -111,7 +120,7 @@
 
       p {
         margin: 0;
-        color: #0051ff;
+        color: var(--landing-accent);
         font-size: 16px;
         line-height: 1.302;
       }

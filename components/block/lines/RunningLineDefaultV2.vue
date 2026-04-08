@@ -95,8 +95,8 @@
 
     &__card {
       border-radius: 20px;
-      border: 1px solid #fff;
-      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--landing-border-strong);
+      background: var(--landing-surface-glass);
       backdrop-filter: blur(10px);
       padding: 20px;
       display: flex;
@@ -123,7 +123,7 @@
 
     &__symbol {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-family: "DM Sans", sans-serif;
       font-size: 18px;
       line-height: 1.302;
@@ -132,7 +132,7 @@
 
     &__price {
       margin: 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-family: "DM Sans", sans-serif;
       font-size: 14px;
       line-height: 1.302;
@@ -143,8 +143,8 @@
       padding: 10px 16px;
       border: 0;
       border-radius: 12px;
-      background: #0051ff;
-      color: #fff;
+      background: var(--landing-accent);
+      color: var(--landing-on-accent);
       font-family: "DM Sans", sans-serif;
       font-size: 16px;
       line-height: 1.302;

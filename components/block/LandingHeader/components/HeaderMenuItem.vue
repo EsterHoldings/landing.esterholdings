@@ -58,14 +58,14 @@
     }
 
     &_title {
-      color: #b8b8c3;
+      color: var(--landing-text-secondary);
 
       a {
         color: inherit;
       }
 
       &_mobile {
-        color: var(--ui-primary-accent);
+        color: var(--landing-accent-secondary);
         width: 100%;
         padding-top: 18px;
         padding-bottom: 12px;
@@ -77,7 +77,7 @@
       margin-bottom: 14px;
       width: 180px;
       height: 1px;
-      background: var(--color-stroke-ui);
+      background: var(--landing-line);
 
       &_mobile {
         display: none;
@@ -85,7 +85,7 @@
     }
 
     &_link {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       margin-bottom: 8px;
 
       a {
@@ -94,7 +94,7 @@
 
       &:hover {
         transition: all 0.2s ease;
-        color: var(--ui-primary-accent);
+        color: var(--landing-accent-secondary);
       }
 
       &_mobile {

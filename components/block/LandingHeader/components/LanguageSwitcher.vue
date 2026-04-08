@@ -19,7 +19,11 @@
           :key="code"
           @click="switchLanguage(code)"
           :class="{ active: locale === code }">
-          <span class="flag" :class="{ 'flag--monochrome': code === 'ru' }">{{ getFlag(code) }}</span>
+          <span
+            class="flag"
+            :class="{ 'flag--monochrome': code === 'ru' }"
+            >{{ getFlag(code) }}</span
+          >
           <span class="label">{{ label.toUpperCase() }}</span>
         </li>
       </ul>
@@ -132,9 +136,9 @@
       top: 40px;
       right: 0;
       width: fit-content;
-      background-color: var(--ui-background);
+      background-color: var(--landing-surface-elevated);
       border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--landing-shadow-soft);
       padding: 10px;
       z-index: 11;
       max-height: 400px;
@@ -155,7 +159,7 @@
         height: 30px;
         font-size: 16px;
         padding: 0 10px 0 0;
-        color: var(--ui-text-main);
+        color: var(--landing-text-primary);
       }
 
       .flag--monochrome {
@@ -164,7 +168,7 @@
 
       .label {
         font-weight: 500;
-        color: var(--ui-text-main);
+        color: var(--landing-text-primary);
         padding: 0 10px;
       }
 
@@ -175,28 +179,28 @@
         padding: 6px 16px;
         font-size: 13px;
         cursor: pointer;
-        background-color: var(--color-stroke-ui-dark);
+        background-color: var(--landing-surface-muted);
         margin-bottom: 5px;
         border-radius: 8px;
         padding: 10px 20px;
 
         &:hover {
-          background-color: var(--color-stroke-ui-dark);
-          color: var(--ui-primary-accent);
+          background-color: var(--landing-surface-muted);
+          color: var(--landing-accent-secondary);
           opacity: 0.7;
         }
 
         &.active {
-          background-color: var(--color-stroke-ui-light);
+          background-color: var(--landing-surface-glass-strong);
           font-weight: 700;
 
           .label {
-            color: var(--ui-primary-accent) !important;
+            color: var(--landing-accent-secondary) !important;
           }
 
           &:hover {
             opacity: 0.7;
-            color: var(--ui-primary-accent);
+            color: var(--landing-accent-secondary);
           }
         }
       }

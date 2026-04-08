@@ -68,6 +68,38 @@
   --ui-date-input-icon-filter: brightness(0) saturate(100%) invert(100%);
   --ui-date-input-color-scheme: dark;
 
+  // Landing theme
+  --landing-bg: #f6f6f6;
+  --landing-surface: #ffffff;
+  --landing-surface-muted: #f1f1f1;
+  --landing-surface-elevated: #ffffff;
+  --landing-surface-glass: rgba(255, 255, 255, 0.3);
+  --landing-surface-glass-strong: rgba(255, 255, 255, 0.42);
+  --landing-overlay: rgba(255, 255, 255, 0.24);
+  --landing-border: #a1a1a1;
+  --landing-border-strong: rgba(255, 255, 255, 0.78);
+  --landing-line: #a1a1a1;
+  --landing-text-primary: #000000;
+  --landing-text-strong: #111111;
+  --landing-text-secondary: #7b7b7b;
+  --landing-text-muted: #4d4d4d;
+  --landing-text-tertiary: #6b7280;
+  --landing-text-accent-soft: #8b97a8;
+  --landing-accent: #0051ff;
+  --landing-accent-hover: #0048e5;
+  --landing-accent-secondary: #f75709;
+  --landing-accent-secondary-hover: #df4e08;
+  --landing-on-accent: #ffffff;
+  --landing-shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --landing-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --landing-shadow-glass: inset 0 3px 2px rgba(190, 181, 181, 0.1), inset 0 -2px 4px rgba(255, 255, 255, 0.5);
+  --landing-shadow-glass-raised:
+    inset 0 3px 2px rgba(190, 181, 181, 0.1), inset 0 -2px 4px rgba(255, 255, 255, 0.4), 0 8px 32px rgba(0, 0, 0, 0.08);
+  --landing-glow-blue: #0052fe;
+  --landing-glow-orange: #f75709;
+  --landing-blob-left: radial-gradient(circle, rgba(247, 87, 9, 0.35) 0%, transparent 70%);
+  --landing-blob-right: radial-gradient(circle, rgba(100, 60, 200, 0.25) 0%, transparent 70%);
+
   //MAIN COLOR VAR-----
   // Ui elements settings
   --ui-border--raduis: 20px;
@@ -77,6 +109,39 @@
   --ui-input--border-radius: var(--ui-border--raduis);
   --ui-input--height: 40px;
   // Buttons
+}
+
+:root[data-theme="dark"] {
+  --landing-bg: #07111d;
+  --landing-surface: #101a29;
+  --landing-surface-muted: #152235;
+  --landing-surface-elevated: #18263a;
+  --landing-surface-glass: rgba(13, 22, 35, 0.72);
+  --landing-surface-glass-strong: rgba(13, 22, 35, 0.84);
+  --landing-overlay: rgba(6, 12, 20, 0.54);
+  --landing-border: rgba(140, 159, 190, 0.28);
+  --landing-border-strong: rgba(156, 180, 218, 0.34);
+  --landing-line: rgba(156, 180, 218, 0.22);
+  --landing-text-primary: #f5f7fb;
+  --landing-text-strong: #ffffff;
+  --landing-text-secondary: #a8b4c7;
+  --landing-text-muted: #c7d1de;
+  --landing-text-tertiary: #8e9db1;
+  --landing-text-accent-soft: #6f819b;
+  --landing-accent: #5b84ff;
+  --landing-accent-hover: #7c9dff;
+  --landing-accent-secondary: #ff8b4d;
+  --landing-accent-secondary-hover: #ffab7c;
+  --landing-on-accent: #ffffff;
+  --landing-shadow-soft: 0 12px 36px rgba(0, 0, 0, 0.28);
+  --landing-shadow-card: 0 14px 32px rgba(0, 0, 0, 0.24);
+  --landing-shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  --landing-shadow-glass-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.03), 0 18px 44px rgba(0, 0, 0, 0.28);
+  --landing-glow-blue: #1b63ff;
+  --landing-glow-orange: #ff7a30;
+  --landing-blob-left: radial-gradient(circle, rgba(255, 122, 48, 0.28) 0%, transparent 72%);
+  --landing-blob-right: radial-gradient(circle, rgba(88, 121, 255, 0.22) 0%, transparent 72%);
 }
 
 @media (prefers-color-scheme: light) {

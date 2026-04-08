@@ -68,8 +68,8 @@
     }
 
     &--primary {
-      background: #0051ff;
-      color: #fff;
+      background: var(--landing-accent);
+      color: var(--landing-on-accent);
 
       &:hover {
         opacity: 0.9;
@@ -77,9 +77,9 @@
     }
 
     &--secondary {
-      background: #fff;
-      color: #f75709;
-      border: 1.5px solid #f75709;
+      background: var(--landing-surface);
+      color: var(--landing-accent-secondary);
+      border: 1.5px solid var(--landing-accent-secondary);
     }
   }
 

@@ -31,7 +31,7 @@
 
     &-content {
       width: 100%;
-      background-color: #f6f6f6;
+      background-color: var(--landing-bg);
       position: relative;
     }
   }

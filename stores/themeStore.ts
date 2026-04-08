@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useThemeStore = defineStore("theme", () => {
-  const currentTheme = ref<"light" | "dark">("dark");
+  const currentTheme = ref<"light" | "dark">("light");
   const lightTheme = {
     "--ui-background": "#ffffff",
     "--ui-background-secondary": "#2a5bbd",
@@ -64,6 +64,9 @@ export const useThemeStore = defineStore("theme", () => {
 
   function applyTheme(theme: Record<string, string>, withTransition = true) {
     const root = document.documentElement;
+    root.dataset.theme = currentTheme.value;
+    root.style.colorScheme = currentTheme.value;
+
     if (withTransition) {
       root.classList.add("theme-transition");
       if (transitionTimer) clearTimeout(transitionTimer);
