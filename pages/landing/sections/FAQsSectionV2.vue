@@ -8,7 +8,7 @@
           <p class="help">
             {{ t("landing.sections.helpSection") }}
             <a
-              href="https://stage.esterholdings.website/en#"
+              href="https://esterholdings.space/en#"
               target="_blank"
               rel="noopener noreferrer">
               {{ t("landing.sections.helpLinkText") }}

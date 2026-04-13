@@ -40,7 +40,7 @@
                 :class="{ 'svg-invert': useDarkHeaderIcons }" />
             </button>
             <a
-              href="https://my.esterholdings.website"
+              href="https://my.esterholdings.space"
               class="auth-link auth-link--login">
               {{ t("landing.header.auth.login") }}
             </a>
