@@ -117,15 +117,15 @@
 }
 
 :root[data-theme="dark"] {
-  --landing-bg: #07111d;
-  --landing-surface: #101a29;
-  --landing-surface-muted: #152235;
+  --landing-bg: #011239;
+  --landing-surface: #02133a;
+  --landing-surface-muted: #02133a;
   --landing-surface-elevated: #18263a;
-  --landing-surface-glass: rgba(13, 22, 35, 0.72);
+  --landing-surface-glass: rgba(13, 30, 67, 0.72);
   --landing-surface-glass-strong: rgba(13, 22, 35, 0.84);
   --landing-overlay: rgba(6, 12, 20, 0.54);
   --landing-border: rgba(140, 159, 190, 0.28);
-  --landing-border-strong: rgba(156, 180, 218, 0.34);
+  --landing-border-strong: #0d1e43;
   --landing-line: rgba(156, 180, 218, 0.22);
   --landing-text-primary: #f5f7fb;
   --landing-text-strong: #ffffff;
