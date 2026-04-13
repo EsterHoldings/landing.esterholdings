@@ -202,8 +202,16 @@
       align-items: center;
       gap: 10px;
 
-      svg {
+      :deep(svg) {
         flex-shrink: 0;
+      }
+
+      :deep(svg [fill="black"]) {
+        fill: var(--landing-text-primary);
+      }
+
+      :deep(svg [stroke="black"]) {
+        stroke: var(--landing-text-primary);
       }
 
       span {
