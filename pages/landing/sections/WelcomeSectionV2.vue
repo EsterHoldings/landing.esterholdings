@@ -25,7 +25,9 @@
           :watch-overflow="true"
           :prevent-clicks="true"
           :prevent-clicks-propagation="true"
-          :autoplay="autoplayOptions">
+          :autoplay="autoplayOptions"
+          @slideChange="onSlideChange"
+      >
         <SwiperSlide
             v-for="slide in slides"
             :key="slide.id"
@@ -120,7 +122,8 @@
                     aria-hidden="true"
                     :class="[
                       asset.className,
-                      index === 0 ? '!fixed top-[-200px] right-0' : ''
+                      index === 0 ? 'top-0 right-0' : '',
+                      slide.id == `slide-1` && index === 0 ? '!fixed' : '',
                     ]"
                 />
 
@@ -147,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {Swiper, SwiperSlide} from "swiper/vue";
 import {Autoplay} from "swiper/modules";
@@ -180,6 +183,14 @@ import monitor from "~/assets/landing/welcome-v2/monitor.svg";
 import FrameLogo from "~/assets/landing/welcome-v2/FramLogo.svg";
 
 const {t} = useI18n();
+
+const currentSlideIndex = ref(0);
+
+const onSlideChange = (swiper: any) => {
+  currentSlideIndex.value = swiper.realIndex;
+};
+
+const currentSlide = computed(() => slides.value[currentSlideIndex.value]);
 
 const mkSlide = (
     i: number,
@@ -263,7 +274,7 @@ const slides = computed(() => [
   ),
 ]);
 
-const AUTO_PLAY_DELAY = 1000000;
+const AUTO_PLAY_DELAY = 8000;
 const swiperModules = [Autoplay];
 const autoplayOptions = computed(() =>
     slides.value.length > 1
@@ -300,6 +311,10 @@ const autoplayOptions = computed(() =>
   position: relative;
   padding-top: 118px;
   z-index: 0;
+  height: calc(100vh - 125px);
+  max-height: 1000px;
+  display: flex;
+  align-items: center;
 }
 
 .hero {
@@ -522,8 +537,9 @@ const autoplayOptions = computed(() =>
     }
 
     &--gray-shadow {
-      top: -300px;
-      right: -160px;
+      //top: -300px;
+      top: -65%;
+      right: 0;
       width: 622px;
       z-index: -1;
       pointer-events: none;
@@ -572,7 +588,7 @@ const autoplayOptions = computed(() =>
 
     &--slide2-city {
       top: -40px;
-      right: -110px;
+      right: 0;
       width: 640px;
       z-index: -1;
       pointer-events: none;
@@ -603,7 +619,7 @@ const autoplayOptions = computed(() =>
 
     &--slide3-monitor {
       top: -86px;
-      right: -136px;
+      right: 0;
       width: 690px;
       z-index: -1;
       pointer-events: none;
@@ -867,7 +883,7 @@ const autoplayOptions = computed(() =>
 
     &__asset--slide3-monitor {
       top: -60px;
-      right: -100px;
+      right: 0;
       width: 800px;
     }
   }
@@ -908,7 +924,7 @@ const autoplayOptions = computed(() =>
 
     &__asset--slide3-monitor {
       top: -40px;
-      right: -80px;
+      right: 0;
       width: 750px;
     }
   }
