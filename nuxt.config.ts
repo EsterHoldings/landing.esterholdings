@@ -209,6 +209,7 @@ export default defineNuxtConfig({
       reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || process.env.VITE_REVERB_HOST || "server.esterholdings.com",
       reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || process.env.VITE_REVERB_PORT || "443",
       reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || process.env.VITE_REVERB_SCHEME || "https",
+      reverbCluster: process.env.NUXT_PUBLIC_REVERB_CLUSTER || process.env.VITE_REVERB_APP_CLUSTER || "mt1",
 
       baseApi: process.env.NUXT_PUBLIC_BASE_API || "https://server.esterholdings.com/api/",
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://server.esterholdings.com/",

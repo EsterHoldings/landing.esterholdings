@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+  import Pusher from "pusher-js";
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
   import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
   import UiIconTradeArrowDown from "~/components/ui/UiIconTradeArrowDown.vue";
@@ -48,6 +49,8 @@
   type Mt4QuotePayload = {
     quotes?: Mt4Quote[];
     items?: Mt4Quote[];
+    data?: Mt4QuotePayload | string;
+    sequence?: unknown;
   };
 
   type Mt4Quote = {
@@ -91,14 +94,70 @@
   const position = ref(0);
   let animationFrameId: number | null = null;
   let quotesChannel: any = null;
+  let quotesPusher: any = null;
+  let ownsQuotesPusher = false;
   let highlightTimer: ReturnType<typeof setTimeout> | null = null;
+  let debugQuotes = false;
 
-  const normalizeEventName = (event: string): string => (event.startsWith(".") ? event : `.${event}`);
+  const normalizePusherEventName = (event: string): string => event.replace(/^\./, "");
 
   const toText = (value: unknown): string => {
     if (value === null || value === undefined) return "";
 
     return String(value).trim();
+  };
+
+  const isLoopbackHost = (value: string): boolean => {
+    const normalized = value.trim().toLowerCase();
+
+    return normalized === "localhost" || normalized === "127.0.0.1";
+  };
+
+  const hostFromUrl = (value: unknown): string => {
+    const raw = toText(value);
+    if (!raw) return "";
+
+    try {
+      return new URL(raw, window.location.origin).hostname;
+    } catch {
+      return "";
+    }
+  };
+
+  const parsePayload = (payload: unknown): Mt4QuotePayload => {
+    if (typeof payload === "string") {
+      try {
+        return parsePayload(JSON.parse(payload));
+      } catch {
+        return {};
+      }
+    }
+
+    if (payload && typeof payload === "object") {
+      const value = payload as Mt4QuotePayload;
+
+      if (!Array.isArray(value.quotes) && !Array.isArray(value.items) && value.data) {
+        return parsePayload(value.data);
+      }
+
+      return value;
+    }
+
+    return {};
+  };
+
+  const quoteDebugEnabled = (): boolean => {
+    if (typeof window === "undefined") return false;
+
+    return (
+      new URLSearchParams(window.location.search).has("quotesDebug") || localStorage.getItem("mt4QuotesDebug") === "1"
+    );
+  };
+
+  const logQuoteDebug = (...args: unknown[]) => {
+    if (!debugQuotes) return;
+
+    console.info("[mt4-quotes]", ...args);
   };
 
   const formatChange = (value: unknown): string => {
@@ -129,7 +188,8 @@
     return Number.isFinite(change) ? change >= 0 : true;
   };
 
-  const applyQuotesPayload = (payload: Mt4QuotePayload) => {
+  const applyQuotesPayload = (rawPayload: Mt4QuotePayload | unknown) => {
+    const payload = parsePayload(rawPayload);
     const quotes = Array.isArray(payload?.quotes) ? payload.quotes : Array.isArray(payload?.items) ? payload.items : [];
     const previousBySymbol = new Map(displayItems.value.map(item => [item.symbol, item.price]));
     const nextItems = quotes
@@ -147,6 +207,12 @@
       .filter((item): item is TickerItem => item !== null);
 
     if (nextItems.length > 0) {
+      logQuoteDebug("received", {
+        sequence: payload.sequence,
+        count: nextItems.length,
+        sample: nextItems.slice(0, 3),
+      });
+
       const changedSymbols = new Set<string>();
       const directions: Record<string, "up" | "down"> = {};
       nextItems.forEach(item => {
@@ -218,28 +284,95 @@
     animationFrameId = null;
   };
 
+  const resolveQuoteSocketConfig = () => {
+    const publicConfig = runtimeConfig.public || {};
+    const currentHost = window.location.hostname;
+    const fallbackHost =
+      hostFromUrl(publicConfig.hostBase) || hostFromUrl(publicConfig.baseUrl) || "server.esterholdings.com";
+    const configuredHost = toText(publicConfig.reverbHost);
+    const host =
+      configuredHost && (!isLoopbackHost(configuredHost) || isLoopbackHost(currentHost))
+        ? configuredHost
+        : fallbackHost || currentHost;
+    const runtimeScheme = toText(publicConfig.reverbScheme).toLowerCase();
+    const currentScheme = window.location.protocol.replace(":", "").toLowerCase();
+    const scheme =
+      currentScheme === "https" && runtimeScheme !== "https" ? "https" : runtimeScheme || currentScheme || "http";
+    const forceTLS = scheme === "https";
+    const port = Number(publicConfig.reverbPort) || (forceTLS ? 443 : 80);
+
+    return {
+      key: toText(publicConfig.reverbKey) || "prod-key",
+      cluster: toText(publicConfig.reverbCluster) || "mt1",
+      host,
+      port,
+      forceTLS,
+      transport: forceTLS ? "wss" : "ws",
+    };
+  };
+
+  const bindQuotesChannel = (pusher: any) => {
+    const eventName = normalizePusherEventName(props.event);
+    quotesChannel = pusher.subscribe(props.channel);
+    quotesChannel.bind(eventName, applyQuotesPayload);
+    quotesChannel.bind("pusher:subscription_succeeded", () => {
+      logQuoteDebug("subscribed", { channel: props.channel, event: eventName });
+    });
+    quotesChannel.bind("pusher:subscription_error", (error: unknown) => {
+      logQuoteDebug("subscription_error", error);
+    });
+  };
+
   const subscribeToLiveQuotes = () => {
     if (!props.live) return;
+    debugQuotes = quoteDebugEnabled();
 
-    const echo = (useNuxtApp() as any).$echo;
-    if (!echo?.channel) return;
+    const echo = (useNuxtApp() as any).$echo || (window as any).Echo;
+    const sharedPusher = echo?.connector?.pusher;
 
-    quotesChannel = echo.channel(props.channel);
-    quotesChannel.listen(normalizeEventName(props.event), applyQuotesPayload);
+    if (sharedPusher?.subscribe) {
+      quotesPusher = sharedPusher;
+      ownsQuotesPusher = false;
+      bindQuotesChannel(sharedPusher);
+      logQuoteDebug("using shared Echo pusher");
+      return;
+    }
+
+    const socketConfig = resolveQuoteSocketConfig();
+    quotesPusher = new Pusher(socketConfig.key, {
+      cluster: socketConfig.cluster,
+      wsHost: socketConfig.host,
+      wsPort: socketConfig.port,
+      wssPort: socketConfig.port,
+      forceTLS: socketConfig.forceTLS,
+      enabledTransports: [socketConfig.transport],
+      enableStats: false,
+    });
+    ownsQuotesPusher = true;
+    quotesPusher.connection.bind("state_change", (state: unknown) => logQuoteDebug("state", state));
+    quotesPusher.connection.bind("error", (error: unknown) => logQuoteDebug("connection_error", error));
+    bindQuotesChannel(quotesPusher);
+    logQuoteDebug("using direct pusher", socketConfig);
   };
 
   const unsubscribeFromLiveQuotes = () => {
-    const echo = (useNuxtApp() as any).$echo;
+    const eventName = normalizePusherEventName(props.event);
 
-    if (quotesChannel?.stopListening) {
-      quotesChannel.stopListening(normalizeEventName(props.event));
+    if (quotesChannel?.unbind) {
+      quotesChannel.unbind(eventName, applyQuotesPayload);
     }
 
-    if (echo?.leave) {
-      echo.leave(props.channel);
+    if (quotesPusher?.unsubscribe) {
+      quotesPusher.unsubscribe(props.channel);
+    }
+
+    if (ownsQuotesPusher && quotesPusher?.disconnect) {
+      quotesPusher.disconnect();
     }
 
     quotesChannel = null;
+    quotesPusher = null;
+    ownsQuotesPusher = false;
   };
 
   watch(() => displayItems.value.length, resetPosition);

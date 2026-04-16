@@ -25,16 +25,29 @@ const isLoopbackHost = (value: string | undefined): boolean => {
   return normalized === "localhost" || normalized === "127.0.0.1";
 };
 
-const resolveWsHost = (candidate: string | undefined): string => {
+const resolveHostFromUrl = (candidate: string | undefined): string => {
+  if (!candidate || candidate.trim() === "") {
+    return "";
+  }
+
+  try {
+    return new URL(candidate, window.location.origin).hostname;
+  } catch {
+    return "";
+  }
+};
+
+const resolveWsHost = (candidate: string | undefined, fallback: string | undefined): string => {
   const normalizedCandidate = String(candidate || "").trim();
+  const normalizedFallback = String(fallback || "").trim();
   const currentHost = window.location.hostname;
 
   if (normalizedCandidate === "") {
-    return currentHost;
+    return normalizedFallback || currentHost;
   }
 
   if (!isLoopbackHost(currentHost) && isLoopbackHost(normalizedCandidate)) {
-    return currentHost;
+    return normalizedFallback || "server.esterholdings.com";
   }
 
   return normalizedCandidate;
@@ -97,11 +110,14 @@ export default defineNuxtPlugin(() => {
     reverbHost?: string;
     reverbPort?: string | number;
     reverbScheme?: string;
+    reverbCluster?: string;
+    baseUrl?: string;
   };
 
   const authOrigin = resolveOrigin(cfg.hostBase || cfg.baseApi);
   const apiBase = resolveApiBase(cfg.baseApi);
   const authEndpoint = `${authOrigin}/broadcasting/auth`;
+  const fallbackWsHost = resolveHostFromUrl(cfg.hostBase || cfg.baseUrl) || "server.esterholdings.com";
 
   const runtimeScheme = String(cfg.reverbScheme || "")
     .trim()
@@ -193,12 +209,13 @@ export default defineNuxtPlugin(() => {
   const echo = new Echo({
     broadcaster: "reverb",
     key: cfg.reverbKey,
-    wsHost: resolveWsHost(cfg.reverbHost),
+    cluster: cfg.reverbCluster || "mt1",
+    wsHost: resolveWsHost(cfg.reverbHost, fallbackWsHost),
     wsPort: port,
     wssPort: port,
     forceTLS,
     enabledTransports: [transport],
-    disableStats: true,
+    enableStats: false,
     activityTimeout: 30_000,
     pongTimeout: 6_000,
     unavailableTimeout: 5_000,
