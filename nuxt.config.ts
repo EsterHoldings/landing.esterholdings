@@ -205,13 +205,14 @@ export default defineNuxtConfig({
       hostBase: process.env.NUXT_PUBLIC_HOST_BASE || "https://server.esterholdings.com",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://server.esterholdings.com/api",
 
-      reverbKey: process.env.NUXT_PUBLIC_REVERB_KEY || process.env.VITE_REVERB_APP_KEY || "",
-      reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || process.env.VITE_REVERB_HOST || "",
-      reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || process.env.VITE_REVERB_PORT || "",
-      reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || process.env.VITE_REVERB_SCHEME || "",
+      reverbKey: process.env.NUXT_PUBLIC_REVERB_KEY || process.env.VITE_REVERB_APP_KEY || "prod-key",
+      reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || process.env.VITE_REVERB_HOST || "server.esterholdings.com",
+      reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || process.env.VITE_REVERB_PORT || "443",
+      reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || process.env.VITE_REVERB_SCHEME || "https",
 
       baseApi: process.env.NUXT_PUBLIC_BASE_API || "https://server.esterholdings.com/api/",
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://server.esterholdings.com/",
+      cabinetUrl: process.env.NUXT_PUBLIC_CABINET_URL || "https://my.esterholdings.space",
       cliFacebook: process.env.NUXT_PUBLIC_CLI_FACEBOOK || "1668019407177142",
       cliGoogle:
         process.env.NUXT_PUBLIC_CLI_GOOGLE ||
