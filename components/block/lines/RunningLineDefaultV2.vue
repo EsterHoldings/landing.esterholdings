@@ -104,9 +104,16 @@
   let ownsQuotesPusher = false;
   let highlightTimer: ReturnType<typeof setTimeout> | null = null;
   let staleQuotesTimer: ReturnType<typeof setTimeout> | null = null;
+  let latestQuotesPollTimer: ReturnType<typeof setInterval> | null = null;
+  let quotesGlobalHandler: ((eventName: string, payload: unknown) => void) | null = null;
   let debugQuotes = false;
 
   const normalizePusherEventName = (event: string): string => event.replace(/^\./, "");
+  const quoteEventNames = (event: string): string[] => {
+    const normalized = normalizePusherEventName(event);
+
+    return Array.from(new Set([normalized, `.${normalized}`]));
+  };
 
   const toText = (value: unknown): string => {
     if (value === null || value === undefined) return "";
@@ -129,6 +136,19 @@
     } catch {
       return "";
     }
+  };
+
+  const apiUrl = (path: string): string => {
+    const publicConfig = runtimeConfig.public || {};
+    const configuredUrl = toText(publicConfig.mt4QuotesLatestUrl);
+    if (configuredUrl) {
+      return new URL(configuredUrl, window.location.origin).toString();
+    }
+
+    const apiBase =
+      toText(publicConfig.apiBase) || toText(publicConfig.baseApi) || "https://server.esterholdings.com/api";
+
+    return `${apiBase.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
   };
 
   const parsePayload = (payload: unknown): Mt4QuotePayload => {
@@ -263,6 +283,49 @@
     }, 15000);
   };
 
+  const fetchLatestQuotes = async () => {
+    if (!props.live || typeof window === "undefined") return;
+
+    try {
+      const response = await fetch(apiUrl("/mt4/quotes/latest"), {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        logQuoteDebug("latest snapshot unavailable", response.status);
+        return;
+      }
+
+      applyQuotesPayload(await response.json());
+    } catch (error) {
+      logQuoteDebug("latest snapshot fetch error", error);
+    }
+  };
+
+  const resolveLatestPollInterval = (): number => {
+    const configured = Number(toText(runtimeConfig.public?.mt4QuotesFallbackIntervalMs));
+
+    return Number.isFinite(configured) && configured > 0 ? Math.max(1000, configured) : 3000;
+  };
+
+  const startLatestQuotesPolling = () => {
+    if (!props.live || latestQuotesPollTimer) return;
+
+    void fetchLatestQuotes();
+    latestQuotesPollTimer = setInterval(() => {
+      void fetchLatestQuotes();
+    }, resolveLatestPollInterval());
+  };
+
+  const stopLatestQuotesPolling = () => {
+    if (!latestQuotesPollTimer) return;
+
+    clearInterval(latestQuotesPollTimer);
+    latestQuotesPollTimer = null;
+  };
+
   const cardClasses = (item: TickerItem) => ({
     "running-line-v2__card--changed": highlightedSymbols.value.has(item.symbol),
     "running-line-v2__card--changed-up":
@@ -335,10 +398,22 @@
 
   const bindQuotesChannel = (pusher: any) => {
     const eventName = normalizePusherEventName(props.event);
+    const eventNames = quoteEventNames(props.event);
     quotesChannel = pusher.subscribe(props.channel);
-    quotesChannel.bind(eventName, applyQuotesPayload);
+    eventNames.forEach(name => {
+      quotesChannel.bind(name, applyQuotesPayload);
+    });
+    if (quotesChannel.bind_global) {
+      quotesGlobalHandler = (incomingEventName: string, payload: unknown) => {
+        const normalizedIncomingEventName = normalizePusherEventName(incomingEventName);
+        if (normalizedIncomingEventName === eventName) {
+          applyQuotesPayload(payload);
+        }
+      };
+      quotesChannel.bind_global(quotesGlobalHandler);
+    }
     quotesChannel.bind("pusher:subscription_succeeded", () => {
-      logQuoteDebug("subscribed", { channel: props.channel, event: eventName });
+      logQuoteDebug("subscribed", { channel: props.channel, events: eventNames });
     });
     quotesChannel.bind("pusher:subscription_error", (error: unknown) => {
       logQuoteDebug("subscription_error", error);
@@ -378,10 +453,16 @@
   };
 
   const unsubscribeFromLiveQuotes = () => {
-    const eventName = normalizePusherEventName(props.event);
+    const eventNames = quoteEventNames(props.event);
 
     if (quotesChannel?.unbind) {
-      quotesChannel.unbind(eventName, applyQuotesPayload);
+      eventNames.forEach(name => {
+        quotesChannel.unbind(name, applyQuotesPayload);
+      });
+    }
+
+    if (quotesChannel?.unbind_global && quotesGlobalHandler) {
+      quotesChannel.unbind_global(quotesGlobalHandler);
     }
 
     if (quotesPusher?.unsubscribe) {
@@ -395,11 +476,14 @@
     quotesChannel = null;
     quotesPusher = null;
     ownsQuotesPusher = false;
+    quotesGlobalHandler = null;
   };
 
   watch(() => displayItems.value.length, resetPosition);
 
   onMounted(() => {
+    debugQuotes = quoteDebugEnabled();
+    startLatestQuotesPolling();
     subscribeToLiveQuotes();
     startAnimation();
   });
@@ -414,6 +498,7 @@
     }
 
     unsubscribeFromLiveQuotes();
+    stopLatestQuotesPolling();
     stopAnimation();
   });
 </script>
