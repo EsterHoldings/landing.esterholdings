@@ -33,7 +33,8 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref } from "vue";
+  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+  import { useNuxtApp } from "nuxt/app";
   import UiIconTradeArrowDown from "~/components/ui/UiIconTradeArrowDown.vue";
   import UiIconTradeArrowUp from "~/components/ui/UiIconTradeArrowUp.vue";
 
@@ -43,23 +44,121 @@
     isUp: boolean;
   };
 
+  type Mt4QuotePayload = {
+    quotes?: Mt4Quote[];
+    items?: Mt4Quote[];
+  };
+
+  type Mt4Quote = {
+    symbol?: unknown;
+    price?: unknown;
+    bid?: unknown;
+    ask?: unknown;
+    change?: unknown;
+    is_up?: unknown;
+    isUp?: unknown;
+  };
+
   const props = withDefaults(
     defineProps<{
       items: TickerItem[];
       speed?: number;
+      live?: boolean;
+      channel?: string;
+      event?: string;
     }>(),
-    { speed: 0.5 }
+    {
+      speed: 0.5,
+      live: true,
+      channel: "mt4.quotes",
+      event: "mt4.quotes.updated",
+    }
   );
 
-  const duplicatedItems = computed(() => [...props.items, ...props.items]);
+  const liveItems = ref<TickerItem[]>([]);
+  const displayItems = computed(() => (liveItems.value.length > 0 ? liveItems.value : props.items));
+  const duplicatedItems = computed(() => [...displayItems.value, ...displayItems.value]);
   const track = ref<HTMLElement | null>(null);
   const position = ref(0);
   let animationFrameId: number | null = null;
+  let quotesChannel: any = null;
+
+  const normalizeEventName = (event: string): string => (event.startsWith(".") ? event : `.${event}`);
+
+  const toText = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+
+    return String(value).trim();
+  };
+
+  const formatChange = (value: unknown): string => {
+    const change = toText(value);
+    if (change === "") return "";
+
+    const numericChange = Number(change);
+    if (!Number.isFinite(numericChange) || numericChange <= 0 || change.startsWith("+")) {
+      return change;
+    }
+
+    return `+${change}`;
+  };
+
+  const quotePrice = (quote: Mt4Quote): string => {
+    const price = toText(quote.price || quote.bid || quote.ask);
+    const change = formatChange(quote.change);
+
+    return change ? `${price} / ${change}` : price;
+  };
+
+  const quoteDirection = (quote: Mt4Quote): boolean => {
+    if (typeof quote.is_up === "boolean") return quote.is_up;
+    if (typeof quote.isUp === "boolean") return quote.isUp;
+
+    const change = Number(toText(quote.change));
+
+    return Number.isFinite(change) ? change >= 0 : true;
+  };
+
+  const applyQuotesPayload = (payload: Mt4QuotePayload) => {
+    const quotes = Array.isArray(payload?.quotes) ? payload.quotes : Array.isArray(payload?.items) ? payload.items : [];
+    const nextItems = quotes
+      .map((quote): TickerItem | null => {
+        const symbol = toText(quote.symbol);
+        const price = quotePrice(quote);
+        if (!symbol || !price) return null;
+
+        return {
+          symbol,
+          price,
+          isUp: quoteDirection(quote),
+        };
+      })
+      .filter((item): item is TickerItem => item !== null);
+
+    if (nextItems.length > 0) {
+      liveItems.value = nextItems;
+    }
+  };
+
+  const resetPosition = () => {
+    position.value = 0;
+    nextTick(() => {
+      if (track.value) {
+        track.value.style.transform = "translateX(0px)";
+      }
+    });
+  };
 
   const animate = () => {
     if (!track.value) return;
+    const halfWidth = track.value.scrollWidth / 2;
+    if (halfWidth <= 0) {
+      animationFrameId = requestAnimationFrame(animate);
+      return;
+    }
+
     position.value -= props.speed;
-    if (Math.abs(position.value) >= track.value.scrollWidth / 2) {
+    if (Math.abs(position.value) >= halfWidth) {
       position.value = 0;
     }
     track.value.style.transform = `translateX(${position.value}px)`;
@@ -76,8 +175,41 @@
     animationFrameId = null;
   };
 
-  onMounted(startAnimation);
-  onUnmounted(stopAnimation);
+  const subscribeToLiveQuotes = () => {
+    if (!props.live) return;
+
+    const echo = (useNuxtApp() as any).$echo;
+    if (!echo?.channel) return;
+
+    quotesChannel = echo.channel(props.channel);
+    quotesChannel.listen(normalizeEventName(props.event), applyQuotesPayload);
+  };
+
+  const unsubscribeFromLiveQuotes = () => {
+    const echo = (useNuxtApp() as any).$echo;
+
+    if (quotesChannel?.stopListening) {
+      quotesChannel.stopListening(normalizeEventName(props.event));
+    }
+
+    if (echo?.leave) {
+      echo.leave(props.channel);
+    }
+
+    quotesChannel = null;
+  };
+
+  watch(displayItems, resetPosition, { deep: true });
+
+  onMounted(() => {
+    subscribeToLiveQuotes();
+    startAnimation();
+  });
+
+  onUnmounted(() => {
+    unsubscribeFromLiveQuotes();
+    stopAnimation();
+  });
 </script>
 
 <style scoped lang="scss">
