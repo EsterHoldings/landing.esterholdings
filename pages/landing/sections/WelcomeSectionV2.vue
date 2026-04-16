@@ -274,7 +274,7 @@ const slides = computed(() => [
   ),
 ]);
 
-const AUTO_PLAY_DELAY = 8000;
+const AUTO_PLAY_DELAY = 80000;
 const swiperModules = [Autoplay];
 const autoplayOptions = computed(() =>
     slides.value.length > 1
