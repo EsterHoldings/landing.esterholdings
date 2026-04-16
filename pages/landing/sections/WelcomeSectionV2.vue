@@ -179,7 +179,7 @@ import databaseIcon from "~/assets/landing/welcome-v2/database.svg";
 import frame222 from "~/assets/landing/welcome-v2/Frame-222.svg";
 import frame16 from "~/assets/landing/welcome-v2/Frame-16.svg";
 import frame23 from "~/assets/landing/welcome-v2/Frame-23.svg";
-import monitor from "~/assets/landing/welcome-v2/monitor.svg";
+import monitor from "~/assets/landing/welcome-v2/monitor.png";
 import FrameLogo from "~/assets/landing/welcome-v2/FramLogo.svg";
 
 const {t} = useI18n();
