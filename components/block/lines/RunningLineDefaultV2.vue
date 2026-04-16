@@ -13,11 +13,17 @@
         :class="cardClasses(item)">
         <div class="running-line-v2__head">
           <UiIconTradeArrowUp
-            v-if="item.isUp"
+            v-if="item.isUp === true"
             class="running-line-v2__icon" />
           <UiIconTradeArrowDown
-            v-else
+            v-else-if="item.isUp === false"
             class="running-line-v2__icon" />
+          <span
+            v-else
+            class="running-line-v2__icon running-line-v2__icon--empty"
+            aria-hidden="true">
+            -
+          </span>
           <div class="running-line-v2__info">
             <p class="running-line-v2__symbol">{{ item.symbol }}</p>
             <p class="running-line-v2__price">{{ item.price }}</p>
@@ -43,7 +49,7 @@
   type TickerItem = {
     symbol: string;
     price: string;
-    isUp: boolean;
+    isUp: boolean | null;
   };
 
   type Mt4QuotePayload = {
@@ -97,6 +103,7 @@
   let quotesPusher: any = null;
   let ownsQuotesPusher = false;
   let highlightTimer: ReturnType<typeof setTimeout> | null = null;
+  let staleQuotesTimer: ReturnType<typeof setTimeout> | null = null;
   let debugQuotes = false;
 
   const normalizePusherEventName = (event: string): string => event.replace(/^\./, "");
@@ -173,7 +180,7 @@
   };
 
   const quotePrice = (quote: Mt4Quote): string => {
-    const price = toText(quote.price || quote.bid || quote.ask);
+    const price = toText(quote.price ?? quote.bid ?? quote.ask);
     const change = formatChange(quote.change);
 
     return change ? `${price} / ${change}` : price;
@@ -218,11 +225,12 @@
       nextItems.forEach(item => {
         if (previousBySymbol.get(item.symbol) !== item.price) {
           changedSymbols.add(item.symbol);
-          directions[item.symbol] = item.isUp ? "up" : "down";
+          directions[item.symbol] = item.isUp === false ? "down" : "up";
         }
       });
 
       liveItems.value = nextItems;
+      scheduleStaleQuotesReset();
 
       if (changedSymbols.size > 0) {
         highlightedSymbols.value = changedSymbols;
@@ -239,6 +247,20 @@
         }, 1800);
       }
     }
+  };
+
+  const scheduleStaleQuotesReset = () => {
+    if (staleQuotesTimer) {
+      clearTimeout(staleQuotesTimer);
+    }
+
+    staleQuotesTimer = setTimeout(() => {
+      liveItems.value = [];
+      highlightedSymbols.value = new Set();
+      highlightDirections.value = {};
+      staleQuotesTimer = null;
+      logQuoteDebug("stale live quotes cleared");
+    }, 15000);
   };
 
   const cardClasses = (item: TickerItem) => ({
@@ -387,6 +409,10 @@
       clearTimeout(highlightTimer);
     }
 
+    if (staleQuotesTimer) {
+      clearTimeout(staleQuotesTimer);
+    }
+
     unsubscribeFromLiveQuotes();
     stopAnimation();
   });
@@ -447,6 +473,21 @@
 
     &__icon {
       flex-shrink: 0;
+    }
+
+    &__icon--empty {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(148, 163, 184, 0.16);
+      color: var(--landing-text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "DM Sans", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
     }
 
     &__info {
