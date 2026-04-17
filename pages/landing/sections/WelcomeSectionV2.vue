@@ -110,9 +110,14 @@
           >
             <div class="hero__visual-stage w-full max-w-[715px]">
               <template v-if="slide.assets.length || slide.showBanner">
-                <UiHomeBannerV2
+<!--                <UiHomeBannerV2-->
+<!--                    v-if="slide.showBanner"-->
+<!--                    class="hero__asset hero__asset&#45;&#45;slide2-city"-->
+<!--                />-->
+                <UiHomeBannerV2Night
                     v-if="slide.showBanner"
-                    class="hero__asset hero__asset--slide2-city"/>
+                    class="hero__asset hero__asset--slide2-city"
+                />
 
                 <img
                     v-for="(asset, index) in slide.assets"
@@ -181,6 +186,7 @@ import frame16 from "~/assets/landing/welcome-v2/Frame-16.svg";
 import frame23 from "~/assets/landing/welcome-v2/Frame-23.svg";
 import monitor from "~/assets/landing/welcome-v2/monitor.png";
 import FrameLogo from "~/assets/landing/welcome-v2/FramLogo.svg";
+import UiHomeBannerV2Night from "~/components/ui/UiHomeBannerV2Night.vue";
 
 const {t} = useI18n();
 
