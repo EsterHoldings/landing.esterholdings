@@ -5,7 +5,9 @@
     </template>
 
     <template #content>
-      <PageStructureContent :plain="true" v-if="!isInitialLoading">
+      <PageStructureContent
+        :plain="true"
+        v-if="!isInitialLoading">
         <template #content>
           <div class="about-company">
             <UiTextH3 class="about-company_title">AML Policy</UiTextH3>
@@ -19,8 +21,8 @@
               </UiTextParagraph>
 
               <UiTextParagraph>
-                The Company continuously monitors exposure to money laundering and terrorism financing risks. Knowing the
-                customer and understanding their instructions enables better risk assessment.
+                The Company continuously monitors exposure to money laundering and terrorism financing risks. Knowing
+                the customer and understanding their instructions enables better risk assessment.
               </UiTextParagraph>
             </div>
 
@@ -36,8 +38,8 @@
 
             <UiTextH3 class="about-company_title">Payments Policy</UiTextH3>
             <UiTextParagraph>
-              Payments are regulated under the "Regulations for Non-Trading Operations," available on the Company Website
-              under “Regulatory Documents and Agreements.”
+              Payments are regulated under the "Regulations for Non-Trading Operations," available on the Company
+              Website under “Regulatory Documents and Agreements.”
             </UiTextParagraph>
 
             <UiTextH3 class="about-company_title">Personnel</UiTextH3>
@@ -67,8 +69,8 @@
             <UiTextH3 class="about-company_title">Reporting Suspicious Activity</UiTextH3>
             <UiTextParagraph>
               All suspicious activities must be reported to the AML Compliance Officer. The company may conduct internal
-              investigations, freeze or close accounts, and inform authorities, cooperating fully with law enforcement where
-              required by law.
+              investigations, freeze or close accounts, and inform authorities, cooperating fully with law enforcement
+              where required by law.
             </UiTextParagraph>
           </div>
         </template>
@@ -85,21 +87,21 @@
 </template>
 
 <script lang="ts" setup>
-import { definePageMeta } from "~/.nuxt/imports";
-import { nextTick, ref } from "vue";
+  import { definePageMeta } from "~/.nuxt/imports";
+  import { nextTick, ref } from "vue";
 
-import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
-import PageStructureContent from "~/components/block/pages/PageStructureContent.vue";
-import UiTextH3 from "~/components/ui/UiTextH3.vue";
-import UiTextH4 from "~/components/ui/UiTextH4.vue";
-import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
-import UiIconLogo from "~/components/ui/UiIconLogo.vue";
-import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
+  import PageStructureDefault from "~/components/block/pages/PageStructureDefault.vue";
+  import PageStructureContent from "~/components/block/pages/PageStructureContent.vue";
+  import UiTextH3 from "~/components/ui/UiTextH3.vue";
+  import UiTextH4 from "~/components/ui/UiTextH4.vue";
+  import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
+  import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import UiIconSpinnerDefault from "~/components/ui/UiIconSpinnerDefault.vue";
 
-definePageMeta({ layout: "cabinet", middleware: ["auth-client", "client-check-auth"] });
+  definePageMeta({ layout: "main" });
 
-const isInitialLoading = ref(true);
-nextTick(() => {
-  isInitialLoading.value = false;
-});
+  const isInitialLoading = ref(true);
+  nextTick(() => {
+    isInitialLoading.value = false;
+  });
 </script>

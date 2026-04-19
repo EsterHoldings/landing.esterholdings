@@ -26,11 +26,11 @@
               <span>{{ feat.text }}</span>
             </div>
           </div>
-          <NuxtLink
-            to="/auth/registration"
+          <a
+            :href="cabinetLink('/auth/registration')"
             class="accounts-v2__link">
             <button class="accounts-v2__btn">{{ card.buttonText }}</button>
-          </NuxtLink>
+          </a>
         </article>
       </div>
     </UiContainer>
@@ -49,8 +49,10 @@
   import UiIconFirstDeposit from "~/components/ui/UiIconFirstDeposit.vue";
   import UiIconShareDeposit from "~/components/ui/UiIconShareDeposit.vue";
   import UiIconRealTime from "~/components/ui/UiIconRealTime.vue";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const { t } = useI18n();
+  const { cabinetLink } = useCabinetLink();
 
   // Индексы соответствуют порядку в accounts__options: demo=0, standard=1, tandem=3
   const cards = computed(() => [

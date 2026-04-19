@@ -48,7 +48,7 @@
             class="actions-wrapper"
             :class="{ 'is-menu-open': isMobileMenuOpen }">
             <div class="actions">
-              <NuxtLink to="/auth/login">
+              <a :href="cabinetLink('/auth/login')">
                 <UiButtonDefault
                   state="link"
                   class="login"
@@ -57,17 +57,17 @@
                   }">
                   {{ t("landing.header.auth.login") }}
                 </UiButtonDefault>
-              </NuxtLink>
+              </a>
 
-              <nuxt-link
-                to="/auth/registration"
+              <a
+                :href="cabinetLink('/auth/registration')"
                 class="register">
                 <UiButtonDefault
                   state="primary"
                   v-if="!isMobileMenuOpen">
                   {{ t("landing.header.auth.register") }}
                 </UiButtonDefault>
-              </nuxt-link>
+              </a>
 
               <div class="actions-icons">
                 <LanguageSwitcher
@@ -116,22 +116,22 @@
               @click="handleClick(link.key)" />
 
             <div class="mobile-acions">
-              <nuxt-link
-                to="/auth/registration"
+              <a
+                :href="cabinetLink('/auth/registration')"
                 class="register">
                 <UiButtonDefault
                   state="primary"
                   v-if="isMobileMenuOpen">
                   {{ t("landing.header.auth.register") }}
                 </UiButtonDefault>
-              </nuxt-link>
-              <NuxtLink to="/auth/login">
+              </a>
+              <a :href="cabinetLink('/auth/login')">
                 <UiButtonDefault
                   state="link"
                   :class="{ 'is-theme-light': isThemeLight }">
                   {{ t("landing.header.auth.login") }}
                 </UiButtonDefault>
-              </NuxtLink>
+              </a>
             </div>
 
             <div class="mobile-banner">
@@ -195,10 +195,12 @@
   import PartnershipMenu from "./LandingHeader/components/PartnershipMenu.vue";
   import CompanyMenu from "./LandingHeader/components/CompanyMenu.vue";
   import LanguageSwitcher from "./LandingHeader/components/LanguageSwitcher.vue";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const themeStore = useThemeStore();
   const uiStore = useUiStore();
   const route = useRoute();
+  const { cabinetLink } = useCabinetLink();
 
   const { isBlurred } = useTrackScroll();
   const { t } = useI18n();

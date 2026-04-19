@@ -40,17 +40,19 @@
                 :class="{ 'svg-invert': useDarkHeaderIcons }" />
             </button>
             <a
-              href="https://my.esterholdings.space"
+              :href="cabinetLink('/auth/login')"
               class="auth-link auth-link--login">
               {{ t("landing.header.auth.login") }}
             </a>
-            <NuxtLink to="/auth/registration">
+            <a
+              :href="cabinetLink('/auth/registration')"
+              class="auth-register-link">
               <UiButtonDefault
                 state="primary"
                 class="auth-register">
                 {{ t("landing.header.auth.register") }}
               </UiButtonDefault>
-            </NuxtLink>
+            </a>
           </div>
 
           <button
@@ -112,21 +114,21 @@
             <UiIconSun v-else />
             <span>{{ themeStore.currentTheme === "light" ? "Night Mode" : "Day Mode" }}</span>
           </button>
-          <NuxtLink
-            to="/auth/login"
+          <a
+            :href="cabinetLink('/auth/login')"
             class="auth-link auth-link--mobile mobile-menu__line">
             <UiIconLogout class="login-icon" />
             {{ t("landing.header.auth.login") }}
-          </NuxtLink>
-          <NuxtLink
-            to="/auth/registration"
+          </a>
+          <a
+            :href="cabinetLink('/auth/registration')"
             class="mobile-register">
             <UiButtonDefault
               state="primary"
               class="auth-register auth-register--mobile">
               {{ t("landing.header.auth.register") }}
             </UiButtonDefault>
-          </NuxtLink>
+          </a>
         </div>
       </div>
     </div>
@@ -153,12 +155,14 @@
   import PartnershipMenu from "./LandingHeader/components/PartnershipMenu.vue";
   import CompanyMenu from "./LandingHeader/components/CompanyMenu.vue";
   import LanguageSwitcher from "./LandingHeader/components/LanguageSwitcher.vue";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const themeStore = useThemeStore();
   const uiStore = useUiStore();
   const route = useRoute();
   const { isBlurred } = useTrackScroll();
   const { t, locale } = useI18n();
+  const { cabinetLink } = useCabinetLink();
 
   const activeLink = ref("");
   const headerItems = ref();

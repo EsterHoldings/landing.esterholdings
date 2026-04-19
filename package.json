@@ -38,7 +38,6 @@
   "devDependencies": {
     "@nuxtjs/i18n": "npm:@nuxtjs/i18n-edge",
     "@types/country-telephone-data": "^0.6.3",
-    "@types/grecaptcha": "^3.0.9",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.18.8",
     "@vite-pwa/assets-generator": "^1.0.0",

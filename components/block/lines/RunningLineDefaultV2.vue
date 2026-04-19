@@ -45,6 +45,7 @@
   import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
   import UiIconTradeArrowDown from "~/components/ui/UiIconTradeArrowDown.vue";
   import UiIconTradeArrowUp from "~/components/ui/UiIconTradeArrowUp.vue";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   type TickerItem = {
     symbol: string;
@@ -88,14 +89,13 @@
   );
 
   const runtimeConfig = useRuntimeConfig();
+  const { cabinetLink } = useCabinetLink();
   const liveItems = ref<TickerItem[]>([]);
   const highlightedSymbols = ref<Set<string>>(new Set());
   const highlightDirections = ref<Record<string, "up" | "down">>({});
   const displayItems = computed(() => (liveItems.value.length > 0 ? liveItems.value : props.items));
   const duplicatedItems = computed(() => [...displayItems.value, ...displayItems.value]);
-  const tradeHref = computed(
-    () => props.tradeHref || String(runtimeConfig.public?.cabinetUrl || "https://my.esterholdings.space")
-  );
+  const tradeHref = computed(() => props.tradeHref || cabinetLink("/auth/login"));
   const track = ref<HTMLElement | null>(null);
   const position = ref(0);
   let animationFrameId: number | null = null;

@@ -200,7 +200,6 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
     public: {
       hostBase: process.env.NUXT_PUBLIC_HOST_BASE || "https://server.esterholdings.com",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://server.esterholdings.com/api",
@@ -219,12 +218,6 @@ export default defineNuxtConfig({
         "EURUSD,USDCHF,GBPUSD,USDJPY,USDCAD,AUDUSD,NZDUSD,EURGBP,EURJPY,EURCHF,EURAUD,EURCAD,EURNZD,GBPJPY,GBPCHF,GBPAUD,GBPCAD,GBPNZD,AUDJPY,AUDCHF,AUDCAD,AUDNZD,NZDJPY,NZDCHF,NZDCAD,CADJPY,CADCHF,CHFJPY,XAUUSD,XAGUSD",
       mt4QuotesLatestUrl: process.env.NUXT_PUBLIC_MT4_QUOTES_LATEST_URL || "",
       mt4QuotesFallbackIntervalMs: process.env.NUXT_PUBLIC_MT4_QUOTES_FALLBACK_INTERVAL_MS || "3000",
-      cliFacebook: process.env.NUXT_PUBLIC_CLI_FACEBOOK || "1668019407177142",
-      cliGoogle:
-        process.env.NUXT_PUBLIC_CLI_GOOGLE ||
-        "351197430667-flnael7gi4buja9a203e7rgebc6ug5dq.apps.googleusercontent.com",
-      cliLinkIdIn: process.env.NUXT_PUBLIC_CLI_LINK_ID_IN || "784gmiujlnm9h2",
-      reCaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LcxyW8rAAAAAB7veVQONзCAW9W1JBdWAXjHUg0P",
     },
   },
 
@@ -236,18 +229,6 @@ export default defineNuxtConfig({
           name: "viewport",
           content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
         },
-      ],
-      script: [
-        {
-          src: "https://accounts.google.com/gsi/client",
-          async: true,
-          defer: true,
-        },
-        // {
-        //     src: 'https://www.google.com/recaptcha/api.js?render=6LcxyW8rAAAAAB7veVQONзCAW9W1JBdWAXjHUg0P',
-        //     async: true,
-        //     defer: true,
-        // },
       ],
     },
   },

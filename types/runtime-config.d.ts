@@ -1,31 +1,20 @@
 import type { PublicRuntimeConfig as NuxtPublicRuntimeConfig } from "nuxt/schema";
 
 declare module "nuxt/schema" {
-  interface RuntimeConfig {
-    recaptchaSecretKey: string;
-  }
-
   interface PublicRuntimeConfig extends NuxtPublicRuntimeConfig {
+    apiBase: string;
     baseApi: string;
     baseUrl: string;
-    cliFacebook: string;
-    cliGoogle: string;
-    cliLinkIdIn: string;
+    cabinetUrl: string;
+    hostBase: string;
     mt4QuotesFallbackIntervalMs: string;
     mt4QuotesLatestUrl: string;
     mt4QuotesSymbols: string;
-    reCaptchaSiteKey: string;
-  }
-}
-
-interface ReCaptchaInstance {
-  ready: (callback: () => void) => void;
-  execute: (siteKey: string, options: { action: string }) => Promise<string>;
-}
-
-declare global {
-  interface Window {
-    grecaptcha: ReCaptchaInstance;
+    reverbCluster: string;
+    reverbHost: string;
+    reverbKey: string;
+    reverbPort: string;
+    reverbScheme: string;
   }
 }
 

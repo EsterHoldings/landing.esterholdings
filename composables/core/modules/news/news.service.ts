@@ -1,4 +1,3 @@
-import useApi from "~/composables/useApi";
 import type { NewsItem, NewsLatestResponse, NewsListResponse } from "./news.types";
 
 const mockNewsItems: NewsItem[] = [
@@ -45,14 +44,7 @@ const mockNewsItems: NewsItem[] = [
 ];
 
 export class NewsService {
-  private useApi: any;
-
-  constructor() {
-    this.useApi = new useApi(true);
-  }
-
   async list(params: { page?: number; perPage?: number } = {}): Promise<{ data: NewsListResponse }> {
-    // return await this.useApi.get("/news", params);
     const page = params.page ?? 1;
     const perPage = params.perPage ?? mockNewsItems.length;
     const start = (page - 1) * perPage;
@@ -71,7 +63,6 @@ export class NewsService {
   }
 
   async latest(params: { limit?: number } = {}): Promise<{ data: NewsLatestResponse }> {
-    // return await this.useApi.get("/news/latest", params);
     const limit = params.limit ?? 3;
     return Promise.resolve({
       data: {

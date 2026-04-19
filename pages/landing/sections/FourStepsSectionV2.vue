@@ -24,7 +24,7 @@
         </article>
       </div>
       <UiButtonV2
-        to="/auth/registration"
+        :to="cabinetLink('/auth/registration')"
         class="steps-v2__cta">
         {{ t("landing.sections.four_steps_section.button") }}
       </UiButtonV2>
@@ -37,8 +37,10 @@
   import { useI18n } from "vue-i18n";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiContainer from "~/components/ui/UiContainer.vue";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const { t, tm } = useI18n();
+  const { cabinetLink } = useCabinetLink();
 
   const steps = computed(() => {
     const items = tm("landing.sections.four_steps_section.items") as any[];

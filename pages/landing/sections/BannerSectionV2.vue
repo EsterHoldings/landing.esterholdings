@@ -25,11 +25,11 @@
         <p class="banner__tag">{{ t("landing.sections.banner_section.tag") }}</p>
 
         <div class="banner__actions">
-          <UiButtonV2 to="/auth/registration">
+          <UiButtonV2 :to="cabinetLink('/auth/registration')">
             {{ t("landing.sections.banner_section.button_primary") }}
           </UiButtonV2>
           <UiButtonV2
-            to="/auth/registration"
+            :to="cabinetLink('/auth/registration')"
             variant="secondary">
             {{ t("landing.sections.banner_section.button_secondary") }}
           </UiButtonV2>
@@ -46,8 +46,10 @@
   import UiIllustrationChartBg from "~/components/ui/UiIllustrationChartBg.vue";
   import imgLogoMark from "~/assets/landing/banner-v2/logo-mark.png";
   import imgLogoName from "~/assets/landing/banner-v2/logo-name.png";
+  import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const { t } = useI18n();
+  const { cabinetLink } = useCabinetLink();
 </script>
 
 <style lang="scss" scoped>
