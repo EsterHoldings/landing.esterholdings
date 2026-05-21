@@ -4,7 +4,8 @@
       <div class="line"></div>
       <div class="top">
         <div class="brand">
-          <UiIconLogo :class="{ 'svg-invert': themeStore.currentTheme !== 'dark' }" />
+          <UiIconLogoLight v-if="themeStore.currentTheme !== 'dark'" />
+          <UiIconLogo v-else />
           <p>{{ t("landing.footer.description") }}</p>
           <div class="social">
             <a
@@ -78,6 +79,7 @@
   import { useThemeStore } from "~/stores/themeStore";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
   import UiIconFacebook from "~/components/ui/UiIconFacebook.vue";
   import UiIconLinkedIn from "~/components/ui/UiIconLinkedIn.vue";
   import UiIconInstagram from "~/components/ui/UiIconInstagram.vue";
@@ -171,10 +173,6 @@
         font-weight: 500;
       }
     }
-  }
-
-  .svg-invert {
-    filter: invert(1);
   }
 
   @media (max-width: 991px) {

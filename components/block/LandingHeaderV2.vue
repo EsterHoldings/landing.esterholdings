@@ -340,6 +340,13 @@
       width: 88px;
       height: 39px;
     }
+
+    :deep(img) {
+      display: block;
+      width: 118px;
+      height: auto;
+      max-height: 44px;
+    }
   }
 
   .desktop-nav {
