@@ -4,19 +4,20 @@
       <h2>{{ t("landing.sections.faqs__title") }}</h2>
       <div class="layout">
         <div class="left">
-          <TheFaqAccordion :items="faqData" />
-          <p class="help">
+          <TheFaqAccordion :items="displayedFaqData" />
+          <p
+            v-if="showHelpLink"
+            class="help">
             {{ t("landing.sections.helpSection") }}
-            <a
-              href="https://esterholdings.space/en#"
-              target="_blank"
-              rel="noopener noreferrer">
+            <NuxtLink :to="localePath('/help')">
               {{ t("landing.sections.helpLinkText") }}
-            </a>
+            </NuxtLink>
           </p>
         </div>
 
-        <div class="form">
+        <form
+          class="form"
+          @submit.prevent="handleSubmit">
           <div class="form__header">
             <h3>{{ t("landing.sections.faqs__form_title") }}</h3>
             <p>{{ t("landing.sections.faqs__form_subtitle") }}</p>
@@ -27,19 +28,22 @@
             class="form__input"
             type="text"
             :placeholder="t('landing.sections.faqs__form_placeholders.name')"
-            autocomplete="name" />
+            autocomplete="name"
+            required />
 
           <input
             v-model="formData.email"
             class="form__input"
             type="email"
             :placeholder="t('landing.sections.faqs__form_placeholders.email')"
-            autocomplete="email" />
+            autocomplete="email"
+            required />
 
           <textarea
             v-model="formData.description"
             class="form__textarea"
-            :placeholder="t('landing.sections.faqs__form_placeholders.description')" />
+            :placeholder="t('landing.sections.faqs__form_placeholders.description')"
+            required />
 
           <div
             class="form__dropzone"
@@ -62,40 +66,145 @@
               @change="onFileSelect" />
           </div>
 
+          <div
+            v-if="selectedFilesLabel"
+            class="form__files">
+            {{ selectedFilesLabel }}
+          </div>
+
+          <p
+            v-if="formState.message"
+            class="form__status"
+            :class="`form__status--${formState.type}`">
+            {{ formState.message }}
+          </p>
+
           <button
             class="form__btn"
-            type="button"
-            @click="handleSubmit">
-            {{ t("landing.sections.faqs__form_button") }}
+            type="submit"
+            :disabled="formState.isSubmitting">
+            {{ formState.isSubmitting ? submitLoadingText : t("landing.sections.faqs__form_button") }}
           </button>
-        </div>
+        </form>
       </div>
     </UiContainer>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { computed, onMounted, ref, watch } from "vue";
+  import { useRuntimeConfig } from "nuxt/app";
   import { useI18n } from "vue-i18n";
+  import { useRoute } from "vue-router";
+  import { useLocalePath } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import TheFaqAccordion from "~/components/block/TheFaqAccordion.vue";
 
-  const { t, tm } = useI18n();
+  type FaqAccordionItem = {
+    title: string;
+    description: string;
+    isActive: boolean;
+  };
 
-  const faqDataRaw = tm("landing.sections.faqs__items") as any[];
-  const faqData = ref(
-    Array.isArray(faqDataRaw)
-      ? faqDataRaw.map((_, index) => ({
-          title: t(`landing.sections.faqs__items[${index}].title`),
-          description: t(`landing.sections.faqs__items[${index}].description`),
-          isActive: index === 1,
-        }))
-      : []
+  type PublicFaqItem = {
+    question?: string;
+    answer?: string;
+  };
+
+  const props = withDefaults(
+    defineProps<{
+      limit?: number;
+      showHelpLink?: boolean;
+    }>(),
+    {
+      limit: 5,
+      showHelpLink: true,
+    }
   );
 
+  const { t, tm, locale } = useI18n();
+  const config = useRuntimeConfig();
+  const route = useRoute();
+  const localePath = useLocalePath();
+
+  const faqData = ref<FaqAccordionItem[]>([]);
+  const apiFaqData = ref<FaqAccordionItem[]>([]);
+  const submitLoadingText = "Sending...";
+
   const formData = ref({ name: "", email: "", description: "", files: [] as File[] });
+  const formState = ref({
+    isSubmitting: false,
+    type: "idle" as "idle" | "success" | "error",
+    message: "",
+  });
   const isDragging = ref(false);
   const fileInputRef = ref<HTMLInputElement | null>(null);
+
+  const showHelpLink = computed(() => props.showHelpLink);
+  const allFaqData = computed(() => (apiFaqData.value.length > 0 ? apiFaqData.value : faqData.value));
+  const displayedFaqData = computed(() => {
+    const items = allFaqData.value;
+    return props.limit && props.limit > 0 ? items.slice(0, props.limit) : items;
+  });
+  const selectedFilesLabel = computed(() => {
+    const files = formData.value.files;
+    if (files.length === 0) return "";
+    if (files.length === 1) return files[0].name;
+
+    return `${files.length} files selected`;
+  });
+
+  const apiUrl = (path: string) => {
+    const base = String(config.public.apiBase || "https://server.esterholdings.com/api").replace(/\/+$/, "");
+    return `${base}/${path.replace(/^\/+/, "")}`;
+  };
+
+  const buildFallbackFaqData = (): FaqAccordionItem[] => {
+    const raw = tm("landing.sections.faqs__items") as any[];
+    if (!Array.isArray(raw)) return [];
+
+    const activeIndex = raw.length > 1 ? 1 : 0;
+    return raw.map((_, index) => ({
+      title: t(`landing.sections.faqs__items[${index}].title`),
+      description: t(`landing.sections.faqs__items[${index}].description`),
+      isActive: index === activeIndex,
+    }));
+  };
+
+  const normalizePublicFaqItems = (items: PublicFaqItem[]): FaqAccordionItem[] => {
+    const activeIndex = items.length > 1 ? 1 : 0;
+
+    return items
+      .map((item, index) => ({
+        title: String(item?.question ?? "").trim(),
+        description: String(item?.answer ?? "").trim(),
+        isActive: index === activeIndex,
+      }))
+      .filter(item => item.title !== "" && item.description !== "");
+  };
+
+  const loadFaqData = async () => {
+    faqData.value = buildFallbackFaqData();
+
+    try {
+      const response = await $fetch<{ data?: PublicFaqItem[] } | PublicFaqItem[]>(apiUrl("/public/faqs"), {
+        query: {
+          locale: locale.value,
+          limit: props.limit && props.limit > 0 ? props.limit : undefined,
+        },
+        headers: {
+          "X-Locale": locale.value,
+          "Accept-Language": locale.value,
+        },
+      });
+
+      const responseItems = Array.isArray(response) ? response : response?.data;
+      const serverItems = Array.isArray(responseItems) ? normalizePublicFaqItems(responseItems) : [];
+      apiFaqData.value = serverItems;
+    } catch {
+      apiFaqData.value = [];
+    }
+  };
 
   const triggerFileInput = () => fileInputRef.value?.click();
 
@@ -109,9 +218,62 @@
     formData.value.files = Array.from(e.dataTransfer?.files ?? []);
   };
 
-  const handleSubmit = () => {
-    // TODO: submit handler
+  const resetForm = () => {
+    formData.value = { name: "", email: "", description: "", files: [] };
+    if (fileInputRef.value) {
+      fileInputRef.value.value = "";
+    }
   };
+
+  const handleSubmit = async () => {
+    if (formState.value.isSubmitting) return;
+
+    formState.value = { isSubmitting: true, type: "idle", message: "" };
+
+    const payload = new FormData();
+    payload.append("name", formData.value.name.trim());
+    payload.append("email", formData.value.email.trim());
+    payload.append("message", formData.value.description.trim());
+    payload.append("locale", locale.value);
+    if (typeof window !== "undefined") {
+      payload.append("page_url", window.location.href);
+    } else {
+      payload.append("page_url", route.fullPath);
+    }
+    formData.value.files.forEach(file => payload.append("files[]", file));
+
+    try {
+      await $fetch(apiUrl("/public/support/tickets"), {
+        method: "POST",
+        body: payload,
+        headers: {
+          "X-Locale": locale.value,
+          "Accept-Language": locale.value,
+        },
+      });
+
+      resetForm();
+      formState.value = {
+        isSubmitting: false,
+        type: "success",
+        message: "Your request has been sent. We will reply by email.",
+      };
+    } catch {
+      formState.value = {
+        isSubmitting: false,
+        type: "error",
+        message: "Unable to send your request. Please try again.",
+      };
+    }
+  };
+
+  watch(locale, () => {
+    loadFaqData();
+  });
+
+  onMounted(() => {
+    loadFaqData();
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -308,6 +470,27 @@
       display: none;
     }
 
+    &__files {
+      color: var(--landing-text-secondary);
+      font-size: 14px;
+      line-height: 1.302;
+    }
+
+    &__status {
+      margin: -4px 0 0;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 600;
+
+      &--success {
+        color: var(--landing-accent);
+      }
+
+      &--error {
+        color: var(--landing-accent-secondary);
+      }
+    }
+
     &__btn {
       width: 170px;
       height: 53px;
@@ -329,6 +512,11 @@
 
       &:active {
         opacity: 0.85;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
       }
     }
   }

@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-  import { PropType, ref } from "vue";
+  import { PropType, ref, watch } from "vue";
   import UiIconArrowDown from "~/components/ui/UiIconArrowDown.vue";
 
   interface IFaqItem {
@@ -46,6 +46,14 @@
   });
 
   const faqItems = ref<IFaqItem[]>(props.items);
+
+  watch(
+    () => props.items,
+    items => {
+      faqItems.value = items;
+    },
+    { deep: true }
+  );
 
   const toggleItem = (index: number) => {
     faqItems.value = faqItems.value.map((item, i) => ({
