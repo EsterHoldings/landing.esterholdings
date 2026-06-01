@@ -193,6 +193,7 @@
           limit: props.limit && props.limit > 0 ? props.limit : undefined,
         },
         headers: {
+          Accept: "application/json",
           "X-Locale": locale.value,
           "Accept-Language": locale.value,
         },
@@ -247,6 +248,7 @@
         method: "POST",
         body: payload,
         headers: {
+          Accept: "application/json",
           "X-Locale": locale.value,
           "Accept-Language": locale.value,
         },
