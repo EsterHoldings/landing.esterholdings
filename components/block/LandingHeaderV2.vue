@@ -336,16 +336,14 @@
     display: inline-flex;
     align-items: center;
 
-    :deep(svg) {
+    :deep(svg:not(.logo-flat)) {
       width: 88px;
       height: 39px;
     }
 
-    :deep(img) {
-      display: block;
-      width: 118px;
-      height: auto;
-      max-height: 44px;
+    :deep(.logo-flat) {
+      width: 90px;
+      height: 40px;
     }
   }
 
