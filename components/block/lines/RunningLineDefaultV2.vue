@@ -8,9 +8,8 @@
       class="running-line-v2__track">
       <article
         v-for="(item, index) in duplicatedItems"
-        :key="`${item.symbol}-${item.price}-${index}`"
-        class="running-line-v2__card"
-        :class="cardClasses(item)">
+        :key="`${item.symbol}-${index}`"
+        class="running-line-v2__card">
         <div class="running-line-v2__head">
           <UiIconTradeArrowUp
             v-if="item.isUp === true"
@@ -26,7 +25,10 @@
           </span>
           <div class="running-line-v2__info">
             <p class="running-line-v2__symbol">{{ item.symbol }}</p>
-            <p class="running-line-v2__price">{{ item.price }}</p>
+            <RunningQuotePrice
+              class="running-line-v2__price"
+              :direction="priceDirection(item)"
+              :value="item.price" />
           </div>
         </div>
         <a
@@ -43,9 +45,12 @@
   import Pusher from "pusher-js";
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
   import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
+  import RunningQuotePrice from "~/components/block/lines/RunningQuotePrice.vue";
   import UiIconTradeArrowDown from "~/components/ui/UiIconTradeArrowDown.vue";
   import UiIconTradeArrowUp from "~/components/ui/UiIconTradeArrowUp.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
+
+  type QuoteDirection = "up" | "down" | null;
 
   type TickerItem = {
     symbol: string;
@@ -91,8 +96,6 @@
   const runtimeConfig = useRuntimeConfig();
   const { cabinetLink } = useCabinetLink();
   const liveItems = ref<TickerItem[]>([]);
-  const highlightedSymbols = ref<Set<string>>(new Set());
-  const highlightDirections = ref<Record<string, "up" | "down">>({});
   const displayItems = computed(() => (liveItems.value.length > 0 ? liveItems.value : props.items));
   const duplicatedItems = computed(() => [...displayItems.value, ...displayItems.value]);
   const tradeHref = computed(() => props.tradeHref || cabinetLink("/auth/login"));
@@ -102,7 +105,6 @@
   let quotesChannel: any = null;
   let quotesPusher: any = null;
   let ownsQuotesPusher = false;
-  let highlightTimer: ReturnType<typeof setTimeout> | null = null;
   let staleQuotesTimer: ReturnType<typeof setTimeout> | null = null;
   let latestQuotesPollTimer: ReturnType<typeof setInterval> | null = null;
   let quotesGlobalHandler: ((eventName: string, payload: unknown) => void) | null = null;
@@ -225,7 +227,6 @@
   const applyQuotesPayload = (rawPayload: Mt4QuotePayload | unknown) => {
     const payload = parsePayload(rawPayload);
     const quotes = Array.isArray(payload?.quotes) ? payload.quotes : Array.isArray(payload?.items) ? payload.items : [];
-    const previousBySymbol = new Map(displayItems.value.map(item => [item.symbol, item.price]));
     const nextItems = quotes
       .map((quote): TickerItem | null => {
         const symbol = toText(quote.symbol);
@@ -247,32 +248,8 @@
         sample: nextItems.slice(0, 3),
       });
 
-      const changedSymbols = new Set<string>();
-      const directions: Record<string, "up" | "down"> = {};
-      nextItems.forEach(item => {
-        if (previousBySymbol.get(item.symbol) !== item.price) {
-          changedSymbols.add(item.symbol);
-          directions[item.symbol] = item.isUp === false ? "down" : "up";
-        }
-      });
-
       liveItems.value = nextItems;
       scheduleStaleQuotesReset();
-
-      if (changedSymbols.size > 0) {
-        highlightedSymbols.value = changedSymbols;
-        highlightDirections.value = directions;
-
-        if (highlightTimer) {
-          clearTimeout(highlightTimer);
-        }
-
-        highlightTimer = setTimeout(() => {
-          highlightedSymbols.value = new Set();
-          highlightDirections.value = {};
-          highlightTimer = null;
-        }, 1800);
-      }
     }
   };
 
@@ -283,8 +260,6 @@
 
     staleQuotesTimer = setTimeout(() => {
       liveItems.value = [];
-      highlightedSymbols.value = new Set();
-      highlightDirections.value = {};
       staleQuotesTimer = null;
       logQuoteDebug("stale live quotes cleared");
     }, 15000);
@@ -348,13 +323,12 @@
     latestQuotesPollTimer = null;
   };
 
-  const cardClasses = (item: TickerItem) => ({
-    "running-line-v2__card--changed": highlightedSymbols.value.has(item.symbol),
-    "running-line-v2__card--changed-up":
-      highlightedSymbols.value.has(item.symbol) && highlightDirections.value[item.symbol] === "up",
-    "running-line-v2__card--changed-down":
-      highlightedSymbols.value.has(item.symbol) && highlightDirections.value[item.symbol] === "down",
-  });
+  const priceDirection = (item: TickerItem): QuoteDirection => {
+    if (item.isUp === true) return "up";
+    if (item.isUp === false) return "down";
+
+    return null;
+  };
 
   const resetPosition = () => {
     position.value = 0;
@@ -511,10 +485,6 @@
   });
 
   onUnmounted(() => {
-    if (highlightTimer) {
-      clearTimeout(highlightTimer);
-    }
-
     if (staleQuotesTimer) {
       clearTimeout(staleQuotesTimer);
     }
@@ -539,8 +509,9 @@
     }
 
     &__card {
+      box-sizing: border-box;
       border-radius: 20px;
-      border: 1px solid var(--landing-border-strong);
+      border: 0;
       background: var(--landing-surface-glass);
       backdrop-filter: blur(10px);
       padding: 20px;
@@ -548,28 +519,7 @@
       align-items: center;
       gap: 40px;
       flex-shrink: 0;
-      transition:
-        border-color 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease,
-        transform 0.25s ease;
-    }
-
-    &__card--changed {
-      transform: translateY(-2px);
-      animation: quote-card-pulse 1.8s ease both;
-    }
-
-    &__card--changed-up {
-      border-color: rgba(77, 199, 97, 0.72);
-      box-shadow: 0 16px 38px rgba(77, 199, 97, 0.2);
-      background: linear-gradient(0deg, rgba(77, 199, 97, 0.14), rgba(77, 199, 97, 0.14)), var(--landing-surface-glass);
-    }
-
-    &__card--changed-down {
-      border-color: rgba(255, 91, 91, 0.7);
-      box-shadow: 0 16px 38px rgba(255, 91, 91, 0.18);
-      background: linear-gradient(0deg, rgba(255, 91, 91, 0.13), rgba(255, 91, 91, 0.13)), var(--landing-surface-glass);
+      transition: background 0.2s ease;
     }
 
     &__head {
@@ -646,20 +596,6 @@
     &__btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 26px rgba(0, 81, 255, 0.24);
-    }
-  }
-
-  @keyframes quote-card-pulse {
-    0% {
-      filter: brightness(1);
-    }
-
-    18% {
-      filter: brightness(1.08);
-    }
-
-    100% {
-      filter: brightness(1);
     }
   }
 
