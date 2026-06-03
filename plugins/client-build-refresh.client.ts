@@ -49,6 +49,8 @@ export default defineNuxtPlugin(() => {
 
   if (!currentBuildId) return;
 
+  void clearClientCaches();
+
   const previousBuildId = localStorage.getItem(LAST_BUILD_KEY);
   localStorage.setItem(LAST_BUILD_KEY, currentBuildId);
 
