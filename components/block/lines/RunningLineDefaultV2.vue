@@ -200,6 +200,13 @@
   };
 
   const quotePrice = (quote: Mt4Quote): string => {
+    const bid = toText(quote.bid);
+    const ask = toText(quote.ask);
+
+    if (bid && ask) {
+      return `${bid} / ${ask}`;
+    }
+
     const price = toText(quote.price ?? quote.bid ?? quote.ask);
     const change = formatChange(quote.change);
 
@@ -304,19 +311,34 @@
     }
   };
 
-  const resolveLatestPollInterval = (): number => {
-    const configured = Number(toText(runtimeConfig.public?.mt4QuotesFallbackIntervalMs));
+  const resolveLatestPollInterval = (): number | null => {
+    const configuredRaw = toText(runtimeConfig.public?.mt4QuotesFallbackIntervalMs);
+    if (configuredRaw === "") return null;
 
-    return Number.isFinite(configured) && configured > 0 ? Math.max(1000, configured) : 3000;
+    const configured = Number(configuredRaw);
+
+    return Number.isFinite(configured) && configured > 0 ? Math.max(1000, configured) : null;
+  };
+
+  const startLatestQuotesSnapshot = () => {
+    if (!props.live || latestQuotesPollTimer) return;
+
+    void fetchLatestQuotes();
   };
 
   const startLatestQuotesPolling = () => {
     if (!props.live || latestQuotesPollTimer) return;
 
+    const interval = resolveLatestPollInterval();
+    if (interval === null) {
+      startLatestQuotesSnapshot();
+      return;
+    }
+
     void fetchLatestQuotes();
     latestQuotesPollTimer = setInterval(() => {
       void fetchLatestQuotes();
-    }, resolveLatestPollInterval());
+    }, interval);
   };
 
   const stopLatestQuotesPolling = () => {
@@ -483,8 +505,8 @@
 
   onMounted(() => {
     debugQuotes = quoteDebugEnabled();
-    startLatestQuotesPolling();
     subscribeToLiveQuotes();
+    startLatestQuotesPolling();
     startAnimation();
   });
 
