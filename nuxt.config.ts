@@ -25,7 +25,7 @@ export default defineNuxtConfig({
   },
   css: ["~/assets/styles/main.scss"],
   modules: ["@pinia/nuxt", "@nuxtjs/i18n", "@nuxtjs/tailwindcss", "@vite-pwa/nuxt"],
-  plugins: ["~/plugins/eventBus.ts"],
+  plugins: ["~/plugins/eventBus.ts", "~/plugins/client-build-refresh.client.ts"],
   imports: {
     dirs: ["stores"],
   },
