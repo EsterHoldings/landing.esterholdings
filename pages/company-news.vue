@@ -8,6 +8,5 @@
 
   definePageMeta({
     layout: "main",
-    alias: "/company-news",
   });
 </script>

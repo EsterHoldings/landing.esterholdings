@@ -3,25 +3,29 @@
     <div
       ref="track"
       class="news-row-v2__track">
-      <article
+      <NuxtLink
         v-for="(item, idx) in items"
         :key="`${item.title}-${idx}`"
+        :to="item.link"
         class="news-row-v2__card">
         <img
           :src="item.image"
           :alt="item.title"
           class="news-row-v2__thumb" />
         <p>{{ item.title }}</p>
-      </article>
+      </NuxtLink>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref } from "vue";
+  import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+  import { useAsyncData } from "#app";
   import { useI18n } from "vue-i18n";
+  import useAppCore from "~/composables/useAppCore";
 
-  const { t, tm } = useI18n();
+  const { t, tm, locale } = useI18n();
+  const appCore = useAppCore();
 
   const images = [
     "https://render.fineartamerica.com/images/rendered/default/flat/beach-towel/images/artworkimages/medium/1/pixel-bitcoin-concept-allan-swart.jpg?&targetx=0&targety=-76&imagewidth=952&imageheight=628&modelwidth=952&modelheight=476&backgroundcolor=52514D&orientation=1&producttype=beachtowel-32-64",
@@ -30,14 +34,33 @@
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9ecfGnvuktF2LkwRKXrzXlJfAKQ_Os9Vqrw&s",
   ];
 
-  const baseItems = computed(() => {
+  const { data: latestNews, refresh } = await useAsyncData("landing-news-row", async () => {
+    const response = await appCore.news.getLatest({ limit: 4, locale: locale.value });
+    return response.data.data;
+  });
+
+  const fallbackItems = computed(() => {
     const raw = tm("landing.sections.news_row__items") as any[];
     return Array.isArray(raw)
       ? raw.map((_, i) => ({
           title: t(`landing.sections.news_row__items[${i}].title`),
           image: images[i],
+          link: localizedPath("/company-news"),
         }))
       : [];
+  });
+
+  const baseItems = computed(() => {
+    const realItems = latestNews.value || [];
+    if (realItems.length) {
+      return realItems.map(item => ({
+        title: item.title,
+        image: item.image,
+        link: localizedPath(`/news/${item.slug}`),
+      }));
+    }
+
+    return fallbackItems.value;
   });
 
   const items = computed(() => [...baseItems.value, ...baseItems.value]);
@@ -45,6 +68,10 @@
   const position = ref(0);
   let animationFrameId: number | null = null;
   const speed = 0.4;
+
+  function localizedPath(path: string): string {
+    return locale.value ? `/${locale.value}${path}` : path;
+  }
 
   const animate = () => {
     if (!track.value) return;
@@ -67,6 +94,10 @@
   onMounted(startAnimation);
 
   onUnmounted(stopAnimation);
+
+  watch(locale, () => {
+    void refresh();
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -93,6 +124,8 @@
       gap: 14px;
       flex-shrink: 0;
       backdrop-filter: blur(10px);
+      color: inherit;
+      text-decoration: none;
 
       p {
         margin: 0;

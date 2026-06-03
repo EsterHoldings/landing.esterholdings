@@ -1,12 +1,15 @@
 <template>
-  <section class="updates-v2">
+  <section
+    v-if="newsItems.length"
+    class="updates-v2">
     <UiContainer>
       <h2>{{ t("landing.sections.latest_updates__title") }}</h2>
       <div class="cards">
-        <article
+        <NuxtLink
           class="card"
           v-for="(item, index) in newsItems"
-          :key="index">
+          :key="item.slug || index"
+          :to="localizedPath(`/news/${item.slug}`)">
           <img
             :src="item.src"
             alt="" />
@@ -15,37 +18,45 @@
             <p>{{ item.subTitle }}</p>
             <time>{{ item.time }}</time>
           </div>
-        </article>
+        </NuxtLink>
       </div>
     </UiContainer>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from "vue";
+  import { computed, watch } from "vue";
+  import { useAsyncData } from "#app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import useAppCore from "~/composables/useAppCore";
   import type { NewsItem } from "~/composables/core/modules/news/news.types";
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const appCore = useAppCore();
 
-  const newsItems = ref<{ src: string; title: string; subTitle: string; time: string }[]>([]);
+  const { data: latestNews, refresh } = await useAsyncData("landing-latest-news", async () => {
+    const response = await appCore.news.getLatest({ limit: 3, locale: locale.value });
+    return response.data.data;
+  });
 
   const mapToCard = (item: NewsItem) => ({
+    slug: item.slug,
     src: item.image,
     title: item.title,
     subTitle: item.subtitle,
     time: item.publishedAt,
   });
 
-  const loadNews = async () => {
-    const response = await appCore.news.getLatest({ limit: 3 });
-    newsItems.value = response.data.data.map(mapToCard);
-  };
+  const newsItems = computed(() => (latestNews.value || []).map(mapToCard));
 
-  onMounted(loadNews);
+  function localizedPath(path: string): string {
+    return locale.value ? `/${locale.value}${path}` : path;
+  }
+
+  watch(locale, () => {
+    void refresh();
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -74,6 +85,8 @@
       background: linear-gradient(-32deg, var(--landing-surface) 12%, var(--landing-surface-muted) 89%);
       display: flex;
       flex-direction: column;
+      color: inherit;
+      text-decoration: none;
 
       img {
         width: 100%;

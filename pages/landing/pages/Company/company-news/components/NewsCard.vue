@@ -1,34 +1,34 @@
 <template>
-  <PanelDefault class="p-4 !w-full">
-    <div class="flex justify-between items-center gap-3">
-      <div class="news-text">
-        <UiTextH4 class="news-text_title">{{ title }}</UiTextH4>
-        <UiTextParagraph class="news-text_date">{{ date }}</UiTextParagraph>
-        <UiTextParagraph class="news-text_message">{{ message }}</UiTextParagraph>
-      </div>
-      <div>
-        <div
-            class="news-image"
-            v-if="image">
-          <img
-              :src="image"
-              :alt="title" />
-        </div>
-        <NuxtLink
-            :to="link"
-            class="learn-more">{{ buttonText }}<span>→</span>
-        </NuxtLink>
-      </div>
+  <NuxtLink
+    :to="link"
+    class="news-card">
+    <div class="news-card__image-wrap">
+      <img
+        class="news-card__image"
+        :class="{ 'news-card__image--loaded': isImageLoaded }"
+        :src="currentImage"
+        :alt="title"
+        @load="handleImageLoad"
+        @error="handleImageError" />
     </div>
-  </PanelDefault>
+
+    <div class="news-card__body">
+      <UiTextParagraph class="news-card__date">{{ date }}</UiTextParagraph>
+      <UiTextH4 class="news-card__title">{{ title }}</UiTextH4>
+      <UiTextParagraph class="news-card__message">{{ message }}</UiTextParagraph>
+
+      <span class="news-card__link">{{ buttonText }}<span>→</span></span>
+    </div>
+  </NuxtLink>
 </template>
 
-<script setup>
-  import UiTextH4 from '~/components/ui/UiTextH4.vue';
-  import UiTextParagraph from '~/components/ui/UiTextParagraph.vue';
-  import PanelDefault from "~/components/block/panels/PanelDefault.vue";
+<script setup lang="ts">
+  import { ref, watch } from "vue";
+  import UiTextH4 from "~/components/ui/UiTextH4.vue";
+  import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 
-  defineProps({
+  const fallbackImage = "/static/newsBg.jpg";
+  const props = defineProps({
     title: String,
     date: String,
     message: String,
@@ -36,50 +36,118 @@
     buttonText: String,
     image: String,
   });
+
+  const currentImage = ref(props.image || fallbackImage);
+  const isImageLoaded = ref(false);
+
+  watch(
+    () => props.image,
+    value => {
+      currentImage.value = value || fallbackImage;
+      isImageLoaded.value = false;
+    }
+  );
+
+  function handleImageLoad(): void {
+    isImageLoaded.value = true;
+  }
+
+  function handleImageError(event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.src.includes(fallbackImage)) return;
+
+    currentImage.value = fallbackImage;
+    isImageLoaded.value = false;
+  }
 </script>
 
 <style scoped lang="scss">
-  .news-text {
-    flex: 1;
-
-    &_title {
-      color: var(--ui-text-main);
-    }
-
-    &_date {
-      font-size: 0.875rem;
-      color: var(--ui-text-main);
-      margin-bottom: 16px;
-      margin-top: 5px;
-    }
-
-    &_message {
-      font-size: 1rem;
-      color: var(--ui-text-main);
-      margin-bottom: 24px;
-    }
-  }
-
-  .learn-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    color: #138ee7;
-    border-radius: 50px;
-    font-weight: 600;
+  .news-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--landing-border-strong);
+    border-radius: 8px;
+    color: inherit;
     text-decoration: none;
-    transition: background 0.3s, color 0.3s;
+    background: var(--landing-surface-glass);
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover {
-      background: #138ee7;
-      color: #fff;
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--landing-accent) 44%, var(--landing-border-strong));
+      box-shadow: 0 18px 40px color-mix(in srgb, var(--landing-accent) 12%, transparent);
     }
-  }
 
-  .news-image img {
-    max-width: 220px;
-    border-radius: 8px;
-    object-fit: cover;
+    &__image-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background:
+        linear-gradient(
+          color-mix(in srgb, var(--landing-surface-muted) 88%, transparent),
+          color-mix(in srgb, var(--landing-surface-muted) 88%, transparent)
+        ),
+        url("/static/newsBg.jpg") center / cover;
+    }
+
+    &__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.24s ease;
+
+      &--loaded {
+        opacity: 1;
+      }
+    }
+
+    &__body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    &__date {
+      margin: 0;
+      color: var(--landing-text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    &__title {
+      margin: 0;
+      color: var(--landing-text-primary);
+      font-size: 20px;
+      line-height: 1.24;
+    }
+
+    &__message {
+      margin: 0;
+      display: -webkit-box;
+      overflow: hidden;
+      color: var(--landing-text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    &__link {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--landing-accent);
+      font-size: 14px;
+      font-weight: 800;
+    }
   }
 </style>

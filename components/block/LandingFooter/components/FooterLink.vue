@@ -8,7 +8,7 @@
       class="item"
       v-for="link in sectionLinks"
       :key="link.path">
-      <NuxtLink :to="`/${link.path}`">
+      <NuxtLink :to="localizedPath(link.path)">
         <UiTextH6>{{ t(link.labelKey) }}</UiTextH6>
       </NuxtLink>
     </li>
@@ -25,12 +25,19 @@
     basePath: String,
   });
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const allLinks = footerMenuRoutes();
 
   const section = props.basePath.split(".").at(-1);
 
   const sectionLinks = allLinks[section];
+
+  function localizedPath(path) {
+    if (!path || path === "#") return "#";
+
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    return locale.value ? `/${locale.value}${normalizedPath}` : normalizedPath;
+  }
 </script>
 
 <style lang="scss" scoped>

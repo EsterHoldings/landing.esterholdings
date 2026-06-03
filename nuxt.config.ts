@@ -20,8 +20,7 @@ export default defineNuxtConfig({
 
   ssr: true,
   routeRules: {
-    "/**": { ssr: false } as any,
-    "/": { ssr: true } as any,
+    "/**": { ssr: true } as any,
   },
   css: ["~/assets/styles/main.scss"],
   modules: ["@pinia/nuxt", "@nuxtjs/i18n", "@nuxtjs/tailwindcss", "@vite-pwa/nuxt"],

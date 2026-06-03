@@ -1,5 +1,5 @@
 import NewsService from "./news.service";
-import type { NewsLatestResponse, NewsListResponse } from "./news.types";
+import type { NewsArticleResponse, NewsLatestResponse, NewsListResponse } from "./news.types";
 
 export class NewsModule {
   private newsService: NewsService;
@@ -8,12 +8,18 @@ export class NewsModule {
     this.newsService = new NewsService();
   }
 
-  async getList(params: { page?: number; perPage?: number } = {}): Promise<{ data: NewsListResponse }> {
+  async getList(
+    params: { page?: number; perPage?: number; locale?: string | null } = {}
+  ): Promise<{ data: NewsListResponse }> {
     return await this.newsService.list(params);
   }
 
-  async getLatest(params: { limit?: number } = {}): Promise<{ data: NewsLatestResponse }> {
+  async getLatest(params: { limit?: number; locale?: string | null } = {}): Promise<{ data: NewsLatestResponse }> {
     return await this.newsService.latest(params);
+  }
+
+  async getBySlug(slug: string, params: { locale?: string | null } = {}): Promise<{ data: NewsArticleResponse }> {
+    return await this.newsService.getBySlug(slug, params);
   }
 }
 

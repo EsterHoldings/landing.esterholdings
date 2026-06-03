@@ -4,7 +4,7 @@
       class="menu-category_title"
       :class="{ 'menu-category_title_mobile': props.isMobile }"
       @click="handleLinkClick">
-      <NuxtLink :to="props.titles.path">
+      <NuxtLink :to="localizedPath(props.titles.path)">
         {{ props.titles.name }}
       </NuxtLink>
       <div
@@ -18,7 +18,7 @@
       v-for="link in props.items"
       :key="link.name">
       <NuxtLink
-        :to="link.path"
+        :to="localizedPath(link.path)"
         @click="handleLinkClick">
         {{ link.name }}
       </NuxtLink>
@@ -28,6 +28,7 @@
 
 <script setup>
   import { inject } from "vue";
+  import { useI18n } from "vue-i18n";
   import UiTextH6 from "~/components/ui/UiTextH6.vue";
   import UiTextH5 from "~/components/ui/UiTextH5.vue";
 
@@ -42,6 +43,7 @@
 
   const activeLink = inject("stateLink");
   const closeMobileMenu = inject("closeMobileMenu", () => {});
+  const { locale } = useI18n();
 
   const handleLinkClick = () => {
     activeLink.value = "";
@@ -49,6 +51,13 @@
       closeMobileMenu();
     }
   };
+
+  function localizedPath(path) {
+    if (!path || path === "#") return "#";
+
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    return locale.value ? `/${locale.value}${normalizedPath}` : normalizedPath;
+  }
 </script>
 
 <style lang="scss" scoped>
