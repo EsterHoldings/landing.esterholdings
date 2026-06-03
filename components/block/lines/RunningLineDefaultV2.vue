@@ -201,15 +201,47 @@
     return `+${change}`;
   };
 
+  const normalizeQuoteSymbol = (value: unknown): string => toText(value).replace(/!+$/, "").toUpperCase();
+
+  const quotePrecision = (symbol: string, value: string): number => {
+    const rawFractionLength = value.includes(".") ? value.slice(value.indexOf(".") + 1).length : 0;
+    const normalizedSymbol = normalizeQuoteSymbol(symbol);
+    let preferredPrecision = 5;
+
+    if (normalizedSymbol.includes("JPY")) {
+      preferredPrecision = 3;
+    } else if (normalizedSymbol.startsWith("XAU")) {
+      preferredPrecision = 2;
+    } else if (normalizedSymbol.startsWith("XAG")) {
+      preferredPrecision = 3;
+    } else if (Number(value) >= 100) {
+      preferredPrecision = 3;
+    }
+
+    return Math.min(8, Math.max(preferredPrecision, rawFractionLength));
+  };
+
+  const formatQuoteNumber = (value: unknown, symbol: string): string => {
+    const raw = toText(value);
+    if (raw === "") return "";
+
+    const normalized = raw.replace(/\s+/g, "");
+    const number = Number(normalized);
+    if (!Number.isFinite(number)) return raw;
+
+    return number.toFixed(quotePrecision(symbol, normalized));
+  };
+
   const quotePrice = (quote: Mt4Quote): string => {
-    const bid = toText(quote.bid);
-    const ask = toText(quote.ask);
+    const symbol = normalizeQuoteSymbol(quote.symbol);
+    const bid = formatQuoteNumber(quote.bid, symbol);
+    const ask = formatQuoteNumber(quote.ask, symbol);
 
     if (bid && ask) {
       return `${bid} / ${ask}`;
     }
 
-    const price = toText(quote.price ?? quote.bid ?? quote.ask);
+    const price = formatQuoteNumber(quote.price ?? quote.bid ?? quote.ask, symbol);
     const change = formatChange(quote.change);
 
     return change ? `${price} / ${change}` : price;
@@ -229,7 +261,7 @@
     const quotes = Array.isArray(payload?.quotes) ? payload.quotes : Array.isArray(payload?.items) ? payload.items : [];
     const nextItems = quotes
       .map((quote): TickerItem | null => {
-        const symbol = toText(quote.symbol);
+        const symbol = normalizeQuoteSymbol(quote.symbol);
         const price = quotePrice(quote);
         if (!symbol || !price) return null;
 
@@ -388,7 +420,7 @@
       host,
       port,
       forceTLS,
-      transport: forceTLS ? "wss" : "ws",
+      transport: "ws",
     };
   };
 

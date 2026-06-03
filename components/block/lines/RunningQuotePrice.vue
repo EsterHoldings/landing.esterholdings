@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from "vue";
+  import { onBeforeUnmount, ref, watch } from "vue";
 
   type QuoteDirection = "up" | "down" | null;
 
@@ -51,9 +51,24 @@
 
   const animationVersion = ref(0);
   const isDigit = (value: string): boolean => /^[0-9]$/.test(value);
-  const chars = ref<PriceChar[]>(buildChars("", props.value, null, animationVersion.value));
+  const placeholderPattern = /^[\s/.-]*$/;
+  let settleTimer: ReturnType<typeof setTimeout> | null = null;
 
-  function buildChars(from: string, to: string, direction: QuoteDirection, version: number): PriceChar[] {
+  const shouldAnimate = (from: string, to: string): boolean => {
+    if (!from || !to) return false;
+    if (placeholderPattern.test(from)) return false;
+    if (from.length !== to.length) return false;
+
+    return from !== to;
+  };
+
+  function buildChars(
+    from: string,
+    to: string,
+    direction: QuoteDirection,
+    version: number,
+    animate: boolean
+  ): PriceChar[] {
     const previousChars = from.split("");
     const currentChars = to.split("");
     const length = Math.max(previousChars.length, currentChars.length);
@@ -61,8 +76,8 @@
     return Array.from({ length }, (_, index) => {
       const previous = previousChars[index] ?? "";
       const current = currentChars[index] ?? "";
-      const digit = isDigit(current) || isDigit(previous);
-      const changed = previous !== current && current !== "";
+      const digit = isDigit(current);
+      const changed = animate && isDigit(previous) && isDigit(current) && previous !== current;
 
       return {
         id: `${version}-${index}-${previous}-${current}`,
@@ -75,6 +90,20 @@
       };
     });
   }
+
+  const chars = ref<PriceChar[]>(buildChars(props.value, props.value, null, animationVersion.value, false));
+
+  const clearSettleTimer = () => {
+    if (!settleTimer) return;
+
+    clearTimeout(settleTimer);
+    settleTimer = null;
+  };
+
+  const settleChars = (value: string) => {
+    clearSettleTimer();
+    chars.value = buildChars(value, value, null, animationVersion.value, false);
+  };
 
   const charClasses = (char: PriceChar) => ({
     "running-quote-price__char": true,
@@ -89,9 +118,20 @@
     () => props.value,
     (value, previousValue) => {
       animationVersion.value += 1;
-      chars.value = buildChars(previousValue, value, props.direction, animationVersion.value);
+      clearSettleTimer();
+
+      const animate = shouldAnimate(previousValue, value);
+      chars.value = buildChars(previousValue, value, props.direction, animationVersion.value, animate);
+
+      if (animate) {
+        settleTimer = setTimeout(() => {
+          settleChars(value);
+        }, 620);
+      }
     }
   );
+
+  onBeforeUnmount(clearSettleTimer);
 </script>
 
 <style scoped lang="scss">
