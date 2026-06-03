@@ -470,38 +470,6 @@
           d="M489.636 673.712H490.322V658.672H493.605V614.047H490.322V599.001H489.636V614.047H486.346V658.672H489.636V673.712Z"
           fill="#999999" />
       </g>
-      <g
-        class="chart-motion"
-        pointer-events="none">
-        <path
-          class="trend-area"
-          d="M500 642C585 608 640 630 700 578C760 530 824 548 880 490C938 432 1000 468 1055 398C1112 322 1180 356 1235 285C1278 228 1314 260 1360 208V620H500V642Z"
-          fill="url(#paint12_linear_chart_bg)" />
-        <path
-          class="trend-line trend-line--glow"
-          d="M500 642C585 608 640 630 700 578C760 530 824 548 880 490C938 432 1000 468 1055 398C1112 322 1180 356 1235 285C1278 228 1314 260 1360 208" />
-        <path
-          class="trend-line trend-line--main"
-          d="M500 642C585 608 640 630 700 578C760 530 824 548 880 490C938 432 1000 468 1055 398C1112 322 1180 356 1235 285C1278 228 1314 260 1360 208" />
-        <path
-          class="trend-sweep"
-          d="M500 642C585 608 640 630 700 578C760 530 824 548 880 490C938 432 1000 468 1055 398C1112 322 1180 356 1235 285C1278 228 1314 260 1360 208" />
-        <circle
-          class="trend-dot trend-dot--1"
-          cx="700"
-          cy="578"
-          r="5" />
-        <circle
-          class="trend-dot trend-dot--2"
-          cx="1055"
-          cy="398"
-          r="5" />
-        <circle
-          class="trend-dot trend-dot--3"
-          cx="1235"
-          cy="285"
-          r="5" />
-      </g>
     </g>
     <defs>
       <linearGradient
@@ -648,25 +616,6 @@
           offset="1"
           stop-color="white" />
       </linearGradient>
-      <linearGradient
-        id="paint12_linear_chart_bg"
-        x1="500"
-        y1="208"
-        x2="1360"
-        y2="642"
-        gradientUnits="userSpaceOnUse">
-        <stop
-          stop-color="#0051FF"
-          stop-opacity="0" />
-        <stop
-          offset="0.52"
-          stop-color="#0051FF"
-          stop-opacity="0.12" />
-        <stop
-          offset="1"
-          stop-color="#F75709"
-          stop-opacity="0.08" />
-      </linearGradient>
       <clipPath id="clip0_chart_bg">
         <rect
           width="2046"
@@ -729,61 +678,6 @@
     }
   }
 
-  @keyframes trend-draw {
-    0% {
-      stroke-dashoffset: 1080;
-      opacity: 0;
-    }
-    12% {
-      opacity: 1;
-    }
-    70%,
-    100% {
-      stroke-dashoffset: 0;
-      opacity: 1;
-    }
-  }
-
-  @keyframes trend-sweep {
-    0% {
-      stroke-dashoffset: 1190;
-      opacity: 0;
-    }
-    16%,
-    68% {
-      opacity: 1;
-    }
-    82%,
-    100% {
-      stroke-dashoffset: 0;
-      opacity: 0;
-    }
-  }
-
-  @keyframes trend-area-pulse {
-    0%,
-    100% {
-      opacity: 0.08;
-      transform: translateY(8px);
-    }
-    45% {
-      opacity: 0.42;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes trend-dot-pulse {
-    0%,
-    100% {
-      opacity: 0.25;
-      transform: scale(0.65);
-    }
-    40% {
-      opacity: 1;
-      transform: scale(1.45);
-    }
-  }
-
   .chart-columns path,
   .candles path {
     transform-box: fill-box;
@@ -798,73 +692,6 @@
     animation-duration: 5.8s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-  }
-
-  .chart-motion {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-
-  .trend-area {
-    animation: trend-area-pulse 6.8s ease-in-out infinite;
-    transform-box: fill-box;
-    transform-origin: center bottom;
-  }
-
-  .trend-line,
-  .trend-sweep {
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .trend-line {
-    stroke-dasharray: 1080;
-    animation: trend-draw 6.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-
-    &--glow {
-      stroke: rgba(0, 81, 255, 0.18);
-      stroke-width: 18;
-      filter: blur(7px);
-    }
-
-    &--main {
-      stroke: #0051ff;
-      stroke-width: 4;
-      filter: drop-shadow(0 0 6px rgba(0, 81, 255, 0.32));
-    }
-  }
-
-  .trend-sweep {
-    stroke: #ffffff;
-    stroke-width: 7;
-    stroke-dasharray: 72 1118;
-    animation: trend-sweep 6.8s ease-in-out infinite;
-    mix-blend-mode: screen;
-    filter: drop-shadow(0 0 10px rgba(0, 81, 255, 0.36));
-  }
-
-  .trend-dot {
-    fill: #0051ff;
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-    filter: drop-shadow(0 0 8px rgba(0, 81, 255, 0.42));
-    animation: trend-dot-pulse 6.8s ease-in-out infinite;
-
-    &--1 {
-      animation-delay: 1s;
-    }
-
-    &--2 {
-      animation-delay: 2.1s;
-    }
-
-    &--3 {
-      fill: #f75709;
-      filter: drop-shadow(0 0 8px rgba(247, 87, 9, 0.36));
-      animation-delay: 3s;
-    }
   }
 
   @for $i from 1 through 51 {
@@ -882,11 +709,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .chart-columns path,
-    .candles path,
-    .trend-area,
-    .trend-line,
-    .trend-sweep,
-    .trend-dot {
+    .candles path {
       animation: none !important;
     }
   }
