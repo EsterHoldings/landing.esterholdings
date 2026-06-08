@@ -1,18 +1,29 @@
 <template>
-  <section class="news-row-v2">
+  <section
+    ref="viewport"
+    class="news-row-v2"
+    :class="{ 'news-row-v2--dragging': isDragging }"
+    @scroll.passive="handleScroll"
+    @pointerdown="handlePointerDown"
+    @pointermove="handlePointerMove"
+    @pointerup="handlePointerUp"
+    @pointercancel="handlePointerCancel"
+    @click.capture="handleClickCapture"
+    @mouseenter="stopAnimation"
+    @mouseleave="startAnimation">
     <div
       ref="track"
       class="news-row-v2__track">
       <NuxtLink
-        v-for="(item, idx) in items"
-        :key="`${item.title}-${idx}`"
-        :to="item.link"
+        v-for="loopItem in loopItems"
+        :key="`${loopItem.copy}-${loopItem.item.link}-${loopItem.item.title}`"
+        :to="loopItem.item.link"
         class="news-row-v2__card">
         <img
-          :src="item.image"
-          :alt="item.title"
+          :src="loopItem.item.image"
+          :alt="loopItem.item.title"
           class="news-row-v2__thumb" />
-        <p>{{ item.title }}</p>
+        <p>{{ loopItem.item.title }}</p>
       </NuxtLink>
     </div>
   </section>
@@ -23,6 +34,7 @@
   import { useAsyncData } from "#app";
   import { useI18n } from "vue-i18n";
   import useAppCore from "~/composables/useAppCore";
+  import { useInfiniteHorizontalLoop } from "~/composables/useInfiniteHorizontalLoop";
 
   const { t, tm, locale } = useI18n();
   const appCore = useAppCore();
@@ -63,54 +75,69 @@
     return fallbackItems.value;
   });
 
-  const items = computed(() => [...baseItems.value, ...baseItems.value]);
+  const viewport = ref<HTMLElement | null>(null);
   const track = ref<HTMLElement | null>(null);
-  const position = ref(0);
-  let animationFrameId: number | null = null;
   const speed = 0.4;
+  const {
+    copies,
+    isDragging,
+    resetLoopPosition,
+    startAnimation,
+    stopAnimation,
+    handleScroll,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleClickCapture,
+  } = useInfiniteHorizontalLoop(viewport, track, { speed });
+  const loopItems = computed(() =>
+    Array.from({ length: copies }, (_, copy) => baseItems.value.map(item => ({ copy, item }))).flat()
+  );
 
   function localizedPath(path: string): string {
     return locale.value ? `/${locale.value}${path}` : path;
   }
 
-  const animate = () => {
-    if (!track.value) return;
-    position.value -= speed;
-    if (Math.abs(position.value) >= track.value.scrollWidth / 2) position.value = 0;
-    track.value.style.transform = `translateX(${position.value}px)`;
-    animationFrameId = requestAnimationFrame(animate);
-  };
-
-  const startAnimation = () => {
-    if (!animationFrameId) animate();
-  };
-
-  const stopAnimation = () => {
-    if (!animationFrameId) return;
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  };
-
-  onMounted(startAnimation);
+  onMounted(() => {
+    resetLoopPosition();
+    window.setTimeout(() => resetLoopPosition(), 150);
+    startAnimation();
+  });
 
   onUnmounted(stopAnimation);
 
-  watch(locale, () => {
-    void refresh();
+  watch(() => baseItems.value.length, () => resetLoopPosition());
+
+  watch(locale, async () => {
+    await refresh();
+    resetLoopPosition();
   });
 </script>
 
 <style lang="scss" scoped>
   .news-row-v2 {
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    cursor: grab;
+    overscroll-behavior-x: contain;
+    scroll-behavior: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &--dragging {
+      cursor: grabbing;
+    }
 
     &__track {
       width: max-content;
       margin: 0;
-      transform: translateX(0);
       display: flex;
       gap: 18px;
-      will-change: transform;
+      will-change: scroll-position;
     }
 
     &__card {
@@ -126,6 +153,7 @@
       backdrop-filter: blur(10px);
       color: inherit;
       text-decoration: none;
+      user-select: none;
 
       p {
         margin: 0;

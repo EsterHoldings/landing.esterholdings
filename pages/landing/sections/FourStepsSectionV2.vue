@@ -9,12 +9,9 @@
         <article
           v-for="(step, index) in steps"
           :key="index"
-          class="step">
+          class="step"
+          :class="`step--${index + 1}`">
           <div class="step__icon">
-            <img
-              alt=""
-              class="step__icon-ellipse"
-              aria-hidden="true" />
             <span>{{ index + 1 }}</span>
           </div>
           <div class="step__body">
@@ -86,8 +83,16 @@
       width: 80px;
       height: 80px;
       border-radius: 20px;
-      background: var(--landing-surface-elevated);
-      box-shadow: var(--landing-shadow-card);
+      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
+      background:
+        linear-gradient(
+          145deg,
+          color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
+          color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
+        );
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+        inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
@@ -95,24 +100,37 @@
       flex-shrink: 0;
       overflow: visible;
 
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        border-radius: 999px;
+      }
+
+      &::before {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
+        z-index: 0;
+      }
+
+      &::after {
+        width: 25px;
+        height: 25px;
+        background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
+        filter: blur(3px);
+        z-index: 2;
+      }
+
       span {
         position: relative;
-        z-index: 1;
+        z-index: 3;
         color: var(--landing-accent);
         font-size: 42px;
         font-weight: 500;
         line-height: 1;
       }
-    }
-
-    &__icon-ellipse {
-      position: absolute;
-      top: -18px;
-      right: -18px;
-      width: 54px;
-      height: 54px;
-      object-fit: contain;
-      z-index: 2;
     }
 
     &__body {
@@ -136,6 +154,59 @@
       font-weight: 400;
       line-height: normal;
     }
+  }
+
+  .step--1,
+  .step--3 {
+    .step__icon {
+      &::before {
+        top: -8px;
+        right: -11px;
+      }
+
+      &::after {
+        top: 8px;
+        right: 6px;
+      }
+    }
+  }
+
+  .step--2 {
+    .step__icon {
+      &::before {
+        right: -10px;
+        bottom: -8px;
+      }
+
+      &::after {
+        right: 2px;
+        bottom: 5px;
+      }
+    }
+  }
+
+  .step--4 {
+    .step__icon {
+      &::before {
+        left: -13px;
+        bottom: -9px;
+      }
+
+      &::after {
+        left: 2px;
+        bottom: 5px;
+      }
+    }
+  }
+
+  :global(:root[data-theme="dark"] .step__icon) {
+    border-color: rgba(139, 164, 214, 0.58);
+    background:
+      linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%),
+      #0b1b44;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -18px 28px rgba(0, 81, 255, 0.08);
   }
 
   .steps-v2__cta {

@@ -1,21 +1,30 @@
 <template>
   <div
+    ref="viewport"
     class="running-line-v2"
+    :class="{ 'running-line-v2--dragging': isDragging }"
+    @scroll.passive="handleScroll"
+    @pointerdown="handlePointerDown"
+    @pointermove="handlePointerMove"
+    @pointerup="handlePointerUp"
+    @pointercancel="handlePointerCancel"
+    @click.capture="handleClickCapture"
     @mouseenter="stopAnimation"
     @mouseleave="startAnimation">
     <div
       ref="track"
       class="running-line-v2__track">
       <article
-        v-for="(item, index) in duplicatedItems"
-        :key="`${item.symbol}-${index}`"
+        v-for="loopItem in loopItems"
+        :key="`${loopItem.copy}-${loopItem.item.symbol}`"
+        v-memo="[loopItem.item.symbol, loopItem.item.price, loopItem.item.isUp, tradeHref]"
         class="running-line-v2__card">
         <div class="running-line-v2__head">
           <UiIconTradeArrowUp
-            v-if="item.isUp === true"
+            v-if="loopItem.item.isUp === true"
             class="running-line-v2__icon" />
           <UiIconTradeArrowDown
-            v-else-if="item.isUp === false"
+            v-else-if="loopItem.item.isUp === false"
             class="running-line-v2__icon" />
           <span
             v-else
@@ -24,11 +33,11 @@
             -
           </span>
           <div class="running-line-v2__info">
-            <p class="running-line-v2__symbol">{{ item.symbol }}</p>
+            <p class="running-line-v2__symbol">{{ loopItem.item.symbol }}</p>
             <RunningQuotePrice
               class="running-line-v2__price"
-              :direction="priceDirection(item)"
-              :value="item.price" />
+              :direction="priceDirection(loopItem.item)"
+              :value="loopItem.item.price" />
           </div>
         </div>
         <a
@@ -42,11 +51,12 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+  import { computed, onMounted, onUnmounted, ref, watch } from "vue";
   import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
   import RunningQuotePrice from "~/components/block/lines/RunningQuotePrice.vue";
   import UiIconTradeArrowDown from "~/components/ui/UiIconTradeArrowDown.vue";
   import UiIconTradeArrowUp from "~/components/ui/UiIconTradeArrowUp.vue";
+  import { useInfiniteHorizontalLoop } from "~/composables/useInfiniteHorizontalLoop";
   import { useCabinetLink } from "~/composables/useCabinetLink";
 
   type QuoteDirection = "up" | "down" | null;
@@ -94,13 +104,24 @@
 
   const runtimeConfig = useRuntimeConfig();
   const { cabinetLink } = useCabinetLink();
-  const liveItems = ref<TickerItem[]>([]);
-  const displayItems = computed(() => (liveItems.value.length > 0 ? liveItems.value : props.items));
-  const duplicatedItems = computed(() => [...displayItems.value, ...displayItems.value]);
+  const liveQuoteMap = ref<Record<string, TickerItem>>({});
+  const liveQuoteOrder = ref<string[]>([]);
   const tradeHref = computed(() => props.tradeHref || cabinetLink("/auth/login"));
+  const viewport = ref<HTMLElement | null>(null);
   const track = ref<HTMLElement | null>(null);
-  const position = ref(0);
-  let animationFrameId: number | null = null;
+  const {
+    copies,
+    isDragging,
+    resetLoopPosition,
+    startAnimation,
+    stopAnimation,
+    handleScroll,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleClickCapture,
+  } = useInfiniteHorizontalLoop(viewport, track, { speed: props.speed });
   let quotesChannel: any = null;
   let quotesPusher: any = null;
   let ownsQuotesPusher = false;
@@ -202,6 +223,25 @@
 
   const normalizeQuoteSymbol = (value: unknown): string => toText(value).replace(/!+$/, "").toUpperCase();
 
+  const baseSymbols = computed(() => new Set(props.items.map(item => normalizeQuoteSymbol(item.symbol))));
+  const displayItems = computed(() => {
+    const quoteMap = liveQuoteMap.value;
+    const baseItems = props.items.map(item => {
+      const symbol = normalizeQuoteSymbol(item.symbol);
+
+      return quoteMap[symbol] ?? item;
+    });
+    const extraItems = liveQuoteOrder.value
+      .filter(symbol => !baseSymbols.value.has(symbol))
+      .map(symbol => quoteMap[symbol])
+      .filter((item): item is TickerItem => Boolean(item));
+
+    return [...baseItems, ...extraItems];
+  });
+  const loopItems = computed(() =>
+    Array.from({ length: copies }, (_, copy) => displayItems.value.map(item => ({ copy, item }))).flat()
+  );
+
   const quotePrecision = (symbol: string, value: string): number => {
     const rawFractionLength = value.includes(".") ? value.slice(value.indexOf(".") + 1).length : 0;
     const normalizedSymbol = normalizeQuoteSymbol(symbol);
@@ -279,7 +319,19 @@
         sample: nextItems.slice(0, 3),
       });
 
-      liveItems.value = nextItems;
+      const nextQuoteMap = { ...liveQuoteMap.value };
+      const nextQuoteOrder = [...liveQuoteOrder.value];
+
+      nextItems.forEach(item => {
+        nextQuoteMap[item.symbol] = item;
+
+        if (!nextQuoteOrder.includes(item.symbol)) {
+          nextQuoteOrder.push(item.symbol);
+        }
+      });
+
+      liveQuoteMap.value = nextQuoteMap;
+      liveQuoteOrder.value = nextQuoteOrder;
       scheduleStaleQuotesReset();
     }
   };
@@ -290,7 +342,8 @@
     }
 
     staleQuotesTimer = setTimeout(() => {
-      liveItems.value = [];
+      liveQuoteMap.value = {};
+      liveQuoteOrder.value = [];
       staleQuotesTimer = null;
       logQuoteDebug("stale live quotes cleared");
     }, 15000);
@@ -359,41 +412,6 @@
     if (item.isUp === false) return "down";
 
     return null;
-  };
-
-  const resetPosition = () => {
-    position.value = 0;
-    nextTick(() => {
-      if (track.value) {
-        track.value.style.transform = "translateX(0px)";
-      }
-    });
-  };
-
-  const animate = () => {
-    if (!track.value) return;
-    const halfWidth = track.value.scrollWidth / 2;
-    if (halfWidth <= 0) {
-      animationFrameId = requestAnimationFrame(animate);
-      return;
-    }
-
-    position.value -= props.speed;
-    if (Math.abs(position.value) >= halfWidth) {
-      position.value = 0;
-    }
-    track.value.style.transform = `translateX(${position.value}px)`;
-    animationFrameId = requestAnimationFrame(animate);
-  };
-
-  const startAnimation = () => {
-    if (!animationFrameId) animate();
-  };
-
-  const stopAnimation = () => {
-    if (!animationFrameId) return;
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
   };
 
   const resolveQuoteSocketConfig = () => {
@@ -508,12 +526,14 @@
     quotesGlobalHandler = null;
   };
 
-  watch(() => displayItems.value.length, resetPosition);
+  watch(() => displayItems.value.length, () => resetLoopPosition());
 
   onMounted(() => {
     debugQuotes = quoteDebugEnabled();
     void subscribeToLiveQuotes();
     startLatestQuotesPolling();
+    resetLoopPosition();
+    window.setTimeout(() => resetLoopPosition(), 150);
     startAnimation();
   });
 
@@ -530,15 +550,27 @@
 
 <style scoped lang="scss">
   .running-line-v2 {
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     margin-top: 14px;
+    cursor: grab;
+    overscroll-behavior-x: contain;
+    scroll-behavior: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &--dragging {
+      cursor: grabbing;
+    }
 
     &__track {
       display: flex;
       width: max-content;
       gap: 18px;
-      transition: transform 0.1s linear;
-      will-change: transform;
+      will-change: scroll-position;
     }
 
     &__card {
@@ -552,6 +584,7 @@
       align-items: center;
       gap: 40px;
       flex-shrink: 0;
+      user-select: none;
       transition: background 0.2s ease;
     }
 
