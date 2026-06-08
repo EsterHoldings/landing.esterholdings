@@ -42,39 +42,20 @@
           <div class="hero__content">
             <div class="w-full max-w-[715px]">
               <h1 class="hero__title">
-                <span
-                  class="hero__shimmer hero__shimmer--title"
-                  :data-text="slide.line1Prefix">
-                  {{ slide.line1Prefix }}
-                </span>
-                <span
-                  class="hero__shimmer hero__shimmer--accent"
-                  :data-text="slide.line1Accent">
-                  {{ slide.line1Accent }}
-                </span>
-                <span
-                  class="hero__shimmer hero__shimmer--title"
-                  :data-text="slide.line1Suffix">
-                  {{ slide.line1Suffix }}
-                </span>
-
-                <template v-if="slide.line2Prefix || slide.line2Accent || slide.line2Suffix">
-                  <br />
-                  <span
-                    class="hero__shimmer hero__shimmer--title"
-                    :data-text="slide.line2Prefix">
-                    {{ slide.line2Prefix }}
-                  </span>
-                  <span
-                    class="hero__shimmer hero__shimmer--accent"
-                    :data-text="slide.line2Accent">
-                    {{ slide.line2Accent }}
-                  </span>
-                  <span
-                    class="hero__shimmer hero__shimmer--title"
-                    :data-text="slide.line2Suffix">
-                    {{ slide.line2Suffix }}
-                  </span>
+                <template
+                  v-for="(line, lineIndex) in slide.titleLines"
+                  :key="lineIndex">
+                  <template
+                    v-for="(segment, segmentIndex) in line"
+                    :key="`${lineIndex}-${segmentIndex}-${segment.text}`">
+                    {{ segmentIndex > 0 && !segment.joinBefore ? " " : "" }}<span
+                      class="hero__shimmer hero__title-segment"
+                      :class="segment.tone === 'accent' ? 'hero__shimmer--accent' : 'hero__shimmer--title'"
+                      :data-text="segment.text">
+                      {{ segment.text }}
+                    </span>
+                  </template>
+                  <br v-if="lineIndex < slide.titleLines.length - 1" />
                 </template>
               </h1>
 
@@ -220,11 +201,71 @@
 
   const isFirstSlideActive = computed(() => currentSlideIndex.value === 0);
 
+  type HeroTitleSegment = {
+    text: string;
+    tone: "title" | "accent";
+    joinBefore: boolean;
+  };
+
   type HeroAsset = {
     src: string;
     className: string;
     kind?: "hex";
     tone?: "primary" | "warning" | "mixed";
+  };
+
+  const ATTACHED_PUNCTUATION = /^[.,!?;:。،؛؟।]+$/u;
+  const NO_SPACE_BEFORE = /^[-–—.,!?;:)\]}。،؛؟।]/u;
+
+  const normalizeTitlePart = (value: string) => value.replace(/\s+/g, " ").trim();
+
+  const addTitleSegment = (line: HeroTitleSegment[], value: string, tone: HeroTitleSegment["tone"]) => {
+    const text = normalizeTitlePart(value);
+
+    if (!text) return;
+
+    if (ATTACHED_PUNCTUATION.test(text) && line.length) {
+      line[line.length - 1].text += text;
+      return;
+    }
+
+    line.push({
+      text,
+      tone,
+      joinBefore: line.length > 0 && NO_SPACE_BEFORE.test(text),
+    });
+  };
+
+  const buildTitleLine = (
+    prefix: string,
+    accent: string,
+    suffix: string,
+    accentTone: HeroTitleSegment["tone"] = "accent"
+  ) => {
+    const line: HeroTitleSegment[] = [];
+
+    addTitleSegment(line, prefix, "title");
+    addTitleSegment(line, accent, accentTone);
+    addTitleSegment(line, suffix, "title");
+
+    return line;
+  };
+
+  const buildTitleLines = (slideIndex: number) => {
+    const lines = [
+      buildTitleLine(
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line1Prefix`),
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line1Accent`),
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line1Suffix`)
+      ),
+      buildTitleLine(
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line2Prefix`),
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line2Accent`),
+        t(`landing.sections.welcomeV2.slides[${slideIndex}].line2Suffix`)
+      ),
+    ];
+
+    return lines.filter((line) => line.length);
   };
 
   const mkSlide = (
@@ -237,12 +278,7 @@
     }
   ) => ({
     id: `slide-${i + 1}`,
-    line1Prefix: t(`landing.sections.welcomeV2.slides[${i}].line1Prefix`),
-    line1Accent: t(`landing.sections.welcomeV2.slides[${i}].line1Accent`),
-    line1Suffix: t(`landing.sections.welcomeV2.slides[${i}].line1Suffix`),
-    line2Prefix: t(`landing.sections.welcomeV2.slides[${i}].line2Prefix`),
-    line2Accent: t(`landing.sections.welcomeV2.slides[${i}].line2Accent`),
-    line2Suffix: t(`landing.sections.welcomeV2.slides[${i}].line2Suffix`),
+    titleLines: buildTitleLines(i),
     subtitle: t(`landing.sections.welcomeV2.slides[${i}].subtitle`),
     showCta: true,
     showBanner: extra.showBanner ?? false,
