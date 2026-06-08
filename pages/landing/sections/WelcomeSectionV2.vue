@@ -324,16 +324,14 @@
   @keyframes hero-hex-glow {
     0%,
     100% {
-      box-shadow:
-        inset 0 0 0 2px rgba(88, 130, 210, 0.18),
-        0 18px 44px rgba(2, 11, 36, 0.22),
-        0 0 40px rgba(27, 99, 255, 0.12);
+      opacity: 0.34;
+      transform: scale(0.98);
+      filter: blur(18px);
     }
     50% {
-      box-shadow:
-        inset 0 0 0 2px rgba(105, 151, 255, 0.26),
-        0 20px 48px rgba(2, 11, 36, 0.24),
-        0 0 54px rgba(255, 139, 77, 0.08);
+      opacity: 0.58;
+      transform: scale(1.04);
+      filter: blur(22px);
     }
   }
 
@@ -854,14 +852,14 @@
       &::after {
         content: "";
         position: absolute;
-        inset: 5%;
-        clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.3s ease;
       }
 
       &::before {
+        display: none;
+        inset: 0;
         z-index: 0;
         background:
           radial-gradient(circle at 30% 24%, rgba(74, 124, 255, 0.22), transparent 46%),
@@ -872,10 +870,12 @@
       }
 
       &::after {
+        inset: -12%;
         z-index: -1;
+        border-radius: 999px;
         background:
-          radial-gradient(circle at 35% 26%, rgba(27, 99, 255, 0.22), transparent 48%),
-          radial-gradient(circle at 76% 68%, rgba(255, 139, 77, 0.08), transparent 58%);
+          radial-gradient(circle at 36% 32%, rgba(27, 99, 255, 0.28), transparent 48%),
+          radial-gradient(circle at 74% 68%, rgba(255, 139, 77, 0.13), transparent 58%);
       }
     }
 
@@ -961,62 +961,52 @@
     }
   }
 
-  :global(:root[data-theme="dark"] .hero__asset-wrap--hex::before) {
-    animation: hero-hex-tint 5.4s ease-in-out infinite;
-  }
-
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex::after) {
-    opacity: 0.86;
     animation: hero-hex-glow 5.6s ease-in-out infinite;
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex .hero__asset-img) {
-    opacity: 0.72;
-    filter: invert(1) brightness(1.34) contrast(1);
-    mix-blend-mode: screen;
+    opacity: 0.86;
+    filter: invert(1) contrast(0.58) sepia(18%) saturate(720%) hue-rotate(182deg) brightness(0.94);
+    mix-blend-mode: normal;
   }
 
   :global(:root[data-theme="dark"] .hero__logo-wrap > .hero__asset--center) {
-    opacity: 0;
-    filter: none;
+    opacity: 0.58;
+    filter: invert(1) contrast(0.58) sepia(18%) saturate(720%) hue-rotate(182deg) brightness(0.94);
     mix-blend-mode: normal;
   }
 
   :global(:root[data-theme="dark"] .hero__logo-wrap .hero__logo) {
+    opacity: 0.92;
     filter: drop-shadow(0 0 10px rgba(91, 132, 255, 0.18));
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex) {
     filter:
-      drop-shadow(0 20px 34px rgba(0, 5, 22, 0.2))
-      drop-shadow(0 0 26px rgba(27, 99, 255, 0.12));
+      drop-shadow(0 20px 34px rgba(0, 8, 38, 0.24))
+      drop-shadow(0 0 28px rgba(27, 99, 255, 0.1));
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
-    opacity: 1;
-    filter: none;
-    mix-blend-mode: normal;
+    opacity: 0.34;
+    filter: brightness(0.34) sepia(42%) saturate(820%) hue-rotate(184deg) contrast(1.05);
+    mix-blend-mode: screen;
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow .hero__asset-img) {
-    opacity: 0.09;
-    filter: invert(1) sepia(22%) saturate(720%) hue-rotate(183deg) brightness(0.9) contrast(1);
+    opacity: 1;
+    filter: none;
     animation: hero-chart-backdrop-drift 7.4s ease-in-out infinite;
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow::before) {
-    opacity: 1;
-    background:
-      radial-gradient(circle at 24% 40%, rgba(38, 101, 255, 0.18), transparent 38%),
-      linear-gradient(145deg, rgba(24, 51, 98, 0.64), rgba(10, 27, 62, 0.48));
-    box-shadow:
-      inset 0 0 0 1px rgba(94, 128, 188, 0.1),
-      0 24px 60px rgba(0, 7, 35, 0.12);
-    animation: hero-chart-backdrop-drift 8.6s ease-in-out infinite;
+    opacity: 0;
+    animation: none;
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow::after) {
-    opacity: 0.46;
+    opacity: 0.28;
     mix-blend-mode: screen;
     background-image:
       repeating-linear-gradient(
