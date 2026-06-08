@@ -989,14 +989,14 @@
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
-    opacity: 0.54;
-    filter: brightness(0.5) sepia(42%) saturate(900%) hue-rotate(184deg) contrast(1.08);
-    mix-blend-mode: screen;
+    opacity: 1;
+    filter: none;
+    mix-blend-mode: normal;
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow .hero__asset-img) {
     opacity: 1;
-    filter: none;
+    filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
     animation: hero-chart-backdrop-drift 7.4s ease-in-out infinite;
   }
 
@@ -1006,22 +1006,22 @@
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow::after) {
-    opacity: 0.42;
-    mix-blend-mode: screen;
+    opacity: 0.5;
+    mix-blend-mode: normal;
     background-image:
       repeating-linear-gradient(
         90deg,
         transparent 0 17px,
-        rgba(96, 130, 198, 0.22) 17px 20px,
+        rgba(94, 133, 255, 0.36) 17px 20px,
         transparent 20px 31px
       ),
       repeating-linear-gradient(
         90deg,
         transparent 0 12px,
-        rgba(82, 124, 255, 0.28) 12px 23px,
+        rgba(58, 108, 231, 0.45) 12px 23px,
         transparent 23px 34px
       ),
-      linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.16) 45%, transparent 70%);
+      linear-gradient(115deg, transparent 0%, rgba(144, 171, 255, 0.22) 45%, transparent 70%);
   }
 
   @media (prefers-reduced-motion: reduce) {
