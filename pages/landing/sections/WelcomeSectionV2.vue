@@ -133,7 +133,7 @@
                   v-if="slide.showLogo"
                   class="hero__logo-wrap hero__asset-wrap--hex hero__asset-wrap--mixed">
                   <img
-                    :src="FrameLogo"
+                    :src="visualCenterFrame"
                     alt=""
                     class="hero__asset hero__asset--center" />
                   <UiIconLogo class="hero__logo" />
@@ -182,7 +182,7 @@
   import frame16 from "~/assets/landing/welcome-v2/Frame-16.svg";
   import frame23 from "~/assets/landing/welcome-v2/Frame-23.svg";
   import monitor from "~/assets/landing/welcome-v2/monitor.png";
-  import FrameLogo from "~/assets/landing/welcome-v2/FramLogo.svg";
+  import visualCenterFrame from "~/assets/landing/welcome-v2/visual-center-frame.svg";
   import UiHomeBannerV2Night from "~/components/ui/UiHomeBannerV2Night.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
   import { useThemeStore } from "~/stores/themeStore";
@@ -847,6 +847,7 @@
 
     &__asset-wrap--hex {
       isolation: isolate;
+      filter: drop-shadow(2px 2px 10px rgba(0, 0, 0, 0.1));
 
       &::before,
       &::after {
@@ -988,8 +989,8 @@
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
-    opacity: 0.34;
-    filter: brightness(0.34) sepia(42%) saturate(820%) hue-rotate(184deg) contrast(1.05);
+    opacity: 0.54;
+    filter: brightness(0.5) sepia(42%) saturate(900%) hue-rotate(184deg) contrast(1.08);
     mix-blend-mode: screen;
   }
 
@@ -1005,7 +1006,7 @@
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow::after) {
-    opacity: 0.28;
+    opacity: 0.42;
     mix-blend-mode: screen;
     background-image:
       repeating-linear-gradient(
