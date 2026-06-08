@@ -415,7 +415,7 @@
     }
 
     &__backdrop--gray-shadow {
-      top: -118px;
+      top: -65%;
       right: 0;
       width: clamp(560px, 36vw, 720px);
       opacity: var(--landing-hero-backdrop-opacity);
