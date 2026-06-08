@@ -690,7 +690,7 @@
         max-width: 715px;
         max-height: 615px;
         width: 100%;
-        height: 100%;
+        height: 562px;
         z-index: -1;
         pointer-events: none;
         opacity: var(--landing-hero-screen-opacity);
