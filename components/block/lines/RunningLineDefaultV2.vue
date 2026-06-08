@@ -42,7 +42,6 @@
 </template>
 
 <script setup lang="ts">
-  import Pusher from "pusher-js";
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
   import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
   import RunningQuotePrice from "~/components/block/lines/RunningQuotePrice.vue";
@@ -448,7 +447,7 @@
     });
   };
 
-  const subscribeToLiveQuotes = () => {
+  const subscribeToLiveQuotes = async () => {
     if (!props.live) return;
     debugQuotes = quoteDebugEnabled();
 
@@ -464,6 +463,8 @@
     }
 
     const socketConfig = resolveQuoteSocketConfig();
+    const { default: Pusher } = await import("pusher-js");
+
     quotesPusher = new Pusher(socketConfig.key, {
       cluster: socketConfig.cluster,
       wsHost: socketConfig.host,
@@ -511,7 +512,7 @@
 
   onMounted(() => {
     debugQuotes = quoteDebugEnabled();
-    subscribeToLiveQuotes();
+    void subscribeToLiveQuotes();
     startLatestQuotesPolling();
     startAnimation();
   });

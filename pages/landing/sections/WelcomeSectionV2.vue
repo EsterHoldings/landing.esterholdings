@@ -123,7 +123,11 @@
                     index === 0 ? 'top-0 right-0' : '',
                     slide.id == `slide-1` && index === 0 ? '!fixed' : '',
                   ]">
+                  <UiIllustrationChartBg
+                    v-if="asset.kind === 'chart'"
+                    class="hero__asset-img" />
                   <img
+                    v-else-if="asset.src"
                     :src="asset.src"
                     alt=""
                     class="hero__asset-img" />
@@ -160,6 +164,7 @@
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiHomeBannerV2 from "~/components/ui/UiHomeBannerV2.vue";
+  import UiIllustrationChartBg from "~/components/ui/UiIllustrationChartBg.vue";
   import benefitCloud from "~/assets/landing/welcome-v2/benefit-cloud.svg";
   import benefitCurveArrow from "~/assets/landing/welcome-v2/benefit-curve-arrow.svg";
   import benefitGem from "~/assets/landing/welcome-v2/benefit-gem.svg";
@@ -172,7 +177,6 @@
   import visualCard5 from "~/assets/landing/welcome-v2/visual-card-5.svg";
   import visualCard6 from "~/assets/landing/welcome-v2/visual-card-6.svg";
   import visualMain from "~/assets/landing/welcome-v2/visual-card-main.svg";
-  import grayShadow from "~/assets/landing/welcome-v2/gray-shadow.svg";
   import frame22 from "~/assets/landing/welcome-v2/Frame-22.svg";
   import frame24 from "~/assets/landing/welcome-v2/Frame-24.svg";
   import frame25 from "~/assets/landing/welcome-v2/Frame-25.svg";
@@ -200,9 +204,9 @@
   const currentSlide = computed(() => slides.value[currentSlideIndex.value]);
 
   type HeroAsset = {
-    src: string;
+    src?: string;
     className: string;
-    kind?: "hex";
+    kind?: "hex" | "chart";
     tone?: "primary" | "warning" | "mixed";
   };
 
@@ -243,7 +247,7 @@
       {
         showLogo: true,
         assets: [
-          { src: grayShadow, className: "hero__asset hero__asset--gray-shadow" },
+          { className: "hero__asset hero__asset--gray-shadow", kind: "chart" },
           { src: visualMain, className: "hero__asset hero__asset--main", kind: "hex", tone: "mixed" },
           { src: visualCard1, className: "hero__asset hero__asset--card-1", kind: "hex", tone: "primary" },
           { src: visualCard2, className: "hero__asset hero__asset--card-2", kind: "hex", tone: "warning" },
@@ -342,36 +346,6 @@
     }
     50% {
       opacity: 0.98;
-    }
-  }
-
-  @keyframes hero-chart-backdrop-drift {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
-    50% {
-      transform: translate3d(-8px, 5px, 0);
-    }
-  }
-
-  @keyframes hero-chart-candles {
-    0%,
-    100% {
-      background-position:
-        0 0,
-        0 0,
-        0 0;
-      opacity: 0.44;
-      transform: translate3d(0, 0, 0);
-    }
-    50% {
-      background-position:
-        28px 0,
-        18px 7px,
-        -18px -6px;
-      opacity: 0.66;
-      transform: translate3d(-6px, 4px, 0);
     }
   }
 
@@ -605,10 +579,9 @@
       }
 
       &--gray-shadow {
-        //top: -300px;
-        top: -65%;
-        right: 0;
-        width: 622px;
+        top: 65px;
+        right: -30px;
+        width: 760px;
         z-index: -1;
         pointer-events: none;
         overflow: visible;
@@ -618,48 +591,6 @@
         transition:
           opacity 0.3s ease,
           filter 0.3s ease;
-
-        &::before,
-        &::after {
-          content: "";
-          position: absolute;
-          pointer-events: none;
-        }
-
-        &::before {
-          inset: 0;
-          z-index: -1;
-          clip-path: polygon(50% 0%, 100% 24%, 100% 74%, 50% 100%, 0% 74%, 0% 24%);
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.06));
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        &::after {
-          top: 54%;
-          right: 9%;
-          z-index: 2;
-          width: 48%;
-          height: 26%;
-          opacity: 0.3;
-          mix-blend-mode: multiply;
-          background-image:
-            repeating-linear-gradient(
-              90deg,
-              transparent 0 17px,
-              rgba(100, 116, 139, 0.28) 17px 20px,
-              transparent 20px 31px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              transparent 0 12px,
-              rgba(100, 116, 139, 0.42) 12px 23px,
-              transparent 23px 34px
-            ),
-            linear-gradient(115deg, transparent 0%, rgba(100, 116, 139, 0.34) 45%, transparent 70%);
-          mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 82%, transparent 100%);
-          animation: hero-chart-candles 6.2s ease-in-out infinite;
-        }
       }
 
       &--card-1 {
@@ -997,31 +928,6 @@
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow .hero__asset-img) {
     opacity: 1;
     filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
-    animation: hero-chart-backdrop-drift 7.4s ease-in-out infinite;
-  }
-
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow::before) {
-    opacity: 0;
-    animation: none;
-  }
-
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow::after) {
-    opacity: 0.5;
-    mix-blend-mode: normal;
-    background-image:
-      repeating-linear-gradient(
-        90deg,
-        transparent 0 17px,
-        rgba(94, 133, 255, 0.36) 17px 20px,
-        transparent 20px 31px
-      ),
-      repeating-linear-gradient(
-        90deg,
-        transparent 0 12px,
-        rgba(58, 108, 231, 0.45) 12px 23px,
-        transparent 23px 34px
-      ),
-      linear-gradient(115deg, transparent 0%, rgba(144, 171, 255, 0.22) 45%, transparent 70%);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1041,10 +947,7 @@
     .hero__asset--slide3-card-bottom,
     .hero__logo-wrap,
     .hero__asset-wrap--hex::before,
-    .hero__asset-wrap--hex::after,
-    .hero__asset--gray-shadow::before,
-    .hero__asset--gray-shadow::after,
-    .hero__asset--gray-shadow .hero__asset-img {
+    .hero__asset-wrap--hex::after {
       animation: none !important;
     }
   }
