@@ -107,29 +107,31 @@
             aria-hidden="true">
             <div class="hero__visual-stage w-full max-w-[715px]">
               <template v-if="slide.assets.length || slide.showBanner">
-                <!--                <UiHomeBannerV2-->
-                <!--                    v-if="slide.showBanner"-->
-                <!--                    class="hero__asset hero__asset&#45;&#45;slide2-city"-->
-                <!--                />-->
-                <UiHomeBannerV2Night
+                <component
+                  :is="themeStore.currentTheme === 'dark' ? UiHomeBannerV2Night : UiHomeBannerV2"
                   v-if="slide.showBanner"
                   class="hero__asset hero__asset--slide2-city" />
 
-                <img
+                <span
                   v-for="(asset, index) in slide.assets"
                   :key="asset.className"
-                  :src="asset.src"
-                  alt=""
                   aria-hidden="true"
                   :class="[
                     asset.className,
+                    asset.kind === 'hex' ? 'hero__asset-wrap--hex' : '',
+                    asset.tone ? `hero__asset-wrap--${asset.tone}` : '',
                     index === 0 ? 'top-0 right-0' : '',
                     slide.id == `slide-1` && index === 0 ? '!fixed' : '',
-                  ]" />
+                  ]">
+                  <img
+                    :src="asset.src"
+                    alt=""
+                    class="hero__asset-img" />
+                </span>
 
                 <div
                   v-if="slide.showLogo"
-                  class="hero__logo-wrap">
+                  class="hero__logo-wrap hero__asset-wrap--hex hero__asset-wrap--mixed">
                   <img
                     :src="FrameLogo"
                     alt=""
@@ -183,9 +185,11 @@
   import FrameLogo from "~/assets/landing/welcome-v2/FramLogo.svg";
   import UiHomeBannerV2Night from "~/components/ui/UiHomeBannerV2Night.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
+  import { useThemeStore } from "~/stores/themeStore";
 
   const { t } = useI18n();
   const { cabinetLink } = useCabinetLink();
+  const themeStore = useThemeStore();
 
   const currentSlideIndex = ref(0);
 
@@ -195,13 +199,20 @@
 
   const currentSlide = computed(() => slides.value[currentSlideIndex.value]);
 
+  type HeroAsset = {
+    src: string;
+    className: string;
+    kind?: "hex";
+    tone?: "primary" | "warning" | "mixed";
+  };
+
   const mkSlide = (
     i: number,
     icons: { icon: string; benefitIndex: number }[],
     extra: {
       showLogo: boolean;
       showBanner?: boolean;
-      assets: { src: string; className: string }[];
+      assets: HeroAsset[];
     }
   ) => ({
     id: `slide-${i + 1}`,
@@ -233,13 +244,13 @@
         showLogo: true,
         assets: [
           { src: grayShadow, className: "hero__asset hero__asset--gray-shadow" },
-          { src: visualMain, className: "hero__asset hero__asset--main" },
-          { src: visualCard1, className: "hero__asset hero__asset--card-1" },
-          { src: visualCard2, className: "hero__asset hero__asset--card-2" },
-          { src: visualCard3, className: "hero__asset hero__asset--card-3" },
-          { src: visualCard4, className: "hero__asset hero__asset--card-4" },
-          { src: visualCard5, className: "hero__asset hero__asset--card-5" },
-          { src: visualCard6, className: "hero__asset hero__asset--card-6" },
+          { src: visualMain, className: "hero__asset hero__asset--main", kind: "hex", tone: "mixed" },
+          { src: visualCard1, className: "hero__asset hero__asset--card-1", kind: "hex", tone: "primary" },
+          { src: visualCard2, className: "hero__asset hero__asset--card-2", kind: "hex", tone: "warning" },
+          { src: visualCard3, className: "hero__asset hero__asset--card-3", kind: "hex", tone: "primary" },
+          { src: visualCard4, className: "hero__asset hero__asset--card-4", kind: "hex", tone: "warning" },
+          { src: visualCard5, className: "hero__asset hero__asset--card-5", kind: "hex", tone: "mixed" },
+          { src: visualCard6, className: "hero__asset hero__asset--card-6", kind: "hex", tone: "primary" },
         ],
       }
     ),
@@ -253,9 +264,9 @@
         showLogo: false,
         showBanner: true,
         assets: [
-          { src: frame22, className: "hero__asset hero__asset--slide2-card-top" },
-          { src: frame25, className: "hero__asset hero__asset--slide2-card-left" },
-          { src: frame24, className: "hero__asset hero__asset--slide2-card-center" },
+          { src: frame22, className: "hero__asset hero__asset--slide2-card-top", kind: "hex", tone: "warning" },
+          { src: frame25, className: "hero__asset hero__asset--slide2-card-left", kind: "hex", tone: "primary" },
+          { src: frame24, className: "hero__asset hero__asset--slide2-card-center", kind: "hex", tone: "mixed" },
         ],
       }
     ),
@@ -269,9 +280,9 @@
         showLogo: false,
         assets: [
           { src: monitor, className: "hero__asset hero__asset--slide3-monitor" },
-          { src: frame16, className: "hero__asset hero__asset--slide3-card-main" },
-          { src: frame23, className: "hero__asset hero__asset--slide3-card-left" },
-          { src: frame222, className: "hero__asset hero__asset--slide3-card-bottom" },
+          { src: frame16, className: "hero__asset hero__asset--slide3-card-main", kind: "hex", tone: "mixed" },
+          { src: frame23, className: "hero__asset hero__asset--slide3-card-left", kind: "hex", tone: "primary" },
+          { src: frame222, className: "hero__asset hero__asset--slide3-card-bottom", kind: "hex", tone: "warning" },
         ],
       }
     ),
@@ -307,6 +318,30 @@
     }
     100% {
       background-position: -60% 50%;
+    }
+  }
+
+  @keyframes hero-hex-glow {
+    0%,
+    100% {
+      box-shadow:
+        0 0 16px color-mix(in srgb, var(--landing-accent) 12%, transparent),
+        0 0 28px color-mix(in srgb, var(--landing-accent-secondary) 7%, transparent);
+    }
+    50% {
+      box-shadow:
+        0 0 22px color-mix(in srgb, var(--landing-accent) 17%, transparent),
+        0 0 34px color-mix(in srgb, var(--landing-accent-secondary) 10%, transparent);
+    }
+  }
+
+  @keyframes hero-hex-tint {
+    0%,
+    100% {
+      opacity: 0.92;
+    }
+    50% {
+      opacity: 1;
     }
   }
 
@@ -729,6 +764,57 @@
       }
     }
 
+    &__asset-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    &__asset-wrap--hex {
+      isolation: isolate;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 5%;
+        clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &::before {
+        z-index: 2;
+        background: color-mix(in srgb, var(--landing-accent) 50%, transparent);
+      }
+
+      &::after {
+        z-index: -1;
+        background: color-mix(in srgb, var(--landing-accent) 9%, transparent);
+      }
+    }
+
+    &__asset-wrap--warning::before {
+      background: color-mix(in srgb, var(--landing-accent-secondary) 50%, transparent);
+    }
+
+    &__asset-wrap--mixed::before {
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--landing-accent) 50%, transparent),
+        color-mix(in srgb, var(--landing-accent-secondary) 50%, transparent)
+      );
+    }
+
+    &__asset--slide3-monitor &__asset-img {
+      height: 100%;
+      object-fit: cover;
+      object-position: left center;
+    }
+
     &__logo-wrap {
       position: absolute;
       left: 272px;
@@ -745,6 +831,7 @@
       height: auto;
       left: 39px;
       top: 89px;
+      z-index: 3;
     }
 
     &__glow {
@@ -791,6 +878,15 @@
     }
   }
 
+  :global(:root[data-theme="dark"] .hero__asset-wrap--hex::before) {
+    animation: hero-hex-tint 5.4s ease-in-out infinite;
+  }
+
+  :global(:root[data-theme="dark"] .hero__asset-wrap--hex::after) {
+    opacity: 1;
+    animation: hero-hex-glow 5.6s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .hero__shimmer::after,
     .hero__asset--main,
@@ -806,7 +902,9 @@
     .hero__asset--slide3-card-main,
     .hero__asset--slide3-card-left,
     .hero__asset--slide3-card-bottom,
-    .hero__logo-wrap {
+    .hero__logo-wrap,
+    .hero__asset-wrap--hex::before,
+    .hero__asset-wrap--hex::after {
       animation: none !important;
     }
   }

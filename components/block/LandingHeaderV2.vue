@@ -380,15 +380,15 @@
 
     :deep(.language-wrapper .icon) {
       display: inline-flex;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       color: var(--landing-text-secondary);
       transition: color 0.2s ease;
     }
 
     :deep(.language-wrapper .icon svg) {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
     :deep(.language-wrapper .dropdown) {
@@ -409,8 +409,8 @@
     padding: 0;
 
     :deep(svg) {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       color: var(--landing-text-secondary);
     }
   }
@@ -539,8 +539,8 @@
       font-weight: 600;
 
       :deep(svg) {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
       }
     }
 
