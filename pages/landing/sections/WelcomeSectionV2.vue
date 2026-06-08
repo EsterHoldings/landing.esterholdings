@@ -10,6 +10,13 @@
         <span class="hero__glow hero__glow--orange-2"></span>
       </div>
 
+      <img
+        v-if="currentSlide?.id === 'slide-1'"
+        :src="grayShadow"
+        alt=""
+        aria-hidden="true"
+        class="hero__viewport-asset hero__viewport-asset--gray-shadow" />
+
       <Swiper
         class="hero__slider"
         :modules="swiperModules"
@@ -242,7 +249,6 @@
       {
         showLogo: true,
         assets: [
-          { src: grayShadow, className: "hero__asset hero__asset--gray-shadow" },
           { src: visualMain, className: "hero__asset hero__asset--main", kind: "hex", tone: "mixed" },
           { src: visualCard1, className: "hero__asset hero__asset--card-1", kind: "hex", tone: "primary" },
           { src: visualCard2, className: "hero__asset hero__asset--card-2", kind: "hex", tone: "warning" },
@@ -382,10 +388,6 @@
         height: auto;
       }
 
-      :deep(.swiper-slide:not(.swiper-slide-active) .hero__asset--gray-shadow) {
-        opacity: 0;
-        visibility: hidden;
-      }
     }
 
     &__slide {
@@ -568,6 +570,25 @@
       height: 100%;
     }
 
+    &__viewport-asset {
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &__viewport-asset--gray-shadow {
+      top: 0;
+      right: 0;
+      width: clamp(560px, 36vw, 720px);
+      opacity: var(--landing-hero-backdrop-opacity);
+      filter: var(--landing-hero-backdrop-filter);
+      mix-blend-mode: var(--landing-hero-backdrop-blend);
+      transition:
+        opacity 0.3s ease,
+        filter 0.3s ease;
+    }
+
     &__asset {
       position: absolute;
       z-index: 1;
@@ -576,21 +597,6 @@
         left: 108px;
         top: 0;
         width: 192px;
-      }
-
-      &--gray-shadow {
-        top: -65%;
-        right: 0;
-        width: 622px;
-        z-index: -1;
-        pointer-events: none;
-        overflow: visible;
-        opacity: var(--landing-hero-backdrop-opacity);
-        filter: var(--landing-hero-backdrop-filter);
-        mix-blend-mode: var(--landing-hero-backdrop-blend);
-        transition:
-          opacity 0.3s ease,
-          filter 0.3s ease;
       }
 
       &--card-1 {
@@ -663,11 +669,12 @@
 
       &--slide3-monitor {
         position: absolute;
-        right: -100px;
-        max-width: 715px;
+        top: 0;
+        right: -24px;
+        max-width: none;
         max-height: 615px;
-        width: 100%;
-        height: 100%;
+        width: min(900px, 58vw);
+        height: auto;
         z-index: -1;
         pointer-events: none;
         opacity: var(--landing-hero-screen-opacity);
@@ -675,8 +682,8 @@
         transition:
           opacity 0.3s ease,
           filter 0.3s ease;
-        object-fit: cover;
-        object-position: left center;
+        object-fit: contain;
+        object-position: right center;
         overflow: visible;
       }
 
@@ -825,9 +832,10 @@
     }
 
     &__asset--slide3-monitor &__asset-img {
-      height: 100%;
-      object-fit: cover;
-      object-position: left center;
+      height: auto;
+      max-height: 615px;
+      object-fit: contain;
+      object-position: right center;
     }
 
     &__logo-wrap {
@@ -919,15 +927,10 @@
     filter: none;
   }
 
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
-    opacity: 1;
-    filter: none;
-    mix-blend-mode: normal;
-  }
-
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow .hero__asset-img) {
+  :global(:root[data-theme="dark"] .hero__viewport-asset--gray-shadow) {
     opacity: 1;
     filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
+    mix-blend-mode: normal;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -965,7 +968,7 @@
         grid-template-columns: minmax(420px, 560px) minmax(420px, 1fr);
       }
 
-      &__asset--gray-shadow {
+      &__viewport-asset--gray-shadow {
         display: none;
       }
 
