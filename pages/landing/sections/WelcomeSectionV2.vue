@@ -10,6 +10,13 @@
         <span class="hero__glow hero__glow--orange-2"></span>
       </div>
 
+      <img
+        v-if="isFirstSlideActive"
+        :src="grayShadow"
+        alt=""
+        aria-hidden="true"
+        class="hero__backdrop hero__backdrop--gray-shadow" />
+
       <Swiper
         class="hero__slider"
         :modules="swiperModules"
@@ -26,6 +33,7 @@
         :prevent-clicks="true"
         :prevent-clicks-propagation="true"
         :autoplay="autoplayOptions"
+        @swiper="onSwiperReady"
         @slideChange="onSlideChange">
         <SwiperSlide
           v-for="slide in slides"
@@ -120,7 +128,6 @@
                     asset.className,
                     asset.kind === 'hex' ? 'hero__asset-wrap--hex' : '',
                     asset.tone ? `hero__asset-wrap--${asset.tone}` : '',
-                    index === 0 ? 'top-0 right-0' : '',
                   ]">
                   <img
                     :src="asset.src"
@@ -135,7 +142,9 @@
                     :src="visualCenterFrame"
                     alt=""
                     class="hero__asset hero__asset--center" />
-                  <UiIconLogo class="hero__logo" />
+                  <component
+                    :is="themeStore.currentTheme === 'dark' ? UiIconLogo : UiIconLogoLight"
+                    class="hero__logo" />
                 </div>
               </template>
 
@@ -157,6 +166,7 @@
   import { Autoplay } from "swiper/modules";
   import "swiper/css";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiHomeBannerV2 from "~/components/ui/UiHomeBannerV2.vue";
   import benefitCloud from "~/assets/landing/welcome-v2/benefit-cloud.svg";
@@ -192,11 +202,23 @@
 
   const currentSlideIndex = ref(0);
 
-  const onSlideChange = (swiper: any) => {
-    currentSlideIndex.value = swiper.realIndex;
+  const setCurrentSlideIndex = (swiper: any) => {
+    currentSlideIndex.value = Number.isFinite(swiper.realIndex)
+      ? swiper.realIndex
+      : Number.isFinite(swiper.activeIndex)
+        ? swiper.activeIndex
+        : 0;
   };
 
-  const currentSlide = computed(() => slides.value[currentSlideIndex.value]);
+  const onSwiperReady = (swiper: any) => {
+    setCurrentSlideIndex(swiper);
+  };
+
+  const onSlideChange = (swiper: any) => {
+    setCurrentSlideIndex(swiper);
+  };
+
+  const isFirstSlideActive = computed(() => currentSlideIndex.value === 0);
 
   type HeroAsset = {
     src: string;
@@ -242,7 +264,6 @@
       {
         showLogo: true,
         assets: [
-          { src: grayShadow, className: "hero__asset hero__asset--gray-shadow" },
           { src: visualMain, className: "hero__asset hero__asset--main", kind: "hex", tone: "mixed" },
           { src: visualCard1, className: "hero__asset hero__asset--card-1", kind: "hex", tone: "primary" },
           { src: visualCard2, className: "hero__asset hero__asset--card-2", kind: "hex", tone: "warning" },
@@ -372,6 +393,8 @@
     }
 
     &__slider {
+      position: relative;
+      z-index: 1;
       overflow: visible;
 
       :deep(.swiper-wrapper) {
@@ -382,10 +405,25 @@
         height: auto;
       }
 
-      :deep(.swiper-slide:not(.swiper-slide-active) .hero__asset--gray-shadow) {
-        opacity: 0;
-        visibility: hidden;
-      }
+    }
+
+    &__backdrop {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &__backdrop--gray-shadow {
+      top: -118px;
+      right: 0;
+      width: clamp(560px, 36vw, 720px);
+      opacity: var(--landing-hero-backdrop-opacity);
+      filter: var(--landing-hero-backdrop-filter);
+      mix-blend-mode: var(--landing-hero-backdrop-blend);
+      transition:
+        opacity 0.3s ease,
+        filter 0.3s ease;
     }
 
     &__slide {
@@ -576,21 +614,6 @@
         left: 108px;
         top: 0;
         width: 192px;
-      }
-
-      &--gray-shadow {
-        top: -65%;
-        right: 0;
-        width: 622px;
-        z-index: -1;
-        pointer-events: none;
-        overflow: visible;
-        opacity: var(--landing-hero-backdrop-opacity);
-        filter: var(--landing-hero-backdrop-filter);
-        mix-blend-mode: var(--landing-hero-backdrop-blend);
-        transition:
-          opacity 0.3s ease,
-          filter 0.3s ease;
       }
 
       &--card-1 {
@@ -849,6 +872,11 @@
       z-index: 3;
     }
 
+    &__logo.logo-flat {
+      width: 140px;
+      height: auto;
+    }
+
     &__glow {
       position: absolute;
       border-radius: 50%;
@@ -919,15 +947,10 @@
     filter: none;
   }
 
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
-    opacity: 1;
-    filter: none;
-    mix-blend-mode: normal;
-  }
-
-  :global(:root[data-theme="dark"] .hero__asset--gray-shadow .hero__asset-img) {
+  :global(:root[data-theme="dark"] .hero__backdrop--gray-shadow) {
     opacity: 1;
     filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
+    mix-blend-mode: normal;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -965,7 +988,7 @@
         grid-template-columns: minmax(420px, 560px) minmax(420px, 1fr);
       }
 
-      &__asset--gray-shadow {
+      &__backdrop--gray-shadow {
         display: none;
       }
 
