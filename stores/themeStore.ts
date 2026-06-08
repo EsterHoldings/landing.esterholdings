@@ -1,10 +1,20 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 type ThemeName = "light" | "dark";
+type ThemeViewTransition = {
+  finished: Promise<void>;
+  ready: Promise<void>;
+  updateCallbackDone: Promise<void>;
+  skipTransition: () => void;
+};
+type ThemeTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void | Promise<void>) => ThemeViewTransition;
+};
 
 const DEFAULT_THEME: ThemeName = "light";
 const THEME_STORAGE_KEY = "theme";
+const THEME_TRANSITION_MS = 200;
 
 const isThemeName = (value: string | null): value is ThemeName => value === "light" || value === "dark";
 
@@ -69,24 +79,74 @@ export const useThemeStore = defineStore("theme", () => {
 
   let transitionTimer: ReturnType<typeof setTimeout> | null = null;
 
-  function applyTheme(themeName: ThemeName, withTransition = true) {
-    currentTheme.value = themeName;
+  const clearTransitionTimer = () => {
+    if (!transitionTimer) return;
+
+    clearTimeout(transitionTimer);
+    transitionTimer = null;
+  };
+
+  const clearThemeTransition = (root: HTMLElement) => {
+    clearTransitionTimer();
+    transitionTimer = setTimeout(() => {
+      root.classList.remove("theme-transition");
+      transitionTimer = null;
+    }, THEME_TRANSITION_MS);
+  };
+
+  const shouldReduceMotion = () =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function commitTheme(themeName: ThemeName) {
     const theme = themeName === "light" ? lightTheme : darkTheme;
     const root = document.documentElement;
+
     root.dataset.theme = themeName;
     root.style.colorScheme = themeName;
-
-    if (withTransition) {
-      root.classList.add("theme-transition");
-      if (transitionTimer) clearTimeout(transitionTimer);
-      transitionTimer = setTimeout(() => {
-        root.classList.remove("theme-transition");
-        transitionTimer = null;
-      }, 400);
-    }
     Object.entries(theme).forEach(([key, value]) => {
       root.style.setProperty(key, value);
     });
+    currentTheme.value = themeName;
+  }
+
+  function applyTheme(themeName: ThemeName, withTransition = true) {
+    const root = document.documentElement;
+
+    clearTransitionTimer();
+    root.classList.remove("theme-transition", "theme-view-transition");
+
+    if (!withTransition || shouldReduceMotion()) {
+      commitTheme(themeName);
+      return;
+    }
+
+    const themeDocument = document as ThemeTransitionDocument;
+
+    if (typeof themeDocument.startViewTransition === "function") {
+      root.classList.add("theme-view-transition");
+
+      try {
+        const transition = themeDocument.startViewTransition(async () => {
+          commitTheme(themeName);
+          await nextTick();
+        });
+
+        transition.finished
+          .catch(() => undefined)
+          .finally(() => {
+            root.classList.remove("theme-view-transition");
+          });
+        return;
+      } catch {
+        root.classList.remove("theme-view-transition");
+      }
+    }
+
+    // Force the transition class to apply before CSS variables change.
+    root.classList.add("theme-transition");
+    void root.offsetWidth;
+    commitTheme(themeName);
+    clearThemeTransition(root);
   }
 
   function setTheme(themeName: ThemeName) {
