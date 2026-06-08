@@ -962,30 +962,29 @@
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex::after) {
-    animation: hero-hex-glow 5.6s ease-in-out infinite;
+    opacity: 0;
+    animation: none;
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex .hero__asset-img) {
-    opacity: 0.86;
-    filter: invert(1) contrast(0.58) sepia(18%) saturate(720%) hue-rotate(182deg) brightness(0.94);
+    opacity: 1;
+    filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
     mix-blend-mode: normal;
   }
 
   :global(:root[data-theme="dark"] .hero__logo-wrap > .hero__asset--center) {
-    opacity: 0.58;
-    filter: invert(1) contrast(0.58) sepia(18%) saturate(720%) hue-rotate(182deg) brightness(0.94);
+    opacity: 1;
+    filter: invert(82%) sepia(19%) saturate(777%) hue-rotate(184deg) brightness(139%) contrast(169%);
     mix-blend-mode: normal;
   }
 
   :global(:root[data-theme="dark"] .hero__logo-wrap .hero__logo) {
-    opacity: 0.92;
-    filter: drop-shadow(0 0 10px rgba(91, 132, 255, 0.18));
+    opacity: 1;
+    filter: none;
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex) {
-    filter:
-      drop-shadow(0 20px 34px rgba(0, 8, 38, 0.24))
-      drop-shadow(0 0 28px rgba(27, 99, 255, 0.1));
+    filter: none;
   }
 
   :global(:root[data-theme="dark"] .hero__asset--gray-shadow) {
