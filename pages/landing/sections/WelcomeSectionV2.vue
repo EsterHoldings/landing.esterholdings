@@ -121,13 +121,8 @@
                     asset.kind === 'hex' ? 'hero__asset-wrap--hex' : '',
                     asset.tone ? `hero__asset-wrap--${asset.tone}` : '',
                     index === 0 ? 'top-0 right-0' : '',
-                    slide.id == `slide-1` && index === 0 ? '!fixed' : '',
                   ]">
-                  <UiIllustrationChartBg
-                    v-if="asset.kind === 'chart'"
-                    class="hero__asset-img" />
                   <img
-                    v-else-if="asset.src"
                     :src="asset.src"
                     alt=""
                     class="hero__asset-img" />
@@ -164,7 +159,6 @@
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiHomeBannerV2 from "~/components/ui/UiHomeBannerV2.vue";
-  import UiIllustrationChartBg from "~/components/ui/UiIllustrationChartBg.vue";
   import benefitCloud from "~/assets/landing/welcome-v2/benefit-cloud.svg";
   import benefitCurveArrow from "~/assets/landing/welcome-v2/benefit-curve-arrow.svg";
   import benefitGem from "~/assets/landing/welcome-v2/benefit-gem.svg";
@@ -177,6 +171,7 @@
   import visualCard5 from "~/assets/landing/welcome-v2/visual-card-5.svg";
   import visualCard6 from "~/assets/landing/welcome-v2/visual-card-6.svg";
   import visualMain from "~/assets/landing/welcome-v2/visual-card-main.svg";
+  import grayShadow from "~/assets/landing/welcome-v2/gray-shadow.svg";
   import frame22 from "~/assets/landing/welcome-v2/Frame-22.svg";
   import frame24 from "~/assets/landing/welcome-v2/Frame-24.svg";
   import frame25 from "~/assets/landing/welcome-v2/Frame-25.svg";
@@ -204,9 +199,9 @@
   const currentSlide = computed(() => slides.value[currentSlideIndex.value]);
 
   type HeroAsset = {
-    src?: string;
+    src: string;
     className: string;
-    kind?: "hex" | "chart";
+    kind?: "hex";
     tone?: "primary" | "warning" | "mixed";
   };
 
@@ -247,7 +242,7 @@
       {
         showLogo: true,
         assets: [
-          { className: "hero__asset hero__asset--gray-shadow", kind: "chart" },
+          { src: grayShadow, className: "hero__asset hero__asset--gray-shadow" },
           { src: visualMain, className: "hero__asset hero__asset--main", kind: "hex", tone: "mixed" },
           { src: visualCard1, className: "hero__asset hero__asset--card-1", kind: "hex", tone: "primary" },
           { src: visualCard2, className: "hero__asset hero__asset--card-2", kind: "hex", tone: "warning" },
@@ -385,6 +380,11 @@
 
       :deep(.swiper-slide) {
         height: auto;
+      }
+
+      :deep(.swiper-slide:not(.swiper-slide-active) .hero__asset--gray-shadow) {
+        opacity: 0;
+        visibility: hidden;
       }
     }
 
@@ -579,9 +579,9 @@
       }
 
       &--gray-shadow {
-        top: 65px;
-        right: -30px;
-        width: 760px;
+        top: -65%;
+        right: 0;
+        width: 622px;
         z-index: -1;
         pointer-events: none;
         overflow: visible;
