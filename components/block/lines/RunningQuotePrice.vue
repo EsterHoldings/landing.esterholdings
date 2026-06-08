@@ -43,9 +43,11 @@
     defineProps<{
       value: string;
       direction?: QuoteDirection;
+      animated?: boolean;
     }>(),
     {
       direction: null,
+      animated: true,
     }
   );
 
@@ -120,7 +122,7 @@
       animationVersion.value += 1;
       clearSettleTimer();
 
-      const animate = shouldAnimate(previousValue, value);
+      const animate = props.animated && shouldAnimate(previousValue, value);
       chars.value = buildChars(previousValue, value, props.direction, animationVersion.value, animate);
 
       if (animate) {

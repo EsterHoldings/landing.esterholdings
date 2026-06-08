@@ -117,7 +117,7 @@
 
 <style lang="scss" scoped>
   .news-row-v2 {
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     cursor: grab;
     overscroll-behavior-x: contain;
@@ -137,7 +137,7 @@
       margin: 0;
       display: flex;
       gap: 18px;
-      will-change: scroll-position;
+      will-change: transform;
     }
 
     &__card {

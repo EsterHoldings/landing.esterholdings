@@ -17,7 +17,7 @@
       <article
         v-for="loopItem in loopItems"
         :key="`${loopItem.copy}-${loopItem.item.symbol}`"
-        v-memo="[loopItem.item.symbol, loopItem.item.price, loopItem.item.isUp, tradeHref]"
+        v-memo="[loopItem.copy, loopItem.item.symbol, loopItem.item.price, loopItem.item.isUp, tradeHref]"
         class="running-line-v2__card">
         <div class="running-line-v2__head">
           <UiIconTradeArrowUp
@@ -35,9 +35,15 @@
           <div class="running-line-v2__info">
             <p class="running-line-v2__symbol">{{ loopItem.item.symbol }}</p>
             <RunningQuotePrice
+              v-if="loopItem.copy === 1"
               class="running-line-v2__price"
               :direction="priceDirection(loopItem.item)"
               :value="loopItem.item.price" />
+            <p
+              v-else
+              class="running-line-v2__price running-line-v2__price--static">
+              {{ loopItem.item.price }}
+            </p>
           </div>
         </div>
         <a
@@ -103,6 +109,7 @@
   );
 
   const runtimeConfig = useRuntimeConfig();
+  const QUOTE_FLUSH_BATCH_SIZE = 1;
   const { cabinetLink } = useCabinetLink();
   const liveQuoteMap = ref<Record<string, TickerItem>>({});
   const liveQuoteOrder = ref<string[]>([]);
@@ -128,6 +135,8 @@
   let staleQuotesTimer: ReturnType<typeof setTimeout> | null = null;
   let latestQuotesPollTimer: ReturnType<typeof setInterval> | null = null;
   let quotesGlobalHandler: ((eventName: string, payload: unknown) => void) | null = null;
+  let pendingQuoteItems = new Map<string, TickerItem>();
+  let quoteFlushFrame: number | null = null;
   let debugQuotes = false;
 
   const normalizePusherEventName = (event: string): string => event.replace(/^\./, "");
@@ -223,7 +232,15 @@
 
   const normalizeQuoteSymbol = (value: unknown): string => toText(value).replace(/!+$/, "").toUpperCase();
 
-  const baseSymbols = computed(() => new Set(props.items.map(item => normalizeQuoteSymbol(item.symbol))));
+  const baseItemMap = computed(() => {
+    const map = new Map<string, TickerItem>();
+    props.items.forEach(item => {
+      map.set(normalizeQuoteSymbol(item.symbol), item);
+    });
+
+    return map;
+  });
+  const baseSymbols = computed(() => new Set(baseItemMap.value.keys()));
   const displayItems = computed(() => {
     const quoteMap = liveQuoteMap.value;
     const baseItems = props.items.map(item => {
@@ -295,6 +312,49 @@
     return Number.isFinite(change) ? change >= 0 : true;
   };
 
+  const quoteChanged = (item: TickerItem): boolean => {
+    const previous = liveQuoteMap.value[item.symbol] ?? baseItemMap.value.get(item.symbol);
+
+    return !previous || previous.price !== item.price || previous.isUp !== item.isUp;
+  };
+
+  const scheduleQuoteFlush = () => {
+    if (quoteFlushFrame !== null) return;
+
+    quoteFlushFrame = requestAnimationFrame(flushPendingQuotes);
+  };
+
+  function flushPendingQuotes() {
+    quoteFlushFrame = null;
+
+    const entries = Array.from(pendingQuoteItems.entries()).slice(0, QUOTE_FLUSH_BATCH_SIZE);
+    if (entries.length === 0) return;
+
+    entries.forEach(([symbol]) => {
+      pendingQuoteItems.delete(symbol);
+    });
+
+    const nextQuoteMap = { ...liveQuoteMap.value };
+    const nextQuoteOrder = [...liveQuoteOrder.value];
+    const nextQuoteSymbols = new Set(nextQuoteOrder);
+
+    entries.forEach(([symbol, item]) => {
+      nextQuoteMap[symbol] = item;
+
+      if (!nextQuoteSymbols.has(symbol)) {
+        nextQuoteOrder.push(symbol);
+        nextQuoteSymbols.add(symbol);
+      }
+    });
+
+    liveQuoteMap.value = nextQuoteMap;
+    liveQuoteOrder.value = nextQuoteOrder;
+
+    if (pendingQuoteItems.size > 0) {
+      scheduleQuoteFlush();
+    }
+  }
+
   const applyQuotesPayload = (rawPayload: Mt4QuotePayload | unknown) => {
     const payload = parsePayload(rawPayload);
     const quotes = Array.isArray(payload?.quotes) ? payload.quotes : Array.isArray(payload?.items) ? payload.items : [];
@@ -319,19 +379,16 @@
         sample: nextItems.slice(0, 3),
       });
 
-      const nextQuoteMap = { ...liveQuoteMap.value };
-      const nextQuoteOrder = [...liveQuoteOrder.value];
-
       nextItems.forEach(item => {
-        nextQuoteMap[item.symbol] = item;
-
-        if (!nextQuoteOrder.includes(item.symbol)) {
-          nextQuoteOrder.push(item.symbol);
+        if (quoteChanged(item)) {
+          pendingQuoteItems.set(item.symbol, item);
         }
       });
 
-      liveQuoteMap.value = nextQuoteMap;
-      liveQuoteOrder.value = nextQuoteOrder;
+      if (pendingQuoteItems.size > 0) {
+        scheduleQuoteFlush();
+      }
+
       scheduleStaleQuotesReset();
     }
   };
@@ -342,6 +399,11 @@
     }
 
     staleQuotesTimer = setTimeout(() => {
+      pendingQuoteItems.clear();
+      if (quoteFlushFrame !== null) {
+        cancelAnimationFrame(quoteFlushFrame);
+        quoteFlushFrame = null;
+      }
       liveQuoteMap.value = {};
       liveQuoteOrder.value = [];
       staleQuotesTimer = null;
@@ -542,6 +604,12 @@
       clearTimeout(staleQuotesTimer);
     }
 
+    pendingQuoteItems.clear();
+    if (quoteFlushFrame !== null) {
+      cancelAnimationFrame(quoteFlushFrame);
+      quoteFlushFrame = null;
+    }
+
     unsubscribeFromLiveQuotes();
     stopLatestQuotesPolling();
     stopAnimation();
@@ -550,7 +618,7 @@
 
 <style scoped lang="scss">
   .running-line-v2 {
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     margin-top: 14px;
     cursor: grab;
@@ -570,7 +638,7 @@
       display: flex;
       width: max-content;
       gap: 18px;
-      will-change: scroll-position;
+      will-change: transform;
     }
 
     &__card {
@@ -634,6 +702,9 @@
       font-family: "DM Sans", sans-serif;
       font-size: 14px;
       line-height: 1.302;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
     }
 
     &__btn {

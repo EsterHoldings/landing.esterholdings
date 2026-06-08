@@ -15,14 +15,14 @@ export const useInfiniteHorizontalLoop = (
   const isDragging = ref(false);
   const copies = Math.max(3, options.copies ?? DEFAULT_COPIES);
   const speed = options.speed ?? 0.4;
-  let animationFrameId: number | null = null;
   let pointerStartX = 0;
-  let pointerStartScrollLeft = 0;
+  let pointerStartOffset = 0;
   let pointerActive = false;
   let resumeAfterPointer = false;
   let suppressClick = false;
-  let scrollPosition = 0;
-  let isApplyingScroll = false;
+  let currentOffset = 0;
+  let loopAnimation: Animation | null = null;
+  let loopDuration = 0;
 
   const segmentWidth = (): number => {
     if (!track.value) return 0;
@@ -30,32 +30,70 @@ export const useInfiniteHorizontalLoop = (
     return track.value.scrollWidth / copies;
   };
 
-  const setScrollLeft = (value: number) => {
-    const viewportElement = viewport.value;
-    if (!viewportElement) return;
+  const pixelsPerSecond = (): number => Math.max(1, speed * 60);
 
-    scrollPosition = value;
-    isApplyingScroll = true;
-    viewportElement.scrollLeft = value;
-    window.setTimeout(() => {
-      isApplyingScroll = false;
-    }, 0);
+  const normalizeOffsetValue = (value: number): number => {
+    const width = segmentWidth();
+    if (width <= 0) return value;
+
+    let nextValue = value;
+    while (nextValue < width) {
+      nextValue += width;
+    }
+
+    while (nextValue >= width * 2) {
+      nextValue -= width;
+    }
+
+    return nextValue;
   };
 
-  const normalizeScrollPosition = () => {
-    const viewportElement = viewport.value;
+  const animationOffset = (): number => {
     const width = segmentWidth();
-    if (!viewportElement || width <= 0) return;
+    if (!loopAnimation || loopDuration <= 0 || width <= 0) return currentOffset;
 
-    const min = width * 0.5;
-    const max = width * 1.5;
-    const currentScrollLeft = scrollPosition || viewportElement.scrollLeft;
+    const time = Number(loopAnimation.currentTime ?? 0);
+    const phase = (time % loopDuration) / loopDuration;
 
-    if (currentScrollLeft < min) {
-      setScrollLeft(currentScrollLeft + width);
-    } else if (currentScrollLeft > max) {
-      setScrollLeft(currentScrollLeft - width);
-    }
+    return width + phase * width;
+  };
+
+  const applyTransform = (value: number) => {
+    if (!track.value) return;
+
+    currentOffset = normalizeOffsetValue(value);
+    track.value.style.transform = `translate3d(${-currentOffset}px, 0, 0)`;
+  };
+
+  const cancelLoopAnimation = () => {
+    if (!loopAnimation) return;
+
+    currentOffset = animationOffset();
+    loopAnimation.cancel();
+    loopAnimation = null;
+    applyTransform(currentOffset);
+  };
+
+  const createLoopAnimation = () => {
+    const trackElement = track.value;
+    const width = segmentWidth();
+    if (!trackElement || width <= 0) return;
+
+    cancelLoopAnimation();
+    currentOffset = normalizeOffsetValue(currentOffset || width);
+    loopDuration = (width / pixelsPerSecond()) * 1000;
+    loopAnimation = trackElement.animate(
+      [
+        { transform: `translate3d(${-width}px, 0, 0)` },
+        { transform: `translate3d(${-width * 2}px, 0, 0)` },
+      ],
+      {
+        duration: loopDuration,
+        iterations: Infinity,
+        easing: "linear",
+      }
+    );
+    loopAnimation.currentTime = ((currentOffset - width) / width) * loopDuration;
   };
 
   const resetLoopPosition = (attempt = 0) => {
@@ -72,53 +110,46 @@ export const useInfiniteHorizontalLoop = (
           return;
         }
 
-        setScrollLeft(width);
+        currentOffset = width;
+
+        if (loopAnimation) {
+          createLoopAnimation();
+          return;
+        }
+
+        applyTransform(width);
       }, 0);
     });
   };
 
-  const animate = () => {
-    const viewportElement = viewport.value;
-    if (viewportElement) {
-      scrollPosition = scrollPosition || viewportElement.scrollLeft;
-      setScrollLeft(scrollPosition + speed);
-      normalizeScrollPosition();
+  const startAnimation = () => {
+    if (loopAnimation) {
+      loopAnimation.play();
+      return;
     }
 
-    animationFrameId = requestAnimationFrame(animate);
-  };
-
-  const startAnimation = () => {
-    if (animationFrameId !== null) return;
-
-    scrollPosition = viewport.value?.scrollLeft ?? scrollPosition;
-    animate();
+    createLoopAnimation();
   };
 
   const stopAnimation = () => {
-    if (animationFrameId === null) return;
+    if (!loopAnimation) return;
 
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
+    currentOffset = animationOffset();
+    loopAnimation.pause();
   };
 
   const handleScroll = () => {
-    if (!isApplyingScroll) {
-      scrollPosition = viewport.value?.scrollLeft ?? scrollPosition;
-    }
-
-    normalizeScrollPosition();
+    viewport.value?.scrollTo({ left: 0 });
   };
 
   const handlePointerDown = (event: PointerEvent) => {
     if (event.button !== 0 || !viewport.value) return;
 
     pointerActive = true;
-    resumeAfterPointer = animationFrameId !== null;
+    resumeAfterPointer = loopAnimation?.playState === "running";
     pointerStartX = event.clientX;
-    pointerStartScrollLeft = viewport.value.scrollLeft;
-    scrollPosition = pointerStartScrollLeft;
-    stopAnimation();
+    pointerStartOffset = loopAnimation ? animationOffset() : currentOffset;
+    cancelLoopAnimation();
     viewport.value.setPointerCapture?.(event.pointerId);
   };
 
@@ -131,8 +162,7 @@ export const useInfiniteHorizontalLoop = (
       suppressClick = true;
     }
 
-    setScrollLeft(pointerStartScrollLeft - delta);
-    normalizeScrollPosition();
+    applyTransform(pointerStartOffset - delta);
   };
 
   const finishPointer = (event: PointerEvent) => {
@@ -159,7 +189,7 @@ export const useInfiniteHorizontalLoop = (
   };
 
   onUnmounted(() => {
-    stopAnimation();
+    cancelLoopAnimation();
   });
 
   watch(
