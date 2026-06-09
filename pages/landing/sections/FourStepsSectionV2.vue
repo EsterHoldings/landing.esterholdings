@@ -136,8 +136,8 @@
         border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
         background: linear-gradient(
           145deg,
-          color-mix(in srgb, var(--landing-surface-elevated) 54%, transparent),
-          color-mix(in srgb, var(--landing-surface-elevated) 34%, transparent)
+          color-mix(in srgb, var(--landing-surface-elevated) 27%, transparent),
+          color-mix(in srgb, var(--landing-surface-elevated) 17%, transparent)
         );
         backdrop-filter: blur(16px) saturate(145%);
         -webkit-backdrop-filter: blur(16px) saturate(145%);
@@ -149,8 +149,8 @@
       &::after {
         z-index: 2;
         background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
-          linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 8%, transparent));
+          linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01)),
+          linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 4%, transparent));
         box-shadow:
           inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
           inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
@@ -262,8 +262,8 @@
   }
 
   :global(:root[data-theme="dark"] .step__icon::before) {
-    border-color: rgba(139, 164, 214, 0.58);
-    background: linear-gradient(145deg, rgba(25, 48, 96, 0.54) 0%, rgba(8, 23, 55, 0.38) 100%);
+    border-color: rgba(139, 164, 214, 0.36);
+    background: linear-gradient(145deg, rgba(25, 48, 96, 0.27) 0%, rgba(8, 23, 55, 0.19) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       inset 0 -18px 28px rgba(0, 81, 255, 0.08);
