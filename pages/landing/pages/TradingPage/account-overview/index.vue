@@ -84,7 +84,7 @@
 
     &_title {
       text-align: center;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &_content {

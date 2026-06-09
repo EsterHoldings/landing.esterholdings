@@ -32,12 +32,11 @@
 <style scoped lang="scss">
   .panel-default {
     width: 100%;
-    border: 1px solid var(--landing-border-strong);
-    border-radius: 12px;
-    background: var(--landing-surface-glass);
-    box-shadow: var(--landing-shadow-card);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     color: var(--landing-text-primary);
-    overflow: hidden;
   }
 
   .panel-default__title {
@@ -47,7 +46,7 @@
     align-items: center;
     font-weight: 700;
     color: var(--landing-text-primary);
-    border-bottom: 1px solid var(--landing-line);
+    border-bottom: 0;
   }
 
   .panel-default__content {

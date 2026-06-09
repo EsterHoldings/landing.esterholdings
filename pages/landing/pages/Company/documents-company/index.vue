@@ -1,11 +1,11 @@
 <template>
   <UiContainer>
     <div>
-      <UiTextH3 class="!text-[var(--ui-text-main)] text-center">
+      <UiTextH3 class="!text-[var(--landing-text-primary)] text-center">
         {{ t('landing.pages.company.documents.title') }}
       </UiTextH3>
 
-      <UiTextH5 class="!text-[var(--ui-text-main)] text-center mb-5">
+      <UiTextH5 class="!text-[var(--landing-text-primary)] text-center mb-5">
         {{ t('landing.pages.company.documents.intro') }}
       </UiTextH5>
 
@@ -13,15 +13,15 @@
 
         <PanelDefault class="p-8 h-full">
           <div class="flex flex-col h-full">
-            <UiTextH4 class="text-[var(--ui-text-main)] mb-4">
+            <UiTextH4 class="text-[var(--landing-text-primary)] mb-4">
               {{ t('landing.pages.company.documents.regulations_title') }}
             </UiTextH4>
 
-            <UiTextH5 class="!text-[var(--ui-text-main)] mb-4">
+            <UiTextH5 class="!text-[var(--landing-text-primary)] mb-4">
               {{ t('landing.pages.company.documents.regulations_subtitle') }}
             </UiTextH5>
 
-            <ul class="list-none pl-2 text-[var(--ui-text-main)]">
+            <ul class="list-none pl-2 text-[var(--landing-text-primary)]">
               <li
                   v-for="(item, index) in regulationsList"
                   :key="index"
@@ -42,11 +42,11 @@
 
         <PanelDefault class="p-8 h-full">
           <div class="flex flex-col h-full">
-            <UiTextH4 class="text-[var(--ui-text-main)] mb-5">
+            <UiTextH4 class="text-[var(--landing-text-primary)] mb-5">
               {{ t('landing.pages.company.documents.contract_title') }}
             </UiTextH4>
 
-            <UiTextH5 class="!text-[var(--ui-text-main)] mb-5">
+            <UiTextH5 class="!text-[var(--landing-text-primary)] mb-5">
               {{ t('landing.pages.company.documents.contract_description') }}
             </UiTextH5>
 

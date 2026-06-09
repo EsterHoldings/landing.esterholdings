@@ -1,33 +1,21 @@
 <template>
-  <div class="platform">
-    <UiContainer>
-      <UiTextH3 class="platform_title">{{ t('landing.pages.trading.platform_title') }}</UiTextH3>
-    </UiContainer>
-  </div>
+  <LandingStaticPage
+    :title="t('landing.pages.trading.platform_title')"
+    :content="content" />
 </template>
 
 <script setup lang="ts">
   import { definePageMeta } from '~/.nuxt/imports';
   import { useI18n } from 'vue-i18n';
-  import UiContainer from '~/components/ui/UiContainer.vue';
-  import UiTextH3 from '~/components/ui/UiTextH3.vue';
+  import { computed } from "vue";
+  import LandingStaticPage from "~/components/block/pages/LandingStaticPage.vue";
+  import { getStaticPageContent } from "~/components/block/pages/staticPageContent";
 
   definePageMeta({
     layout: 'main',
     alias: '/platform',
   });
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const content = computed(() => getStaticPageContent("platform", locale.value));
 </script>
-
-<style lang="scss" scoped>
-  .platform {
-    padding: 40px;
-
-    &_title {
-      color: var(--ui-text-main);
-      text-align: center;
-      margin-top: 50px;
-    }
-  }
-</style>

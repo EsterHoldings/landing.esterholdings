@@ -59,7 +59,7 @@
     padding: 40px;
 
     &__title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       text-align: center;
       margin-top: 50px;
     }

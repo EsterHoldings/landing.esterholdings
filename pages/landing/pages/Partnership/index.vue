@@ -137,13 +137,13 @@
     gap: 40px;
 
     &__title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       text-align: center;
       margin-top: 50px;
     }
 
     &__intro {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &__img {
@@ -162,12 +162,12 @@
     &__subtitle,
     &__section-title {
       font-weight: 700;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &__list {
       padding-left: 20px;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       font-size: 14px;
 
       li {

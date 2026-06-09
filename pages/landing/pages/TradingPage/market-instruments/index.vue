@@ -111,12 +111,12 @@
 
     &-title {
       text-align: center;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       margin-bottom: 30px;
     }
 
     &-text {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
 
       &_wrapper {
         display: flex;

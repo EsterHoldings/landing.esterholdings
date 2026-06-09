@@ -64,7 +64,7 @@ const {t, tm} = useI18n();
   min-height: 500px;
   min-width: 100%;
   border-radius: 15px;
-  border: 1px solid var(--ui-stroke);
+  border: 1px solid var(--landing-border-strong);
   cursor: pointer;
   transition: flex 0.3s ease-in-out, transform 0.1s ease;
   display: flex;
@@ -75,7 +75,7 @@ const {t, tm} = useI18n();
 
 .account-card.active {
   flex: 2;
-  background-color: var(--ui-background-card);
+  background-color: var(--landing-surface-elevated);
   transform: scale(1.05);
   position: relative;
   overflow: hidden;
@@ -159,7 +159,7 @@ const {t, tm} = useI18n();
   align-items: center;
   font-size: 16px;
   font-weight: bold;
-  color: var(--ui-text-main);
+  color: var(--landing-text-primary);
 
   &_title {
     writing-mode: vertical-rl;

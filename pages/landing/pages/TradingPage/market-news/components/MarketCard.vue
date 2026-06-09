@@ -60,19 +60,19 @@
     flex: 1;
 
     &_title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &_date {
       font-size: 0.875rem;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       margin-bottom: 16px;
       margin-top: 5px;
     }
 
     &_message {
       font-size: 1rem;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       margin-bottom: 24px;
     }
   }

@@ -76,7 +76,7 @@ const {t} = useI18n();
   gap: 20px;
 
   &_title {
-    color: var(--ui-text-main);
+    color: var(--landing-text-primary);
     text-align: center;
   }
 
@@ -87,7 +87,7 @@ const {t} = useI18n();
     gap: 20px;
 
     &_address {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
 
       h6 {
         margin-top: 15px;
@@ -108,7 +108,7 @@ const {t} = useI18n();
         display: flex;
         align-items: start;
         gap: 5px;
-        color: var(--ui-text-main);
+        color: var(--landing-text-primary);
 
         h5 {
           span {

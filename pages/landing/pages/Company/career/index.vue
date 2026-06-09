@@ -6,7 +6,7 @@
 
         <div class="flex justify-between items-start gap-4">
           <PanelDefault class="w-[50%] p-5">
-            <UiTextH5 class="career_subtitle !text-[var(--ui-primary-main] mb-5">{{ t('landing.pages.company.career.subtitle') }}</UiTextH5>
+            <UiTextH5 class="career_subtitle !text-[var(--landing-accent)] mb-5">{{ t('landing.pages.company.career.subtitle') }}</UiTextH5>
 
             <ul class="career_list">
               <li
@@ -60,16 +60,16 @@
     gap: 20px;
 
     &_title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       text-align: center;
     }
 
     &_subtitle {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &_list {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       padding-left: 10px;
       li {
         margin-bottom: 15px;
@@ -78,7 +78,7 @@
     }
 
     h5 {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
   }
 </style>

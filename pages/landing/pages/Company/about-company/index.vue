@@ -107,7 +107,7 @@
     gap: 20px;
 
     &_title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       text-align: center;
     }
 
@@ -123,7 +123,7 @@
       gap: 20px;
 
       p {
-        color: var(--ui-text-secondary);
+        color: var(--landing-text-secondary);
         line-height: 25px;
 
         span {
@@ -138,7 +138,7 @@
     }
 
     &_list {
-      color: var(--ui-text-secondary);
+      color: var(--landing-text-secondary);
       font-size: 14px;
 
       display: grid;

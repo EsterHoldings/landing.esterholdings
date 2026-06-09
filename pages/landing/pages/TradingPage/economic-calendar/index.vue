@@ -35,7 +35,7 @@
     gap: 20px;
 
     &__title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       text-align: center;
     }
 

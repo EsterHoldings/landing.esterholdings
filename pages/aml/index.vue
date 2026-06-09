@@ -1,7 +1,7 @@
 <template>
   <PageStructureDefault>
     <template #header>
-      <UiTextH4 class="text-[var(--ui-text-main)]">AML Policy</UiTextH4>
+      <UiTextH4 class="text-[var(--landing-text-primary)]">AML Policy</UiTextH4>
     </template>
 
     <template #content>
@@ -77,7 +77,7 @@
       </PageStructureContent>
 
       <template v-else>
-        <div class="flex min-h-[55vh] w-full flex-col items-center justify-center text-[var(--ui-text-main)]">
+        <div class="flex min-h-[55vh] w-full flex-col items-center justify-center text-[var(--landing-text-primary)]">
           <UiIconLogo class="mb-4 h-[44px] w-[44px]" />
           <UiIconSpinnerDefault class="h-[44px] w-[44px]" />
         </div>

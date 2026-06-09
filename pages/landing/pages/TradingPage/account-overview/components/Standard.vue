@@ -22,7 +22,7 @@
 
       <div>
         <div class="max-w-[600px] w-full m-auto mt-5">
-          <UiTextH5 class="!text-[var(--ui-text-main)] text-center">
+          <UiTextH5 class="!text-[var(--landing-text-primary)] text-center">
             {{ t(`landing.sections.accounts__options[0].description`) }}
           </UiTextH5>
         </div>
@@ -66,7 +66,7 @@ const {t, tm} = useI18n();
 
 .account-card.active {
   flex: 2;
-  background-color: var(--ui-background-card);
+  background-color: var(--landing-surface-elevated);
   transform: scale(1.05);
   position: relative;
   overflow: hidden;

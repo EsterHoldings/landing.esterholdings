@@ -74,23 +74,23 @@
 
     &_title {
       text-align: center;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
 
       &-platform {
-        color: var(--ui-text-main);
+        color: var(--landing-text-primary);
       }
     }
 
     &_subtitle {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &_text {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
     }
 
     &_list {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       list-style: none;
 
       li {
@@ -106,15 +106,15 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
 
       a {
-        color: var(--ui-text-link);
+        color: var(--landing-accent);
         text-decoration: underline;
         cursor: pointer;
 
         &:hover {
-          color: var(--ui-text-link-hover);
+          color: var(--landing-accent-hover);
         }
       }
     }

@@ -35,11 +35,11 @@
 
       <UiTextH4 class="text-center mt-5">Схема 3 рівнів</UiTextH4>
       <PanelDefault class="panel p-5 mb-8">
-        <pre class="text-[var(--ui-text-main)]">
+        <pre class="text-[var(--landing-text-primary)]">
 Ви (IB)
-<span class="text-[var(--color-text-muted)]">├─</span> Рівень 1: Ваші прямі реферали
-<span class="text-[var(--color-text-muted)]">│  ├─</span> Рівень 2: реферали ваших рефералів
-<span class="text-[var(--color-text-muted)]">│  │  └─</span> Рівень 3: ще один рівень вкладеності
+<span class="text-[var(--landing-text-tertiary)]">├─</span> Рівень 1: Ваші прямі реферали
+<span class="text-[var(--landing-text-tertiary)]">│  ├─</span> Рівень 2: реферали ваших рефералів
+<span class="text-[var(--landing-text-tertiary)]">│  │  └─</span> Рівень 3: ще один рівень вкладеності
         </pre>
         <ul>
           <li><strong>Рівень 1</strong> — зареєстровані <em>безпосередньо</em> через ваше посилання/QR.</li>
@@ -187,7 +187,7 @@ const {t} = useI18n();
 <style lang="scss" scoped>
 .register-ib {
   &_title {
-    color: var(--ui-text-main);
+    color: var(--landing-text-primary);
     text-align: center;
     margin-bottom: 50px;
   }
@@ -199,13 +199,13 @@ const {t} = useI18n();
 
 h4 {
   margin: 0 0 12px;
-  color: var(--ui-text-main);
+  color: var(--landing-text-primary);
   font-weight: 600;
   font-size: 18px;
 }
 
 p, li {
-  color: var(--ui-text-secondary);
+  color: var(--landing-text-secondary);
   line-height: 1.6;
 }
 
@@ -224,8 +224,8 @@ ul, ol {
 }
 
 .ascii {
-  background: var(--color-ui-bg, rgba(0, 0, 0, 0.03));
-  border: 1px solid var(--color-stroke-ui-dark, rgba(0, 0, 0, 0.08));
+  background: var(--landing-surface-muted);
+  border: 1px solid var(--landing-line);
   border-radius: 8px;
   padding: 12px;
   margin: 8px 0 12px;
@@ -237,7 +237,7 @@ ul, ol {
 .faq .q {
   margin: 10px 0 2px;
   font-weight: 600;
-  color: var(--ui-text-main);
+  color: var(--landing-text-primary);
 }
 
 .faq .a {

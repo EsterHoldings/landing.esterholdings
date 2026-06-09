@@ -70,7 +70,7 @@ const themeStore = useThemeStore();
     gap: 142px;
     background: var(--ui-background);
     border-radius: 15px;
-    border: 1px solid var(--ui-stroke);
+    border: 1px solid var(--landing-border-strong);
     overflow: hidden;
     box-shadow: inset 0 -50px 50px -20px var(--ui-background),
       inset 0 50px 50px -20px var(--ui-background);
@@ -107,17 +107,17 @@ const themeStore = useThemeStore();
   }
 
   &__title {
-    color: var(--ui-text-main);
+    color: var(--landing-text-primary);
   }
 
   &__text {
-    color: var(--ui-text-secondary);
+    color: var(--landing-text-secondary);
     white-space: pre-line;
   }
 }
 
 :deep(.light-theme.wrapper) {
-  background: var(--ui-background-card);
+  background: var(--landing-surface-elevated);
 
   &::before,
   &::after {
