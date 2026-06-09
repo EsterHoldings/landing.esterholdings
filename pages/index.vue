@@ -43,6 +43,20 @@
   const uiStore = useUiStore();
   const welcomeRef = ref<HTMLElement | null>(null);
 
+  const clearLegacyScrollLock = () => {
+    const elements = [document.documentElement, document.body];
+    elements.forEach(element => {
+      element.classList.remove("scroll-unlocked", "overflow-hidden", "fixed", "landing-scroll-locked");
+      element.style.overflow = "";
+      element.style.overflowY = "";
+      element.style.position = "";
+      element.style.width = "";
+      element.style.top = "";
+      element.style.left = "";
+      element.style.right = "";
+    });
+  };
+
   const handleScroll = () => {
     if (!welcomeRef.value) return;
 
@@ -51,20 +65,7 @@
   };
 
   onMounted(() => {
-    const body = document.body;
-    const html = document.documentElement;
-
-    body.classList.add("scroll-unlocked");
-    html.classList.add("scroll-unlocked");
-    body.style.setProperty("overflow", "auto", "important");
-    body.style.setProperty("overflow-y", "auto", "important");
-    body.style.position = "";
-    body.style.width = "";
-    body.classList.remove("overflow-hidden", "fixed");
-    html.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow-y", "auto", "important");
-    html.classList.remove("overflow-hidden", "fixed");
-
+    clearLegacyScrollLock();
     window.addEventListener("scroll", handleScroll);
     handleScroll();
   });
@@ -80,7 +81,14 @@
     display: flex;
     flex-direction: column;
     background: var(--landing-bg);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  @supports (overflow: clip) {
+    .landing-v2 {
+      overflow-x: clip;
+    }
   }
 
   @media (max-width: 991px) {

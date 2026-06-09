@@ -1,6 +1,10 @@
 <template>
   <UiContainer>
-    <section class="documents-page">
+    <section
+      ref="documentsRef"
+      class="documents-page"
+      @pointermove="handlePointerMove"
+      @pointerleave="resetPointer">
       <header class="documents-hero">
         <span class="documents-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
         <h1>
@@ -23,7 +27,11 @@
       <div class="documents-grid">
         <article class="document-card document-card--primary">
           <div class="document-card__top">
-            <span class="document-card__index">01</span>
+            <span class="document-number document-number--1 document-card__index">
+              <span class="document-number__orb document-number__orb--solid" />
+              <span class="document-number__orb document-number__orb--glow" />
+              <span class="document-number__value">01</span>
+            </span>
             <div>
               <h2>
                 {{ t("landing.pages.company.documents.regulations_title") }}
@@ -47,7 +55,11 @@
 
         <article class="document-card">
           <div class="document-card__top">
-            <span class="document-card__index">02</span>
+            <span class="document-number document-number--2 document-card__index">
+              <span class="document-number__orb document-number__orb--solid" />
+              <span class="document-number__orb document-number__orb--glow" />
+              <span class="document-number__value">02</span>
+            </span>
             <div>
               <h2>
                 {{ t("landing.pages.company.documents.contract_title") }}
@@ -87,7 +99,13 @@
           <li
             v-for="(step, index) in pageCopy.steps"
             :key="step.title">
-            <span>{{ String(index + 1).padStart(2, "0") }}</span>
+            <span
+              class="document-number documents-process__number"
+              :class="`document-number--${index + 3}`">
+              <span class="document-number__orb document-number__orb--solid" />
+              <span class="document-number__orb document-number__orb--glow" />
+              <span class="document-number__value">{{ String(index + 1).padStart(2, "0") }}</span>
+            </span>
             <div>
               <h3>{{ step.title }}</h3>
               <p>{{ step.text }}</p>
@@ -102,7 +120,7 @@
 <script setup lang="ts">
   import { definePageMeta } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
-  import { computed } from "vue";
+  import { computed, ref } from "vue";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
 
@@ -197,6 +215,7 @@
   };
 
   const { t, tm, locale } = useI18n();
+  const documentsRef = ref<HTMLElement | null>(null);
 
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
@@ -210,6 +229,26 @@
       : [];
   });
 
+  const updatePointerOffset = (x = 0, y = 0) => {
+    documentsRef.value?.style.setProperty("--documents-orb-x", `${x}px`);
+    documentsRef.value?.style.setProperty("--documents-orb-y", `${y}px`);
+  };
+
+  const handlePointerMove = (event: PointerEvent) => {
+    const element = documentsRef.value;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+
+    updatePointerOffset(x, y);
+  };
+
+  const resetPointer = () => {
+    updatePointerOffset();
+  };
+
   const handleClickContract = () => {
     const url = "https://esterholdings.com/wp-content/uploads/ESTER-HOLDINGS-INC_PUBLIC_OFFER_2024_EN.pdf";
     window.open(url, "_blank", "noopener,noreferrer");
@@ -221,6 +260,8 @@
     display: flex;
     flex-direction: column;
     gap: clamp(52px, 6vw, 86px);
+    --documents-orb-x: 0px;
+    --documents-orb-y: 0px;
     color: var(--landing-text-primary);
   }
 
@@ -311,25 +352,13 @@
 
     &__top {
       display: grid;
-      grid-template-columns: 56px minmax(0, 1fr);
+      grid-template-columns: 76px minmax(0, 1fr);
       gap: 20px;
       align-items: flex-start;
     }
 
     &__index {
-      display: inline-flex;
       flex: 0 0 auto;
-      align-items: center;
-      justify-content: flex-start;
-      width: auto;
-      height: auto;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: var(--landing-accent);
-      font-size: 16px;
-      font-weight: 900;
-      line-height: 1.2;
     }
 
     h2 {
@@ -414,6 +443,123 @@
     }
   }
 
+  .document-number {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: flex-end;
+    justify-content: flex-start;
+    width: 66px;
+    height: 66px;
+    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
+    border-radius: 18px;
+    padding: 9px 0 9px 12px;
+    overflow: visible;
+    isolation: isolate;
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
+      color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
+    );
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+      inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
+        linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 8%, transparent));
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+    }
+
+    &__orb {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 999px;
+      transform: translate(var(--documents-orb-x), var(--documents-orb-y));
+      transition: transform 180ms ease-out;
+      will-change: transform;
+    }
+
+    &__orb--solid {
+      z-index: 0;
+      width: 31px;
+      height: 31px;
+      background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
+    }
+
+    &__orb--glow {
+      z-index: 1;
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
+      filter: blur(3px);
+    }
+
+    &__value {
+      position: relative;
+      z-index: 3;
+      color: var(--landing-accent);
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    &--1,
+    &--3 {
+      .document-number__orb--solid {
+        top: -8px;
+        right: -10px;
+      }
+
+      .document-number__orb--glow {
+        top: 8px;
+        right: 5px;
+      }
+    }
+
+    &--2,
+    &--5 {
+      .document-number__orb--solid {
+        right: -9px;
+        bottom: -8px;
+      }
+
+      .document-number__orb--glow {
+        right: 2px;
+        bottom: 5px;
+      }
+    }
+
+    &--4 {
+      .document-number__orb--solid {
+        left: -11px;
+        bottom: -8px;
+      }
+
+      .document-number__orb--glow {
+        left: 2px;
+        bottom: 5px;
+      }
+    }
+  }
+
+  :global(:root[data-theme="dark"] .document-number) {
+    border-color: rgba(139, 164, 214, 0.58);
+    background: linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%), #0b1b44;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -16px 24px rgba(0, 81, 255, 0.08);
+  }
+
   .documents-process {
     display: grid;
     grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
@@ -455,7 +601,7 @@
 
       li {
         display: grid;
-        grid-template-columns: 56px minmax(0, 1fr);
+        grid-template-columns: 76px minmax(0, 1fr);
         gap: 16px;
         align-items: start;
         border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
@@ -467,17 +613,7 @@
         }
 
         > span {
-          display: inline-flex;
-          align-items: flex-start;
-          justify-content: flex-start;
-          width: auto;
-          height: auto;
-          border-radius: 0;
-          background: transparent;
-          color: var(--landing-accent);
-          font-size: 16px;
-          font-weight: 900;
-          line-height: 1.25;
+          margin-top: 2px;
         }
       }
 

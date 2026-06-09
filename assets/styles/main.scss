@@ -82,12 +82,22 @@ html {
   }
 }
 
-html,
+html {
+  min-height: 100%;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  background-color: var(--ui-background);
+}
+
 body {
   min-height: 100dvh;
   height: auto;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
@@ -100,15 +110,22 @@ body {
   background-color: var(--ui-background);
 }
 
-/* Force-unlock scroll when we explicitly add class from router hook */
-html.scroll-unlocked,
-body.scroll-unlocked {
-  overflow: auto !important;
-  overflow-y: auto !important;
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+html.landing-scroll-locked,
+body.landing-scroll-locked {
+  overflow: hidden !important;
   overscroll-behavior: none !important;
   overscroll-behavior-y: none !important;
-  position: static !important;
-  width: auto !important;
+}
+
+body.landing-scroll-locked {
+  touch-action: none;
 }
 
 body {

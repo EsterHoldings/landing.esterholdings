@@ -184,11 +184,14 @@
 
     const elements = [document.documentElement, document.body];
     elements.forEach(element => {
-      element.classList.remove("overflow-hidden", "fixed");
+      element.classList.remove("scroll-unlocked", "overflow-hidden", "fixed", "landing-scroll-locked");
       element.style.overflow = "";
       element.style.overflowY = "";
       element.style.position = "";
       element.style.width = "";
+      element.style.top = "";
+      element.style.left = "";
+      element.style.right = "";
     });
   };
 
@@ -279,11 +282,8 @@
     activeLink.value = "";
 
     if (isMobileMenuOpen.value) {
-      document.documentElement.classList.remove("scroll-unlocked");
-      document.body.classList.remove("scroll-unlocked");
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
+      document.documentElement.classList.add("landing-scroll-locked");
+      document.body.classList.add("landing-scroll-locked");
     } else {
       closeMobileMenu();
     }
