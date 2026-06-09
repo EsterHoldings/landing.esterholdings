@@ -447,13 +447,12 @@
     position: relative;
     display: inline-flex;
     flex-shrink: 0;
-    align-items: flex-end;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
     width: 66px;
     height: 66px;
     border: 0;
     border-radius: 18px;
-    padding: 9px 0 9px 12px;
     overflow: visible;
     isolation: isolate;
     background: transparent;
@@ -473,12 +472,14 @@
       border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
       background: linear-gradient(
         145deg,
-        color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
-        color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
+        color-mix(in srgb, var(--landing-surface-elevated) 54%, transparent),
+        color-mix(in srgb, var(--landing-surface-elevated) 34%, transparent)
       );
+      backdrop-filter: blur(16px) saturate(145%);
+      -webkit-backdrop-filter: blur(16px) saturate(145%);
       box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 28%, transparent),
+        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 8%, transparent);
     }
 
     &::after {
@@ -565,7 +566,7 @@
 
   :global(:root[data-theme="dark"] .document-number::before) {
     border-color: rgba(139, 164, 214, 0.58);
-    background: linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%), #0b1b44;
+    background: linear-gradient(145deg, rgba(25, 48, 96, 0.54) 0%, rgba(8, 23, 55, 0.38) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       inset 0 -16px 24px rgba(0, 81, 255, 0.08);
