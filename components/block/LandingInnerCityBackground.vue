@@ -33,12 +33,9 @@
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
-    opacity: 0.18;
+    opacity: 0.12;
     pointer-events: none;
-    filter: drop-shadow(0 24px 60px color-mix(in srgb, var(--ui-primary-main) 16%, transparent));
-    transition:
-      opacity 0.2s ease,
-      filter 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   .inner-city-bg__illustration {
@@ -58,7 +55,7 @@
   }
 
   :global(:root[data-theme="dark"]) .inner-city-bg {
-    opacity: 0.2;
+    opacity: 0.11;
   }
 
   @media (max-width: 991px) {
@@ -67,11 +64,11 @@
       right: -64px;
       width: min(68vw, 460px);
       min-width: 300px;
-      opacity: 0.13;
+      opacity: 0.09;
     }
 
     :global(:root[data-theme="dark"]) .inner-city-bg {
-      opacity: 0.16;
+      opacity: 0.09;
     }
   }
 
@@ -80,11 +77,11 @@
       right: -120px;
       width: 360px;
       min-width: 360px;
-      opacity: 0.1;
+      opacity: 0.08;
     }
 
     :global(:root[data-theme="dark"]) .inner-city-bg {
-      opacity: 0.12;
+      opacity: 0.08;
     }
   }
 </style>
