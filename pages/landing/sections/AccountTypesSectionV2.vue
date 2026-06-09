@@ -2,6 +2,14 @@
   <section
     id="accounts"
     class="accounts-v2">
+    <span
+      id="demo-account"
+      class="accounts-v2__scroll-anchor"
+      aria-hidden="true" />
+    <span
+      id="standard-account"
+      class="accounts-v2__scroll-anchor"
+      aria-hidden="true" />
     <UiContainer>
       <h2 class="accounts-v2__title">{{ t("landing.sections.accounts__title") }}</h2>
       <div class="accounts-v2__cards">
@@ -15,9 +23,7 @@
             class="accounts-v2__badge"
             >{{ card.badge }}</span
           >
-          <div
-            :id="`${card.id}-account`"
-            class="accounts-v2__card-header accounts-v2__card-anchor">
+          <div class="accounts-v2__card-header accounts-v2__card-anchor">
             <p class="accounts-v2__card-name">{{ card.title }}</p>
             <p class="accounts-v2__card-desc">{{ card.subtitle }}</p>
           </div>
@@ -93,6 +99,16 @@
     margin-top: 160px;
     overflow: hidden;
     scroll-margin-top: 130px;
+
+    &__scroll-anchor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+      scroll-margin-top: 150px;
+    }
 
     &__title {
       margin: 0;
@@ -276,6 +292,10 @@
     .accounts-v2 {
       margin-top: 56px;
       scroll-margin-top: 110px;
+
+      &__scroll-anchor {
+        scroll-margin-top: 124px;
+      }
 
       &__title {
         font-size: 34px;

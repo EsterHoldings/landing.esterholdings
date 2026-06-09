@@ -107,7 +107,10 @@
 
   onUnmounted(stopAnimation);
 
-  watch(() => baseItems.value.length, () => resetLoopPosition());
+  watch(
+    () => baseItems.value.length,
+    () => resetLoopPosition()
+  );
 
   watch(locale, async () => {
     await refresh();
@@ -117,6 +120,7 @@
 
 <style lang="scss" scoped>
   .news-row-v2 {
+    margin-top: 88px;
     overflow-x: hidden;
     overflow-y: hidden;
     cursor: grab;
@@ -176,7 +180,7 @@
 
   @media (max-width: 991px) {
     .news-row-v2 {
-      margin-top: 32px;
+      margin-top: 48px;
 
       &__track {
         gap: 10px;
