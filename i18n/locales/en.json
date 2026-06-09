@@ -652,7 +652,9 @@
         "mt4_requirements_text": "Windows XP and higher.",
         "mt4_requirements_link": "Instructions for Mac OS",
         "platform_title": "Platform",
-        "traders_blog_title": "Traders Blog",
+        "traders_blog_title": "Trader Blog",
+        "traders_blog_subtitle": "Practical market insights, trading education and platform materials for traders.",
+        "traders_blog_empty": "No trader blog posts published yet.",
         "traders_blog_items": [
           {
             "title": "How to Effectively Manage Risks in Trading",

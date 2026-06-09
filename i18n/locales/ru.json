@@ -656,7 +656,9 @@
         "mt4_requirements_text": "Windows XP и выше.",
         "mt4_requirements_link": "Инструкции для Mac OS",
         "platform_title": "Платформа",
-        "traders_blog_title": "Блог трейдеров",
+        "traders_blog_title": "Блог трейдера",
+        "traders_blog_subtitle": "Практические рыночные обзоры, обучение трейдингу и материалы платформы для трейдеров.",
+        "traders_blog_empty": "Посты блога трейдера пока не опубликованы.",
         "traders_blog_items": [
           {
             "title": "Как эффективно управлять рисками в торговле",

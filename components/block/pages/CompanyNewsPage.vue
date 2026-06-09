@@ -2,9 +2,9 @@
   <UiContainer>
     <div class="company-news">
       <div class="company-news__head">
-        <UiTextH3 class="company-news_title">{{ t("landing.pages.company.news.title") }}</UiTextH3>
+        <UiTextH3 class="company-news_title">{{ pageTitle }}</UiTextH3>
         <p class="company-news__lead">
-          {{ t("landing.pages.company.news.subtitle", "Company updates, platform news and important announcements.") }}
+          {{ pageSubtitle }}
         </p>
       </div>
 
@@ -19,13 +19,13 @@
           :message="card.subtitle"
           :date="card.publishedAt"
           :button-text="buttonText"
-          :link="localizedPath(`/news/${card.slug}`)" />
+          :link="localizedPath(`${detailBasePath}/${card.slug}`)" />
       </div>
 
       <div
         v-else
         class="company-news__empty">
-        {{ t("landing.pages.company.news.empty", "No company news published yet.") }}
+        {{ emptyText }}
       </div>
 
       <button
@@ -36,8 +36,8 @@
         @click="loadMore">
         {{
           isLoadingMore
-            ? t("landing.pages.company.news.loading", "Loading...")
-            : t("landing.pages.company.news.load_more", "Загрузить еще")
+            ? loadingText
+            : loadMoreText
         }}
       </button>
     </div>
@@ -52,13 +52,44 @@
   import UiTextH3 from "~/components/ui/UiTextH3.vue";
   import NewsCard from "~/pages/landing/pages/Company/company-news/components/NewsCard.vue";
   import useAppCore from "~/composables/useAppCore";
-  import type { NewsItem, NewsListResponse } from "~/composables/core/modules/news/news.types";
+  import type { NewsArticleType, NewsItem, NewsListResponse } from "~/composables/core/modules/news/news.types";
 
   const PAGE_SIZE = 9;
+
+  const props = withDefaults(
+    defineProps<{
+      articleType?: NewsArticleType;
+      titleKey?: string;
+      titleFallback?: string;
+      subtitleKey?: string;
+      subtitleFallback?: string;
+      emptyKey?: string;
+      emptyFallback?: string;
+      detailBasePath?: string;
+      asyncKey?: string;
+    }>(),
+    {
+      articleType: "news",
+      titleKey: "landing.pages.company.news.title",
+      titleFallback: "Company news",
+      subtitleKey: "landing.pages.company.news.subtitle",
+      subtitleFallback: "Company updates, platform news and important announcements.",
+      emptyKey: "landing.pages.company.news.empty",
+      emptyFallback: "No company news published yet.",
+      detailBasePath: "/news",
+      asyncKey: "company-news-page",
+    }
+  );
 
   const { t, locale } = useI18n();
   const appCore = useAppCore();
   const buttonText = computed(() => t("landing.pages.company.news.button"));
+  const pageTitle = computed(() => t(props.titleKey, props.titleFallback));
+  const pageSubtitle = computed(() => t(props.subtitleKey, props.subtitleFallback));
+  const emptyText = computed(() => t(props.emptyKey, props.emptyFallback));
+  const loadingText = computed(() => t("landing.pages.company.news.loading", "Loading..."));
+  const loadMoreText = computed(() => t("landing.pages.company.news.load_more", "Загрузить еще"));
+  const detailBasePath = computed(() => props.detailBasePath.replace(/\/$/, ""));
   const currentPage = ref(1);
   const isLoadingMore = ref(false);
   const newsItems = ref<NewsItem[]>([]);
@@ -69,8 +100,13 @@
     lastPage: 1,
   });
 
-  const { data: initialPayload, refresh } = await useAsyncData("company-news-page", async () => {
-    const response = await appCore.news.getList({ page: 1, perPage: PAGE_SIZE, locale: locale.value });
+  const { data: initialPayload, refresh } = await useAsyncData(`${props.asyncKey}-${locale.value}`, async () => {
+    const response = await appCore.news.getList({
+      page: 1,
+      perPage: PAGE_SIZE,
+      locale: locale.value,
+      articleType: props.articleType,
+    });
     return response.data;
   });
 
@@ -86,7 +122,12 @@
     isLoadingMore.value = true;
     try {
       const nextPage = currentPage.value + 1;
-      const response = await appCore.news.getList({ page: nextPage, perPage: PAGE_SIZE, locale: locale.value });
+      const response = await appCore.news.getList({
+        page: nextPage,
+        perPage: PAGE_SIZE,
+        locale: locale.value,
+        articleType: props.articleType,
+      });
       newsItems.value = [...newsItems.value, ...response.data.data];
       meta.value = response.data.meta;
       currentPage.value = nextPage;

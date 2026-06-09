@@ -1,5 +1,9 @@
 <template>
-  <section class="steps-v2">
+  <section
+    ref="sectionRef"
+    class="steps-v2"
+    @pointermove="handlePointerMove"
+    @pointerleave="resetPointer">
     <UiContainer>
       <h2>
         {{ t("landing.sections.four_steps_section.title.before") }}
@@ -12,7 +16,9 @@
           class="step"
           :class="`step--${index + 1}`">
           <div class="step__icon">
-            <span>{{ index + 1 }}</span>
+            <span class="step__orb step__orb--solid" />
+            <span class="step__orb step__orb--glow" />
+            <span class="step__number">{{ index + 1 }}</span>
           </div>
           <div class="step__body">
             <h3>{{ step.title }}</h3>
@@ -30,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { computed, ref } from "vue";
   import { useI18n } from "vue-i18n";
   import UiButtonV2 from "~/components/ui/UiButtonV2.vue";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -38,6 +44,7 @@
 
   const { t, tm } = useI18n();
   const { cabinetLink } = useCabinetLink();
+  const sectionRef = ref<HTMLElement | null>(null);
 
   const steps = computed(() => {
     const items = tm("landing.sections.four_steps_section.items") as any[];
@@ -47,11 +54,33 @@
       text: t(`landing.sections.four_steps_section.items[${index}].text`),
     }));
   });
+
+  const updatePointerOffset = (x = 0, y = 0) => {
+    sectionRef.value?.style.setProperty("--step-orb-x", `${x}px`);
+    sectionRef.value?.style.setProperty("--step-orb-y", `${y}px`);
+  };
+
+  const handlePointerMove = (event: PointerEvent) => {
+    const element = sectionRef.value;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+
+    updatePointerOffset(x, y);
+  };
+
+  const resetPointer = () => {
+    updatePointerOffset();
+  };
 </script>
 
 <style lang="scss" scoped>
   .steps-v2 {
     margin-top: 160px;
+    --step-orb-x: 0px;
+    --step-orb-y: 0px;
 
     h2 {
       margin: 0;
@@ -99,31 +128,51 @@
       padding: 10px 0 10px 14px;
       flex-shrink: 0;
       overflow: visible;
+      isolation: isolate;
 
-      &::before,
       &::after {
         content: "";
         position: absolute;
         pointer-events: none;
-        border-radius: 999px;
       }
 
-      &::before {
+      &::after {
+        inset: 0;
+        z-index: 2;
+        border-radius: inherit;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
+          linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 8%, transparent));
+        box-shadow:
+          inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+          inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+      }
+
+      .step__orb {
+        position: absolute;
+        pointer-events: none;
+        border-radius: 999px;
+        transform: translate(var(--step-orb-x), var(--step-orb-y));
+        transition: transform 180ms ease-out;
+        will-change: transform;
+      }
+
+      .step__orb--solid {
         width: 36px;
         height: 36px;
         background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
         z-index: 0;
       }
 
-      &::after {
+      .step__orb--glow {
         width: 25px;
         height: 25px;
         background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
         filter: blur(3px);
-        z-index: 2;
+        z-index: 1;
       }
 
-      span {
+      .step__number {
         position: relative;
         z-index: 3;
         color: var(--landing-accent);
@@ -159,12 +208,12 @@
   .step--1,
   .step--3 {
     .step__icon {
-      &::before {
+      .step__orb--solid {
         top: -8px;
         right: -11px;
       }
 
-      &::after {
+      .step__orb--glow {
         top: 8px;
         right: 6px;
       }
@@ -173,12 +222,12 @@
 
   .step--2 {
     .step__icon {
-      &::before {
+      .step__orb--solid {
         right: -10px;
         bottom: -8px;
       }
 
-      &::after {
+      .step__orb--glow {
         right: 2px;
         bottom: 5px;
       }
@@ -187,12 +236,12 @@
 
   .step--4 {
     .step__icon {
-      &::before {
+      .step__orb--solid {
         left: -13px;
         bottom: -9px;
       }
 
-      &::after {
+      .step__orb--glow {
         left: 2px;
         bottom: 5px;
       }

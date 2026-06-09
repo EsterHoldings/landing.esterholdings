@@ -1,5 +1,12 @@
 import { useNuxtApp } from "#app";
-import type { NewsArticleResponse, NewsItem, NewsLatestResponse, NewsListResponse, NewsSeo } from "./news.types";
+import type {
+  NewsArticleResponse,
+  NewsArticleType,
+  NewsItem,
+  NewsLatestResponse,
+  NewsListResponse,
+  NewsSeo,
+} from "./news.types";
 
 interface ApiEnvelope<T> {
   data?: T;
@@ -7,6 +14,7 @@ interface ApiEnvelope<T> {
 
 interface ApiNewsArticle {
   id: string;
+  article_type?: NewsArticleType | null;
   slug: string;
   title: string;
   excerpt?: string | null;
@@ -33,11 +41,11 @@ const fallbackImage = "/static/newsBg.jpg";
 
 export class NewsService {
   async list(
-    params: { page?: number; perPage?: number; locale?: string | null } = {}
+    params: { page?: number; perPage?: number; locale?: string | null; articleType?: NewsArticleType } = {}
   ): Promise<{ data: NewsListResponse }> {
     const page = params.page ?? 1;
     const perPage = params.perPage ?? 9;
-    const response = await this.api<ApiEnvelope<ApiNewsListPayload>>("/news", {
+    const response = await this.api<ApiEnvelope<ApiNewsListPayload>>(this.basePath(params.articleType), {
       query: this.cleanQuery({ page, perPage, locale: params.locale }),
     });
     const payload = response.data || {};
@@ -56,9 +64,11 @@ export class NewsService {
     };
   }
 
-  async latest(params: { limit?: number; locale?: string | null } = {}): Promise<{ data: NewsLatestResponse }> {
+  async latest(
+    params: { limit?: number; locale?: string | null; articleType?: NewsArticleType } = {}
+  ): Promise<{ data: NewsLatestResponse }> {
     const limit = params.limit ?? 3;
-    const response = await this.api<ApiEnvelope<ApiNewsLatestPayload>>("/news/latest", {
+    const response = await this.api<ApiEnvelope<ApiNewsLatestPayload>>(`${this.basePath(params.articleType)}/latest`, {
       query: this.cleanQuery({ limit, locale: params.locale }),
     });
 
@@ -69,10 +79,16 @@ export class NewsService {
     };
   }
 
-  async getBySlug(slug: string, params: { locale?: string | null } = {}): Promise<{ data: NewsArticleResponse }> {
-    const response = await this.api<ApiEnvelope<ApiNewsArticle>>(`/news/${encodeURIComponent(slug)}`, {
-      query: this.cleanQuery({ locale: params.locale }),
-    });
+  async getBySlug(
+    slug: string,
+    params: { locale?: string | null; articleType?: NewsArticleType } = {}
+  ): Promise<{ data: NewsArticleResponse }> {
+    const response = await this.api<ApiEnvelope<ApiNewsArticle>>(
+      `${this.basePath(params.articleType)}/${encodeURIComponent(slug)}`,
+      {
+        query: this.cleanQuery({ locale: params.locale }),
+      }
+    );
 
     return {
       data: {
@@ -104,6 +120,7 @@ export class NewsService {
 
     return {
       id: item.id,
+      articleType: item.article_type === "trader_blog" ? "trader_blog" : "news",
       slug: item.slug,
       title: item.title,
       excerpt,
@@ -130,6 +147,10 @@ export class NewsService {
       month: "short",
       day: "numeric",
     }).format(date);
+  }
+
+  private basePath(articleType: NewsArticleType = "news"): string {
+    return articleType === "trader_blog" ? "/trader-blog" : "/news";
   }
 }
 
