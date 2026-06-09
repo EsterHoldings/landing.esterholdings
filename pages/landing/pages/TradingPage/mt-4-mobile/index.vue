@@ -1,5 +1,5 @@
 <template>
-  <LandingMt4Page mode="desktop" />
+  <LandingMt4Page mode="mobile" />
 </template>
 
 <script setup lang="ts">
@@ -8,6 +8,6 @@
 
   definePageMeta({
     layout: "main",
-    alias: "/mt-4",
+    alias: "/mt-4-mobile",
   });
 </script>
