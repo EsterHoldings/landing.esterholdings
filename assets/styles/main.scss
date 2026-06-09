@@ -86,7 +86,7 @@ html,
 body,
 #__nuxt {
   min-height: 100dvh;
-  height: 100vh;
+  height: auto;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: none;

@@ -31,22 +31,28 @@
   }
 
   .page {
+    flex: 1 0 auto;
     overflow: unset;
 
     &--inner {
-      min-height: 100vh;
+      min-height: 0;
       padding-top: 120px;
+      padding-bottom: 56px;
       background: var(--landing-bg);
     }
 
     &-wrapper {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      min-height: 100svh;
+      overflow-x: hidden;
     }
 
     &-content {
       width: 100%;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
       background-color: var(--landing-bg);
       position: relative;
     }
@@ -55,6 +61,7 @@
   @media (max-width: 991px) {
     .page--inner {
       padding-top: 108px;
+      padding-bottom: 40px;
     }
   }
 </style>
