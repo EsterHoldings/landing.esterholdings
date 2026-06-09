@@ -1,20 +1,28 @@
 // app/router.options.ts
-import type { RouterConfig } from '@nuxt/schema'
+import type { RouterConfig } from "@nuxt/schema";
 
 export default <RouterConfig>{
-    scrollBehavior(to, from, savedPosition) {
-        // 1. Если это back/forward в браузере — верни сохранённую позицию
-        if (savedPosition) {
-            return savedPosition
-        }
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
 
-        // 2. Если это тот же маршрут (например, только локаль изменилась),
-        //    не скроль наверх, просто оставайся
-        if (to.fullPath.split('#')[0] === from.fullPath.split('#')[0]) {
-            return false
-        }
+    if (to.hash) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            el: to.hash,
+            top: 120,
+            behavior: "smooth",
+          });
+        }, 60);
+      });
+    }
 
-        // 3. Стандартное поведение: новый роут -> в верх
-        return { left: 0, top: 0 }
-    },
-}
+    if (to.fullPath.split("#")[0] === from.fullPath.split("#")[0]) {
+      return false;
+    }
+
+    return { left: 0, top: 0 };
+  },
+};

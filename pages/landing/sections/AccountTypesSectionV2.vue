@@ -1,10 +1,13 @@
 <template>
-  <section class="accounts-v2">
+  <section
+    id="accounts"
+    class="accounts-v2">
     <UiContainer>
       <h2 class="accounts-v2__title">{{ t("landing.sections.accounts__title") }}</h2>
       <div class="accounts-v2__cards">
         <article
           v-for="card in cards"
+          :id="`${card.id}-account`"
           :key="card.id"
           class="accounts-v2__card"
           :class="`accounts-v2__card--${card.theme}`">
@@ -103,6 +106,7 @@
     position: relative;
     margin-top: 160px;
     overflow: hidden;
+    scroll-margin-top: 130px;
 
     &__title {
       margin: 0;
@@ -121,6 +125,7 @@
 
     &__card {
       position: relative;
+      scroll-margin-top: 130px;
       border: 6px solid var(--landing-border-strong);
       border-radius: 20px;
       padding: 30px;
@@ -280,6 +285,7 @@
   @media (max-width: 991px) {
     .accounts-v2 {
       margin-top: 56px;
+      scroll-margin-top: 110px;
 
       &__title {
         font-size: 34px;
@@ -291,6 +297,10 @@
 
       &__card--orange {
         border-top-right-radius: 20px;
+      }
+
+      &__card {
+        scroll-margin-top: 110px;
       }
 
       &__badge {

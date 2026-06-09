@@ -18,8 +18,14 @@
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 40px;
+    padding: 0;
     z-index: 1;
+  }
+
+  @media (max-width: 1480px) {
+    .container {
+      padding: 0 20px;
+    }
   }
 
   @media (max-width: 991px) {
@@ -30,7 +36,7 @@
 
   @media (max-width: 575px) {
     .container {
-      padding: 0 12px;
+      padding: 0 20px;
     }
   }
 </style>

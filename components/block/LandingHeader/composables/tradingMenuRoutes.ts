@@ -1,13 +1,8 @@
 export const tradingMenuRoutes = (activeLink, t) => {
   return {
     [t(`landing.header.megaMenu.${activeLink}[0].section`)]: {
-      path: "account-overview?index=0",
-      list: [
-        "account-overview?index=0",
-        "account-overview?index=1",
-        "account-overview?index=2",
-        "account-overview?index=3",
-      ],
+      path: "/#accounts",
+      list: ["/#demo-account", "/#standard-account"],
     },
     [t(`landing.header.megaMenu.${activeLink}[1].section`)]: {
       path: "market-instruments?index=0",

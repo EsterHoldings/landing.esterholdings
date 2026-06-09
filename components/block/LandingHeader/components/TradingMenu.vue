@@ -54,6 +54,13 @@
   function buildItems(sections, sectionIndex) {
     const titleList = t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].section`);
 
+    if (sectionIndex === 0) {
+      return [0, 1].map((accountIndex, itemIndex) => ({
+        name: t(`landing.sections.accounts__options[${accountIndex}].title`),
+        path: menuRoutes[titleList]?.list?.[itemIndex] ?? "#",
+      }));
+    }
+
     return sections.items.map((_, itemIndex) => ({
       name: t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].items[${itemIndex}]`),
       path: menuRoutes[titleList]?.list?.[itemIndex] ?? "#",
