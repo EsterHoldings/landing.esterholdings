@@ -2,7 +2,6 @@
   <div class="page-wrapper">
     <div class="page-content">
       <LandingHeaderV2 class="header" />
-      <LandingInnerCityBackground />
 
       <transition
         name="fade"
@@ -18,7 +17,6 @@
 <script setup lang="ts">
   import LandingHeaderV2 from "~/components/block/LandingHeaderV2.vue";
   import LandingFooterV2 from "~/components/block/LandingFooterV2.vue";
-  import LandingInnerCityBackground from "~/components/block/LandingInnerCityBackground.vue";
 </script>
 
 <style lang="scss" scoped>

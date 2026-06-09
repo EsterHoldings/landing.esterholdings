@@ -2,7 +2,6 @@
   <div class="page-wrapper">
     <div class="page-content">
       <LandingHeaderV2 class="header" />
-      <LandingInnerCityBackground v-if="!isHomePage" />
       <div
         class="page"
         :class="{ 'page--inner': !isHomePage }">
@@ -18,7 +17,6 @@
   import { useRoute } from "vue-router";
   import LandingHeaderV2 from "~/components/block/LandingHeaderV2.vue";
   import LandingFooterV2 from "~/components/block/LandingFooterV2.vue";
-  import LandingInnerCityBackground from "~/components/block/LandingInnerCityBackground.vue";
 
   const route = useRoute();
   const isHomePage = computed(() => {
