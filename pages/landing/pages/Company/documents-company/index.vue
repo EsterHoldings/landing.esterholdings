@@ -451,27 +451,38 @@
     justify-content: flex-start;
     width: 66px;
     height: 66px;
-    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
+    border: 0;
     border-radius: 18px;
     padding: 9px 0 9px 12px;
     overflow: visible;
     isolation: isolate;
-    background: linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
-      color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
-    );
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-      inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+    background: transparent;
+    box-shadow: none;
 
+    &::before,
     &::after {
       content: "";
       position: absolute;
       inset: 0;
-      z-index: 2;
       border-radius: inherit;
       pointer-events: none;
+    }
+
+    &::before {
+      z-index: 1;
+      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
+      background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
+        color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
+      );
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+    }
+
+    &::after {
+      z-index: 2;
       background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
         linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 8%, transparent));
@@ -497,7 +508,7 @@
     }
 
     &__orb--glow {
-      z-index: 1;
+      z-index: 0;
       width: 22px;
       height: 22px;
       background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
@@ -552,7 +563,7 @@
     }
   }
 
-  :global(:root[data-theme="dark"] .document-number) {
+  :global(:root[data-theme="dark"] .document-number::before) {
     border-color: rgba(139, 164, 214, 0.58);
     background: linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%), #0b1b44;
     box-shadow:

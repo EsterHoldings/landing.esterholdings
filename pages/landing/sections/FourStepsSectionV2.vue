@@ -112,16 +112,9 @@
       width: 80px;
       height: 80px;
       border-radius: 20px;
-      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
-      background:
-        linear-gradient(
-          145deg,
-          color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
-          color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
-        );
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-        inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
@@ -130,16 +123,30 @@
       overflow: visible;
       isolation: isolate;
 
+      &::before,
       &::after {
         content: "";
         position: absolute;
+        inset: 0;
+        border-radius: inherit;
         pointer-events: none;
       }
 
+      &::before {
+        z-index: 1;
+        border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
+        background: linear-gradient(
+          145deg,
+          color-mix(in srgb, var(--landing-surface-elevated) 94%, var(--landing-accent) 6%),
+          color-mix(in srgb, var(--landing-surface-elevated) 88%, var(--landing-bg) 12%)
+        );
+        box-shadow:
+          inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
+          inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+      }
+
       &::after {
-        inset: 0;
         z-index: 2;
-        border-radius: inherit;
         background:
           linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
           linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 8%, transparent));
@@ -167,9 +174,14 @@
       .step__orb--glow {
         width: 25px;
         height: 25px;
-        background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
+        background: radial-gradient(
+          circle,
+          rgba(142, 181, 255, 0.95) 0%,
+          rgba(60, 122, 255, 0.62) 44%,
+          transparent 72%
+        );
         filter: blur(3px);
-        z-index: 1;
+        z-index: 0;
       }
 
       .step__number {
@@ -248,11 +260,9 @@
     }
   }
 
-  :global(:root[data-theme="dark"] .step__icon) {
+  :global(:root[data-theme="dark"] .step__icon::before) {
     border-color: rgba(139, 164, 214, 0.58);
-    background:
-      linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%),
-      #0b1b44;
+    background: linear-gradient(145deg, rgba(21, 38, 76, 0.95) 0%, rgba(10, 24, 55, 0.98) 100%), #0b1b44;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       inset 0 -18px 28px rgba(0, 81, 255, 0.08);
