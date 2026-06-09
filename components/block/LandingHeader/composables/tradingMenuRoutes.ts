@@ -29,7 +29,7 @@ export const tradingMenuRoutes = (activeLink, t) => {
 
     [t(`landing.header.megaMenu.${activeLink}[4].section`)]: {
       path: "trader's-hub",
-      list: ["/trader's-blog", "/economic-calendar", "/market-news"],
+      list: ["/trader's-blog", "/economic-calendar"],
     },
 
     [t(`landing.header.megaMenu.${activeLink}[5].section`)]: {

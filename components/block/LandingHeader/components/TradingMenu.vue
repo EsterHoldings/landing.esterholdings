@@ -39,6 +39,9 @@
   const headerItems = tm(`landing.header.megaMenu.${props.activeLink}`);
   const menuRoutes = routes(props.activeLink, t);
   const hiddenSectionIndexes = new Set([0, 1, 5]);
+  const hiddenItemIndexesBySection = {
+    4: new Set([2]),
+  };
   const visibleHeaderItems = headerItems
     .map((section, index) => ({ ...section, index }))
     .filter(section => !hiddenSectionIndexes.has(section.index));
@@ -61,10 +64,13 @@
       }));
     }
 
-    return sections.items.map((_, itemIndex) => ({
-      name: t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].items[${itemIndex}]`),
-      path: menuRoutes[titleList]?.list?.[itemIndex] ?? "#",
-    }));
+    return sections.items
+      .map((_, itemIndex) => ({ itemIndex }))
+      .filter(({ itemIndex }) => !hiddenItemIndexesBySection[sectionIndex]?.has(itemIndex))
+      .map(({ itemIndex }, visibleItemIndex) => ({
+        name: t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].items[${itemIndex}]`),
+        path: menuRoutes[titleList]?.list?.[visibleItemIndex] ?? "#",
+      }));
   }
 </script>
 
