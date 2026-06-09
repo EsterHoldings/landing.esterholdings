@@ -2,6 +2,7 @@
   <div class="page-wrapper">
     <div class="page-content">
       <LandingHeaderV2 class="header" />
+      <LandingInnerCityBackground />
 
       <transition
         name="fade"
@@ -9,7 +10,7 @@
         <div class="page page--inner"><slot /></div>
       </transition>
 
-      <LandingFooterV2 />
+      <LandingFooterV2 class="footer" />
     </div>
   </div>
 </template>
@@ -17,6 +18,7 @@
 <script setup lang="ts">
   import LandingHeaderV2 from "~/components/block/LandingHeaderV2.vue";
   import LandingFooterV2 from "~/components/block/LandingFooterV2.vue";
+  import LandingInnerCityBackground from "~/components/block/LandingInnerCityBackground.vue";
 </script>
 
 <style lang="scss" scoped>
@@ -24,10 +26,17 @@
     z-index: 9999;
   }
 
+  .footer {
+    position: relative;
+    z-index: 1;
+  }
+
   .page {
     //min-height: 100vh;
     flex: 1 0 auto;
     overflow: unset;
+    position: relative;
+    z-index: 1;
 
     &-wrapper {
       display: flex;
@@ -42,6 +51,7 @@
       flex-direction: column;
       background-color: var(--landing-bg);
       position: relative;
+      isolation: isolate;
     }
   }
 
@@ -49,7 +59,7 @@
     min-height: 0;
     padding-top: 120px;
     padding-bottom: 56px;
-    background: var(--landing-bg);
+    background: transparent;
   }
 
   @media (max-width: 991px) {
