@@ -5,8 +5,9 @@
       :class="{ header__link_active: props.linkKey === props.activeLink }">
       <UiTextH5>{{ props.name }}</UiTextH5>
 
-      <UiIconChevronUp v-if="props.linkKey === props.activeLink" />
-      <UiIconChevronDown v-else />
+      <UiIconChevronDown
+        class="header__chevron"
+        :class="{ 'header__chevron--active': props.linkKey === props.activeLink }" />
     </div>
 
     <div class="header__underline"></div>
@@ -33,7 +34,6 @@
 
 <script setup>
   import UiIconChevronDown from "~/components/ui/UiIconChevronDown.vue";
-  import UiIconChevronUp from "~/components/ui/UiIconChevronUp.vue";
   import UiTextH5 from "~/components/ui/UiTextH5.vue";
   import TradingMenu from "./TradingMenu.vue";
   import PartnershipMenu from "./PartnershipMenu.vue";
@@ -73,6 +73,15 @@
       width: 34px;
       height: 34px;
       color: inherit;
+    }
+
+    .header__chevron {
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+
+      &--active {
+        transform: rotate(180deg);
+      }
     }
 
     &:hover {

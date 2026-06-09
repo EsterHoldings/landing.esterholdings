@@ -1,20 +1,20 @@
 <template>
   <div class="page-wrapper">
     <div class="page-content">
-      <LandingHeader class="header" />
+      <LandingHeaderV2 class="header" />
 
       <transition name="fade" mode="out-in">
-        <div class="page"><slot /></div>
+        <div class="page page--inner"><slot /></div>
       </transition>
 
-      <LandingFooter />
+      <LandingFooterV2 />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import LandingHeader from "~/components/block/LandingHeader.vue";
-import LandingFooter from "~/components/block/LandingFooter";
+import LandingHeaderV2 from "~/components/block/LandingHeaderV2.vue";
+import LandingFooterV2 from "~/components/block/LandingFooterV2.vue";
 </script>
 
 <style lang="scss" scoped>
@@ -34,8 +34,20 @@ import LandingFooter from "~/components/block/LandingFooter";
 
   &-content {
     width: 100%;
-    background-color: var(--ui-background);
+    background-color: var(--landing-bg);
     position: relative;
+  }
+}
+
+.page--inner {
+  min-height: 100vh;
+  padding-top: 120px;
+  background: var(--landing-bg);
+}
+
+@media (max-width: 991px) {
+  .page--inner {
+    padding-top: 108px;
   }
 }
 

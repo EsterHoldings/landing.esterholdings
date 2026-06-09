@@ -20,6 +20,7 @@
             <HeaderLink
               v-for="link in linksList"
               :key="link.key"
+              :link-key="link.key"
               :name="link.name"
               :activeLink="activeLink"
               :isInvertColor="useDarkHeaderIcons"
@@ -68,77 +69,82 @@
       </UiContainer>
     </div>
 
-    <div
-      v-if="!isMobileMenuOpen && activeLink"
-      class="desktop-menu">
+    <Transition name="desktop-menu-fade" mode="out-in">
       <div
-        ref="menuRef"
-        class="desktop-menu__content"
-        :style="menuContentStyle">
-        <TradingMenu
-          v-if="activeLink === 'Trading'"
-          :activeLink="activeLink" />
-        <PartnershipMenu
-          v-else-if="activeLink === 'Partnership'"
-          :activeLink="activeLink" />
-        <CompanyMenu
-          v-else-if="activeLink === 'Company'"
-          :activeLink="activeLink" />
+        v-if="!isMobileMenuOpen && activeLink"
+        :key="activeLink"
+        class="desktop-menu">
+        <div
+          ref="menuRef"
+          class="desktop-menu__content"
+          :style="menuContentStyle">
+          <TradingMenu
+            v-if="activeLink === 'Trading'"
+            :activeLink="activeLink" />
+          <PartnershipMenu
+            v-else-if="activeLink === 'Partnership'"
+            :activeLink="activeLink" />
+          <CompanyMenu
+            v-else-if="activeLink === 'Company'"
+            :activeLink="activeLink" />
+        </div>
       </div>
-    </div>
+    </Transition>
 
-    <div
-      v-if="isMobileMenuOpen"
-      class="mobile-menu">
-      <div class="mobile-menu__panel">
-        <div class="mobile-menu__items">
-          <HeaderMobileLink
-            v-for="link in linksList"
-            :key="`${link.key}-${activeLink}`"
-            :name="link.name"
-            :linkKey="link.key"
-            :headerItems="headerItems"
-            :activeLink="activeLink"
-            @click="handleClick(link.key)" />
-        </div>
-        <div class="mobile-menu__footer">
-          <div class="mobile-menu__line mobile-menu__line--lang">
-            <LanguageSwitcher />
-            <span>{{ currentLocaleLabel }}</span>
+    <Transition name="mobile-menu-fade">
+      <div
+        v-if="isMobileMenuOpen"
+        class="mobile-menu">
+        <div class="mobile-menu__panel">
+          <div class="mobile-menu__items">
+            <HeaderMobileLink
+              v-for="link in linksList"
+              :key="`${link.key}-${activeLink}`"
+              :name="link.name"
+              :linkKey="link.key"
+              :headerItems="headerItems"
+              :activeLink="activeLink"
+              @click="handleClick(link.key)" />
           </div>
-          <button
-            class="theme-inline mobile-menu__line"
-            type="button"
-            @click="themeStore.toggleTheme()">
-            <UiIconMoon v-if="themeStore.currentTheme === 'light'" />
-            <UiIconSun v-else />
-            <span>{{ themeStore.currentTheme === "light" ? "Night Mode" : "Day Mode" }}</span>
-          </button>
-          <a
-            :href="cabinetLink('/auth/login')"
-            class="auth-link auth-link--mobile mobile-menu__line">
-            <UiIconLogout class="login-icon" />
-            {{ t("landing.header.auth.login") }}
-          </a>
-          <a
-            :href="cabinetLink('/auth/registration')"
-            class="mobile-register">
-            <UiButtonDefault
-              state="primary"
-              class="auth-register auth-register--mobile">
-              {{ t("landing.header.auth.register") }}
-            </UiButtonDefault>
-          </a>
+          <div class="mobile-menu__footer">
+            <div class="mobile-menu__line mobile-menu__line--lang">
+              <LanguageSwitcher />
+              <span>{{ currentLocaleLabel }}</span>
+            </div>
+            <button
+              class="theme-inline mobile-menu__line"
+              type="button"
+              @click="themeStore.toggleTheme()">
+              <UiIconMoon v-if="themeStore.currentTheme === 'light'" />
+              <UiIconSun v-else />
+              <span>{{ themeStore.currentTheme === "light" ? "Night Mode" : "Day Mode" }}</span>
+            </button>
+            <a
+              :href="cabinetLink('/auth/login')"
+              class="auth-link auth-link--mobile mobile-menu__line">
+              <UiIconLogout class="login-icon" />
+              {{ t("landing.header.auth.login") }}
+            </a>
+            <a
+              :href="cabinetLink('/auth/registration')"
+              class="mobile-register">
+              <UiButtonDefault
+                state="primary"
+                class="auth-register auth-register--mobile">
+                {{ t("landing.header.auth.register") }}
+              </UiButtonDefault>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
   import { useI18n } from "vue-i18n";
   import { ref, computed, onMounted, onBeforeUnmount, watch, provide } from "vue";
-  import { useRoute, onBeforeRouteLeave } from "vue-router";
+  import { useRoute } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
   import { useThemeStore } from "~/stores/themeStore.js";
   import useTrackScroll, { isSlideWithoutPicture } from "./LandingHeader/composables/trackScroll";
@@ -222,7 +228,7 @@
 
   const forceSvgInvert = computed(() => {
     const baseRouteName = route.name?.toString().split("___")[0];
-    return themeStore.currentTheme === "light" && baseRouteName !== "index-v2";
+    return themeStore.currentTheme === "light" && baseRouteName !== "index";
   });
 
   const useDarkHeaderIcons = computed(() => isThemeLight.value || isWithPicture.value || forceSvgInvert.value);
@@ -288,11 +294,14 @@
     closeMobileMenu();
   });
 
-  onBeforeRouteLeave(() => {
-    activeLink.value = "";
-    uiStore.showMenu = false;
-    closeMobileMenu();
-  });
+  watch(
+    () => route.fullPath,
+    () => {
+      activeLink.value = "";
+      uiStore.showMenu = false;
+      closeMobileMenu();
+    }
+  );
 
   watch(windowWidth, width => {
     if (width > 991 && isMobileMenuOpen.value) closeMobileMenu();
@@ -310,6 +319,11 @@
       inset: 0 0 auto 0;
       z-index: 10000;
       padding: 20px;
+      transition:
+        border-radius 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     &__bar {
@@ -483,6 +497,7 @@
       position: absolute;
       pointer-events: auto;
       margin-top: 20px;
+      transform-origin: top center;
     }
   }
 
@@ -598,6 +613,32 @@
   .dropdown-leave-to {
     opacity: 0;
     transform: translateY(-8px);
+  }
+
+  .desktop-menu-fade-enter-active,
+  .desktop-menu-fade-leave-active {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .desktop-menu-fade-enter-from,
+  .desktop-menu-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+
+  .mobile-menu-fade-enter-active,
+  .mobile-menu-fade-leave-active {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .mobile-menu-fade-enter-from,
+  .mobile-menu-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 
   @media (max-width: 991px) {

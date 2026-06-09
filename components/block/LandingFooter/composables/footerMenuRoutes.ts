@@ -5,13 +5,8 @@ export const footerMenuRoutes = () => {
         labelKey: "landing.footer.trading.items[0]",
         path: "account-overview?index=0",
       },
-      {
-        labelKey: "landing.footer.trading.items[1]",
-        path: "market-instruments?index=0",
-      },
       { labelKey: "landing.footer.trading.items[2]", path: "platform" },
-      { labelKey: "landing.footer.trading.items[3]", path: "trading-term" },
-      { labelKey: "landing.footer.trading.items[4]", path: "tandem-trading" },
+      { labelKey: "landing.footer.trading.items[3]", path: "trading-conditions" },
     ],
     partnership: [
       { labelKey: "landing.footer.partnership.items[0]", path: "register-ib" },

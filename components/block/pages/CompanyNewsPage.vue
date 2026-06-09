@@ -166,13 +166,13 @@
     }
 
     &_title {
-      color: var(--ui-text-main);
+      color: var(--landing-text-primary);
       margin: 0;
     }
 
     &__lead {
       margin: 12px 0 0;
-      color: var(--ui-text-secondary);
+      color: var(--landing-text-secondary);
       font-size: 16px;
       line-height: 1.55;
     }

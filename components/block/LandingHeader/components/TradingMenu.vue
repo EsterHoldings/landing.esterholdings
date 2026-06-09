@@ -7,17 +7,11 @@
         class="menu-grid"
         :class="{ 'menu-mobile': props.isMobile }">
         <HeaderMenuItem
-          v-for="(section, index) in headerItems"
+          v-for="section in visibleHeaderItems"
           :key="section.section"
-          :titles="buildTitle(index)"
-          :items="buildItems(section, index)"
+          :titles="buildTitle(section.index)"
+          :items="buildItems(section, section.index)"
           :isMobile="props.isMobile" />
-
-        <div
-          class="menu-banner"
-          :class="{ 'menu-banner_mobile': props.isMobile }">
-          BANNER
-        </div>
       </div>
     </div>
   </UiContainer>
@@ -44,6 +38,10 @@
 
   const headerItems = tm(`landing.header.megaMenu.${props.activeLink}`);
   const menuRoutes = routes(props.activeLink, t);
+  const hiddenSectionIndexes = new Set([1, 5]);
+  const visibleHeaderItems = headerItems
+    .map((section, index) => ({ ...section, index }))
+    .filter(section => !hiddenSectionIndexes.has(section.index));
 
   function buildTitle(sectionIndex) {
     const title = t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].section`);
@@ -85,27 +83,11 @@
 
   .menu-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, max-content);
     grid-auto-rows: auto;
-    gap: 40px 32px;
+    gap: 40px 42px;
     position: relative;
     align-items: baseline;
-  }
-
-  .menu-banner {
-    grid-column: 3 / span 2;
-    height: 200px;
-    background: linear-gradient(135deg, var(--landing-accent) 0%, var(--landing-accent-secondary) 100%);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--landing-on-accent);
-    font-weight: bold;
-
-    &_mobile {
-      display: none;
-    }
   }
 
   .menu-mobile {

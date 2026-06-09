@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-[var(--ui-background-panel)] border border-[var(--color-stroke-ui-light)] rounded-[10px]">
+  <div class="panel-default">
     <div
       v-if="title.length > 0"
-      class="px-[10px] h-10 flex items-center font-semibold">
+      class="panel-default__title">
       <div class="flex items-center justify-between w-full">
         <span>{{ props.title }}</span>
         <div>
@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full h-auto">
+    <div class="panel-default__content">
       <slot />
     </div>
   </div>
@@ -28,3 +28,30 @@
     },
   });
 </script>
+
+<style scoped lang="scss">
+  .panel-default {
+    width: 100%;
+    border: 1px solid var(--landing-border-strong);
+    border-radius: 12px;
+    background: var(--landing-surface-glass);
+    box-shadow: var(--landing-shadow-card);
+    color: var(--landing-text-primary);
+    overflow: hidden;
+  }
+
+  .panel-default__title {
+    min-height: 40px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    color: var(--landing-text-primary);
+    border-bottom: 1px solid var(--landing-line);
+  }
+
+  .panel-default__content {
+    width: 100%;
+    height: auto;
+  }
+</style>

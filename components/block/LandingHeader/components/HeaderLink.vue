@@ -4,29 +4,25 @@
     :class="linkClass">
     <UiTextH5 :class="textClass">{{ props.name }}</UiTextH5>
 
-    <UiIconChevronUp
-      v-if="isActive"
-      :class="iconUpClass" />
-
     <UiIconChevronDown
-      v-else
-      :class="iconDownClass" />
+      class="header__chevron"
+      :class="iconClass" />
   </div>
 </template>
 
 <script setup>
   import { computed } from "vue";
   import UiIconChevronDown from "~/components/ui/UiIconChevronDown.vue";
-  import UiIconChevronUp from "~/components/ui/UiIconChevronUp.vue";
   import UiTextH5 from "~/components/ui/UiTextH5.vue";
 
   const props = defineProps({
     name: String,
+    linkKey: String,
     activeLink: String,
     isInvertColor: Boolean,
   });
 
-  const isActive = computed(() => props.name === props.activeLink);
+  const isActive = computed(() => props.linkKey === props.activeLink);
 
   const linkClass = computed(() => ({
     "active-link": isActive.value,
@@ -38,12 +34,9 @@
     "is-theme-default": !props.isInvertColor,
   }));
 
-  const iconUpClass = computed(() => ({
+  const iconClass = computed(() => ({
+    "header__chevron--active": isActive.value,
     "active-link": isActive.value,
-    "svg-fill": props.isInvertColor,
-  }));
-
-  const iconDownClass = computed(() => ({
     "svg-fill": props.isInvertColor,
   }));
 </script>
@@ -56,6 +49,9 @@
     color: var(--landing-text-primary);
     text-decoration: none;
     cursor: pointer;
+    transition:
+      color 0.2s ease,
+      opacity 0.2s ease;
 
     &:hover {
       color: var(--landing-accent-secondary);
@@ -63,6 +59,18 @@
       svg {
         fill: currentColor;
       }
+    }
+  }
+
+  .header__chevron {
+    transform: rotate(0deg);
+    transition:
+      transform 0.2s ease,
+      color 0.2s ease,
+      fill 0.2s ease;
+
+    &--active {
+      transform: rotate(180deg);
     }
   }
 

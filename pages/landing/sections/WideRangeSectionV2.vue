@@ -10,7 +10,7 @@
           <NuxtLink
             v-for="(item, index) in items"
             :key="index"
-            :to="`/market-instruments?index=${index}`"
+            :to="localizedMarketPath(index)"
             :style="{ '--i': index }"
             class="range-v2__card">
             <div class="range-v2__thumb">
@@ -46,7 +46,7 @@
   import imgMoon from "~/assets/landing/static-v2/moon.png";
   import imgEtfs from "~/assets/landing/static-v2/etfs.png";
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const listRef = ref<HTMLElement | null>(null);
   const isVisible = ref(false);
@@ -86,6 +86,10 @@
       image: IMAGES[key].img,
     }))
   );
+
+  function localizedMarketPath(index: number): string {
+    return locale.value ? `/${locale.value}/market-instruments?index=${index}` : `/market-instruments?index=${index}`;
+  }
 </script>
 
 <style lang="scss" scoped>
