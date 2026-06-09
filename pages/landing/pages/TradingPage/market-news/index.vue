@@ -26,13 +26,12 @@
           v-for="(card, index) in newsItems"
           :key="card.title"
           class="market-news-item">
-          <span
-            class="market-number market-news-item__number"
-            :class="`market-number--${index + 1}`">
-            <span class="market-number__orb market-number__orb--solid" />
-            <span class="market-number__orb market-number__orb--glow" />
-            <span class="market-number__value">{{ index + 1 }}</span>
-          </span>
+          <figure class="market-news-item__preview">
+            <img
+              :src="card.preview"
+              :alt="card.title"
+              loading="lazy" />
+          </figure>
 
           <div class="market-news-item__body">
             <span class="market-news-item__date">{{ card.time }}</span>
@@ -187,6 +186,12 @@
   const newsItems = computed(() => {
     const items = tm("landing.pages.trading.market_news_items") as any[];
     const buttonText = t("landing.pages.company.news.button");
+    const previews = [
+      "/static/market-newsBg.jpg",
+      "/static/forex-money.webp",
+      "/static/bitcion_image.webp",
+      "/static/energy_image.webp",
+    ];
 
     return Array.isArray(items)
       ? items.map((_, index) => ({
@@ -195,6 +200,7 @@
           time: t(`landing.pages.trading.market_news_items[${index}].time`),
           link: "/trader-blog",
           buttonText,
+          preview: previews[index % previews.length],
         }))
       : [];
   });
@@ -306,11 +312,40 @@
 
   .market-news-item {
     display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-columns: 152px minmax(0, 1fr);
     gap: 20px;
     align-items: flex-start;
     border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
     padding-bottom: clamp(28px, 3vw, 38px);
+
+    &__preview {
+      position: relative;
+      margin: 0;
+      aspect-ratio: 1.18;
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--landing-line) 74%, transparent);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--landing-surface-elevated) 22%, transparent);
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 18%, transparent);
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.15), transparent 48%),
+          linear-gradient(0deg, color-mix(in srgb, var(--landing-accent) 18%, transparent), transparent 64%);
+        pointer-events: none;
+      }
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.92) contrast(0.98);
+      }
+    }
 
     &__date {
       display: inline-flex;
@@ -552,6 +587,10 @@
     .market-news-item,
     .market-news-rhythm__steps li {
       grid-template-columns: 1fr;
+    }
+
+    .market-news-item__preview {
+      width: min(100%, 320px);
     }
   }
 </style>
