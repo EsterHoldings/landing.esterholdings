@@ -218,6 +218,7 @@ export default defineNuxtConfig({
     public: {
       hostBase: process.env.NUXT_PUBLIC_HOST_BASE || "https://server.esterholdings.com",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://server.esterholdings.com/api",
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "https://esterholdings.space",
 
       reverbKey: process.env.NUXT_PUBLIC_REVERB_KEY || process.env.VITE_REVERB_APP_KEY || "prod-key",
       reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || process.env.VITE_REVERB_HOST || "server.esterholdings.com",

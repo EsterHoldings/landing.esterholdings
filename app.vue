@@ -17,6 +17,7 @@
   import { useHead } from "#imports";
 
   import ModalRightSideDefault from "./components/block/modals/ModalRightSideDefault.vue";
+  import useLandingSeo from "./composables/useLandingSeo";
   import { useThemeStore } from "./stores/themeStore";
 
   import "vue-draggable-resizable/style.css";
@@ -27,6 +28,8 @@
   const modalKey = ref(0);
   const themeStore = useThemeStore();
   const browserThemeColor = computed(() => (themeStore.currentTheme === "dark" ? "#07111d" : "#f6f6f6"));
+
+  await useLandingSeo();
 
   const openModal = (component: any, props = {}) => {
     modalContent.value = component;
