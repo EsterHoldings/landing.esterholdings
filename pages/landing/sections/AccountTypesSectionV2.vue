@@ -50,14 +50,14 @@
   import UiIconSpreads from "~/components/ui/UiIconSpreads.vue";
   import UiIconDeposit from "~/components/ui/UiIconDeposit.vue";
   import UiIconFirstDeposit from "~/components/ui/UiIconFirstDeposit.vue";
-  import UiIconShareDeposit from "~/components/ui/UiIconShareDeposit.vue";
-  import UiIconRealTime from "~/components/ui/UiIconRealTime.vue";
+  import UiIconSecurity from "~/components/ui/UiIconSecurity.vue";
+  import UiIconInstruments from "~/components/ui/UiIconInstruments.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const { t } = useI18n();
   const { cabinetLink } = useCabinetLink();
 
-  // Индексы соответствуют порядку в accounts__options: demo=0, standard=1, tandem=3
+  // Индексы соответствуют порядку в accounts__options: demo=0, standard=1, pro=2, islamic=4.
   const cards = computed(() => [
     {
       id: "demo",
@@ -86,17 +86,30 @@
       buttonText: t("landing.sections.accounts__options[1].buttonText"),
     },
     {
-      id: "tandem",
+      id: "pro",
       theme: "blue",
       badge: null,
-      title: t("landing.sections.accounts__options[3].title"),
-      subtitle: t("landing.sections.accounts__options[3].description"),
+      title: t("landing.sections.accounts__options[2].title"),
+      subtitle: t("landing.sections.accounts__options[2].description"),
       features: [
-        { icon: UiIconReverage, text: t("landing.sections.accounts__options[3].features[0]") },
-        { icon: UiIconShareDeposit, text: t("landing.sections.accounts__options[3].features[1]") },
-        { icon: UiIconRealTime, text: t("landing.sections.accounts__options[3].features[2]") },
+        { icon: UiIconReverage, text: t("landing.sections.accounts__options[2].features[0]") },
+        { icon: UiIconSpreads, text: t("landing.sections.accounts__options[2].features[1]") },
+        { icon: UiIconFirstDeposit, text: t("landing.sections.accounts__options[2].features[2]") },
       ],
-      buttonText: t("landing.sections.accounts__options[3].buttonText"),
+      buttonText: t("landing.sections.accounts__options[2].buttonText"),
+    },
+    {
+      id: "islamic",
+      theme: "blue",
+      badge: null,
+      title: t("landing.sections.accounts__options[4].title"),
+      subtitle: t("landing.sections.accounts__options[4].description"),
+      features: [
+        { icon: UiIconReverage, text: t("landing.sections.accounts__options[4].features[0]") },
+        { icon: UiIconSecurity, text: t("landing.sections.accounts__options[4].features[1]") },
+        { icon: UiIconInstruments, text: t("landing.sections.accounts__options[4].features[2]") },
+      ],
+      buttonText: t("landing.sections.accounts__options[4].buttonText"),
     },
   ]);
 </script>
@@ -119,7 +132,7 @@
     &__cards {
       margin-top: 34px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 20px;
     }
 
@@ -306,6 +319,14 @@
       &__badge {
         top: -18px;
         right: -6px;
+      }
+    }
+  }
+
+  @media (min-width: 992px) and (max-width: 1279px) {
+    .accounts-v2 {
+      &__cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   }

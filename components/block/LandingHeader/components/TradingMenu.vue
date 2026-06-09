@@ -38,7 +38,7 @@
 
   const headerItems = tm(`landing.header.megaMenu.${props.activeLink}`);
   const menuRoutes = routes(props.activeLink, t);
-  const hiddenSectionIndexes = new Set([0, 1, 5]);
+  const hiddenSectionIndexes = new Set([1, 5]);
   const hiddenItemIndexesBySection = {
     4: new Set([2]),
   };
@@ -56,13 +56,6 @@
 
   function buildItems(sections, sectionIndex) {
     const titleList = t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].section`);
-
-    if (sectionIndex === 0) {
-      return [0, 1].map((accountIndex, itemIndex) => ({
-        name: t(`landing.sections.accounts__options[${accountIndex}].title`),
-        path: menuRoutes[titleList]?.list?.[itemIndex] ?? "#",
-      }));
-    }
 
     return sections.items
       .map((_, itemIndex) => ({ itemIndex }))
