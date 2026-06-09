@@ -38,7 +38,7 @@
 
   const headerItems = tm(`landing.header.megaMenu.${props.activeLink}`);
   const menuRoutes = routes(props.activeLink, t);
-  const hiddenSectionIndexes = new Set([1, 5]);
+  const hiddenSectionIndexes = new Set([0, 1, 5]);
   const visibleHeaderItems = headerItems
     .map((section, index) => ({ ...section, index }))
     .filter(section => !hiddenSectionIndexes.has(section.index));

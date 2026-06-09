@@ -9,7 +9,6 @@
     <NewsRowSectionV2 />
     <FeaturesSectionV2 />
     <WideRangeSectionV2 />
-    <AccountTypesSectionV2 />
     <FourStepsSectionV2 />
     <BannerSectionV2 />
     <LatestUpdatesSectionV2 />
@@ -28,7 +27,6 @@
   import TradingPlatformSectionV2 from "~/pages/landing/sections/TradingPlatformSectionV2.vue";
   import NewsRowSectionV2 from "~/pages/landing/sections/NewsRowSectionV2.vue";
   import FeaturesSectionV2 from "~/pages/landing/sections/FeaturesSectionV2.vue";
-  import AccountTypesSectionV2 from "~/pages/landing/sections/AccountTypesSectionV2.vue";
   import WideRangeSectionV2 from "~/pages/landing/sections/WideRangeSectionV2.vue";
   import FourStepsSectionV2 from "~/pages/landing/sections/FourStepsSectionV2.vue";
   import BannerSectionV2 from "~/pages/landing/sections/BannerSectionV2.vue";
