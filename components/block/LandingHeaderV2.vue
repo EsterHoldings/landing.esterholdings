@@ -69,7 +69,9 @@
       </UiContainer>
     </div>
 
-    <Transition name="desktop-menu-fade" mode="out-in">
+    <Transition
+      name="desktop-menu-fade"
+      mode="out-in">
       <div
         v-if="!isMobileMenuOpen && activeLink"
         :key="activeLink"
@@ -179,9 +181,15 @@
 
   const closeMobileMenu = () => {
     isMobileMenuOpen.value = false;
-    document.body.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.width = "";
+
+    const elements = [document.documentElement, document.body];
+    elements.forEach(element => {
+      element.classList.remove("overflow-hidden", "fixed");
+      element.style.overflow = "";
+      element.style.overflowY = "";
+      element.style.position = "";
+      element.style.width = "";
+    });
   };
 
   provide("stateLink", activeLink);
@@ -271,6 +279,8 @@
     activeLink.value = "";
 
     if (isMobileMenuOpen.value) {
+      document.documentElement.classList.remove("scroll-unlocked");
+      document.body.classList.remove("scroll-unlocked");
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
       document.body.style.width = "100%";

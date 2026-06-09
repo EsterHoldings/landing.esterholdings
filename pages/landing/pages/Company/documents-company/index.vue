@@ -220,7 +220,7 @@
   .documents-page {
     display: flex;
     flex-direction: column;
-    gap: 44px;
+    gap: clamp(52px, 6vw, 86px);
     color: var(--landing-text-primary);
   }
 
@@ -260,18 +260,25 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 12px 18px;
       margin-top: 28px;
 
       span {
-        border: 1px solid color-mix(in srgb, var(--landing-accent) 24%, var(--landing-line));
-        border-radius: 999px;
-        padding: 10px 15px;
-        background: color-mix(in srgb, var(--landing-accent) 10%, transparent);
-        color: var(--landing-text-primary);
+        display: inline-flex;
+        align-items: center;
+        color: var(--landing-text-secondary);
         font-size: 14px;
         font-weight: 800;
-        line-height: 1;
+        line-height: 1.2;
+
+        &::before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          margin-right: 10px;
+          border-radius: 50%;
+          background: var(--landing-accent);
+        }
       }
     }
   }
@@ -279,44 +286,33 @@
   .documents-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
-    gap: 28px;
-    align-items: stretch;
+    gap: clamp(48px, 6vw, 96px);
+    align-items: start;
   }
 
   .document-card,
   .documents-process {
     position: relative;
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--landing-accent) 22%, var(--landing-line));
-    border-radius: 26px;
-    background:
-      radial-gradient(circle at 85% 18%, color-mix(in srgb, var(--landing-accent) 16%, transparent), transparent 32%),
-      linear-gradient(
-        145deg,
-        color-mix(in srgb, var(--landing-bg) 90%, white),
-        color-mix(in srgb, var(--landing-bg) 96%, var(--landing-accent) 4%)
-      );
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
 
   .document-card {
     display: flex;
     flex-direction: column;
-    min-height: 360px;
-    padding: clamp(26px, 3vw, 38px);
+    min-height: 0;
+    padding: 0;
 
     &--primary {
-      background:
-        radial-gradient(circle at 10% 8%, color-mix(in srgb, var(--landing-accent) 18%, transparent), transparent 28%),
-        linear-gradient(
-          145deg,
-          color-mix(in srgb, var(--landing-bg) 88%, white),
-          color-mix(in srgb, var(--landing-bg) 94%, var(--landing-accent) 6%)
-        );
+      background: transparent;
     }
 
     &__top {
-      display: flex;
-      gap: 18px;
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 20px;
       align-items: flex-start;
     }
 
@@ -324,15 +320,16 @@
       display: inline-flex;
       flex: 0 0 auto;
       align-items: center;
-      justify-content: center;
-      width: 56px;
-      height: 56px;
-      border: 1px solid color-mix(in srgb, var(--landing-accent) 38%, var(--landing-line));
-      border-radius: 18px;
-      background: color-mix(in srgb, var(--landing-accent) 14%, transparent);
+      justify-content: flex-start;
+      width: auto;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
       color: var(--landing-accent);
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
+      line-height: 1.2;
     }
 
     h2 {
@@ -421,7 +418,8 @@
     display: grid;
     grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
     gap: 34px;
-    padding: clamp(26px, 3vw, 38px);
+    border-top: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
+    padding: clamp(38px, 4vw, 58px) 0 0;
 
     &__intro {
       span {
@@ -470,15 +468,16 @@
 
         > span {
           display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 46px;
-          height: 46px;
-          border-radius: 15px;
-          background: color-mix(in srgb, var(--landing-accent) 14%, transparent);
+          align-items: flex-start;
+          justify-content: flex-start;
+          width: auto;
+          height: auto;
+          border-radius: 0;
+          background: transparent;
           color: var(--landing-accent);
           font-size: 16px;
           font-weight: 900;
+          line-height: 1.25;
         }
       }
 
@@ -498,13 +497,6 @@
         line-height: 1.5;
       }
     }
-  }
-
-  :global(:root[data-theme="dark"]) .document-card,
-  :global(:root[data-theme="dark"]) .documents-process {
-    background:
-      radial-gradient(circle at 82% 14%, rgba(91, 132, 255, 0.18), transparent 34%),
-      linear-gradient(145deg, rgba(4, 24, 68, 0.92), rgba(2, 18, 57, 0.98));
   }
 
   @media (max-width: 991px) {
@@ -531,10 +523,8 @@
       }
     }
 
-    .document-card,
     .documents-process {
-      border-radius: 20px;
-      padding: 22px;
+      padding-top: 32px;
     }
 
     .document-card__top,

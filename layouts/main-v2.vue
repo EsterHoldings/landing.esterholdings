@@ -45,7 +45,6 @@
       display: flex;
       flex-direction: column;
       min-height: 100svh;
-      overflow-x: hidden;
     }
 
     &-content {

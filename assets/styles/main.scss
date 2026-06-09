@@ -83,8 +83,7 @@ html {
 }
 
 html,
-body,
-#__nuxt {
+body {
   min-height: 100dvh;
   height: auto;
   overflow-x: hidden;
@@ -92,6 +91,12 @@ body,
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
+  background-color: var(--ui-background);
+}
+
+#__nuxt {
+  min-height: 100dvh;
+  height: auto;
   background-color: var(--ui-background);
 }
 
