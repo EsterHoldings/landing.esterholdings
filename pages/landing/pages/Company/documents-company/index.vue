@@ -30,7 +30,7 @@
             <span class="document-number document-number--1 document-card__index">
               <span class="document-number__orb document-number__orb--solid" />
               <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">01</span>
+              <span class="document-number__value">1</span>
             </span>
             <div>
               <h2>
@@ -58,7 +58,7 @@
             <span class="document-number document-number--2 document-card__index">
               <span class="document-number__orb document-number__orb--solid" />
               <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">02</span>
+              <span class="document-number__value">2</span>
             </span>
             <div>
               <h2>
@@ -104,7 +104,7 @@
               :class="`document-number--${index + 3}`">
               <span class="document-number__orb document-number__orb--solid" />
               <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">{{ String(index + 1).padStart(2, "0") }}</span>
+              <span class="document-number__value">{{ index + 3 }}</span>
             </span>
             <div>
               <h3>{{ step.title }}</h3>
@@ -239,8 +239,8 @@
     if (!element) return;
 
     const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
 
     updatePointerOffset(x, y);
   };
@@ -497,7 +497,7 @@
       pointer-events: none;
       border-radius: 999px;
       transform: translate(var(--documents-orb-x), var(--documents-orb-y));
-      transition: transform 180ms ease-out;
+      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
       will-change: transform;
     }
 
@@ -505,6 +505,8 @@
       z-index: 0;
       width: 31px;
       height: 31px;
+      top: -8px;
+      right: -10px;
       background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
     }
 
@@ -512,6 +514,8 @@
       z-index: 0;
       width: 22px;
       height: 22px;
+      top: 8px;
+      right: 5px;
       background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
       filter: blur(3px);
     }
@@ -523,44 +527,6 @@
       font-size: 32px;
       font-weight: 500;
       line-height: 1;
-    }
-
-    &--1,
-    &--3 {
-      .document-number__orb--solid {
-        top: -8px;
-        right: -10px;
-      }
-
-      .document-number__orb--glow {
-        top: 8px;
-        right: 5px;
-      }
-    }
-
-    &--2,
-    &--5 {
-      .document-number__orb--solid {
-        right: -9px;
-        bottom: -8px;
-      }
-
-      .document-number__orb--glow {
-        right: 2px;
-        bottom: 5px;
-      }
-    }
-
-    &--4 {
-      .document-number__orb--solid {
-        left: -11px;
-        bottom: -8px;
-      }
-
-      .document-number__orb--glow {
-        left: 2px;
-        bottom: 5px;
-      }
     }
   }
 

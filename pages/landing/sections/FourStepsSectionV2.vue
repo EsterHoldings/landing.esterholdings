@@ -65,8 +65,8 @@
     if (!element) return;
 
     const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
 
     updatePointerOffset(x, y);
   };
@@ -161,7 +161,7 @@
         pointer-events: none;
         border-radius: 999px;
         transform: translate(var(--step-orb-x), var(--step-orb-y));
-        transition: transform 180ms ease-out;
+        transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
         will-change: transform;
       }
 
