@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <section
-      ref="contactsRef"
-      class="contacts-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <section class="contacts-page">
       <header class="contacts-hero">
         <span class="contacts-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
         <h1>{{ t("landing.pages.company.contacts.title") }}</h1>
@@ -34,12 +30,8 @@
             :href="`mailto:${channel.email}`"
             class="contacts-channel">
             <span
-              class="contacts-number"
-              :class="`contacts-number--${index + 1}`">
-              <span class="contacts-number__orb contacts-number__orb--solid" />
-              <span class="contacts-number__orb contacts-number__orb--glow" />
-              <span class="contacts-number__value">{{ index + 1 }}</span>
-            </span>
+              class="contacts-icon"
+              :data-symbol="channel.symbol" />
             <span class="contacts-channel__body">
               <span class="contacts-channel__label">{{ channel.label }}</span>
               <strong>{{ channel.email }}</strong>
@@ -60,12 +52,8 @@
             v-for="(step, index) in pageCopy.steps"
             :key="step.title">
             <span
-              class="contacts-number contacts-process__number"
-              :class="`contacts-number--${index + 4}`">
-              <span class="contacts-number__orb contacts-number__orb--solid" />
-              <span class="contacts-number__orb contacts-number__orb--glow" />
-              <span class="contacts-number__value">{{ index + 1 }}</span>
-            </span>
+              class="contacts-icon contacts-process__icon"
+              :data-symbol="pageCopy.stepSymbols[index]" />
             <div>
               <h3>{{ step.title }}</h3>
               <p>{{ step.text }}</p>
@@ -78,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
+  import { computed } from "vue";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -95,6 +83,7 @@
     processEyebrow: string;
     processTitle: string;
     processText: string;
+    stepSymbols: string[];
     steps: Array<{ title: string; text: string }>;
   };
 
@@ -106,6 +95,7 @@
       processEyebrow: "Before you write",
       processTitle: "Route the request to the right team",
       processText: "The correct channel helps the team process your request faster and keep the answer precise.",
+      stepSymbols: ["SUP", "$", "PR"],
       steps: [
         {
           title: "Use support for platform questions",
@@ -128,6 +118,7 @@
       processEyebrow: "Перед зверненням",
       processTitle: "Спрямуйте запит у правильну команду",
       processText: "Правильний канал допомагає швидше обробити звернення та дати точну відповідь.",
+      stepSymbols: ["SUP", "$", "PR"],
       steps: [
         {
           title: "Підтримка для питань платформи",
@@ -150,6 +141,7 @@
       processEyebrow: "Перед обращением",
       processTitle: "Направьте запрос в правильную команду",
       processText: "Правильный канал помогает быстрее обработать обращение и дать точный ответ.",
+      stepSymbols: ["SUP", "$", "PR"],
       steps: [
         {
           title: "Поддержка для вопросов платформы",
@@ -168,7 +160,6 @@
   };
 
   const { t, locale } = useI18n();
-  const contactsRef = ref<HTMLElement | null>(null);
 
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
@@ -181,36 +172,19 @@
     {
       label: t("landing.pages.company.contacts.support_label"),
       email: cleanEmail(t("landing.pages.company.contacts.support_email")),
+      symbol: "SUP",
     },
     {
       label: t("landing.pages.company.contacts.finance_label"),
       email: cleanEmail(t("landing.pages.company.contacts.finance_email")),
+      symbol: "$",
     },
     {
       label: t("landing.pages.company.contacts.marketing_label"),
       email: cleanEmail(t("landing.pages.company.contacts.marketing_email")),
+      symbol: "PR",
     },
   ]);
-
-  const updatePointerOffset = (x = 0, y = 0) => {
-    contactsRef.value?.style.setProperty("--contacts-orb-x", `${x}px`);
-    contactsRef.value?.style.setProperty("--contacts-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = contactsRef.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
 </script>
 
 <style lang="scss" scoped>
@@ -218,8 +192,6 @@
     display: flex;
     flex-direction: column;
     gap: clamp(52px, 6vw, 86px);
-    --contacts-orb-x: 0px;
-    --contacts-orb-y: 0px;
     color: var(--landing-text-primary);
   }
 
@@ -279,6 +251,26 @@
           background: var(--landing-accent);
         }
       }
+    }
+  }
+
+  .contacts-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+    color: var(--landing-accent);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    &::before {
+      content: attr(data-symbol);
     }
   }
 

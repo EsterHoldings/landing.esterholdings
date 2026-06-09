@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <section
-      ref="mt4Ref"
-      class="mt4-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <section class="mt4-page">
       <header class="mt4-hero">
         <span class="mt4-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
         <h1>{{ pageTitle }}</h1>
@@ -23,11 +19,9 @@
         class="mt4-showcase"
         :class="{ 'mt4-showcase--reverse': isMobilePage }">
         <div class="mt4-showcase__content">
-          <span class="mt4-number mt4-showcase__number">
-            <span class="mt4-number__orb mt4-number__orb--solid" />
-            <span class="mt4-number__orb mt4-number__orb--glow" />
-            <span class="mt4-number__value">{{ isMobilePage ? 2 : 1 }}</span>
-          </span>
+          <span
+            class="mt4-icon mt4-showcase__icon"
+            :data-symbol="isMobilePage ? 'APP' : 'MT4'" />
 
           <div>
             <span class="mt4-showcase__label">{{ primarySection.label }}</span>
@@ -80,12 +74,8 @@
             v-for="(feature, index) in mt4Features"
             :key="feature">
             <span
-              class="mt4-number mt4-details__number"
-              :class="`mt4-number--${index + 3}`">
-              <span class="mt4-number__orb mt4-number__orb--solid" />
-              <span class="mt4-number__orb mt4-number__orb--glow" />
-              <span class="mt4-number__value">{{ index + 3 }}</span>
-            </span>
+              class="mt4-icon mt4-details__icon"
+              :data-symbol="mt4FeatureSymbols[index] ?? 'OK'" />
             <span>{{ feature }}</span>
           </li>
         </ul>
@@ -116,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
+  import { computed } from "vue";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiButtonDefault from "~/components/ui/UiButtonDefault.vue";
@@ -243,7 +233,7 @@
   };
 
   const { t, tm, locale } = useI18n();
-  const mt4Ref = ref<HTMLElement | null>(null);
+  const mt4FeatureSymbols = ["UI", "APP", "MQL", "NDD", "DJ", "FX"];
 
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
@@ -267,26 +257,6 @@
     return Array.isArray(features) ? features.map((_, index) => t(`landing.pages.trading.mt4_features[${index}]`)) : [];
   });
 
-  const updatePointerOffset = (x = 0, y = 0) => {
-    mt4Ref.value?.style.setProperty("--mt4-orb-x", `${x}px`);
-    mt4Ref.value?.style.setProperty("--mt4-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = mt4Ref.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
-
   const localizedPath = (path: string) => {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
     return locale.value ? `/${locale.value}${normalizedPath}` : normalizedPath;
@@ -298,8 +268,6 @@
     display: flex;
     flex-direction: column;
     gap: clamp(52px, 6vw, 86px);
-    --mt4-orb-x: 0px;
-    --mt4-orb-y: 0px;
     color: var(--landing-text-primary);
   }
 
@@ -383,7 +351,7 @@
       align-items: start;
     }
 
-    &__number {
+    &__icon {
       margin-top: 3px;
     }
 
@@ -461,99 +429,24 @@
     }
   }
 
-  .mt4-number {
-    position: relative;
+  .mt4-icon {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 66px;
-    height: 66px;
-    border: 0;
-    border-radius: 18px;
-    overflow: visible;
-    isolation: isolate;
-    background: transparent;
-    box-shadow: none;
-
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-    }
+    width: 58px;
+    height: 58px;
+    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+    color: var(--landing-accent);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
 
     &::before {
-      z-index: 1;
-      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
-      background: linear-gradient(
-        145deg,
-        color-mix(in srgb, var(--landing-surface-elevated) 27%, transparent),
-        color-mix(in srgb, var(--landing-surface-elevated) 17%, transparent)
-      );
-      backdrop-filter: blur(16px) saturate(145%);
-      -webkit-backdrop-filter: blur(16px) saturate(145%);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 28%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 8%, transparent);
+      content: attr(data-symbol);
     }
-
-    &::after {
-      z-index: 2;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01)),
-        linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 4%, transparent));
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
-    }
-
-    &__orb {
-      position: absolute;
-      pointer-events: none;
-      border-radius: 999px;
-      transform: translate(var(--mt4-orb-x), var(--mt4-orb-y));
-      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
-    }
-
-    &__orb--solid {
-      z-index: 0;
-      width: 31px;
-      height: 31px;
-      top: -8px;
-      right: -10px;
-      background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
-    }
-
-    &__orb--glow {
-      z-index: 0;
-      width: 22px;
-      height: 22px;
-      top: 8px;
-      right: 5px;
-      background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
-      filter: blur(3px);
-    }
-
-    &__value {
-      position: relative;
-      z-index: 3;
-      color: var(--landing-accent);
-      font-size: 32px;
-      font-weight: 500;
-      line-height: 1;
-    }
-  }
-
-  :global(:root[data-theme="dark"] .mt4-number::before) {
-    border-color: rgba(139, 164, 214, 0.36);
-    background: linear-gradient(145deg, rgba(25, 48, 96, 0.27) 0%, rgba(8, 23, 55, 0.19) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -16px 24px rgba(0, 81, 255, 0.08);
   }
 
   .mt4-details {
@@ -620,14 +513,11 @@
       }
     }
 
-    &__number {
+    &__icon {
       width: 54px;
       height: 54px;
       border-radius: 15px;
-
-      .mt4-number__value {
-        font-size: 26px;
-      }
+      font-size: 12px;
     }
   }
 

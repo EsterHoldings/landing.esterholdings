@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <section
-      ref="careerRef"
-      class="career-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <section class="career-page">
       <header class="career-hero">
         <span class="career-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
         <h1>{{ t("landing.pages.company.career.title") }}</h1>
@@ -31,12 +27,8 @@
             v-for="(position, index) in positions"
             :key="position">
             <span
-              class="career-number"
-              :class="`career-number--${index + 1}`">
-              <span class="career-number__orb career-number__orb--solid" />
-              <span class="career-number__orb career-number__orb--glow" />
-              <span class="career-number__value">{{ index + 1 }}</span>
-            </span>
+              class="career-icon"
+              :data-symbol="pageCopy.positionSymbols[index] ?? 'CV'" />
             <div>
               <h3>{{ position }}</h3>
               <p>{{ pageCopy.positionNotes[index] ?? pageCopy.positionFallback }}</p>
@@ -64,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
+  import { computed } from "vue";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -80,6 +72,7 @@
     meta: string[];
     openingsEyebrow: string;
     openingsText: string;
+    positionSymbols: string[];
     positionNotes: string[];
     positionFallback: string;
     ctaEyebrow: string;
@@ -95,6 +88,7 @@
       openingsEyebrow: "Open roles",
       openingsText:
         "The current roles are focused on client growth, market expertise and strong operational discipline.",
+      positionSymbols: ["CRM", "AN"],
       positionNotes: [
         "Client communication, account onboarding and careful work with trading service requests.",
         "Market research, analytical materials and support for client-facing trading content.",
@@ -111,6 +105,7 @@
       openingsEyebrow: "Відкриті ролі",
       openingsText:
         "Поточні ролі сфокусовані на розвитку клієнтів, ринковій експертизі та сильній операційній дисципліні.",
+      positionSymbols: ["CRM", "AN"],
       positionNotes: [
         "Комунікація з клієнтами, супровід відкриття рахунків і уважна робота з торговими запитами.",
         "Ринкові дослідження, аналітичні матеріали та підтримка трейдерського контенту для клієнтів.",
@@ -127,6 +122,7 @@
       openingsEyebrow: "Открытые роли",
       openingsText:
         "Текущие роли сфокусированы на развитии клиентов, рыночной экспертизе и сильной операционной дисциплине.",
+      positionSymbols: ["CRM", "AN"],
       positionNotes: [
         "Коммуникация с клиентами, сопровождение открытия счетов и внимательная работа с торговыми запросами.",
         "Рыночные исследования, аналитические материалы и поддержка трейдерского контента для клиентов.",
@@ -138,7 +134,6 @@
   };
 
   const { t, tm, locale } = useI18n();
-  const careerRef = ref<HTMLElement | null>(null);
 
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
@@ -154,26 +149,6 @@
     const subject = encodeURIComponent(`${t("landing.pages.company.career.title")} - CV`);
     return `mailto:marketing@esterholdings.com?subject=${subject}`;
   });
-
-  const updatePointerOffset = (x = 0, y = 0) => {
-    careerRef.value?.style.setProperty("--career-orb-x", `${x}px`);
-    careerRef.value?.style.setProperty("--career-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = careerRef.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
 </script>
 
 <style lang="scss" scoped>
@@ -181,8 +156,6 @@
     display: flex;
     flex-direction: column;
     gap: clamp(52px, 6vw, 86px);
-    --career-orb-x: 0px;
-    --career-orb-y: 0px;
     color: var(--landing-text-primary);
   }
 
@@ -242,6 +215,26 @@
           background: var(--landing-accent);
         }
       }
+    }
+  }
+
+  .career-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+    color: var(--landing-accent);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    &::before {
+      content: attr(data-symbol);
     }
   }
 

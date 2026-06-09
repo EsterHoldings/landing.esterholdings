@@ -27,11 +27,9 @@
       <div class="documents-grid">
         <article class="document-card document-card--primary">
           <div class="document-card__top">
-            <span class="document-number document-number--1 document-card__index">
-              <span class="document-number__orb document-number__orb--solid" />
-              <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">1</span>
-            </span>
+            <span
+              class="document-card__icon"
+              data-symbol="REG" />
             <div>
               <h2>
                 {{ t("landing.pages.company.documents.regulations_title") }}
@@ -55,11 +53,9 @@
 
         <article class="document-card">
           <div class="document-card__top">
-            <span class="document-number document-number--2 document-card__index">
-              <span class="document-number__orb document-number__orb--solid" />
-              <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">2</span>
-            </span>
+            <span
+              class="document-card__icon"
+              data-symbol="PDF" />
             <div>
               <h2>
                 {{ t("landing.pages.company.documents.contract_title") }}
@@ -101,10 +97,10 @@
             :key="step.title">
             <span
               class="document-number documents-process__number"
-              :class="`document-number--${index + 3}`">
+              :class="`document-number--${index + 1}`">
               <span class="document-number__orb document-number__orb--solid" />
               <span class="document-number__orb document-number__orb--glow" />
-              <span class="document-number__value">{{ index + 3 }}</span>
+              <span class="document-number__value">{{ index + 1 }}</span>
             </span>
             <div>
               <h3>{{ step.title }}</h3>
@@ -359,6 +355,26 @@
 
     &__index {
       flex: 0 0 auto;
+    }
+
+    &__icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+      color: var(--landing-accent);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+
+      &::before {
+        content: attr(data-symbol);
+      }
     }
 
     h2 {

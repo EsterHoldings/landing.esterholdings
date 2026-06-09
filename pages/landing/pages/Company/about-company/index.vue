@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <section
-      ref="aboutRef"
-      class="about-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <section class="about-page">
       <header class="about-hero">
         <span class="about-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
         <h1>{{ t("landing.pages.company.about.title") }}</h1>
@@ -42,12 +38,8 @@
             v-for="(item, index) in pageCopy.principles"
             :key="item.title">
             <span
-              class="about-number"
-              :class="`about-number--${index + 1}`">
-              <span class="about-number__orb about-number__orb--solid" />
-              <span class="about-number__orb about-number__orb--glow" />
-              <span class="about-number__value">{{ index + 1 }}</span>
-            </span>
+              class="about-icon"
+              :data-symbol="pageCopy.principleSymbols[index]" />
             <div>
               <h3>{{ item.title }}</h3>
               <p>{{ item.text }}</p>
@@ -141,12 +133,8 @@
             v-for="(item, index) in activityList"
             :key="item">
             <span
-              class="about-number about-activity__number"
-              :class="`about-number--${index + 4}`">
-              <span class="about-number__orb about-number__orb--solid" />
-              <span class="about-number__orb about-number__orb--glow" />
-              <span class="about-number__value">{{ index + 1 }}</span>
-            </span>
+              class="about-icon about-activity__icon"
+              :data-symbol="pageCopy.activitySymbols[index] ?? 'OK'" />
             <span>{{ item }}</span>
           </li>
         </ul>
@@ -156,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
+  import { computed } from "vue";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -171,10 +159,12 @@
     meta: string[];
     storyEyebrow: string;
     storyTitle: string;
+    principleSymbols: string[];
     principles: Array<{ title: string; text: string }>;
     flowTitle: string;
     activityTitle: string;
     activityText: string;
+    activitySymbols: string[];
     flow: {
       ecn: string;
       banks: string;
@@ -192,6 +182,7 @@
       meta: ["Financial holding", "Client-first service", "Transparent execution"],
       storyEyebrow: "How Ester works",
       storyTitle: "A financial company focused on stable client outcomes",
+      principleSymbols: ["TC", "QA", "LAW"],
       principles: [
         {
           title: "Trading conditions",
@@ -209,6 +200,7 @@
       flowTitle: "Transparent routing between liquidity and clients",
       activityTitle: "Services around the full trading process",
       activityText: "Ester combines market access, advisory support, analytics and education in one operating model.",
+      activitySymbols: ["FX", "EDU", "IB", "SUP"],
       flow: {
         ecn: "ECN platform",
         banks: "Banks and liquidity suppliers",
@@ -224,6 +216,7 @@
       meta: ["Фінансовий холдинг", "Сервіс навколо клієнта", "Прозоре виконання"],
       storyEyebrow: "Як працює Ester",
       storyTitle: "Фінансова компанія, сфокусована на стабільному результаті клієнта",
+      principleSymbols: ["TC", "QA", "LAW"],
       principles: [
         {
           title: "Торгові умови",
@@ -241,6 +234,7 @@
       flowTitle: "Прозорий маршрут між ліквідністю та клієнтами",
       activityTitle: "Сервіси навколо повного торгового процесу",
       activityText: "Ester поєднує доступ до ринку, консультаційну підтримку, аналітику та навчання в одній моделі.",
+      activitySymbols: ["FX", "EDU", "IB", "SUP"],
       flow: {
         ecn: "ECN-платформа",
         banks: "Банки та постачальники ліквідності",
@@ -256,6 +250,7 @@
       meta: ["Финансовый холдинг", "Сервис вокруг клиента", "Прозрачное исполнение"],
       storyEyebrow: "Как работает Ester",
       storyTitle: "Финансовая компания, сфокусированная на стабильном результате клиента",
+      principleSymbols: ["TC", "QA", "LAW"],
       principles: [
         {
           title: "Торговые условия",
@@ -273,6 +268,7 @@
       flowTitle: "Прозрачный маршрут между ликвидностью и клиентами",
       activityTitle: "Сервисы вокруг полного торгового процесса",
       activityText: "Ester объединяет доступ к рынку, консультационную поддержку, аналитику и обучение в одной модели.",
+      activitySymbols: ["FX", "EDU", "IB", "SUP"],
       flow: {
         ecn: "ECN-платформа",
         banks: "Банки и поставщики ликвидности",
@@ -286,8 +282,6 @@
   };
 
   const { t, tm, locale } = useI18n();
-  const aboutRef = ref<HTMLElement | null>(null);
-
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
     return localizedCopy[language] ?? localizedCopy.en;
@@ -304,26 +298,6 @@
     const list = tm("landing.pages.company.about.activity_list") as any[];
     return Array.isArray(list) ? list.map((_, index) => t(`landing.pages.company.about.activity_list[${index}]`)) : [];
   });
-
-  const updatePointerOffset = (x = 0, y = 0) => {
-    aboutRef.value?.style.setProperty("--about-orb-x", `${x}px`);
-    aboutRef.value?.style.setProperty("--about-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = aboutRef.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
 </script>
 
 <style lang="scss" scoped>
@@ -331,8 +305,6 @@
     display: flex;
     flex-direction: column;
     gap: clamp(52px, 6vw, 86px);
-    --about-orb-x: 0px;
-    --about-orb-y: 0px;
     color: var(--landing-text-primary);
   }
 
@@ -396,6 +368,26 @@
           background: var(--landing-accent);
         }
       }
+    }
+  }
+
+  .about-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+    color: var(--landing-accent);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    &::before {
+      content: attr(data-symbol);
     }
   }
 
