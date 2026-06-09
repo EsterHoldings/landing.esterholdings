@@ -6,6 +6,7 @@
     <TickerSectionV2 />
     <AdvantagesSectionV2 />
     <TradingPlatformSectionV2 />
+    <AccountTypesSectionV2 />
     <NewsRowSectionV2 />
     <FeaturesSectionV2 />
     <WideRangeSectionV2 />
@@ -25,6 +26,7 @@
   import TickerSectionV2 from "~/pages/landing/sections/TickerSectionV2.vue";
   import AdvantagesSectionV2 from "~/pages/landing/sections/AdvantagesSectionV2.vue";
   import TradingPlatformSectionV2 from "~/pages/landing/sections/TradingPlatformSectionV2.vue";
+  import AccountTypesSectionV2 from "~/pages/landing/sections/AccountTypesSectionV2.vue";
   import NewsRowSectionV2 from "~/pages/landing/sections/NewsRowSectionV2.vue";
   import FeaturesSectionV2 from "~/pages/landing/sections/FeaturesSectionV2.vue";
   import WideRangeSectionV2 from "~/pages/landing/sections/WideRangeSectionV2.vue";

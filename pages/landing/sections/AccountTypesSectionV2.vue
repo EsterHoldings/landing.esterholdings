@@ -7,7 +7,6 @@
       <div class="accounts-v2__cards">
         <article
           v-for="card in cards"
-          :id="`${card.id}-account`"
           :key="card.id"
           class="accounts-v2__card"
           :class="`accounts-v2__card--${card.theme}`">
@@ -16,7 +15,9 @@
             class="accounts-v2__badge"
             >{{ card.badge }}</span
           >
-          <div class="accounts-v2__card-header">
+          <div
+            :id="`${card.id}-account`"
+            class="accounts-v2__card-header accounts-v2__card-anchor">
             <p class="accounts-v2__card-name">{{ card.title }}</p>
             <p class="accounts-v2__card-desc">{{ card.subtitle }}</p>
           </div>
@@ -50,14 +51,12 @@
   import UiIconSpreads from "~/components/ui/UiIconSpreads.vue";
   import UiIconDeposit from "~/components/ui/UiIconDeposit.vue";
   import UiIconFirstDeposit from "~/components/ui/UiIconFirstDeposit.vue";
-  import UiIconSecurity from "~/components/ui/UiIconSecurity.vue";
-  import UiIconInstruments from "~/components/ui/UiIconInstruments.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
 
   const { t } = useI18n();
   const { cabinetLink } = useCabinetLink();
 
-  // Индексы соответствуют порядку в accounts__options: demo=0, standard=1, pro=2, islamic=4.
+  // Индексы соответствуют порядку в accounts__options: demo=0, standard=1.
   const cards = computed(() => [
     {
       id: "demo",
@@ -85,32 +84,6 @@
       ],
       buttonText: t("landing.sections.accounts__options[1].buttonText"),
     },
-    {
-      id: "pro",
-      theme: "blue",
-      badge: null,
-      title: t("landing.sections.accounts__options[2].title"),
-      subtitle: t("landing.sections.accounts__options[2].description"),
-      features: [
-        { icon: UiIconReverage, text: t("landing.sections.accounts__options[2].features[0]") },
-        { icon: UiIconSpreads, text: t("landing.sections.accounts__options[2].features[1]") },
-        { icon: UiIconFirstDeposit, text: t("landing.sections.accounts__options[2].features[2]") },
-      ],
-      buttonText: t("landing.sections.accounts__options[2].buttonText"),
-    },
-    {
-      id: "islamic",
-      theme: "blue",
-      badge: null,
-      title: t("landing.sections.accounts__options[4].title"),
-      subtitle: t("landing.sections.accounts__options[4].description"),
-      features: [
-        { icon: UiIconReverage, text: t("landing.sections.accounts__options[4].features[0]") },
-        { icon: UiIconSecurity, text: t("landing.sections.accounts__options[4].features[1]") },
-        { icon: UiIconInstruments, text: t("landing.sections.accounts__options[4].features[2]") },
-      ],
-      buttonText: t("landing.sections.accounts__options[4].buttonText"),
-    },
   ]);
 </script>
 
@@ -132,7 +105,7 @@
     &__cards {
       margin-top: 34px;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 20px;
     }
 
@@ -193,6 +166,10 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+    }
+
+    &__card-anchor {
+      scroll-margin-top: 130px;
     }
 
     &__card-name {
@@ -319,14 +296,6 @@
       &__badge {
         top: -18px;
         right: -6px;
-      }
-    }
-  }
-
-  @media (min-width: 992px) and (max-width: 1279px) {
-    .accounts-v2 {
-      &__cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   }
