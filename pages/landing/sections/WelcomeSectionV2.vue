@@ -345,7 +345,7 @@
     ),
   ]);
 
-  const AUTO_PLAY_DELAY = 100000;
+  const AUTO_PLAY_DELAY = 10000;
   const swiperModules = [Autoplay];
   const autoplayOptions = computed(() =>
     slides.value.length > 1
