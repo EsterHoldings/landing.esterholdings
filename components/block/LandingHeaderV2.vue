@@ -225,11 +225,9 @@
   });
 
   const isThemeLight = computed(() => {
-    return (
-      (uiStore.headerScrolled && themeStore.currentTheme !== "dark") ||
-      (themeStore.currentTheme !== "dark" && isMobileMenuOpen.value) ||
-      isBlurred.value
-    );
+    if (themeStore.currentTheme === "dark") return false;
+
+    return uiStore.headerScrolled || isMobileMenuOpen.value || isBlurred.value;
   });
 
   const isWithPicture = computed(() => {
