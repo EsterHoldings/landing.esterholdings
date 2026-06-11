@@ -45,6 +45,7 @@
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import useAppCore from "~/composables/useAppCore";
+  import { renderArticleContent } from "~/utils/renderArticleContent";
 
   definePageMeta({
     layout: "main",
@@ -68,7 +69,7 @@
   }
 
   const article = computed(() => articleData.value!);
-  const renderedContent = computed(() => renderMarkdownLike(article.value.content || ""));
+  const renderedContent = computed(() => renderArticleContent(article.value.content || ""));
   const fallbackImage = "/static/newsBg.jpg";
   const currentCoverImage = ref(article.value.image || fallbackImage);
   const isCoverLoaded = ref(false);
@@ -96,43 +97,6 @@
     twitterImage: computed(() => article.value.seo.twitter_image_url || article.value.image),
   });
 
-  function renderMarkdownLike(value: string): string {
-    const blocks = escapeHtml(value)
-      .split(/\n{2,}/)
-      .map(block => block.trim())
-      .filter(Boolean);
-
-    return blocks
-      .map(block => {
-        const lines = block.split("\n").map(line => line.trim());
-        const firstLine = lines[0] || "";
-
-        if (firstLine.startsWith("### ")) {
-          return `<h3>${firstLine.slice(4)}</h3>`;
-        }
-
-        if (firstLine.startsWith("## ")) {
-          return `<h2>${firstLine.slice(3)}</h2>`;
-        }
-
-        if (lines.every(line => line.startsWith("- "))) {
-          return `<ul>${lines.map(line => `<li>${line.slice(2)}</li>`).join("")}</ul>`;
-        }
-
-        return `<p>${lines.join("<br>")}</p>`;
-      })
-      .join("");
-  }
-
-  function escapeHtml(value: string): string {
-    return value
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
   function handleImageLoad(): void {
     isCoverLoaded.value = true;
   }
@@ -151,8 +115,7 @@
     padding: 42px 0 80px;
 
     &__article {
-      max-width: 920px;
-      margin: 0 auto;
+      width: 100%;
     }
 
     &__back {
@@ -179,7 +142,6 @@
       }
 
       p {
-        max-width: 760px;
         margin: 0;
         color: var(--landing-text-secondary);
         font-size: 18px;
@@ -220,6 +182,7 @@
     }
 
     &__content {
+      width: 100%;
       margin-top: 32px;
       color: var(--landing-text-primary);
       font-size: 17px;
@@ -249,6 +212,32 @@
         margin: 0 0 18px;
         padding-left: 22px;
         color: var(--landing-text-secondary);
+      }
+
+      :deep(a) {
+        color: var(--landing-accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      :deep(strong) {
+        color: var(--landing-text-primary);
+        font-weight: 800;
+      }
+
+      :deep(img) {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        margin: 28px 0;
+        border-radius: 8px;
+      }
+
+      :deep(hr) {
+        margin: 28px 0;
+        border: 0;
+        border-top: 1px solid var(--landing-border-strong);
       }
     }
   }

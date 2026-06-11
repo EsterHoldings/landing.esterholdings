@@ -1,4 +1,5 @@
 import { useNuxtApp } from "#app";
+import { decodeHtmlEntitiesDeep } from "~/utils/renderArticleContent";
 import type {
   NewsArticleResponse,
   NewsArticleType,
@@ -117,6 +118,8 @@ export class NewsService {
   private normalizeArticle(item: ApiNewsArticle): NewsItem {
     const publishedAtIso = item.published_at || item.updated_at || null;
     const excerpt = item.excerpt || null;
+    const galleryImages = Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [];
+    const seo = item.seo || {};
 
     return {
       id: item.id,
@@ -129,10 +132,16 @@ export class NewsService {
       locale: item.locale || "en",
       publishedAt: this.formatDate(publishedAtIso),
       publishedAtIso,
-      image: item.cover_image_url || fallbackImage,
-      galleryImages: Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [],
+      image:
+        item.cover_image_url ||
+        seo.og_image_url ||
+        seo.twitter_image_url ||
+        galleryImages[0] ||
+        this.extractFirstImage(item.content || "") ||
+        fallbackImage,
+      galleryImages,
       videoLinks: Array.isArray(item.video_links) ? item.video_links.filter(Boolean) : [],
-      seo: item.seo || {},
+      seo,
       updatedAt: item.updated_at || null,
     };
   }
@@ -151,6 +160,12 @@ export class NewsService {
 
   private basePath(articleType: NewsArticleType = "news"): string {
     return articleType === "trader_blog" ? "/trader-blog" : "/news";
+  }
+
+  private extractFirstImage(content: string): string | null {
+    const decoded = decodeHtmlEntitiesDeep(content);
+    const match = decoded.match(/<img[^>]+(?:src|data-src)=["']([^"']+)["']/i);
+    return match?.[1] || null;
   }
 }
 
