@@ -498,6 +498,7 @@
         },
         "news": {
           "title": "Actualités de l'entreprise",
+          "subtitle": "Actualités de l'entreprise, nouveautés de la plateforme et annonces importantes.",
           "items": [
             {
               "title": "Les actions NVIDIA ont bondi de 15% après le rapport",

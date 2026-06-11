@@ -494,6 +494,7 @@
         },
         "news": {
           "title": "Unternehmensnachrichten",
+          "subtitle": "Unternehmensupdates, Plattformneuigkeiten und wichtige Ankündigungen.",
           "items": [
             {
               "title": "NVIDIA-Aktien stiegen nach dem Bericht um 15%",

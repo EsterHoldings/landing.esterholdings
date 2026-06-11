@@ -494,6 +494,7 @@
         },
         "news": {
           "title": "Company News",
+          "subtitle": "Company updates, platform news and important announcements.",
           "items": [
             {
               "title": "NVIDIA shares soared 15% after the report",

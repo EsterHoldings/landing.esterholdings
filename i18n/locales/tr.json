@@ -494,6 +494,7 @@
         },
         "news": {
           "title": "Şirket Haberleri",
+          "subtitle": "Şirket güncellemeleri, platform haberleri ve önemli duyurular.",
           "items": [
             {
               "title": "NVIDIA hisseleri rapor sonrası %15 yükseldi",
