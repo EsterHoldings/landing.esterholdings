@@ -83,9 +83,6 @@
           <TradingMenu
             v-if="activeLink === 'Trading'"
             :activeLink="activeLink" />
-          <PartnershipMenu
-            v-else-if="activeLink === 'Partnership'"
-            :activeLink="activeLink" />
           <CompanyMenu
             v-else-if="activeLink === 'Company'"
             :activeLink="activeLink" />
@@ -160,7 +157,6 @@
   import HeaderMobileLink from "./LandingHeader/components/HeaderMobileLink.vue";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import TradingMenu from "./LandingHeader/components/TradingMenu.vue";
-  import PartnershipMenu from "./LandingHeader/components/PartnershipMenu.vue";
   import CompanyMenu from "./LandingHeader/components/CompanyMenu.vue";
   import LanguageSwitcher from "./LandingHeader/components/LanguageSwitcher.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
@@ -200,7 +196,6 @@
 
   const linksList = computed(() => [
     { key: "Trading", name: t("landing.header.nav.trading") },
-    { key: "Partnership", name: t("landing.header.nav.partnership") },
     { key: "Company", name: t("landing.header.nav.company") },
   ]);
 

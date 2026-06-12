@@ -152,7 +152,6 @@
           ref="menuRef"
           class="menu-content"
           :class="{
-            'menu-content_is-partnership': activeLink === 'Partnership',
             'menu-content_is-company': activeLink === 'Company',
           }">
           <transition
@@ -160,9 +159,6 @@
             mode="out-in">
             <TradingMenu
               v-if="activeLink === 'Trading'"
-              :activeLink="activeLink" />
-            <PartnershipMenu
-              v-else-if="activeLink === 'Partnership'"
               :activeLink="activeLink" />
             <CompanyMenu
               v-else-if="activeLink === 'Company'"
@@ -192,7 +188,6 @@
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiTextH6 from "~/components/ui/UiTextH6.vue";
   import TradingMenu from "./LandingHeader/components/TradingMenu.vue";
-  import PartnershipMenu from "./LandingHeader/components/PartnershipMenu.vue";
   import CompanyMenu from "./LandingHeader/components/CompanyMenu.vue";
   import LanguageSwitcher from "./LandingHeader/components/LanguageSwitcher.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
@@ -222,7 +217,6 @@
   const linksList = computed(() => {
     return [
       { key: "Trading", name: t("landing.header.nav.trading") },
-      { key: "Partnership", name: t("landing.header.nav.partnership") },
       { key: "Company", name: t("landing.header.nav.company") },
     ];
   });
@@ -472,10 +466,6 @@
     max-width: 1200px;
     margin: 0 auto;
     pointer-events: auto;
-
-    &_is-partnership {
-      max-width: 500px;
-    }
 
     &_is-company {
       max-width: 120px;

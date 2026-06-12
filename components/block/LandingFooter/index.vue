@@ -22,8 +22,6 @@
 
         <FooterLink basePath="landing.footer.trading" />
 
-        <FooterLink basePath="landing.footer.partnership" />
-
         <FooterLink basePath="landing.footer.company" />
       </div>
 

@@ -49,10 +49,11 @@
 
   function buildItems(sections, sectionIndex) {
     const titleList = t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].section`);
+    const routeList = menuRoutes[titleList]?.list ?? [];
 
-    return sections.items.map((_, itemIndex) => ({
+    return sections.items.slice(0, routeList.length).map((_, itemIndex) => ({
       name: t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].items[${itemIndex}]`),
-      path: menuRoutes[titleList]?.list?.[itemIndex] ?? "#",
+      path: routeList[itemIndex] ?? "#",
     }));
   }
 </script>

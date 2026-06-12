@@ -18,12 +18,6 @@
       class="header-mobile_menu"
       v-if="props.linkKey === props.activeLink && props.linkKey === 'Trading'" />
 
-    <PartnershipMenu
-      :activeLink="props.activeLink"
-      isMobile
-      class="header-mobile_menu"
-      v-if="props.linkKey === props.activeLink && props.linkKey === 'Partnership'" />
-
     <CompanyMenu
       :activeLink="props.activeLink"
       isMobile
@@ -36,7 +30,6 @@
   import UiIconChevronDown from "~/components/ui/UiIconChevronDown.vue";
   import UiTextH5 from "~/components/ui/UiTextH5.vue";
   import TradingMenu from "./TradingMenu.vue";
-  import PartnershipMenu from "./PartnershipMenu.vue";
   import CompanyMenu from "./CompanyMenu.vue";
 
   const props = defineProps({

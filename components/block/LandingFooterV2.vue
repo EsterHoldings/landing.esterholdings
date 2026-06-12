@@ -35,9 +35,6 @@
           <div class="nav-links__item nav-links__item--trading">
             <FooterLink basePath="landing.footer.trading" />
           </div>
-          <div class="nav-links__item nav-links__item--partnership">
-            <FooterLink basePath="landing.footer.partnership" />
-          </div>
           <div class="nav-links__item nav-links__item--company">
             <FooterLink basePath="landing.footer.company" />
           </div>
@@ -199,18 +196,12 @@
         display: grid;
         width: 100%;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-areas:
-          "trading company"
-          "partnership .";
+        grid-template-areas: "trading company";
         gap: 30px 20px;
       }
 
       .nav-links__item--trading {
         grid-area: trading;
-      }
-
-      .nav-links__item--partnership {
-        grid-area: partnership;
       }
 
       .nav-links__item--company {

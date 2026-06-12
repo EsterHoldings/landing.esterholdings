@@ -7,7 +7,6 @@ export const companyMenuRoutes = (activeLink, t) => {
         "documents",
         "company-news",
         "contacts",
-        "career",
       ],
     },
   };
