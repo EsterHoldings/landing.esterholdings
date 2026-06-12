@@ -8,6 +8,6 @@
 
   definePageMeta({
     layout: "main",
-    alias: "/mt-4",
+    alias: ["/mt-4", "/terminal-mt4", "/metatrader-mac"],
   });
 </script>
