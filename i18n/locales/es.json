@@ -654,8 +654,7 @@
           "interfaz fácil y comprensible con una variedad de herramientas de análisis técnico;",
           "oportunidad de operar desde teléfonos inteligentes, Ipads y PDAs;",
           "lenguaje de programación integrado MQL4, que permite crear propios asesores de trading e indicadores;",
-          "acceso a liquidez interbancaria con la ayuda de la tecnología МТ4 Bridge, ejecución sin recotizaciones (No Dealing Desk);",
-          "noticias financieras de Dow Jones"
+          "acceso a liquidez interbancaria con la ayuda de la tecnología МТ4 Bridge, ejecución sin recotizaciones (No Dealing Desk);"
         ],
         "mt4_requirements_title": "REQUISITOS DEL SISTEMA:",
         "mt4_requirements_text": "Windows XP y superior.",

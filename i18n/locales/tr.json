@@ -646,8 +646,7 @@
           "çeşitli teknik analiz araçlarına sahip kolay ve anlaşılır arayüz;",
           "akıllı telefonlar, iPad'ler ve PDA'lardan işlem yapma fırsatı;",
           "kendi işlem danışmanları ve göstergeleri oluşturmaya izin veren yerleşik programlama dili MQL4;",
-          "MT4 Bridge teknolojisi yardımıyla bankalararası likiditeye erişim, requote olmadan işlem (No Dealing Desk);",
-          "Dow Jones'tan finansal haberler"
+          "MT4 Bridge teknolojisi yardımıyla bankalararası likiditeye erişim, requote olmadan işlem (No Dealing Desk);"
         ],
         "mt4_requirements_title": "SİSTEM GEREKSİNİMLERİ:",
         "mt4_requirements_text": "Windows XP ve üzeri.",

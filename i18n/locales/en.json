@@ -646,8 +646,7 @@
           "easy and understandable interface with a variety of tools of technical analysis;",
           "opportunity to trade from smart phones, Ipads and PDAs;",
           "built-in programming language MQL4, allowing to create own trade advisors and indicators;",
-          "access to intebank liquidity with the help of the technology МТ4 Bridge, execution without re-quotes (No Dealing Desk);",
-          "financial news from Dow Jones"
+          "access to intebank liquidity with the help of the technology МТ4 Bridge, execution without re-quotes (No Dealing Desk);"
         ],
         "mt4_requirements_title": "SYSTEM REQUIREMENTS:",
         "mt4_requirements_text": "Windows XP and higher.",

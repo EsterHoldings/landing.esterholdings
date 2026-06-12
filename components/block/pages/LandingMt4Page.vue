@@ -233,7 +233,7 @@
   };
 
   const { t, tm, locale } = useI18n();
-  const mt4FeatureSymbols = ["UI", "APP", "MQL", "NDD", "DJ", "FX"];
+  const mt4FeatureSymbols = ["UI", "APP", "MQL", "NDD"];
 
   const pageCopy = computed(() => {
     const language = locale.value.split("-")[0];
