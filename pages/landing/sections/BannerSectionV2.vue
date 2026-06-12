@@ -12,9 +12,11 @@
           <p class="banner__subtitle">{{ t("landing.sections.banner_section.subtitle") }}</p>
           <div class="banner__logo">
             <img
+              class="banner__logo-mark"
               :src="imgLogoMark"
               alt="" />
             <img
+              class="banner__logo-name"
               :src="imgLogoName"
               alt="ESTER" />
           </div>
@@ -100,18 +102,24 @@
 
     &__logo {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 10px;
       flex-shrink: 0;
 
-      img:first-child {
-        height: 84px;
+      img {
+        display: block;
         width: auto;
       }
 
-      img:last-child {
+      &-mark {
+        height: 84px;
+      }
+
+      &-name {
         height: 38px;
-        width: auto;
+        object-fit: contain;
+        object-position: left bottom;
+        transition: filter 200ms ease;
       }
     }
 
@@ -173,11 +181,11 @@
       }
 
       &__logo {
-        img:first-child {
+        &-mark {
           height: 48px;
         }
 
-        img:last-child {
+        &-name {
           height: 22px;
         }
       }
@@ -204,5 +212,9 @@
         align-items: stretch;
       }
     }
+  }
+
+  :global(:root[data-theme="dark"] .banner__logo-name) {
+    filter: brightness(0) invert(1);
   }
 </style>
