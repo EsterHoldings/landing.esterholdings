@@ -9,7 +9,7 @@
           class="card"
           v-for="(item, index) in newsItems"
           :key="item.slug || index"
-          :to="localizedPath(`/news/${item.slug}`)">
+          :to="item.link">
           <img
             :src="item.src"
             alt="" />
@@ -42,6 +42,7 @@
 
   const mapToCard = (item: NewsItem) => ({
     slug: item.slug,
+    link: item.urlPath || localizedPath(`/news/${item.slug}`),
     src: item.image,
     title: item.title,
     subTitle: item.subtitle,

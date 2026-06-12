@@ -19,7 +19,7 @@
           :message="card.subtitle"
           :date="card.publishedAt"
           :button-text="buttonText"
-          :link="localizedPath(`${detailBasePath}/${card.slug}`)" />
+          :link="articlePath(card)" />
       </div>
 
       <div
@@ -67,6 +67,8 @@
       emptyFallback?: string;
       detailBasePath?: string;
       asyncKey?: string;
+      localeOverride?: string | null;
+      initialPage?: number;
     }>(),
     {
       articleType: "news",
@@ -78,6 +80,8 @@
       emptyFallback: "No company news published yet.",
       detailBasePath: "/news",
       asyncKey: "company-news-page",
+      localeOverride: null,
+      initialPage: 1,
     }
   );
 
@@ -90,7 +94,9 @@
   const loadingText = computed(() => t("landing.pages.company.news.loading", "Loading..."));
   const loadMoreText = computed(() => t("landing.pages.company.news.load_more", "Загрузить еще"));
   const detailBasePath = computed(() => props.detailBasePath.replace(/\/$/, ""));
-  const currentPage = ref(1);
+  const effectiveLocale = computed(() => props.localeOverride || locale.value);
+  const effectiveInitialPage = computed(() => Math.max(1, Number(props.initialPage) || 1));
+  const currentPage = ref(effectiveInitialPage.value);
   const isLoadingMore = ref(false);
   const newsItems = ref<NewsItem[]>([]);
   const meta = ref<NewsListResponse["meta"]>({
@@ -100,11 +106,11 @@
     lastPage: 1,
   });
 
-  const { data: initialPayload, refresh } = await useAsyncData(`${props.asyncKey}-${locale.value}`, async () => {
+  const { data: initialPayload, refresh } = await useAsyncData(`${props.asyncKey}-${effectiveLocale.value}-${effectiveInitialPage.value}`, async () => {
     const response = await appCore.news.getList({
-      page: 1,
+      page: effectiveInitialPage.value,
       perPage: PAGE_SIZE,
-      locale: locale.value,
+      locale: effectiveLocale.value,
       articleType: props.articleType,
     });
     return response.data;
@@ -113,7 +119,11 @@
   const hasMore = computed(() => newsItems.value.length < meta.value.total);
 
   function localizedPath(path: string): string {
-    return locale.value ? `/${locale.value}${path}` : path;
+    return effectiveLocale.value ? `/${effectiveLocale.value}${path}` : path;
+  }
+
+  function articlePath(article: NewsItem): string {
+    return article.urlPath || localizedPath(`${detailBasePath.value}/${article.slug}`);
   }
 
   async function loadMore(): Promise<void> {
@@ -125,7 +135,7 @@
       const response = await appCore.news.getList({
         page: nextPage,
         perPage: PAGE_SIZE,
-        locale: locale.value,
+        locale: effectiveLocale.value,
         articleType: props.articleType,
       });
       newsItems.value = [...newsItems.value, ...response.data.data];
@@ -141,13 +151,13 @@
     value => {
       newsItems.value = value?.data || [];
       meta.value = value?.meta || meta.value;
-      currentPage.value = 1;
+      currentPage.value = effectiveInitialPage.value;
     },
     { immediate: true }
   );
 
-  watch(locale, async () => {
-    currentPage.value = 1;
+  watch([effectiveLocale, effectiveInitialPage], async () => {
+    currentPage.value = effectiveInitialPage.value;
     await refresh();
   });
 </script>

@@ -125,6 +125,7 @@ export class NewsService {
       id: item.id,
       articleType: item.article_type === "trader_blog" ? "trader_blog" : "news",
       slug: item.slug,
+      urlPath: this.publicPathFromCanonical(seo.canonical_url),
       title: item.title,
       excerpt,
       subtitle: excerpt || "",
@@ -160,6 +161,22 @@ export class NewsService {
 
   private basePath(articleType: NewsArticleType = "news"): string {
     return articleType === "trader_blog" ? "/trader-blog" : "/news";
+  }
+
+  private publicPathFromCanonical(value: string | null | undefined): string | null {
+    const canonical = String(value || "").trim();
+    if (!canonical) return null;
+
+    if (canonical.startsWith("/")) {
+      return canonical;
+    }
+
+    try {
+      const url = new URL(canonical);
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return null;
+    }
   }
 
   private extractFirstImage(content: string): string | null {

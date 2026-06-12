@@ -4,6 +4,7 @@ export interface NewsItem {
   id: string;
   articleType: NewsArticleType;
   slug: string;
+  urlPath: string | null;
   title: string;
   excerpt: string | null;
   subtitle: string;

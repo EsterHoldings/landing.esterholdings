@@ -3,9 +3,9 @@
     <UiContainer>
       <article class="news-detail__article">
         <NuxtLink
-          :to="localizedPath('/trader-blog')"
+          :to="backPath"
           class="news-detail__back">
-          ← {{ t("landing.pages.trading.traders_blog_title", "Trader Blog") }}
+          ← {{ backLabel }}
         </NuxtLink>
 
         <header class="news-detail__header">
@@ -45,38 +45,60 @@
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import useAppCore from "~/composables/useAppCore";
+  import type { NewsArticleType, NewsItem } from "~/composables/core/modules/news/news.types";
   import { renderArticleContent } from "~/utils/renderArticleContent";
 
   definePageMeta({
     layout: "main",
-    alias: "/trader's-blog/:slug",
   });
 
   const route = useRoute();
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const appCore = useAppCore();
-  const slug = computed(() => String(route.params.slug || ""));
+  const fallbackImage = "/static/newsBg.jpg";
+  const NewsArticleTypeValue = {
+    NEWS: "news",
+    TRADER_BLOG: "trader_blog",
+  } as const satisfies Record<string, NewsArticleType>;
 
-  const { data: articleData } = await useAsyncData(`trader-blog-detail-${slug.value}-${locale.value}`, async () => {
-    const response = await appCore.news.getBySlug(slug.value, {
-      locale: locale.value,
-      articleType: "trader_blog",
-    });
-    return response.data.data;
+  const legacySlug = computed(() => String(route.params.legacySlug || ""));
+  const legacyLocalePrefix = computed(() => {
+    const firstSegment = route.path.split("/").filter(Boolean)[0] || "en";
+    return firstSegment.toLowerCase();
   });
+  const apiLocale = computed(() => (legacyLocalePrefix.value === "ua" ? "uk" : legacyLocalePrefix.value));
+
+  const { data: articleData } = await useAsyncData(
+    `legacy-article-detail-${legacyLocalePrefix.value}-${legacySlug.value}`,
+    async () => {
+      const newsArticle = await fetchArticle(NewsArticleTypeValue.NEWS);
+      if (newsArticle) return newsArticle;
+
+      return await fetchArticle(NewsArticleTypeValue.TRADER_BLOG);
+    }
+  );
 
   if (!articleData.value) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Trader blog article not found",
+      statusMessage: "Legacy article not found",
     });
   }
 
   const article = computed(() => articleData.value!);
   const renderedContent = computed(() => renderArticleContent(article.value.content || ""));
-  const fallbackImage = "/static/newsBg.jpg";
   const currentCoverImage = ref(article.value.image || fallbackImage);
   const isCoverLoaded = ref(false);
+  const backLabel = computed(() =>
+    article.value.articleType === "trader_blog"
+      ? t("landing.pages.trading.traders_blog_title", "Trader Blog")
+      : t("landing.pages.company.news.back", "Company news")
+  );
+  const backPath = computed(() =>
+    article.value.articleType === "trader_blog"
+      ? localizedPath("/trader-blog")
+      : localizedPath("/company-news")
+  );
 
   watch(
     () => article.value.image,
@@ -85,10 +107,6 @@
       isCoverLoaded.value = false;
     }
   );
-
-  function localizedPath(path: string): string {
-    return locale.value ? `/${locale.value}${path}` : path;
-  }
 
   useSeoMeta({
     title: computed(() => article.value.seo.meta_title || article.value.title),
@@ -114,6 +132,24 @@
     ),
   });
 
+  async function fetchArticle(articleType: NewsArticleType): Promise<NewsItem | null> {
+    try {
+      const response = await appCore.news.getBySlug(legacySlug.value, {
+        locale: apiLocale.value,
+        articleType,
+      });
+
+      return response.data.data;
+    } catch {
+      return null;
+    }
+  }
+
+  function localizedPath(path: string): string {
+    const prefix = apiLocale.value ? `/${apiLocale.value}` : "";
+    return `${prefix}${path}`;
+  }
+
   function handleImageLoad(): void {
     isCoverLoaded.value = true;
   }
@@ -125,6 +161,7 @@
     currentCoverImage.value = fallbackImage;
     isCoverLoaded.value = false;
   }
+
 </script>
 
 <style scoped lang="scss">

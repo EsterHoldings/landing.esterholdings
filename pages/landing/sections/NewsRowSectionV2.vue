@@ -68,7 +68,7 @@
       return realItems.map(item => ({
         title: item.title,
         image: item.image,
-        link: localizedPath(`/news/${item.slug}`),
+        link: item.urlPath || localizedPath(`/news/${item.slug}`),
       }));
     }
 

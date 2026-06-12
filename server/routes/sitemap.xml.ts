@@ -12,6 +12,9 @@ type NewsListResponse = {
       slug?: string | null;
       updated_at?: string | null;
       published_at?: string | null;
+      seo?: {
+        canonical_url?: string | null;
+      } | null;
     }>;
   };
 };
@@ -94,11 +97,43 @@ async function loadArticleTypeUrls(
     return items
       .filter(item => item.slug)
       .map(item => ({
-        loc: localizedLandingUrl(siteUrl, locale, `${publicPath}/${item.slug}`),
+        loc: articleSitemapUrl(siteUrl, locale, publicPath, item),
         lastmod: item.updated_at || item.published_at || new Date().toISOString(),
       }));
   } catch {
     return [];
+  }
+}
+
+function articleSitemapUrl(
+  siteUrl: string,
+  locale: string,
+  publicPath: string,
+  item: {
+    slug?: string | null;
+    seo?: { canonical_url?: string | null } | null;
+  }
+): string {
+  const canonicalPath = publicPathFromCanonical(item.seo?.canonical_url);
+
+  return canonicalPath !== null
+    ? `${siteUrl.replace(/\/+$/, "")}${canonicalPath}`
+    : localizedLandingUrl(siteUrl, locale, `${publicPath}/${item.slug}`);
+}
+
+function publicPathFromCanonical(value: string | null | undefined): string | null {
+  const canonical = String(value || "").trim();
+  if (!canonical) return null;
+
+  if (canonical.startsWith("/")) {
+    return canonical;
+  }
+
+  try {
+    const url = new URL(canonical);
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
   }
 }
 

@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from "vue";
-  import { createError, useAsyncData, useRoute, useSeoMeta } from "#app";
+  import { createError, useAsyncData, useHead, useRoute, useSeoMeta } from "#app";
   import { definePageMeta } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -95,6 +95,19 @@
     twitterTitle: computed(() => article.value.seo.twitter_title || article.value.title),
     twitterDescription: computed(() => article.value.seo.twitter_description || article.value.subtitle || ""),
     twitterImage: computed(() => article.value.seo.twitter_image_url || article.value.image),
+  });
+
+  useHead({
+    link: computed(() =>
+      article.value.seo.canonical_url
+        ? [
+            {
+              rel: "canonical",
+              href: article.value.seo.canonical_url,
+            },
+          ]
+        : []
+    ),
   });
 
   function handleImageLoad(): void {
