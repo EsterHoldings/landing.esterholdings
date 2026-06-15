@@ -183,7 +183,10 @@
 
 <style scoped lang="scss">
   .news-detail {
+    position: relative;
+    z-index: 0;
     padding: 42px 0 80px;
+    background: var(--landing-bg);
 
     &__article {
       width: 100%;
@@ -254,10 +257,15 @@
 
     &__content {
       width: 100%;
+      position: relative;
+      z-index: 0;
+      isolation: isolate;
+      contain: paint;
       margin-top: 32px;
       color: var(--landing-text-primary);
       font-size: 17px;
       line-height: 1.72;
+      overflow-wrap: anywhere;
 
       :deep(h2),
       :deep(h3) {

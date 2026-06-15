@@ -4,6 +4,7 @@ import type { RouteRecordRaw } from "vue-router";
 const legacyArticleComponent = () => import("~/components/block/pages/LegacyArticleDetailPage.vue");
 const legacyCompanyNewsCategoryComponent = () => import("~/components/block/pages/LegacyCompanyNewsCategoryPage.vue");
 const legacyTraderBlogCategoryComponent = () => import("~/components/block/pages/LegacyTraderBlogCategoryPage.vue");
+const legacyRouteMeta = { layout: "main" };
 
 const legacyLocales = ["en", "ru", "ua"] as const;
 const legacyArticlePrefixes = [
@@ -21,6 +22,7 @@ function legacyArticleRoutes(): RouteRecordRaw[] {
     name: `legacy-article-${locale}`,
     path: `/${locale}/:legacySlug`,
     component: legacyArticleComponent,
+    meta: legacyRouteMeta,
   }));
 
   const prefixedArticleRoutes = legacyLocales.flatMap(locale =>
@@ -28,6 +30,7 @@ function legacyArticleRoutes(): RouteRecordRaw[] {
       name: `legacy-article-${locale}-${prefix}`,
       path: `/${locale}/${prefix}/:legacySlug(.*)*`,
       component: legacyArticleComponent,
+      meta: legacyRouteMeta,
     }))
   );
 
@@ -40,31 +43,37 @@ function legacyCategoryRoutes(): RouteRecordRaw[] {
       name: "legacy-company-news-category-en",
       path: "/en/category/companys-news/:tail(.*)*",
       component: legacyCompanyNewsCategoryComponent,
+      meta: legacyRouteMeta,
     },
     {
       name: "legacy-company-news-category-ru",
       path: "/ru/category/companys-news/:tail(.*)*",
       component: legacyCompanyNewsCategoryComponent,
+      meta: legacyRouteMeta,
     },
     {
       name: "legacy-company-news-category-ua",
       path: "/ua/category/companys-news/:tail(.*)*",
       component: legacyCompanyNewsCategoryComponent,
+      meta: legacyRouteMeta,
     },
     {
       name: "legacy-trader-blog-category-en",
       path: "/en/category/traders-blog/:tail(.*)*",
       component: legacyTraderBlogCategoryComponent,
+      meta: legacyRouteMeta,
     },
     {
       name: "legacy-trader-blog-category-ru",
       path: "/ru/category/traders-blog/:tail(.*)*",
       component: legacyTraderBlogCategoryComponent,
+      meta: legacyRouteMeta,
     },
     {
       name: "legacy-trader-blog-category-ua",
       path: "/ua/category/traders-blog/:tail(.*)*",
       component: legacyTraderBlogCategoryComponent,
+      meta: legacyRouteMeta,
     },
   ];
 }
