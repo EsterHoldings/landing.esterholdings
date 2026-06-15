@@ -5,24 +5,33 @@ const legacyArticleComponent = () => import("~/components/block/pages/LegacyArti
 const legacyCompanyNewsCategoryComponent = () => import("~/components/block/pages/LegacyCompanyNewsCategoryPage.vue");
 const legacyTraderBlogCategoryComponent = () => import("~/components/block/pages/LegacyTraderBlogCategoryPage.vue");
 
+const legacyLocales = ["en", "ru", "ua"] as const;
+const legacyArticlePrefixes = [
+  "company-news",
+  "companys-news",
+  "trader-blog",
+  "traders-blog",
+  "analytics",
+  "strategy",
+  "strategies",
+] as const;
+
 function legacyArticleRoutes(): RouteRecordRaw[] {
-  return [
-    {
-      name: "legacy-article-en",
-      path: "/en/:legacySlug",
+  const rootArticleRoutes = legacyLocales.map(locale => ({
+    name: `legacy-article-${locale}`,
+    path: `/${locale}/:legacySlug`,
+    component: legacyArticleComponent,
+  }));
+
+  const prefixedArticleRoutes = legacyLocales.flatMap(locale =>
+    legacyArticlePrefixes.map(prefix => ({
+      name: `legacy-article-${locale}-${prefix}`,
+      path: `/${locale}/${prefix}/:legacySlug(.*)*`,
       component: legacyArticleComponent,
-    },
-    {
-      name: "legacy-article-ru",
-      path: "/ru/:legacySlug",
-      component: legacyArticleComponent,
-    },
-    {
-      name: "legacy-article-ua",
-      path: "/ua/:legacySlug",
-      component: legacyArticleComponent,
-    },
-  ];
+    }))
+  );
+
+  return [...prefixedArticleRoutes, ...rootArticleRoutes];
 }
 
 function legacyCategoryRoutes(): RouteRecordRaw[] {

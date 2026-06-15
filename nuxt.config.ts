@@ -90,6 +90,12 @@ export default defineNuxtConfig({
         file: "uk.json",
       },
       {
+        code: "ua",
+        iso: "uk-UA",
+        name: "Українська",
+        file: "uk.json",
+      },
+      {
         code: "he",
         iso: "he-IL",
         name: "עברית",
