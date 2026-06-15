@@ -82,12 +82,12 @@ export class NewsService {
 
   async getBySlug(
     slug: string,
-    params: { locale?: string | null; articleType?: NewsArticleType } = {}
+    params: { locale?: string | null; articleType?: NewsArticleType; legacyPath?: string | null } = {}
   ): Promise<{ data: NewsArticleResponse }> {
     const response = await this.api<ApiEnvelope<ApiNewsArticle>>(
       `${this.basePath(params.articleType)}/${encodeURIComponent(slug)}`,
       {
-        query: this.cleanQuery({ locale: params.locale }),
+        query: this.cleanQuery({ locale: params.locale, legacyPath: params.legacyPath }),
       }
     );
 

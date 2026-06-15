@@ -22,7 +22,7 @@ export class NewsModule {
 
   async getBySlug(
     slug: string,
-    params: { locale?: string | null; articleType?: NewsArticleType } = {}
+    params: { locale?: string | null; articleType?: NewsArticleType; legacyPath?: string | null } = {}
   ): Promise<{ data: NewsArticleResponse }> {
     return await this.newsService.getBySlug(slug, params);
   }

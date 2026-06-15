@@ -1,7 +1,9 @@
 <template>
   <main class="news-detail">
     <UiContainer>
-      <article class="news-detail__article">
+      <article
+        v-if="article"
+        class="news-detail__article">
         <NuxtLink
           :to="backPath"
           class="news-detail__back">
@@ -34,23 +36,25 @@
           class="news-detail__content"
           v-html="renderedContent"></div>
       </article>
+
+      <section
+        v-else
+        class="news-detail__not-found">
+        <h1>Article not found</h1>
+        <p>The requested article is not available.</p>
+      </section>
     </UiContainer>
   </main>
 </template>
 
 <script setup lang="ts">
   import { computed, ref, watch } from "vue";
-  import { createError, useAsyncData, useHead, useRoute, useSeoMeta } from "#app";
-  import { definePageMeta } from "~/.nuxt/imports";
+  import { setResponseStatus, useAsyncData, useHead, useRequestEvent, useRoute, useSeoMeta } from "#app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import useAppCore from "~/composables/useAppCore";
   import type { NewsArticleType, NewsItem } from "~/composables/core/modules/news/news.types";
   import { renderArticleContent } from "~/utils/renderArticleContent";
-
-  definePageMeta({
-    layout: "main",
-  });
 
   const route = useRoute();
   const { t } = useI18n();
@@ -61,71 +65,80 @@
     TRADER_BLOG: "trader_blog",
   } as const satisfies Record<string, NewsArticleType>;
 
-  const legacySlug = computed(() => String(route.params.legacySlug || ""));
+  const legacyPathSegments = computed(() => {
+    const rawValue = route.params.legacySlug;
+    const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+
+    return values
+      .flatMap(value => String(value || "").split("/"))
+      .map(value => value.trim())
+      .filter(Boolean);
+  });
+  const legacySlug = computed(() => legacyPathSegments.value.at(-1) || "");
   const legacyLocalePrefix = computed(() => {
     const firstSegment = route.path.split("/").filter(Boolean)[0] || "en";
     return firstSegment.toLowerCase();
   });
   const apiLocale = computed(() => (legacyLocalePrefix.value === "ua" ? "uk" : legacyLocalePrefix.value));
+  const legacyPath = computed(() => route.path);
 
-  const { data: articleData } = await useAsyncData(
+  const { data: articleData } = await useAsyncData<NewsItem | false>(
     `legacy-article-detail-${legacyLocalePrefix.value}-${legacySlug.value}`,
     async () => {
       const newsArticle = await fetchArticle(NewsArticleTypeValue.NEWS);
       if (newsArticle) return newsArticle;
 
-      return await fetchArticle(NewsArticleTypeValue.TRADER_BLOG);
+      return (await fetchArticle(NewsArticleTypeValue.TRADER_BLOG)) || false;
     }
   );
 
   if (!articleData.value) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Legacy article not found",
-    });
+    const event = useRequestEvent();
+    if (event) {
+      setResponseStatus(event, 404, "Legacy article not found");
+    }
   }
 
-  const article = computed(() => articleData.value!);
-  const renderedContent = computed(() => renderArticleContent(article.value.content || ""));
-  const currentCoverImage = ref(article.value.image || fallbackImage);
+  const article = computed<NewsItem | null>(() => articleData.value || null);
+  const renderedContent = computed(() => renderArticleContent(article.value?.content || ""));
+  const currentCoverImage = ref(fallbackImage);
   const isCoverLoaded = ref(false);
   const backLabel = computed(() =>
-    article.value.articleType === "trader_blog"
+    article.value?.articleType === "trader_blog"
       ? t("landing.pages.trading.traders_blog_title", "Trader Blog")
       : t("landing.pages.company.news.back", "Company news")
   );
   const backPath = computed(() =>
-    article.value.articleType === "trader_blog"
-      ? localizedPath("/trader-blog")
-      : localizedPath("/company-news")
+    article.value?.articleType === "trader_blog" ? localizedPath("/trader-blog") : localizedPath("/company-news")
   );
 
   watch(
-    () => article.value.image,
+    () => article.value?.image,
     value => {
       currentCoverImage.value = value || fallbackImage;
       isCoverLoaded.value = false;
-    }
+    },
+    { immediate: true }
   );
 
   useSeoMeta({
-    title: computed(() => article.value.seo.meta_title || article.value.title),
-    description: computed(() => article.value.seo.meta_description || article.value.subtitle || ""),
-    ogTitle: computed(() => article.value.seo.og_title || article.value.title),
-    ogDescription: computed(() => article.value.seo.og_description || article.value.subtitle || ""),
-    ogImage: computed(() => article.value.seo.og_image_url || article.value.image),
-    twitterTitle: computed(() => article.value.seo.twitter_title || article.value.title),
-    twitterDescription: computed(() => article.value.seo.twitter_description || article.value.subtitle || ""),
-    twitterImage: computed(() => article.value.seo.twitter_image_url || article.value.image),
+    title: computed(() => article.value?.seo.meta_title || article.value?.title || "Article not found"),
+    description: computed(() => article.value?.seo.meta_description || article.value?.subtitle || ""),
+    ogTitle: computed(() => article.value?.seo.og_title || article.value?.title || ""),
+    ogDescription: computed(() => article.value?.seo.og_description || article.value?.subtitle || ""),
+    ogImage: computed(() => article.value?.seo.og_image_url || article.value?.image),
+    twitterTitle: computed(() => article.value?.seo.twitter_title || article.value?.title || ""),
+    twitterDescription: computed(() => article.value?.seo.twitter_description || article.value?.subtitle || ""),
+    twitterImage: computed(() => article.value?.seo.twitter_image_url || article.value?.image),
   });
 
   useHead({
     link: computed(() =>
-      article.value.seo.canonical_url
+      article.value?.seo.canonical_url
         ? [
             {
               rel: "canonical",
-              href: article.value.seo.canonical_url,
+              href: article.value?.seo.canonical_url || "",
             },
           ]
         : []
@@ -133,10 +146,15 @@
   });
 
   async function fetchArticle(articleType: NewsArticleType): Promise<NewsItem | null> {
+    if (!legacySlug.value) {
+      return null;
+    }
+
     try {
       const response = await appCore.news.getBySlug(legacySlug.value, {
         locale: apiLocale.value,
         articleType,
+        legacyPath: legacyPath.value,
       });
 
       return response.data.data;
@@ -161,7 +179,6 @@
     currentCoverImage.value = fallbackImage;
     isCoverLoaded.value = false;
   }
-
 </script>
 
 <style scoped lang="scss">
@@ -292,6 +309,32 @@
         margin: 28px 0;
         border: 0;
         border-top: 1px solid var(--landing-border-strong);
+      }
+    }
+
+    &__not-found {
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        color: var(--landing-text-primary);
+        font-size: clamp(34px, 4vw, 58px);
+        line-height: 1.06;
+        font-weight: 800;
+      }
+
+      p {
+        color: var(--landing-text-secondary);
+        font-size: 18px;
+        line-height: 1.58;
       }
     }
   }
