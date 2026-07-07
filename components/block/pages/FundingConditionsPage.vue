@@ -1053,40 +1053,120 @@
   }
 
   .funding-flow__steps {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: 15px;
+    gap: 22px;
+    width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
 
     li {
+      --funding-flow-offset: 0px;
       display: grid;
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-      padding-bottom: 18px;
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 28px;
+      align-items: center;
+      width: min(960px, calc(100% - var(--funding-flow-offset)));
+      min-height: 132px;
+      margin-left: var(--funding-flow-offset);
+      border: 6px solid #fff;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 44%),
+        linear-gradient(146deg, #ffffff 0%, #fbfbfb 48%, #f1f1f1 100%);
+      padding: 24px 34px 24px 24px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.98),
+        inset 22px 24px 58px rgba(255, 255, 255, 0.78),
+        inset -24px -28px 64px rgba(211, 211, 211, 0.28);
 
       &:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
+        border-bottom: 6px solid #fff;
+      }
+
+      &:nth-child(2) {
+        --funding-flow-offset: clamp(0px, 8vw, 120px);
+      }
+
+      &:nth-child(3) {
+        --funding-flow-offset: clamp(0px, 16vw, 240px);
+      }
+
+      &:nth-child(4) {
+        --funding-flow-offset: clamp(0px, 24vw, 360px);
+      }
+
+      &:nth-child(5) {
+        --funding-flow-offset: clamp(0px, 32vw, 480px);
       }
     }
 
     h3 {
       margin: 0;
       color: var(--landing-text-primary);
-      font-size: 18px;
-      font-weight: 800;
-      line-height: 1.25;
+      font-size: clamp(24px, 2vw, 28px);
+      font-weight: 900;
+      line-height: 1.12;
     }
 
     p {
-      margin: 7px 0 0;
+      margin: 12px 0 0;
       color: var(--landing-text-secondary);
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.5;
+      font-size: clamp(15px, 1.25vw, 18px);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+  }
+
+  .funding-flow {
+    position: relative;
+    isolation: isolate;
+    grid-template-columns: 1fr;
+    gap: 42px;
+    overflow: visible;
+    border-top: 0;
+    padding-top: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 178px;
+      left: 20%;
+      width: min(880px, 68vw);
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(255, 126, 55, 0.22) 0%,
+        rgba(255, 151, 94, 0.15) 34%,
+        rgba(255, 184, 132, 0.08) 56%,
+        transparent 74%
+      );
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .funding-section-intro {
+      position: relative;
+      z-index: 1;
+
+      h2 {
+        max-width: 1120px;
+        margin-top: 22px;
+        font-size: clamp(38px, 3.5vw, 48px);
+        line-height: 1;
+      }
+
+      p {
+        max-width: 1320px;
+        margin-top: 20px;
+        font-size: clamp(16px, 1.35vw, 18px);
+        font-weight: 500;
+        line-height: 1.45;
+      }
     }
   }
 
@@ -1096,10 +1176,10 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 66px;
-    height: 66px;
+    width: 80px;
+    height: 80px;
     border: 0;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: visible;
     isolation: isolate;
     background: transparent;
@@ -1126,7 +1206,7 @@
       -webkit-backdrop-filter: blur(16px) saturate(145%);
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 28%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 8%, transparent);
+        inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 8%, transparent);
     }
 
     &::after {
@@ -1136,7 +1216,7 @@
         linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 4%, transparent));
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
+        inset 0 -18px 28px color-mix(in srgb, var(--landing-accent) 7%, transparent);
     }
 
     &__orb {
@@ -1150,19 +1230,15 @@
 
     &__orb--solid {
       z-index: 0;
-      width: 31px;
-      height: 31px;
-      top: -8px;
-      right: -10px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
     }
 
     &__orb--glow {
       z-index: 0;
-      width: 22px;
-      height: 22px;
-      top: 8px;
-      right: 5px;
+      width: 25px;
+      height: 25px;
       background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
       filter: blur(3px);
     }
@@ -1171,9 +1247,47 @@
       position: relative;
       z-index: 3;
       color: var(--landing-accent);
-      font-size: 32px;
+      font-size: 42px;
       font-weight: 500;
       line-height: 1;
+    }
+  }
+
+  .funding-step-number--1,
+  .funding-step-number--3,
+  .funding-step-number--5 {
+    .funding-step-number__orb--solid {
+      top: -8px;
+      right: -11px;
+    }
+
+    .funding-step-number__orb--glow {
+      top: 8px;
+      right: 6px;
+    }
+  }
+
+  .funding-step-number--2 {
+    .funding-step-number__orb--solid {
+      right: -10px;
+      bottom: -8px;
+    }
+
+    .funding-step-number__orb--glow {
+      right: 2px;
+      bottom: 5px;
+    }
+  }
+
+  .funding-step-number--4 {
+    .funding-step-number__orb--solid {
+      left: -13px;
+      bottom: -9px;
+    }
+
+    .funding-step-number__orb--glow {
+      left: 2px;
+      bottom: 5px;
     }
   }
 
@@ -1182,7 +1296,7 @@
     background: linear-gradient(145deg, rgba(25, 48, 96, 0.27) 0%, rgba(8, 23, 55, 0.19) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -16px 24px rgba(0, 81, 255, 0.08);
+      inset 0 -18px 28px rgba(0, 81, 255, 0.08);
   }
 
   .funding-rules {
@@ -1275,6 +1389,18 @@
     .funding-rules {
       grid-template-columns: 1fr;
     }
+
+    .funding-flow {
+      &::before {
+        left: 4%;
+        width: 92%;
+      }
+    }
+
+    .funding-flow__steps li {
+      --funding-flow-offset: 0px;
+      width: 100%;
+    }
   }
 
   @media (max-width: 575px) {
@@ -1291,6 +1417,11 @@
     .funding-method dl div,
     .funding-flow__steps li {
       grid-template-columns: 1fr;
+    }
+
+    .funding-flow__steps li {
+      min-height: 0;
+      padding: 20px;
     }
 
     .funding-action {

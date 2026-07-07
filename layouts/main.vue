@@ -3,11 +3,9 @@
     <div class="page-content">
       <LandingHeaderV2 class="header" />
 
-      <transition
-        name="fade"
-        mode="out-in">
-        <div class="page page--inner"><slot /></div>
-      </transition>
+      <div class="page page--inner">
+        <slot />
+      </div>
 
       <LandingFooterV2 class="footer" />
     </div>
@@ -47,6 +45,7 @@
       min-height: 100svh;
       display: flex;
       flex-direction: column;
+      overflow-x: clip;
       background-color: var(--landing-bg);
       position: relative;
       isolation: isolate;
@@ -65,15 +64,5 @@
       padding-top: 108px;
       padding-bottom: 40px;
     }
-  }
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.3s ease;
-  }
-
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
   }
 </style>

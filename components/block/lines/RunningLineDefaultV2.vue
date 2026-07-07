@@ -109,7 +109,7 @@
   );
 
   const runtimeConfig = useRuntimeConfig();
-  const QUOTE_FLUSH_BATCH_SIZE = 1;
+  const QUOTE_FLUSH_BATCH_SIZE = 8;
   const { cabinetLink } = useCabinetLink();
   const liveQuoteMap = ref<Record<string, TickerItem>>({});
   const liveQuoteOrder = ref<string[]>([]);
@@ -120,6 +120,7 @@
     copies,
     isDragging,
     resetLoopPosition,
+    refreshLoopPosition,
     startAnimation,
     stopAnimation,
     handleScroll,
@@ -588,7 +589,11 @@
     quotesGlobalHandler = null;
   };
 
-  watch(() => displayItems.value.length, () => resetLoopPosition());
+  watch(
+    () => displayItems.value.length,
+    () => refreshLoopPosition(),
+    { flush: "post" }
+  );
 
   onMounted(() => {
     debugQuotes = quoteDebugEnabled();
@@ -643,6 +648,7 @@
 
     &__card {
       box-sizing: border-box;
+      inline-size: clamp(286px, 20vw, 320px);
       border-radius: 20px;
       border: 0;
       background: var(--landing-surface-glass);
@@ -650,6 +656,7 @@
       padding: 20px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 40px;
       flex-shrink: 0;
       user-select: none;
@@ -685,6 +692,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
+      min-width: 0;
     }
 
     &__symbol {
@@ -703,6 +711,7 @@
       font-size: 14px;
       line-height: 1.302;
       white-space: nowrap;
+      inline-size: 17ch;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
     }
@@ -745,6 +754,7 @@
       }
 
       &__card {
+        inline-size: clamp(218px, 62vw, 250px);
         padding: 10px 14px;
         gap: 14px;
         border-radius: 14px;
@@ -765,6 +775,7 @@
 
       &__price {
         font-size: 11px;
+        inline-size: 17ch;
       }
 
       &__btn {

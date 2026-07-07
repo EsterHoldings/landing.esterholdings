@@ -1,9 +1,11 @@
 <template>
   <div class="header-v2">
-    <div
-      v-if="isMobileMenuOpen"
-      class="overlay"
-      @click="closeMobileMenu"></div>
+    <Transition name="overlay-fade">
+      <div
+        v-if="isMobileMenuOpen"
+        class="overlay"
+        @click="closeMobileMenu"></div>
+    </Transition>
     <div class="header-v2__fixed">
       <UiContainer class="!p-0">
         <header
@@ -501,6 +503,18 @@
       pointer-events: auto;
       margin-top: 20px;
       transform-origin: top center;
+
+      :deep(.menu-wrapper) {
+        transform: translateZ(0);
+        transition:
+          opacity 0.24s ease,
+          background-color 0.24s ease,
+          border-color 0.24s ease,
+          box-shadow 0.24s ease,
+          backdrop-filter 0.24s ease,
+          -webkit-backdrop-filter 0.24s ease;
+        will-change: opacity, backdrop-filter;
+      }
     }
   }
 
@@ -522,12 +536,22 @@
       border-radius: 0 0 20px 20px;
       background: var(--landing-surface-glass-strong);
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--landing-border-strong);
       box-shadow: var(--landing-shadow-glass-raised);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overflow: hidden;
+      transform: translateZ(0);
+      transition:
+        opacity 0.24s ease,
+        background-color 0.24s ease,
+        border-color 0.24s ease,
+        box-shadow 0.24s ease,
+        backdrop-filter 0.24s ease,
+        -webkit-backdrop-filter 0.24s ease;
+      will-change: opacity, backdrop-filter;
     }
 
     &__items {
@@ -621,8 +645,8 @@
   .desktop-menu-fade-enter-active,
   .desktop-menu-fade-leave-active {
     transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
+      opacity 0.24s ease,
+      transform 0.24s ease;
   }
 
   .desktop-menu-fade-enter-from,
@@ -631,17 +655,37 @@
     transform: translateY(-10px) scale(0.98);
   }
 
+  .desktop-menu-fade-enter-from .desktop-menu__content :deep(.menu-wrapper),
+  .desktop-menu-fade-leave-to .desktop-menu__content :deep(.menu-wrapper) {
+    opacity: 0;
+  }
+
   .mobile-menu-fade-enter-active,
   .mobile-menu-fade-leave-active {
     transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
+      opacity 0.24s ease,
+      transform 0.24s ease;
   }
 
   .mobile-menu-fade-enter-from,
   .mobile-menu-fade-leave-to {
     opacity: 0;
     transform: translateY(-10px);
+  }
+
+  .mobile-menu-fade-enter-from .mobile-menu__panel,
+  .mobile-menu-fade-leave-to .mobile-menu__panel {
+    opacity: 0;
+  }
+
+  .overlay-fade-enter-active,
+  .overlay-fade-leave-active {
+    transition: opacity 0.24s ease;
+  }
+
+  .overlay-fade-enter-from,
+  .overlay-fade-leave-to {
+    opacity: 0;
   }
 
   @media (max-width: 991px) {

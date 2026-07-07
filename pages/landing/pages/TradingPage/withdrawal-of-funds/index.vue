@@ -1,10 +1,10 @@
 <template>
-  <FundingConditionsPage mode="withdrawal" />
+  <WithdrawalOfFundsPage />
 </template>
 
 <script setup lang="ts">
   import { definePageMeta } from "~/.nuxt/imports";
-  import FundingConditionsPage from "~/components/block/pages/FundingConditionsPage.vue";
+  import WithdrawalOfFundsPage from "~/components/block/pages/WithdrawalOfFundsPage.vue";
 
   definePageMeta({
     layout: "main",

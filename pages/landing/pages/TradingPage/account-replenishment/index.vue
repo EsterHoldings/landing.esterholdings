@@ -1,10 +1,10 @@
 <template>
-  <FundingConditionsPage mode="deposit" />
+  <AccountReplenishmentPage />
 </template>
 
 <script setup lang="ts">
   import { definePageMeta } from "~/.nuxt/imports";
-  import FundingConditionsPage from "~/components/block/pages/FundingConditionsPage.vue";
+  import AccountReplenishmentPage from "~/components/block/pages/AccountReplenishmentPage.vue";
 
   definePageMeta({
     layout: "main",

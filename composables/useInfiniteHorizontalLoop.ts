@@ -23,6 +23,9 @@ export const useInfiniteHorizontalLoop = (
   let currentOffset = 0;
   let loopAnimation: Animation | null = null;
   let loopDuration = 0;
+  let resizeObserver: ResizeObserver | null = null;
+  let refreshFrame: number | null = null;
+  let lastSegmentWidth = 0;
 
   const segmentWidth = (): number => {
     if (!track.value) return 0;
@@ -79,14 +82,12 @@ export const useInfiniteHorizontalLoop = (
     const width = segmentWidth();
     if (!trackElement || width <= 0) return;
 
+    const previousPlayState = loopAnimation?.playState;
     cancelLoopAnimation();
     currentOffset = normalizeOffsetValue(currentOffset || width);
     loopDuration = (width / pixelsPerSecond()) * 1000;
     loopAnimation = trackElement.animate(
-      [
-        { transform: `translate3d(${-width}px, 0, 0)` },
-        { transform: `translate3d(${-width * 2}px, 0, 0)` },
-      ],
+      [{ transform: `translate3d(${-width}px, 0, 0)` }, { transform: `translate3d(${-width * 2}px, 0, 0)` }],
       {
         duration: loopDuration,
         iterations: Infinity,
@@ -94,6 +95,10 @@ export const useInfiniteHorizontalLoop = (
       }
     );
     loopAnimation.currentTime = ((currentOffset - width) / width) * loopDuration;
+
+    if (previousPlayState && previousPlayState !== "running") {
+      loopAnimation.pause();
+    }
   };
 
   const resetLoopPosition = (attempt = 0) => {
@@ -120,6 +125,56 @@ export const useInfiniteHorizontalLoop = (
         applyTransform(width);
       }, 0);
     });
+  };
+
+  const refreshLoopPosition = (attempt = 0) => {
+    void nextTick(() => {
+      window.setTimeout(() => {
+        const viewportElement = viewport.value;
+        const width = segmentWidth();
+        if (!viewportElement) return;
+        if (width <= 0) {
+          if (attempt < 6) {
+            window.setTimeout(() => refreshLoopPosition(attempt + 1), 50);
+          }
+
+          return;
+        }
+
+        if (loopAnimation) {
+          createLoopAnimation();
+          return;
+        }
+
+        applyTransform(currentOffset || width);
+      }, 0);
+    });
+  };
+
+  const scheduleLoopRefresh = () => {
+    if (refreshFrame !== null) return;
+
+    refreshFrame = window.requestAnimationFrame(() => {
+      refreshFrame = null;
+      refreshLoopPosition();
+    });
+  };
+
+  const observeTrackSize = (trackElement: HTMLElement | null) => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+    lastSegmentWidth = segmentWidth();
+
+    if (!trackElement || typeof ResizeObserver === "undefined") return;
+
+    resizeObserver = new ResizeObserver(() => {
+      const width = segmentWidth();
+      if (width <= 0 || Math.abs(width - lastSegmentWidth) < 0.5) return;
+
+      lastSegmentWidth = width;
+      scheduleLoopRefresh();
+    });
+    resizeObserver.observe(trackElement);
   };
 
   const startAnimation = () => {
@@ -189,6 +244,12 @@ export const useInfiniteHorizontalLoop = (
   };
 
   onUnmounted(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+    if (refreshFrame !== null) {
+      window.cancelAnimationFrame(refreshFrame);
+      refreshFrame = null;
+    }
     cancelLoopAnimation();
   });
 
@@ -198,6 +259,7 @@ export const useInfiniteHorizontalLoop = (
       if (!viewportElement || !trackElement) return;
 
       resetLoopPosition();
+      observeTrackSize(trackElement);
     },
     { flush: "post" }
   );
@@ -206,6 +268,7 @@ export const useInfiniteHorizontalLoop = (
     copies,
     isDragging,
     resetLoopPosition,
+    refreshLoopPosition,
     startAnimation,
     stopAnimation,
     handleScroll,

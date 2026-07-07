@@ -59,6 +59,7 @@
       min-height: 100svh;
       display: flex;
       flex-direction: column;
+      overflow-x: clip;
       background-color: var(--landing-bg);
       position: relative;
       isolation: isolate;
