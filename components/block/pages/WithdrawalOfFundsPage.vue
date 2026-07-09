@@ -82,24 +82,41 @@
               aria-hidden="true" />
 
             <span
-              class="withdrawal-visual__card withdrawal-visual__card--request"
+              class="withdrawal-visual__request-card"
               aria-hidden="true">
-              <svg viewBox="0 0 72 92">
-                <circle
-                  cx="36"
-                  cy="20"
-                  r="12" />
-                <path d="M18 44h33M18 58h28M18 72h22" />
-                <path d="M49 70l7 7 13-17" />
-              </svg>
+              <span class="withdrawal-visual__request-avatar">
+                <span />
+              </span>
+              <span class="withdrawal-visual__request-rows">
+                <span>
+                  <i />
+                  <b />
+                </span>
+                <span>
+                  <i />
+                  <b />
+                </span>
+                <span>
+                  <i />
+                  <b />
+                </span>
+              </span>
+              <span class="withdrawal-visual__request-check" />
             </span>
 
             <span
-              class="withdrawal-visual__card withdrawal-visual__card--shield"
+              class="withdrawal-visual__shield-object"
               aria-hidden="true">
-              <svg viewBox="0 0 88 98">
-                <path d="M44 7 78 22v25c0 24-14 39-34 47C24 86 10 71 10 47V22L44 7Z" />
-                <path d="m27 50 12 12 25-29" />
+              <svg viewBox="0 0 126 144">
+                <path
+                  class="withdrawal-visual__shield-glass"
+                  d="M63 9 111 30v38c0 35-20 57-48 68-28-11-48-33-48-68V30L63 9Z" />
+                <path
+                  class="withdrawal-visual__shield-edge"
+                  d="M63 18 101 35v32c0 28-15 46-38 56-23-10-38-28-38-56V35L63 18Z" />
+                <path
+                  class="withdrawal-visual__shield-check"
+                  d="m39 73 19 20 36-45" />
               </svg>
             </span>
 
@@ -1744,27 +1761,207 @@
       }
     }
 
-    &__card--request {
-      top: 11%;
-      left: 15%;
-      width: 20%;
-      height: 24%;
-      color: rgba(0, 81, 255, 0.18);
-      filter: blur(0.15px);
-      opacity: 0.82;
-      --withdrawal-card-rotate: -1deg;
-      animation-delay: -1s;
+    &__request-card {
+      position: absolute;
+      top: 5.6%;
+      left: 6.8%;
+      z-index: 3;
+      width: 31.6%;
+      height: 31.2%;
+      border: 1px solid rgba(231, 236, 248, 0.94);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 48% 14%, rgba(218, 235, 255, 0.32) 0, transparent 31%),
+        linear-gradient(146deg, rgba(255, 255, 255, 0.92), rgba(248, 251, 255, 0.66)), rgba(255, 255, 255, 0.62);
+      box-shadow:
+        0 24px 58px rgba(27, 54, 102, 0.1),
+        0 0 38px rgba(138, 164, 228, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset 15px 14px 32px rgba(255, 255, 255, 0.46),
+        inset -18px -22px 34px rgba(221, 229, 245, 0.22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transform: perspective(780px) rotateY(-14deg) rotateX(3deg) rotateZ(-0.7deg);
+      transform-origin: center;
+      opacity: 0.93;
+      animation:
+        withdrawalRequestFloat 8.5s ease-in-out infinite,
+        withdrawalRequestGlow 5.8s ease-in-out infinite;
     }
 
-    &__card--shield {
-      top: 40%;
-      left: 15%;
-      width: 17.5%;
-      height: 20%;
-      color: rgba(0, 81, 255, 0.34);
-      opacity: 0.78;
-      --withdrawal-card-rotate: 1.5deg;
-      animation-delay: -3.4s;
+    &__request-avatar {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      width: 31%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.88) 0 12%, transparent 13%),
+        linear-gradient(145deg, rgba(215, 244, 255, 0.92), rgba(151, 162, 232, 0.82));
+      box-shadow:
+        0 14px 28px rgba(69, 87, 166, 0.22),
+        inset 0 5px 10px rgba(255, 255, 255, 0.76),
+        inset 0 -9px 14px rgba(77, 91, 177, 0.22);
+      translate: -50% 0;
+      animation: withdrawalRequestAvatarPulse 4.8s ease-in-out infinite;
+
+      span {
+        position: absolute;
+        inset: 22%;
+        color: rgba(255, 255, 255, 0.94);
+      }
+
+      span::before,
+      span::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        background: currentColor;
+        translate: -50% 0;
+      }
+
+      span::before {
+        top: 0;
+        width: 32%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+      }
+
+      span::after {
+        bottom: 2%;
+        width: 70%;
+        height: 36%;
+        border-radius: 999px 999px 42% 42%;
+      }
+    }
+
+    &__request-rows {
+      position: absolute;
+      left: 14%;
+      right: 12%;
+      bottom: 17%;
+      display: grid;
+      gap: 11%;
+
+      span {
+        display: grid;
+        grid-template-columns: 16% 1fr;
+        align-items: center;
+        gap: 10%;
+      }
+
+      i,
+      b {
+        display: block;
+        opacity: 0.62;
+        transform-origin: left center;
+        animation: withdrawalRequestLineDraw 4.8s ease-in-out infinite;
+      }
+
+      i {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: linear-gradient(145deg, rgba(179, 193, 230, 0.8), rgba(135, 151, 204, 0.48));
+        box-shadow: 0 5px 9px rgba(65, 88, 143, 0.08);
+      }
+
+      b {
+        height: clamp(8px, 1vw, 11px);
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(157, 173, 219, 0.6), rgba(205, 214, 232, 0.44));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+      }
+
+      span:nth-child(2) i,
+      span:nth-child(2) b {
+        animation-delay: 0.18s;
+      }
+
+      span:nth-child(3) i,
+      span:nth-child(3) b {
+        animation-delay: 0.36s;
+      }
+
+      span:nth-child(3) b {
+        width: 68%;
+      }
+    }
+
+    &__request-check {
+      position: absolute;
+      right: 10%;
+      bottom: 13%;
+      width: 22%;
+      height: 18%;
+      transform: rotate(-5deg);
+      animation: withdrawalRequestCheckPulse 4.8s ease-in-out infinite;
+    }
+
+    &__request-check::before {
+      content: "";
+      position: absolute;
+      left: 4%;
+      top: 30%;
+      width: 86%;
+      height: 52%;
+      border-right: 9px solid rgba(125, 151, 228, 0.82);
+      border-bottom: 9px solid rgba(125, 151, 228, 0.82);
+      border-radius: 4px;
+      filter: drop-shadow(0 7px 8px rgba(74, 91, 166, 0.18));
+      transform: rotate(42deg) scale(0.72);
+    }
+
+    &__shield-object {
+      position: absolute;
+      top: 44.2%;
+      left: 7.2%;
+      z-index: 3;
+      width: 22.4%;
+      aspect-ratio: 126 / 144;
+      color: rgba(112, 141, 219, 0.86);
+      transform: perspective(720px) rotateY(-12deg) rotateX(4deg) rotateZ(0.6deg);
+      transform-origin: center;
+      filter: drop-shadow(0 20px 24px rgba(63, 79, 145, 0.14));
+      animation:
+        withdrawalShieldFloat 8.8s ease-in-out infinite,
+        withdrawalShieldGlow 5.6s ease-in-out infinite;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+    }
+
+    &__shield-glass {
+      fill: rgba(255, 255, 255, 0.34);
+      stroke: rgba(155, 174, 224, 0.34);
+      stroke-width: 5;
+      filter: drop-shadow(0 9px 12px rgba(68, 83, 147, 0.1));
+    }
+
+    &__shield-edge {
+      fill: rgba(255, 255, 255, 0.2);
+      stroke: currentColor;
+      stroke-width: 7;
+      stroke-linejoin: round;
+      stroke-dasharray: 410;
+      stroke-dashoffset: 410;
+      filter: drop-shadow(0 6px 7px rgba(93, 111, 184, 0.1));
+      animation: withdrawalShieldDraw 5.6s ease-in-out infinite;
+    }
+
+    &__shield-check {
+      fill: none;
+      stroke: rgba(91, 122, 210, 0.92);
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 110;
+      stroke-dashoffset: 110;
+      filter: drop-shadow(0 10px 9px rgba(75, 92, 165, 0.2));
+      animation: withdrawalShieldCheckDraw 5.6s ease-in-out infinite;
     }
 
     &__card--document {
@@ -1938,6 +2135,152 @@
 
     50% {
       translate: 0 -8px;
+    }
+  }
+
+  @keyframes withdrawalRequestFloat {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    50% {
+      translate: 0 -7px;
+    }
+  }
+
+  @keyframes withdrawalRequestGlow {
+    0%,
+    100% {
+      box-shadow:
+        0 24px 58px rgba(27, 54, 102, 0.1),
+        0 0 38px rgba(138, 164, 228, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset 15px 14px 32px rgba(255, 255, 255, 0.46),
+        inset -18px -22px 34px rgba(221, 229, 245, 0.22);
+    }
+
+    50% {
+      box-shadow:
+        0 28px 64px rgba(27, 54, 102, 0.13),
+        0 0 34px rgba(105, 139, 223, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98),
+        inset 15px 14px 32px rgba(255, 255, 255, 0.54),
+        inset -18px -22px 34px rgba(221, 229, 245, 0.26);
+    }
+  }
+
+  @keyframes withdrawalRequestAvatarPulse {
+    0%,
+    100% {
+      opacity: 0.68;
+      scale: 0.96;
+    }
+
+    46%,
+    74% {
+      opacity: 0.96;
+      scale: 1;
+    }
+  }
+
+  @keyframes withdrawalRequestLineDraw {
+    0%,
+    13% {
+      opacity: 0.22;
+      scale: 0.22 1;
+    }
+
+    42%,
+    78% {
+      opacity: 0.62;
+      scale: 1 1;
+    }
+
+    100% {
+      opacity: 0.42;
+      scale: 0.92 1;
+    }
+  }
+
+  @keyframes withdrawalRequestCheckPulse {
+    0%,
+    22% {
+      opacity: 0;
+      scale: 0.72;
+    }
+
+    45%,
+    78% {
+      opacity: 1;
+      scale: 1;
+    }
+
+    100% {
+      opacity: 0.62;
+      scale: 0.92;
+    }
+  }
+
+  @keyframes withdrawalShieldFloat {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    50% {
+      translate: 0 -6px;
+    }
+  }
+
+  @keyframes withdrawalShieldGlow {
+    0%,
+    100% {
+      filter: drop-shadow(0 20px 24px rgba(63, 79, 145, 0.14));
+      opacity: 0.82;
+    }
+
+    52% {
+      filter: drop-shadow(0 22px 28px rgba(63, 79, 145, 0.18)) drop-shadow(0 0 16px rgba(111, 140, 220, 0.16));
+      opacity: 0.96;
+    }
+  }
+
+  @keyframes withdrawalShieldDraw {
+    0%,
+    18% {
+      stroke-dashoffset: 410;
+      opacity: 0.34;
+    }
+
+    48%,
+    82% {
+      stroke-dashoffset: 0;
+      opacity: 0.82;
+    }
+
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.58;
+    }
+  }
+
+  @keyframes withdrawalShieldCheckDraw {
+    0%,
+    30% {
+      stroke-dashoffset: 110;
+      opacity: 0.24;
+    }
+
+    52%,
+    84% {
+      stroke-dashoffset: 0;
+      opacity: 0.92;
+    }
+
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.62;
     }
   }
 
