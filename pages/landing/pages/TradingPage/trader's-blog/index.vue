@@ -2,7 +2,7 @@
   <CompanyNewsPage
     article-type="trader_blog"
     title-key="landing.pages.trading.traders_blog_title"
-    title-fallback="Trader Blog"
+    title-fallback="Trader’s Blog"
     subtitle-key="landing.pages.trading.traders_blog_subtitle"
     subtitle-fallback="Practical market insights, trading education and platform materials for traders."
     empty-key="landing.pages.trading.traders_blog_empty"

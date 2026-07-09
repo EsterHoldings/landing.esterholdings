@@ -503,6 +503,8 @@
         "news": {
           "title": "Notícias da Empresa",
           "subtitle": "Atualizações da empresa, novidades da plataforma e anúncios importantes.",
+          "loading": "Carregando...",
+          "load_more": "Carregar mais",
           "items": [
             {
               "title": "Ações da NVIDIA dispararam 15% após o relatório",

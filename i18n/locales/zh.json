@@ -491,6 +491,8 @@
         "news": {
           "title": "公司新闻",
           "subtitle": "公司动态、平台新闻和重要公告。",
+          "loading": "加载中...",
+          "load_more": "加载更多",
           "items": [
             {
               "title": "NVIDIA股票在报告后飙升15%",

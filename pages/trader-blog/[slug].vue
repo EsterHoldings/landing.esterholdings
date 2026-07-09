@@ -1,49 +1,15 @@
 <template>
-  <main class="news-detail">
-    <UiContainer>
-      <article class="news-detail__article">
-        <NuxtLink
-          :to="localizedPath('/trader-blog')"
-          class="news-detail__back">
-          ← {{ t("landing.pages.trading.traders_blog_title", "Trader Blog") }}
-        </NuxtLink>
-
-        <header class="news-detail__header">
-          <time
-            v-if="article.publishedAt"
-            class="news-detail__date">
-            {{ article.publishedAt }}
-          </time>
-          <h1>{{ article.title }}</h1>
-          <p v-if="article.subtitle">{{ article.subtitle }}</p>
-        </header>
-
-        <div
-          v-if="article.image"
-          class="news-detail__cover">
-          <img
-            class="news-detail__cover-image"
-            :class="{ 'news-detail__cover-image--loaded': isCoverLoaded }"
-            :src="currentCoverImage"
-            :alt="article.title"
-            @load="handleImageLoad"
-            @error="handleImageError" />
-        </div>
-
-        <div
-          class="news-detail__content"
-          v-html="renderedContent"></div>
-      </article>
-    </UiContainer>
-  </main>
+  <NewsArticleDetailPage
+    :article="article"
+    :rendered-content="renderedContent" />
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from "vue";
+  import { computed } from "vue";
   import { createError, useAsyncData, useHead, useRoute, useSeoMeta } from "#app";
   import { definePageMeta } from "~/.nuxt/imports";
   import { useI18n } from "vue-i18n";
-  import UiContainer from "~/components/ui/UiContainer.vue";
+  import NewsArticleDetailPage from "~/components/block/pages/NewsArticleDetailPage.vue";
   import useAppCore from "~/composables/useAppCore";
   import { renderArticleContent } from "~/utils/renderArticleContent";
 
@@ -53,7 +19,7 @@
   });
 
   const route = useRoute();
-  const { t, locale } = useI18n();
+  const { locale } = useI18n();
   const appCore = useAppCore();
   const slug = computed(() => String(route.params.slug || ""));
 
@@ -74,21 +40,6 @@
 
   const article = computed(() => articleData.value!);
   const renderedContent = computed(() => renderArticleContent(article.value.content || ""));
-  const fallbackImage = "/static/newsBg.jpg";
-  const currentCoverImage = ref(article.value.image || fallbackImage);
-  const isCoverLoaded = ref(false);
-
-  watch(
-    () => article.value.image,
-    value => {
-      currentCoverImage.value = value || fallbackImage;
-      isCoverLoaded.value = false;
-    }
-  );
-
-  function localizedPath(path: string): string {
-    return locale.value ? `/${locale.value}${path}` : path;
-  }
 
   useSeoMeta({
     title: computed(() => article.value.seo.meta_title || article.value.title),
@@ -113,167 +64,4 @@
         : []
     ),
   });
-
-  function handleImageLoad(): void {
-    isCoverLoaded.value = true;
-  }
-
-  function handleImageError(event: Event): void {
-    const image = event.target as HTMLImageElement | null;
-    if (!image || image.src.includes(fallbackImage)) return;
-
-    currentCoverImage.value = fallbackImage;
-    isCoverLoaded.value = false;
-  }
 </script>
-
-<style scoped lang="scss">
-  .news-detail {
-    position: relative;
-    z-index: 0;
-    padding: 42px 0 80px;
-    background: var(--landing-bg);
-
-    &__article {
-      width: 100%;
-    }
-
-    &__back {
-      display: inline-flex;
-      margin-bottom: 24px;
-      color: var(--landing-accent);
-      font-size: 14px;
-      font-weight: 800;
-      text-decoration: none;
-    }
-
-    &__header {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 24px;
-
-      h1 {
-        margin: 0;
-        color: var(--landing-text-primary);
-        font-size: clamp(34px, 4vw, 58px);
-        line-height: 1.06;
-        font-weight: 800;
-      }
-
-      p {
-        margin: 0;
-        color: var(--landing-text-secondary);
-        font-size: 18px;
-        line-height: 1.58;
-      }
-    }
-
-    &__date {
-      color: var(--landing-text-secondary);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    &__cover {
-      width: 100%;
-      aspect-ratio: 16 / 8.5;
-      overflow: hidden;
-      border-radius: 8px;
-      border: 1px solid var(--landing-border-strong);
-      background:
-        linear-gradient(
-          color-mix(in srgb, var(--landing-surface-muted) 88%, transparent),
-          color-mix(in srgb, var(--landing-surface-muted) 88%, transparent)
-        ),
-        url("/static/newsBg.jpg") center / cover;
-    }
-
-    &__cover-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.24s ease;
-
-      &--loaded {
-        opacity: 1;
-      }
-    }
-
-    &__content {
-      width: 100%;
-      position: relative;
-      z-index: 0;
-      isolation: isolate;
-      contain: paint;
-      margin-top: 32px;
-      color: var(--landing-text-primary);
-      font-size: 17px;
-      line-height: 1.72;
-      overflow-wrap: anywhere;
-
-      :deep(h2),
-      :deep(h3) {
-        margin: 30px 0 12px;
-        color: var(--landing-text-primary);
-        line-height: 1.22;
-      }
-
-      :deep(h2) {
-        font-size: 28px;
-      }
-
-      :deep(h3) {
-        font-size: 22px;
-      }
-
-      :deep(p) {
-        margin: 0 0 18px;
-        color: var(--landing-text-secondary);
-      }
-
-      :deep(ul) {
-        margin: 0 0 18px;
-        padding-left: 22px;
-        color: var(--landing-text-secondary);
-      }
-
-      :deep(a) {
-        color: var(--landing-accent);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-
-      :deep(strong) {
-        color: var(--landing-text-primary);
-        font-weight: 800;
-      }
-
-      :deep(img) {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        margin: 28px 0;
-        border-radius: 8px;
-      }
-
-      :deep(hr) {
-        margin: 28px 0;
-        border: 0;
-        border-top: 1px solid var(--landing-border-strong);
-      }
-    }
-  }
-
-  @media (max-width: 640px) {
-    .news-detail {
-      padding: 28px 0 56px;
-
-      &__cover {
-        aspect-ratio: 4 / 3;
-      }
-    }
-  }
-</style>

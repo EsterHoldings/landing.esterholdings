@@ -13,19 +13,19 @@
     </div>
 
     <div class="news-card__body">
-      <UiTextParagraph class="news-card__date">{{ date }}</UiTextParagraph>
-      <UiTextH4 class="news-card__title">{{ title }}</UiTextH4>
-      <UiTextParagraph class="news-card__message">{{ message }}</UiTextParagraph>
+      <h2 class="news-card__title">{{ title }}</h2>
+      <p class="news-card__message">{{ message }}</p>
 
-      <span class="news-card__link">{{ buttonText }}<span>→</span></span>
+      <div class="news-card__meta">
+        <time class="news-card__date">{{ date }}</time>
+        <span class="news-card__link">{{ buttonText }}</span>
+      </div>
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
   import { ref, watch } from "vue";
-  import UiTextH4 from "~/components/ui/UiTextH4.vue";
-  import UiTextParagraph from "~/components/ui/UiTextParagraph.vue";
 
   const fallbackImage = "/static/newsBg.jpg";
   const props = defineProps({
@@ -67,11 +67,14 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid var(--landing-border-strong);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    border-radius: 10px;
     color: inherit;
     text-decoration: none;
-    background: var(--landing-surface-glass);
+    background: #fff;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      0 1px 0 rgba(255, 255, 255, 0.8);
     transition:
       transform 0.2s ease,
       border-color 0.2s ease,
@@ -79,13 +82,15 @@
 
     &:hover {
       transform: translateY(-2px);
-      border-color: color-mix(in srgb, var(--landing-accent) 44%, var(--landing-border-strong));
-      box-shadow: 0 18px 40px color-mix(in srgb, var(--landing-accent) 12%, transparent);
+      border-color: rgba(0, 81, 255, 0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        0 18px 44px rgba(0, 81, 255, 0.08);
     }
 
     &__image-wrap {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 1.63 / 1;
       overflow: hidden;
       background:
         linear-gradient(
@@ -100,54 +105,86 @@
       height: 100%;
       object-fit: cover;
       opacity: 0;
-      transition: opacity 0.24s ease;
+      transition:
+        opacity 0.24s ease,
+        transform 0.32s ease;
 
       &--loaded {
         opacity: 1;
       }
     }
 
+    &:hover &__image {
+      transform: scale(1.025);
+    }
+
     &__body {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 16px;
+      min-height: 184px;
+      padding: 24px 24px 22px;
     }
 
     &__date {
       margin: 0;
+      display: block;
       color: var(--landing-text-secondary);
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.2;
     }
 
     &__title {
       margin: 0;
       color: var(--landing-text-primary);
-      font-size: 20px;
-      line-height: 1.24;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.12;
     }
 
     &__message {
-      margin: 0;
+      margin: 16px 0 0;
       display: -webkit-box;
       overflow: hidden;
       color: var(--landing-text-secondary);
       font-size: 14px;
-      line-height: 1.5;
-      -webkit-line-clamp: 3;
+      font-weight: 500;
+      line-height: 1.26;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
     }
 
-    &__link {
+    &__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
       margin-top: auto;
+      padding-top: 24px;
+    }
+
+    &__link {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      flex-shrink: 0;
       color: var(--landing-accent);
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 800;
+      line-height: 1.2;
+    }
+  }
+
+  @media (max-width: 575px) {
+    .news-card {
+      &__body {
+        min-height: 170px;
+        padding: 20px;
+      }
+
+      &__meta {
+        padding-top: 20px;
+      }
     }
   }
 </style>

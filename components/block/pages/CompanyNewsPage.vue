@@ -1,12 +1,12 @@
 <template>
   <UiContainer>
-    <div class="company-news">
-      <div class="company-news__head">
-        <UiTextH3 class="company-news_title">{{ pageTitle }}</UiTextH3>
+    <main class="company-news">
+      <header class="company-news__head">
+        <h1 class="company-news__title">{{ pageTitle }}</h1>
         <p class="company-news__lead">
           {{ pageSubtitle }}
         </p>
-      </div>
+      </header>
 
       <div
         v-if="newsItems.length"
@@ -34,13 +34,9 @@
         class="company-news__load-more"
         :disabled="isLoadingMore"
         @click="loadMore">
-        {{
-          isLoadingMore
-            ? loadingText
-            : loadMoreText
-        }}
+        {{ isLoadingMore ? loadingText : loadMoreText }}
       </button>
-    </div>
+    </main>
   </UiContainer>
 </template>
 
@@ -49,7 +45,6 @@
   import { useAsyncData } from "#app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
-  import UiTextH3 from "~/components/ui/UiTextH3.vue";
   import NewsCard from "~/pages/landing/pages/Company/company-news/components/NewsCard.vue";
   import useAppCore from "~/composables/useAppCore";
   import type { NewsArticleType, NewsItem, NewsListResponse } from "~/composables/core/modules/news/news.types";
@@ -92,7 +87,7 @@
   const pageSubtitle = computed(() => t(props.subtitleKey, props.subtitleFallback));
   const emptyText = computed(() => t(props.emptyKey, props.emptyFallback));
   const loadingText = computed(() => t("landing.pages.company.news.loading", "Loading..."));
-  const loadMoreText = computed(() => t("landing.pages.company.news.load_more", "Загрузить еще"));
+  const loadMoreText = computed(() => t("landing.pages.company.news.load_more", "Load more"));
   const detailBasePath = computed(() => props.detailBasePath.replace(/\/$/, ""));
   const effectiveLocale = computed(() => props.localeOverride || locale.value);
   const effectiveInitialPage = computed(() => Math.max(1, Number(props.initialPage) || 1));
@@ -106,15 +101,18 @@
     lastPage: 1,
   });
 
-  const { data: initialPayload, refresh } = await useAsyncData(`${props.asyncKey}-${effectiveLocale.value}-${effectiveInitialPage.value}`, async () => {
-    const response = await appCore.news.getList({
-      page: effectiveInitialPage.value,
-      perPage: PAGE_SIZE,
-      locale: effectiveLocale.value,
-      articleType: props.articleType,
-    });
-    return response.data;
-  });
+  const { data: initialPayload, refresh } = await useAsyncData(
+    `${props.asyncKey}-${effectiveLocale.value}-${effectiveInitialPage.value}`,
+    async () => {
+      const response = await appCore.news.getList({
+        page: effectiveInitialPage.value,
+        perPage: PAGE_SIZE,
+        locale: effectiveLocale.value,
+        articleType: props.articleType,
+      });
+      return response.data;
+    }
+  );
 
   const hasMore = computed(() => newsItems.value.length < meta.value.total);
 
@@ -123,7 +121,13 @@
   }
 
   function articlePath(article: NewsItem): string {
-    return article.urlPath || localizedPath(`${detailBasePath.value}/${article.slug}`);
+    const fallbackPath = localizedPath(`${detailBasePath.value}/${article.slug}`);
+
+    if (props.articleType === "trader_blog") {
+      return fallbackPath;
+    }
+
+    return article.urlPath || fallbackPath;
   }
 
   async function loadMore(): Promise<void> {
@@ -166,31 +170,38 @@
   .company-news {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 42px 0 72px;
+    gap: 44px;
+    padding: 30px 0 96px;
+    font-family: "DM Sans", "Inter", "Muli", sans-serif;
 
     &__head {
-      max-width: 760px;
+      max-width: 820px;
       margin: 0 auto;
       text-align: center;
     }
 
-    &_title {
-      color: var(--landing-text-primary);
+    &__title {
       margin: 0;
+      color: var(--landing-text-primary);
+      font-size: clamp(44px, 5vw, 72px);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0;
     }
 
     &__lead {
-      margin: 12px 0 0;
+      max-width: 620px;
+      margin: 34px auto 0;
       color: var(--landing-text-secondary);
-      font-size: 16px;
-      line-height: 1.55;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.3;
     }
 
     &_wrapper {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
+      gap: 20px;
       align-items: stretch;
     }
 
@@ -207,14 +218,15 @@
 
     &__load-more {
       align-self: center;
-      min-width: 190px;
-      height: 48px;
-      padding: 0 24px;
+      min-width: min(440px, 100%);
+      height: 66px;
+      margin-top: 6px;
+      padding: 0 32px;
       border: 0;
-      border-radius: 8px;
+      border-radius: 14px;
       color: var(--landing-on-accent);
       background: var(--landing-accent);
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 800;
       cursor: pointer;
       transition:
@@ -234,18 +246,32 @@
 
   @media (max-width: 991px) {
     .company-news {
-      padding: 28px 0 52px;
+      gap: 34px;
+      padding: 18px 0 70px;
 
       &_wrapper {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      &__lead {
+        margin-top: 22px;
       }
     }
   }
 
   @media (max-width: 640px) {
     .company-news {
+      &__title {
+        font-size: 40px;
+      }
+
       &_wrapper {
         grid-template-columns: 1fr;
+      }
+
+      &__load-more {
+        width: 100%;
+        min-width: 0;
       }
     }
   }
