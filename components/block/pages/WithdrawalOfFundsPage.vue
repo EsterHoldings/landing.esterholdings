@@ -32,7 +32,7 @@
             :aria-label="copy.hero.imageAlt">
             <svg
               class="withdrawal-visual__routes"
-              viewBox="0 0 690 610"
+              viewBox="0 0 836 624"
               aria-hidden="true">
               <defs>
                 <marker
@@ -50,27 +50,27 @@
               </defs>
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--left"
-                d="M160 84 H226 Q250 84 250 108 V230 Q250 254 226 254 H156 Q132 254 132 278 V384 Q132 408 156 408 H228"
+                d="M238 112 H304 Q338 112 338 146 V258 M168 284 V420 Q168 492 235 492 H333"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--bottom"
-                d="M262 485 H444 Q468 485 468 461 V404"
+                d="M337 512 H465 M552 420 V510 H655 Q712 510 712 455 V414"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--right"
-                d="M515 215 H573 Q597 215 597 239 V420 Q597 444 573 444 H507"
+                d="M642 132 H702 Q735 132 735 166 V440 Q735 474 703 474 H618"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--top"
-                d="M405 221 C458 188 497 168 542 154"
+                d="M468 270 C552 214 615 178 696 176"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--middle"
-                d="M405 300 C456 300 503 300 548 302"
+                d="M482 344 C578 350 652 354 742 358"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--bottom"
-                d="M405 379 C456 408 499 431 540 454"
+                d="M478 394 C566 438 632 472 718 504"
                 pathLength="1" />
             </svg>
 
@@ -123,20 +123,40 @@
             <span
               class="withdrawal-visual__card withdrawal-visual__card--document"
               aria-hidden="true">
-              <svg viewBox="0 0 76 88">
-                <path d="M15 8h32l14 15v57H15z" />
-                <path d="M47 8v17h14M26 37h21M26 51h17" />
-                <path d="m39 67 8 8 15-19" />
-              </svg>
+              <span class="withdrawal-visual__document-sheet">
+                <span class="withdrawal-visual__document-fold" />
+                <span class="withdrawal-visual__document-line withdrawal-visual__document-line--wide" />
+                <span class="withdrawal-visual__document-line withdrawal-visual__document-line--wide" />
+                <span class="withdrawal-visual__document-line withdrawal-visual__document-line--short" />
+                <span class="withdrawal-visual__document-line withdrawal-visual__document-line--mini" />
+              </span>
+              <span class="withdrawal-visual__document-check" />
             </span>
 
             <span
               class="withdrawal-visual__card withdrawal-visual__card--clock"
               aria-hidden="true">
-              <svg viewBox="0 0 92 92">
-                <path d="M13 67h38M13 52h27M13 37h19" />
-                <path d="M45 12a34 34 0 1 1-19 62" />
-                <path d="M45 27v22l15 9" />
+              <svg
+                class="withdrawal-visual__clock-icon"
+                viewBox="0 0 106 104">
+                <path
+                  class="withdrawal-visual__clock-ring"
+                  d="M36 24a38 38 0 1 1-14 61" />
+                <path
+                  class="withdrawal-visual__clock-hand"
+                  d="M62 38v24l16 12" />
+                <path
+                  class="withdrawal-visual__clock-line withdrawal-visual__clock-line--one"
+                  d="M18 58h25" />
+                <path
+                  class="withdrawal-visual__clock-line withdrawal-visual__clock-line--two"
+                  d="M18 72h18" />
+                <path
+                  class="withdrawal-visual__clock-line withdrawal-visual__clock-line--three"
+                  d="M18 86h9" />
+                <path
+                  class="withdrawal-visual__clock-line withdrawal-visual__clock-line--four"
+                  d="M39 86h10" />
               </svg>
             </span>
 
@@ -1550,25 +1570,29 @@
   }
 
   .withdrawal-hero {
+    --withdrawal-hero-width: min(1808px, calc(100vw - 104px));
     position: relative;
     isolation: isolate;
     display: grid;
-    grid-template-columns: minmax(520px, 1.15fr) minmax(360px, 0.85fr);
-    align-items: center;
-    gap: clamp(24px, 3vw, 60px);
-    min-height: min(560px, calc(100svh - 132px));
-    padding: clamp(12px, 2vw, 28px) 0 clamp(30px, 4vw, 62px);
+    grid-template-columns: minmax(0, 836px) minmax(420px, 650px);
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: clamp(74px, 10.7vw, 205px);
+    width: var(--withdrawal-hero-width);
+    margin-inline: calc((100% - var(--withdrawal-hero-width)) / 2);
+    min-height: min(820px, calc(100svh - 132px));
+    padding: clamp(56px, 4.4vw, 82px) 0 clamp(78px, 6vw, 118px);
 
     &__content {
       position: relative;
       z-index: 2;
       grid-column: 2;
       grid-row: 1;
-      max-width: 555px;
+      max-width: 650px;
     }
 
     h1 {
-      max-width: 555px;
+      max-width: 520px;
       margin: 28px 0 0;
       color: #000;
       font-size: clamp(54px, 5.8vw, 82px);
@@ -1577,10 +1601,10 @@
     }
 
     p {
-      max-width: 440px;
+      max-width: 620px;
       margin: 34px 0 0;
       color: var(--landing-text-secondary);
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 500;
       line-height: 1.28;
     }
@@ -1615,17 +1639,19 @@
       z-index: 1;
       grid-column: 1;
       grid-row: 1;
-      justify-self: center;
+      justify-self: end;
+      width: min(100%, 836px);
       min-width: 0;
       margin-left: 0;
+      transform: translateY(-18px);
     }
   }
 
   .withdrawal-visual {
     position: relative;
-    width: clamp(520px, 43vw, 690px);
+    width: min(100%, 836px);
     max-width: 100%;
-    aspect-ratio: 690 / 610;
+    aspect-ratio: 836 / 624;
     isolation: isolate;
 
     &::before {
@@ -1714,17 +1740,17 @@
     }
 
     &__haze--blue {
-      left: 19%;
-      top: 43%;
-      width: 30%;
+      left: 20%;
+      top: 38%;
+      width: 28%;
       height: 25%;
       background: rgba(0, 81, 255, 0.14);
     }
 
     &__haze--orange {
-      right: 16%;
-      top: 39%;
-      width: 24%;
+      right: 24%;
+      top: 36%;
+      width: 22%;
       height: 20%;
       background: rgba(255, 129, 61, 0.12);
       animation-delay: -2.5s;
@@ -1763,11 +1789,11 @@
 
     &__request-card {
       position: absolute;
-      top: 5.6%;
-      left: 6.8%;
+      top: 7.4%;
+      left: 7.6%;
       z-index: 3;
-      width: 31.6%;
-      height: 31.2%;
+      width: 18.6%;
+      height: 28.6%;
       border: 1px solid rgba(231, 236, 248, 0.94);
       border-radius: 22px;
       background:
@@ -1914,10 +1940,10 @@
 
     &__shield-object {
       position: absolute;
-      top: 44.2%;
-      left: 7.2%;
+      top: 43.2%;
+      left: 8.1%;
       z-index: 3;
-      width: 22.4%;
+      width: 14.4%;
       aspect-ratio: 126 / 144;
       color: rgba(112, 141, 219, 0.86);
       transform: perspective(720px) rotateY(-12deg) rotateX(4deg) rotateZ(0.6deg);
@@ -1965,32 +1991,206 @@
     }
 
     &__card--document {
-      top: 73%;
-      left: 30%;
-      width: 17.5%;
-      height: 17.5%;
-      color: rgba(0, 81, 255, 0.2);
-      opacity: 0.72;
-      --withdrawal-card-rotate: -1.5deg;
-      animation-delay: -5.1s;
+      top: 72.8%;
+      left: 21.8%;
+      z-index: 4;
+      width: 15.4%;
+      height: 20.6%;
+      overflow: visible;
+      border-color: rgba(238, 242, 250, 0.96);
+      border-radius: 19px;
+      background:
+        radial-gradient(circle at 68% 77%, rgba(213, 223, 247, 0.28) 0, transparent 43%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.64)), rgba(255, 255, 255, 0.64);
+      box-shadow:
+        0 24px 50px rgba(32, 54, 97, 0.09),
+        0 7px 22px rgba(104, 125, 188, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset -12px -15px 26px rgba(221, 229, 245, 0.2);
+      color: rgba(103, 130, 207, 0.88);
+      opacity: 0.94;
+      --withdrawal-card-rotate: -0.6deg;
+      animation:
+        withdrawalVisualFloat 9s ease-in-out infinite -5.1s,
+        withdrawalLowerCardGlow 5.8s ease-in-out infinite -1.4s;
     }
 
     &__card--clock {
-      top: 74%;
-      left: 52%;
-      width: 18%;
-      height: 17.5%;
-      color: rgba(0, 81, 255, 0.3);
+      top: 73.4%;
+      left: 44.9%;
+      z-index: 4;
+      width: 15.6%;
+      height: 20.9%;
+      overflow: visible;
+      border-color: rgba(238, 242, 250, 0.96);
+      border-radius: 19px;
+      background:
+        radial-gradient(circle at 51% 43%, rgba(216, 226, 250, 0.26) 0, transparent 46%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 255, 0.64)), rgba(255, 255, 255, 0.64);
+      box-shadow:
+        0 24px 50px rgba(32, 54, 97, 0.09),
+        0 7px 22px rgba(104, 125, 188, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset -12px -15px 26px rgba(221, 229, 245, 0.2);
+      color: rgba(103, 130, 207, 0.9);
+      opacity: 0.94;
+      --withdrawal-card-rotate: 0.4deg;
+      animation:
+        withdrawalVisualFloat 9s ease-in-out infinite -2.2s,
+        withdrawalLowerCardGlow 5.8s ease-in-out infinite -3.6s;
+    }
+
+    &__document-sheet {
+      position: absolute;
+      left: 25%;
+      top: 18%;
+      width: 46%;
+      height: 60%;
+      border-radius: 5px 12px 5px 5px;
+      background:
+        linear-gradient(135deg, transparent 0 19%, rgba(255, 255, 255, 0.46) 20% 30%, transparent 31%),
+        linear-gradient(145deg, rgba(158, 177, 226, 0.78), rgba(116, 143, 213, 0.66));
+      box-shadow:
+        0 12px 22px rgba(70, 91, 152, 0.12),
+        inset 0 1px 3px rgba(255, 255, 255, 0.52),
+        inset 0 -8px 12px rgba(66, 82, 150, 0.08);
+      transform: perspective(320px) rotateY(-7deg) rotateX(2deg);
+      animation: withdrawalDocumentSheetPulse 5.6s ease-in-out infinite;
+    }
+
+    &__document-fold {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 31%;
+      aspect-ratio: 1;
+      border-radius: 0 10px 0 5px;
+      background: linear-gradient(135deg, rgba(231, 236, 250, 0.84), rgba(166, 181, 224, 0.56));
+      clip-path: polygon(0 0, 100% 100%, 100% 0);
+      box-shadow: -2px 2px 7px rgba(80, 99, 158, 0.08);
+    }
+
+    &__document-line {
+      position: absolute;
+      left: 18%;
+      height: 7%;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 1px 2px rgba(63, 82, 143, 0.08);
+      transform-origin: left center;
+      animation: withdrawalDocumentLineDraw 5.6s ease-in-out infinite;
+    }
+
+    &__document-line--wide {
+      width: 54%;
+    }
+
+    &__document-line--short {
+      width: 45%;
+    }
+
+    &__document-line--mini {
+      width: 34%;
+    }
+
+    &__document-line:nth-of-type(2) {
+      top: 31%;
+    }
+
+    &__document-line:nth-of-type(3) {
+      top: 48%;
+      animation-delay: 0.16s;
+    }
+
+    &__document-line:nth-of-type(4) {
+      top: 65%;
+      animation-delay: 0.32s;
+    }
+
+    &__document-line:nth-of-type(5) {
+      top: 81%;
+      animation-delay: 0.48s;
+    }
+
+    &__document-check {
+      position: absolute;
+      right: 13%;
+      bottom: 17%;
+      width: 34%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(222, 228, 247, 0.98), rgba(179, 190, 227, 0.86));
+      box-shadow:
+        0 10px 18px rgba(74, 91, 154, 0.14),
+        inset 0 3px 7px rgba(255, 255, 255, 0.72),
+        inset 0 -8px 11px rgba(116, 132, 192, 0.16);
+      animation: withdrawalDocumentCheckPulse 5.6s ease-in-out infinite;
+    }
+
+    &__document-check::before {
+      content: "";
+      position: absolute;
+      left: 30%;
+      top: 24%;
+      width: 39%;
+      height: 55%;
+      border-right: 5px solid rgba(255, 255, 255, 0.94);
+      border-bottom: 5px solid rgba(255, 255, 255, 0.94);
+      border-radius: 3px;
+      transform: rotate(42deg);
+    }
+
+    &__card--clock &__clock-icon {
+      width: 84%;
+      height: 84%;
+      overflow: visible;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transform: translate(4%, 2%);
+      filter: drop-shadow(0 9px 10px rgba(71, 91, 154, 0.1));
+    }
+
+    &__clock-ring {
+      stroke-width: 8;
+      stroke-dasharray: 190;
+      stroke-dashoffset: 190;
+      animation: withdrawalClockRingDraw 5.8s ease-in-out infinite;
+    }
+
+    &__clock-hand {
+      stroke-width: 8;
+      stroke-dasharray: 58;
+      stroke-dashoffset: 58;
+      animation: withdrawalClockHandDraw 5.8s ease-in-out infinite;
+    }
+
+    &__clock-line {
+      stroke-width: 7;
       opacity: 0.78;
-      --withdrawal-card-rotate: 1deg;
-      animation-delay: -2.2s;
+      stroke-dasharray: 34;
+      stroke-dashoffset: 12;
+      animation: withdrawalClockLineDraw 5.8s ease-in-out infinite;
+    }
+
+    &__clock-line--two {
+      animation-delay: 0.14s;
+    }
+
+    &__clock-line--three {
+      animation-delay: 0.28s;
+    }
+
+    &__clock-line--four {
+      animation-delay: 0.42s;
     }
 
     &__card--bank {
-      top: 19%;
-      right: 9%;
-      width: 18%;
-      height: 18%;
+      top: 12.8%;
+      right: 9.2%;
+      width: 15.6%;
+      height: 20.9%;
       color: rgba(0, 81, 255, 0.2);
       opacity: 0.78;
       --withdrawal-card-rotate: 1.2deg;
@@ -1998,10 +2198,10 @@
     }
 
     &__card--payment {
-      top: 44%;
-      right: 5%;
-      width: 21%;
-      height: 14.5%;
+      top: 39.2%;
+      right: 4.6%;
+      width: 17.2%;
+      height: 13.1%;
       color: rgba(0, 81, 255, 0.2);
       opacity: 0.76;
       --withdrawal-card-rotate: -1deg;
@@ -2009,10 +2209,10 @@
     }
 
     &__card--profile {
-      top: 67%;
-      right: 8%;
-      width: 17%;
-      height: 18%;
+      top: 60.7%;
+      right: 9.3%;
+      width: 15.6%;
+      height: 20.9%;
       color: rgba(0, 81, 255, 0.16);
       opacity: 0.73;
       --withdrawal-card-rotate: 1.4deg;
@@ -2021,11 +2221,11 @@
 
     &__wallet {
       position: absolute;
-      left: 28.8%;
-      top: 27.8%;
+      left: 26.2%;
+      top: 27.2%;
       z-index: 5;
       display: block;
-      width: 39%;
+      width: 36.4%;
       height: auto;
       transform: perspective(560px) rotateY(-8deg) rotateX(2deg) rotateZ(0.4deg);
       transform-origin: center;
@@ -2035,9 +2235,9 @@
 
     &__wallet-shadow {
       position: absolute;
-      left: 35%;
-      top: 67%;
-      z-index: 4;
+      left: 31.4%;
+      top: 65.8%;
+      z-index: 3;
       width: 28%;
       height: 9%;
       border-radius: 999px;
@@ -2092,9 +2292,9 @@
     }
 
     &__coin--usdt {
-      top: 27%;
-      left: 60%;
-      width: 9.5%;
+      top: 18.6%;
+      left: 58.8%;
+      width: 8.6%;
       aspect-ratio: 1;
       background:
         radial-gradient(circle at 31% 26%, #dbfff2 0 9%, transparent 10%),
@@ -2103,9 +2303,9 @@
     }
 
     &__coin--btc {
-      top: 43%;
-      left: 65%;
-      width: 9%;
+      top: 36%;
+      left: 61.6%;
+      width: 8.3%;
       aspect-ratio: 1;
       background:
         radial-gradient(circle at 30% 24%, #fff3d9 0 9%, transparent 10%),
@@ -2115,9 +2315,9 @@
     }
 
     &__coin--eth {
-      top: 58%;
-      left: 62%;
-      width: 8.5%;
+      top: 55.2%;
+      left: 61.2%;
+      width: 8.1%;
       aspect-ratio: 1;
       background:
         radial-gradient(circle at 32% 24%, #f5f1ff 0 9%, transparent 10%),
@@ -2281,6 +2481,133 @@
     100% {
       stroke-dashoffset: 0;
       opacity: 0.62;
+    }
+  }
+
+  @keyframes withdrawalLowerCardGlow {
+    0%,
+    100% {
+      box-shadow:
+        0 24px 50px rgba(32, 54, 97, 0.09),
+        0 7px 22px rgba(104, 125, 188, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset -12px -15px 26px rgba(221, 229, 245, 0.2);
+    }
+
+    52% {
+      box-shadow:
+        0 27px 56px rgba(32, 54, 97, 0.12),
+        0 0 24px rgba(132, 157, 220, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98),
+        inset -12px -15px 26px rgba(221, 229, 245, 0.25);
+    }
+  }
+
+  @keyframes withdrawalDocumentSheetPulse {
+    0%,
+    100% {
+      opacity: 0.82;
+      filter: saturate(0.86);
+    }
+
+    50% {
+      opacity: 0.98;
+      filter: saturate(1);
+    }
+  }
+
+  @keyframes withdrawalDocumentLineDraw {
+    0%,
+    16% {
+      opacity: 0.48;
+      scale: 0.56 1;
+    }
+
+    46%,
+    78% {
+      opacity: 0.92;
+      scale: 1 1;
+    }
+
+    100% {
+      opacity: 0.6;
+      scale: 0.92 1;
+    }
+  }
+
+  @keyframes withdrawalDocumentCheckPulse {
+    0%,
+    22% {
+      opacity: 0.62;
+      scale: 0.88;
+    }
+
+    48%,
+    82% {
+      opacity: 0.98;
+      scale: 1;
+    }
+
+    100% {
+      opacity: 0.7;
+      scale: 0.94;
+    }
+  }
+
+  @keyframes withdrawalClockRingDraw {
+    0%,
+    16% {
+      stroke-dashoffset: 74;
+      opacity: 0.58;
+    }
+
+    46%,
+    82% {
+      stroke-dashoffset: 38;
+      opacity: 0.92;
+    }
+
+    100% {
+      stroke-dashoffset: 38;
+      opacity: 0.66;
+    }
+  }
+
+  @keyframes withdrawalClockHandDraw {
+    0%,
+    27% {
+      stroke-dashoffset: 24;
+      opacity: 0.46;
+    }
+
+    52%,
+    84% {
+      stroke-dashoffset: 0;
+      opacity: 0.9;
+    }
+
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.62;
+    }
+  }
+
+  @keyframes withdrawalClockLineDraw {
+    0%,
+    18% {
+      stroke-dashoffset: 14;
+      opacity: 0.38;
+    }
+
+    48%,
+    80% {
+      stroke-dashoffset: 0;
+      opacity: 0.8;
+    }
+
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.52;
     }
   }
 
@@ -2925,6 +3252,7 @@
 
   @media (max-width: 1199px) {
     .withdrawal-hero {
+      --withdrawal-hero-width: min(100%, calc(100vw - 40px));
       grid-template-columns: minmax(420px, 1.08fr) minmax(320px, 0.92fr);
     }
 
@@ -2941,6 +3269,8 @@
     }
 
     .withdrawal-hero {
+      width: 100%;
+      margin-inline: 0;
       grid-template-columns: 1fr;
       min-height: 0;
 
