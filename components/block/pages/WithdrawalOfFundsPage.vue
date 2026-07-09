@@ -26,12 +26,169 @@
         </div>
 
         <div class="withdrawal-hero__media">
-          <img
-            :src="assetPath('hero.png')"
-            :alt="copy.hero.imageAlt"
-            width="256"
-            height="228"
-            loading="eager" />
+          <div
+            class="withdrawal-visual"
+            role="img"
+            :aria-label="copy.hero.imageAlt">
+            <svg
+              class="withdrawal-visual__routes"
+              viewBox="0 0 690 610"
+              aria-hidden="true">
+              <defs>
+                <marker
+                  id="withdrawal-visual-arrow"
+                  markerUnits="userSpaceOnUse"
+                  markerWidth="10"
+                  markerHeight="10"
+                  refX="9"
+                  refY="5"
+                  orient="auto">
+                  <path
+                    d="M0 0 L10 5 L0 10 Z"
+                    fill="#dbe3f7" />
+                </marker>
+              </defs>
+              <path
+                class="withdrawal-visual__route withdrawal-visual__route--left"
+                d="M160 84 H226 Q250 84 250 108 V230 Q250 254 226 254 H156 Q132 254 132 278 V384 Q132 408 156 408 H228"
+                pathLength="1" />
+              <path
+                class="withdrawal-visual__route withdrawal-visual__route--bottom"
+                d="M262 485 H444 Q468 485 468 461 V404"
+                pathLength="1" />
+              <path
+                class="withdrawal-visual__route withdrawal-visual__route--right"
+                d="M515 215 H573 Q597 215 597 239 V420 Q597 444 573 444 H507"
+                pathLength="1" />
+              <path
+                class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--top"
+                d="M405 221 C458 188 497 168 542 154"
+                pathLength="1" />
+              <path
+                class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--middle"
+                d="M405 300 C456 300 503 300 548 302"
+                pathLength="1" />
+              <path
+                class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--bottom"
+                d="M405 379 C456 408 499 431 540 454"
+                pathLength="1" />
+            </svg>
+
+            <span
+              class="withdrawal-visual__haze withdrawal-visual__haze--blue"
+              aria-hidden="true" />
+            <span
+              class="withdrawal-visual__haze withdrawal-visual__haze--orange"
+              aria-hidden="true" />
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--request"
+              aria-hidden="true">
+              <svg viewBox="0 0 72 92">
+                <circle
+                  cx="36"
+                  cy="20"
+                  r="12" />
+                <path d="M18 44h33M18 58h28M18 72h22" />
+                <path d="M49 70l7 7 13-17" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--shield"
+              aria-hidden="true">
+              <svg viewBox="0 0 88 98">
+                <path d="M44 7 78 22v25c0 24-14 39-34 47C24 86 10 71 10 47V22L44 7Z" />
+                <path d="m27 50 12 12 25-29" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--document"
+              aria-hidden="true">
+              <svg viewBox="0 0 76 88">
+                <path d="M15 8h32l14 15v57H15z" />
+                <path d="M47 8v17h14M26 37h21M26 51h17" />
+                <path d="m39 67 8 8 15-19" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--clock"
+              aria-hidden="true">
+              <svg viewBox="0 0 92 92">
+                <path d="M13 67h38M13 52h27M13 37h19" />
+                <path d="M45 12a34 34 0 1 1-19 62" />
+                <path d="M45 27v22l15 9" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--bank"
+              aria-hidden="true">
+              <svg viewBox="0 0 92 82">
+                <path d="M12 30 46 10l34 20H12Z" />
+                <path d="M20 34v28M35 34v28M50 34v28M65 34v28M12 66h68" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--payment"
+              aria-hidden="true">
+              <svg viewBox="0 0 104 68">
+                <path d="M9 15h86v45H9z" />
+                <path d="M9 28h86M23 43h20" />
+                <circle
+                  cx="70"
+                  cy="47"
+                  r="8" />
+                <circle
+                  cx="82"
+                  cy="47"
+                  r="8" />
+              </svg>
+            </span>
+
+            <span
+              class="withdrawal-visual__card withdrawal-visual__card--profile"
+              aria-hidden="true">
+              <svg viewBox="0 0 78 84">
+                <circle
+                  cx="39"
+                  cy="26"
+                  r="15" />
+                <path d="M12 75c4-19 16-29 27-29s23 10 27 29" />
+              </svg>
+            </span>
+
+            <img
+              class="withdrawal-visual__wallet"
+              :src="assetPath('wallet-raster.png')"
+              alt=""
+              aria-hidden="true"
+              width="252"
+              height="228"
+              loading="eager" />
+            <span
+              class="withdrawal-visual__wallet-shadow"
+              aria-hidden="true" />
+
+            <span
+              class="withdrawal-visual__coin withdrawal-visual__coin--usdt"
+              aria-hidden="true">
+              <span>T</span>
+            </span>
+            <span
+              class="withdrawal-visual__coin withdrawal-visual__coin--btc"
+              aria-hidden="true">
+              <span>₿</span>
+            </span>
+            <span
+              class="withdrawal-visual__coin withdrawal-visual__coin--eth"
+              aria-hidden="true">
+              <span>◆</span>
+            </span>
+          </div>
         </div>
       </section>
 
@@ -1444,17 +1601,382 @@
       justify-self: center;
       min-width: 0;
       margin-left: 0;
+    }
+  }
 
-      img {
-        display: block;
-        width: clamp(520px, 43vw, 690px);
-        max-width: 100%;
-        height: auto;
-        mix-blend-mode: multiply;
-        object-fit: contain;
-        mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0.76) 72%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0.76) 72%, transparent 100%);
+  .withdrawal-visual {
+    position: relative;
+    width: clamp(520px, 43vw, 690px);
+    max-width: 100%;
+    aspect-ratio: 690 / 610;
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 5% 2% 4% 0;
+      z-index: -2;
+      background:
+        radial-gradient(
+          ellipse at 44% 51%,
+          rgba(255, 255, 255, 0.94) 0 36%,
+          rgba(255, 255, 255, 0.62) 47%,
+          transparent 70%
+        ),
+        radial-gradient(ellipse at 28% 58%, rgba(0, 81, 255, 0.12) 0, rgba(0, 81, 255, 0.06) 34%, transparent 66%),
+        radial-gradient(ellipse at 68% 44%, rgba(255, 136, 71, 0.1) 0, rgba(255, 136, 71, 0.04) 34%, transparent 62%);
+      filter: blur(5px);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 9% 4% 6%;
+      z-index: -1;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.96) 0 10%,
+          transparent 31% 70%,
+          rgba(255, 255, 255, 0.96) 91% 100%
+        ),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0, transparent 20% 76%, rgba(255, 255, 255, 0.98) 100%);
+      mask-image: radial-gradient(ellipse at center, #000 0 56%, rgba(0, 0, 0, 0.62) 72%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse at center, #000 0 56%, rgba(0, 0, 0, 0.62) 72%, transparent 100%);
+      pointer-events: none;
+    }
+
+    &__routes {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    &__route,
+    &__arrow-route {
+      fill: none;
+      vector-effect: non-scaling-stroke;
+    }
+
+    &__route {
+      stroke: rgba(114, 126, 154, 0.28);
+      stroke-width: 3;
+      stroke-dasharray: 0.035 0.025;
+      stroke-linecap: round;
+    }
+
+    &__arrow-route {
+      stroke: rgba(197, 207, 232, 0.72);
+      stroke-width: 17;
+      stroke-linecap: round;
+      marker-end: url("#withdrawal-visual-arrow");
+      filter: drop-shadow(0 12px 16px rgba(66, 93, 150, 0.08));
+      opacity: 0.74;
+    }
+
+    &__arrow-route--middle {
+      stroke-width: 16;
+    }
+
+    &__arrow-route--bottom {
+      stroke-width: 15;
+    }
+
+    &__haze {
+      position: absolute;
+      z-index: 1;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(20px);
+      opacity: 0.42;
+      animation: withdrawalVisualFloat 8s ease-in-out infinite;
+    }
+
+    &__haze--blue {
+      left: 19%;
+      top: 43%;
+      width: 30%;
+      height: 25%;
+      background: rgba(0, 81, 255, 0.14);
+    }
+
+    &__haze--orange {
+      right: 16%;
+      top: 39%;
+      width: 24%;
+      height: 20%;
+      background: rgba(255, 129, 61, 0.12);
+      animation-delay: -2.5s;
+    }
+
+    &__card {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(231, 236, 248, 0.8);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(247, 250, 255, 0.58)), rgba(255, 255, 255, 0.65);
+      box-shadow:
+        0 24px 48px rgba(28, 52, 98, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      color: rgba(0, 81, 255, 0.3);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      transform: perspective(720px) rotateY(-12deg) rotateX(3deg) rotateZ(var(--withdrawal-card-rotate, 0deg));
+      transform-origin: center;
+      animation: withdrawalVisualFloat 9s ease-in-out infinite;
+
+      svg {
+        width: 62%;
+        height: 62%;
+        overflow: visible;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
       }
+    }
+
+    &__card--request {
+      top: 11%;
+      left: 15%;
+      width: 20%;
+      height: 24%;
+      color: rgba(0, 81, 255, 0.18);
+      filter: blur(0.15px);
+      opacity: 0.82;
+      --withdrawal-card-rotate: -1deg;
+      animation-delay: -1s;
+    }
+
+    &__card--shield {
+      top: 40%;
+      left: 15%;
+      width: 17.5%;
+      height: 20%;
+      color: rgba(0, 81, 255, 0.34);
+      opacity: 0.78;
+      --withdrawal-card-rotate: 1.5deg;
+      animation-delay: -3.4s;
+    }
+
+    &__card--document {
+      top: 73%;
+      left: 30%;
+      width: 17.5%;
+      height: 17.5%;
+      color: rgba(0, 81, 255, 0.2);
+      opacity: 0.72;
+      --withdrawal-card-rotate: -1.5deg;
+      animation-delay: -5.1s;
+    }
+
+    &__card--clock {
+      top: 74%;
+      left: 52%;
+      width: 18%;
+      height: 17.5%;
+      color: rgba(0, 81, 255, 0.3);
+      opacity: 0.78;
+      --withdrawal-card-rotate: 1deg;
+      animation-delay: -2.2s;
+    }
+
+    &__card--bank {
+      top: 19%;
+      right: 9%;
+      width: 18%;
+      height: 18%;
+      color: rgba(0, 81, 255, 0.2);
+      opacity: 0.78;
+      --withdrawal-card-rotate: 1.2deg;
+      animation-delay: -4s;
+    }
+
+    &__card--payment {
+      top: 44%;
+      right: 5%;
+      width: 21%;
+      height: 14.5%;
+      color: rgba(0, 81, 255, 0.2);
+      opacity: 0.76;
+      --withdrawal-card-rotate: -1deg;
+      animation-delay: -6s;
+    }
+
+    &__card--profile {
+      top: 67%;
+      right: 8%;
+      width: 17%;
+      height: 18%;
+      color: rgba(0, 81, 255, 0.16);
+      opacity: 0.73;
+      --withdrawal-card-rotate: 1.4deg;
+      animation-delay: -2.8s;
+    }
+
+    &__wallet {
+      position: absolute;
+      left: 28.8%;
+      top: 27.8%;
+      z-index: 5;
+      display: block;
+      width: 39%;
+      height: auto;
+      transform: perspective(560px) rotateY(-8deg) rotateX(2deg) rotateZ(0.4deg);
+      transform-origin: center;
+      filter: drop-shadow(0 30px 24px rgba(22, 53, 118, 0.2));
+      animation: withdrawalWalletFloat 7.5s ease-in-out infinite;
+    }
+
+    &__wallet-shadow {
+      position: absolute;
+      left: 35%;
+      top: 67%;
+      z-index: 4;
+      width: 28%;
+      height: 9%;
+      border-radius: 999px;
+      background:
+        radial-gradient(ellipse at 60% 52%, rgba(36, 54, 86, 0.18) 0, rgba(63, 84, 121, 0.1) 38%, transparent 72%),
+        radial-gradient(ellipse at 42% 44%, rgba(0, 81, 255, 0.08) 0, transparent 64%);
+      filter: blur(12px);
+      transform: rotate(-2deg);
+      pointer-events: none;
+      animation: withdrawalWalletShadowFloat 7.5s ease-in-out infinite;
+    }
+
+    &__coin {
+      position: absolute;
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 900;
+      line-height: 1;
+      transform: perspective(560px) rotateY(-15deg) rotateX(4deg);
+      transform-origin: center;
+      box-shadow:
+        0 10px 24px rgba(30, 56, 114, 0.18),
+        inset 0 3px 6px rgba(255, 255, 255, 0.58),
+        inset 0 -7px 10px rgba(0, 0, 0, 0.18);
+      animation: withdrawalCoinFloat 6.8s ease-in-out infinite;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 9%;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.46);
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 13% 16% 55% 22%;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.44);
+        filter: blur(2px);
+      }
+
+      span {
+        position: relative;
+        z-index: 1;
+        transform: translateY(1px);
+      }
+    }
+
+    &__coin--usdt {
+      top: 27%;
+      left: 60%;
+      width: 9.5%;
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 31% 26%, #dbfff2 0 9%, transparent 10%),
+        linear-gradient(145deg, #66ccb4, #21a98d 48%, #117468);
+      font-size: clamp(22px, 2.4vw, 36px);
+    }
+
+    &__coin--btc {
+      top: 43%;
+      left: 65%;
+      width: 9%;
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 30% 24%, #fff3d9 0 9%, transparent 10%),
+        linear-gradient(145deg, #ffb260, #f07824 52%, #bc5219);
+      font-size: clamp(20px, 2.3vw, 34px);
+      animation-delay: -2s;
+    }
+
+    &__coin--eth {
+      top: 58%;
+      left: 62%;
+      width: 8.5%;
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 32% 24%, #f5f1ff 0 9%, transparent 10%),
+        linear-gradient(145deg, #9b9acd, #6f6caa 50%, #555182);
+      font-size: clamp(15px, 1.8vw, 27px);
+      animation-delay: -4s;
+    }
+  }
+
+  @keyframes withdrawalVisualFloat {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    50% {
+      translate: 0 -8px;
+    }
+  }
+
+  @keyframes withdrawalWalletFloat {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    50% {
+      translate: 0 -7px;
+    }
+  }
+
+  @keyframes withdrawalWalletShadowFloat {
+    0%,
+    100% {
+      opacity: 0.95;
+      translate: 0 0;
+      scale: 1;
+    }
+
+    50% {
+      opacity: 0.74;
+      translate: 0 -2px;
+      scale: 0.96;
+    }
+  }
+
+  @keyframes withdrawalCoinFloat {
+    0%,
+    100% {
+      rotate: 0deg;
+      translate: 0 0;
+    }
+
+    50% {
+      rotate: 5deg;
+      translate: 0 -9px;
     }
   }
 
@@ -2088,15 +2610,16 @@
       &__media {
         order: -1;
         margin-left: 0;
-
-        img {
-          width: 100%;
-        }
       }
 
       &__content {
         max-width: 100%;
       }
+    }
+
+    .withdrawal-visual {
+      width: min(100%, 660px);
+      margin: 0 auto;
     }
 
     .withdrawal-benefits,
