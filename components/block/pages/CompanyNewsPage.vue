@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from "vue";
-  import { useAsyncData } from "#app";
+  import { useAsyncData, useHead } from "#app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import NewsCard from "~/pages/landing/pages/Company/company-news/components/NewsCard.vue";
@@ -50,6 +50,12 @@
   import type { NewsArticleType, NewsItem, NewsListResponse } from "~/composables/core/modules/news/news.types";
 
   const PAGE_SIZE = 9;
+
+  useHead({
+    bodyAttrs: {
+      class: "landing-news-list-route",
+    },
+  });
 
   const props = withDefaults(
     defineProps<{
@@ -167,11 +173,17 @@
 </script>
 
 <style lang="scss" scoped>
+  :global(body.landing-news-list-route .page-content),
+  :global(body.landing-news-list-route .page--inner) {
+    background-color: var(--landing-bg);
+  }
+
   .company-news {
     display: flex;
     flex-direction: column;
     gap: 44px;
     padding: 30px 0 96px;
+    background: var(--landing-bg);
     font-family: "DM Sans", "Inter", "Muli", sans-serif;
 
     &__head {

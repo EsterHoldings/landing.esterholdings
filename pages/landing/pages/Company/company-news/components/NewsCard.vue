@@ -67,14 +67,12 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--landing-border-strong);
     border-radius: 10px;
     color: inherit;
     text-decoration: none;
-    background: #fff;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.96),
-      0 1px 0 rgba(255, 255, 255, 0.8);
+    background: var(--landing-surface);
+    box-shadow: var(--landing-shadow-glass), var(--landing-shadow-card);
     transition:
       transform 0.2s ease,
       border-color 0.2s ease,
@@ -82,10 +80,10 @@
 
     &:hover {
       transform: translateY(-2px);
-      border-color: rgba(0, 81, 255, 0.18);
+      border-color: color-mix(in srgb, var(--landing-accent) 32%, var(--landing-border-strong));
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.96),
-        0 18px 44px rgba(0, 81, 255, 0.08);
+        var(--landing-shadow-glass),
+        0 18px 44px color-mix(in srgb, var(--landing-accent) 14%, transparent);
     }
 
     &__image-wrap {

@@ -189,12 +189,19 @@
 
 <script setup lang="ts">
   import { computed } from "vue";
+  import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
 
   defineProps<{
     mode?: "desktop" | "mobile";
   }>();
+
+  useHead({
+    bodyAttrs: {
+      class: "mt4-route",
+    },
+  });
 
   type IconTextItem = {
     icon: string;
@@ -1261,6 +1268,11 @@
 </script>
 
 <style lang="scss" scoped>
+  :global(body.mt4-route .page-content),
+  :global(body.mt4-route .page--inner) {
+    background-color: var(--landing-bg);
+  }
+
   .mt4-page {
     display: flex;
     flex-direction: column;
@@ -1495,18 +1507,21 @@
 
   .terminal-card,
   .about-card {
-    border: 6px solid #fff;
+    border: 6px solid var(--landing-border-strong);
     border-radius: 20px;
-    background: linear-gradient(145deg, #ffffff 0%, #fafafa 48%, #f1f1f1 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.96),
-      inset 20px 20px 48px rgba(255, 255, 255, 0.7),
-      inset -24px -26px 58px rgba(215, 215, 215, 0.3);
+    background: linear-gradient(
+      145deg,
+      var(--landing-surface) 0%,
+      var(--landing-surface-elevated) 48%,
+      var(--landing-surface-muted) 100%
+    );
+    box-shadow: var(--landing-shadow-glass), var(--landing-shadow-card);
     backdrop-filter: none;
   }
 
   .terminal-card {
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     min-height: 460px;
@@ -1559,6 +1574,7 @@
 
     &__image {
       position: absolute;
+      z-index: 2;
       pointer-events: none;
       user-select: none;
       object-fit: contain;
@@ -1908,16 +1924,78 @@
       inset 0 -18px 28px rgba(0, 81, 255, 0.08);
   }
 
-  :global(:root[data-theme="dark"]) {
-    .terminal-card,
-    .about-card {
-      border-color: rgba(255, 255, 255, 0.18);
-      background: linear-gradient(145deg, rgba(18, 35, 76, 0.96) 0%, rgba(7, 22, 56, 0.94) 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        inset 18px 18px 48px rgba(255, 255, 255, 0.04),
-        inset -24px -26px 58px rgba(0, 0, 0, 0.28);
-    }
+  :global(:root[data-theme="dark"] .mt4-hero__media img),
+  :global(:root[data-theme="dark"] .terminal-card__image) {
+    filter: var(--landing-hero-screen-filter) drop-shadow(0 20px 36px rgba(0, 0, 0, 0.24));
+    opacity: 0.9;
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card) {
+    border-color: rgba(139, 164, 214, 0.24);
+    background:
+      radial-gradient(circle at 16% 118%, rgba(255, 139, 77, 0.2) 0%, transparent 42%),
+      radial-gradient(circle at 78% -18%, rgba(91, 132, 255, 0.24) 0%, transparent 45%),
+      linear-gradient(145deg, rgba(18, 35, 76, 0.98) 0%, rgba(5, 21, 56, 0.98) 55%, rgba(2, 17, 50, 0.98) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 22px 26px 58px rgba(255, 255, 255, 0.035),
+      inset -30px -34px 74px rgba(0, 0, 0, 0.32),
+      0 24px 54px rgba(0, 0, 0, 0.2);
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card::before) {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 4px;
+    border-radius: 14px;
+    pointer-events: none;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 38%, transparent 72%),
+      linear-gradient(-22deg, rgba(7, 23, 58, 0.1) 16.6%, rgba(38, 62, 111, 0.15) 84.4%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -22px 38px rgba(0, 81, 255, 0.06);
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card::after) {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: auto 9% 8% 9%;
+    height: 42%;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(91, 132, 255, 0.08) 42%, transparent 72%);
+    filter: blur(28px);
+    opacity: 0.95;
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card__label) {
+    color: #7fa0ff;
+    text-shadow: 0 0 22px rgba(91, 132, 255, 0.34);
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card h2) {
+    color: #ffffff;
+    text-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card p) {
+    color: #b7c2d5;
+  }
+
+  :global(:root[data-theme="dark"] .terminal-card .mt4-button--secondary) {
+    background: rgba(91, 132, 255, 0.08);
+  }
+
+  :global(:root[data-theme="dark"] .about-card) {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: linear-gradient(145deg, rgba(18, 35, 76, 0.96) 0%, rgba(7, 22, 56, 0.94) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 18px 18px 48px rgba(255, 255, 255, 0.04),
+      inset -24px -26px 58px rgba(0, 0, 0, 0.28);
   }
 
   .requirements-banner {

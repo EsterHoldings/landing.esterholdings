@@ -1802,12 +1802,14 @@
 <style scoped lang="scss">
   :global(body.account-replenishment-route .page-content),
   :global(body.account-replenishment-route .page--inner) {
-    background-color: #fff;
+    background-color: var(--landing-bg);
   }
 
   .replenishment-page {
     --replenishment-orb-x: 0px;
     --replenishment-orb-y: 0px;
+    position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     gap: clamp(82px, 7vw, 116px);
@@ -1843,7 +1845,7 @@
     h1 {
       max-width: 555px;
       margin: 28px 0 0;
-      color: #000;
+      color: var(--landing-text-strong);
       font-size: clamp(54px, 5.8vw, 82px);
       font-weight: 400;
       line-height: 0.98;
@@ -2020,7 +2022,7 @@
     position: relative;
     min-height: 190px;
     overflow: hidden;
-    border: 6px solid #fff;
+    border: 6px solid var(--landing-border-strong);
     border-radius: 16px;
     background:
       linear-gradient(
@@ -2213,7 +2215,7 @@
       width: min(640px, 100%);
       min-height: 88px;
       overflow: hidden;
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 16px;
       background:
         linear-gradient(
@@ -2474,6 +2476,24 @@
     color: var(--landing-text-primary);
   }
 
+  :global(:root[data-theme="dark"] body.account-replenishment-route),
+  :global(:root[data-theme="dark"] body.account-replenishment-route .page-content),
+  :global(:root[data-theme="dark"] body.account-replenishment-route .page--inner) {
+    background-color: var(--landing-bg) !important;
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-page::before) {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -140px calc(50% - 50vw) -120px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 14% 14%, rgba(91, 132, 255, 0.16) 0%, transparent 34%),
+      radial-gradient(circle at 86% 6%, rgba(255, 139, 77, 0.09) 0%, transparent 36%),
+      linear-gradient(180deg, rgba(3, 23, 67, 0.9) 0%, var(--landing-bg) 42%, var(--landing-bg) 100%);
+  }
+
   :global(:root[data-theme="dark"] .method-card),
   :global(:root[data-theme="dark"] .flow-steps li) {
     border-color: rgba(255, 255, 255, 0.08);
@@ -2495,8 +2515,51 @@
       linear-gradient(145deg, rgba(255, 255, 255, 0) 42%, rgba(0, 0, 0, 0.1) 100%);
   }
 
+  :global(:root[data-theme="dark"] .method-card__title) {
+    border-color: rgba(139, 164, 214, 0.2);
+    background:
+      linear-gradient(145deg, rgba(33, 52, 96, 0.82), rgba(7, 22, 56, 0.44)),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset -18px -18px 36px rgba(0, 0, 0, 0.14),
+      0 18px 38px rgba(0, 0, 0, 0.16);
+  }
+
   :global(:root[data-theme="dark"] .method-card__ghost) {
     color: rgba(255, 255, 255, 0.04);
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-hero__media) {
+    overflow: hidden;
+    border-radius: 26px;
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-hero__media::after) {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    max-width: 842px;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(1, 18, 57, 0.72) 0%,
+        rgba(1, 18, 57, 0.42) 38%,
+        rgba(1, 18, 57, 0.3) 62%,
+        rgba(1, 18, 57, 0.5) 100%
+      ),
+      radial-gradient(circle at 82% 75%, rgba(91, 132, 255, 0.16) 0%, transparent 36%);
+    mix-blend-mode: multiply;
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-hero__media img) {
+    position: relative;
+    z-index: 1;
+    filter: brightness(0.72) saturate(0.88) contrast(1.04);
+    mix-blend-mode: normal;
+    opacity: 0.9;
   }
 
   @media (max-width: 1199px) {

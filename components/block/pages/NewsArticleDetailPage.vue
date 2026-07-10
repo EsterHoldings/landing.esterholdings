@@ -39,10 +39,17 @@
 
 <script setup lang="ts">
   import { ref, watch } from "vue";
+  import { useHead } from "#app";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import type { NewsItem } from "~/composables/core/modules/news/news.types";
 
   const fallbackImage = "/static/newsBg.jpg";
+
+  useHead({
+    bodyAttrs: {
+      class: "landing-article-detail-route",
+    },
+  });
 
   const props = withDefaults(
     defineProps<{
@@ -84,6 +91,11 @@
 </script>
 
 <style scoped lang="scss">
+  :global(body.landing-article-detail-route .page-content),
+  :global(body.landing-article-detail-route .page--inner) {
+    background-color: var(--landing-bg);
+  }
+
   .article-detail {
     position: relative;
     z-index: 0;
@@ -284,7 +296,7 @@
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
-        background: #fff;
+        background: var(--landing-surface);
       }
 
       :deep(th),
@@ -348,7 +360,7 @@
         border: 1px solid var(--landing-border-strong);
         border-radius: 8px;
         color: var(--landing-text-primary);
-        background: #fff;
+        background: var(--landing-surface);
         font-size: 14px;
         font-weight: 700;
       }

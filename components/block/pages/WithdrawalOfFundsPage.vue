@@ -50,27 +50,27 @@
               </defs>
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--left"
-                d="M238 112 H304 Q338 112 338 146 V258 M168 284 V420 Q168 492 235 492 H333"
+                d="M222 109 H268 Q294 109 294 135 V244 M148 276 V416 M148 420 V470 Q148 508 188 508 H316"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--bottom"
-                d="M337 512 H465 M552 420 V510 H655 Q712 510 712 455 V414"
+                d="M306 508 H386 M452 418 V508 H650 Q692 508 692 466 V424"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__route withdrawal-visual__route--right"
-                d="M642 132 H702 Q735 132 735 166 V440 Q735 474 703 474 H618"
+                d="M632 140 H682 Q712 140 712 170 V442 Q712 474 680 474 H612"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--top"
-                d="M468 270 C552 214 615 178 696 176"
+                d="M432 262 C510 224 573 184 636 184"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--middle"
-                d="M482 344 C578 350 652 354 742 358"
+                d="M448 292 C538 292 594 296 642 304"
                 pathLength="1" />
               <path
                 class="withdrawal-visual__arrow-route withdrawal-visual__arrow-route--bottom"
-                d="M478 394 C566 438 632 472 718 504"
+                d="M448 340 C526 374 590 406 638 426"
                 pathLength="1" />
             </svg>
 
@@ -1547,7 +1547,7 @@
 <style scoped lang="scss">
   :global(body.withdrawal-of-funds-route .page-content),
   :global(body.withdrawal-of-funds-route .page--inner) {
-    background-color: #fff;
+    background-color: var(--landing-bg);
   }
 
   .withdrawal-page {
@@ -1594,7 +1594,7 @@
     h1 {
       max-width: 520px;
       margin: 28px 0 0;
-      color: #000;
+      color: var(--landing-text-strong);
       font-size: clamp(54px, 5.8vw, 82px);
       font-weight: 400;
       line-height: 0.98;
@@ -1789,11 +1789,11 @@
 
     &__request-card {
       position: absolute;
-      top: 7.4%;
-      left: 7.6%;
+      top: 8.3%;
+      left: 9.4%;
       z-index: 3;
-      width: 18.6%;
-      height: 28.6%;
+      width: 17.1%;
+      height: 27.4%;
       border: 1px solid rgba(231, 236, 248, 0.94);
       border-radius: 22px;
       background:
@@ -1940,10 +1940,10 @@
 
     &__shield-object {
       position: absolute;
-      top: 43.2%;
-      left: 8.1%;
+      top: 47.2%;
+      left: 10.7%;
       z-index: 3;
-      width: 14.4%;
+      width: 12.2%;
       aspect-ratio: 126 / 144;
       color: rgba(112, 141, 219, 0.86);
       transform: perspective(720px) rotateY(-12deg) rotateX(4deg) rotateZ(0.6deg);
@@ -1992,10 +1992,10 @@
 
     &__card--document {
       top: 72.8%;
-      left: 21.8%;
+      left: 22.9%;
       z-index: 4;
-      width: 15.4%;
-      height: 20.6%;
+      width: 14.4%;
+      height: 19.4%;
       overflow: visible;
       border-color: rgba(238, 242, 250, 0.96);
       border-radius: 19px;
@@ -2016,11 +2016,11 @@
     }
 
     &__card--clock {
-      top: 73.4%;
-      left: 44.9%;
+      top: 74.2%;
+      left: 45.5%;
       z-index: 4;
-      width: 15.6%;
-      height: 20.9%;
+      width: 14.5%;
+      height: 19.6%;
       overflow: visible;
       border-color: rgba(238, 242, 250, 0.96);
       border-radius: 19px;
@@ -2187,10 +2187,10 @@
     }
 
     &__card--bank {
-      top: 12.8%;
-      right: 9.2%;
-      width: 15.6%;
-      height: 20.9%;
+      top: 16.6%;
+      right: 10.1%;
+      width: 15%;
+      height: 19.8%;
       color: rgba(0, 81, 255, 0.2);
       opacity: 0.78;
       --withdrawal-card-rotate: 1.2deg;
@@ -2198,10 +2198,10 @@
     }
 
     &__card--payment {
-      top: 39.2%;
-      right: 4.6%;
-      width: 17.2%;
-      height: 13.1%;
+      top: 40.1%;
+      right: 7.3%;
+      width: 16.2%;
+      height: 14.7%;
       color: rgba(0, 81, 255, 0.2);
       opacity: 0.76;
       --withdrawal-card-rotate: -1deg;
@@ -2210,9 +2210,9 @@
 
     &__card--profile {
       top: 60.7%;
-      right: 9.3%;
-      width: 15.6%;
-      height: 20.9%;
+      right: 10.4%;
+      width: 15%;
+      height: 19.9%;
       color: rgba(0, 81, 255, 0.16);
       opacity: 0.73;
       --withdrawal-card-rotate: 1.4deg;
@@ -2221,13 +2221,13 @@
 
     &__wallet {
       position: absolute;
-      left: 26.2%;
-      top: 27.2%;
+      left: 28.7%;
+      top: 28.5%;
       z-index: 5;
       display: block;
-      width: 36.4%;
+      width: 32.4%;
       height: auto;
-      transform: perspective(560px) rotateY(-8deg) rotateX(2deg) rotateZ(0.4deg);
+      transform: perspective(560px) rotateY(-8deg) rotateX(2deg) rotateZ(0.4deg) scaleY(0.83);
       transform-origin: center;
       filter: drop-shadow(0 30px 24px rgba(22, 53, 118, 0.2));
       animation: withdrawalWalletFloat 7.5s ease-in-out infinite;
@@ -2235,10 +2235,10 @@
 
     &__wallet-shadow {
       position: absolute;
-      left: 31.4%;
-      top: 65.8%;
+      left: 33%;
+      top: 62.8%;
       z-index: 3;
-      width: 28%;
+      width: 25%;
       height: 9%;
       border-radius: 999px;
       background:
@@ -2292,8 +2292,8 @@
     }
 
     &__coin--usdt {
-      top: 18.6%;
-      left: 58.8%;
+      top: 17.7%;
+      left: 58.3%;
       width: 8.6%;
       aspect-ratio: 1;
       background:
@@ -2303,8 +2303,8 @@
     }
 
     &__coin--btc {
-      top: 36%;
-      left: 61.6%;
+      top: 36.1%;
+      left: 60.6%;
       width: 8.3%;
       aspect-ratio: 1;
       background:
@@ -2315,8 +2315,8 @@
     }
 
     &__coin--eth {
-      top: 55.2%;
-      left: 61.2%;
+      top: 55.1%;
+      left: 59.6%;
       width: 8.1%;
       aspect-ratio: 1;
       background:
@@ -2771,7 +2771,7 @@
     position: relative;
     min-height: 190px;
     overflow: hidden;
-    border: 6px solid #fff;
+    border: 6px solid var(--landing-border-strong);
     border-radius: 16px;
     background:
       linear-gradient(
@@ -2964,7 +2964,7 @@
       width: min(640px, 100%);
       min-height: 88px;
       overflow: hidden;
-      border: 6px solid #fff;
+      border: 6px solid var(--landing-border-strong);
       border-radius: 16px;
       background:
         linear-gradient(
@@ -3246,8 +3246,74 @@
       linear-gradient(145deg, rgba(255, 255, 255, 0) 42%, rgba(0, 0, 0, 0.1) 100%);
   }
 
+  :global(:root[data-theme="dark"] .method-card__title) {
+    border-color: rgba(139, 164, 214, 0.2);
+    background:
+      linear-gradient(145deg, rgba(33, 52, 96, 0.82), rgba(7, 22, 56, 0.44)),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset -18px -18px 36px rgba(0, 0, 0, 0.14),
+      0 18px 38px rgba(0, 0, 0, 0.16);
+  }
+
   :global(:root[data-theme="dark"] .method-card__ghost) {
     color: rgba(255, 255, 255, 0.04);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual::before) {
+    background:
+      radial-gradient(ellipse at 44% 51%, rgba(16, 36, 82, 0.72) 0 36%, rgba(11, 26, 61, 0.44) 47%, transparent 70%),
+      radial-gradient(ellipse at 28% 58%, rgba(91, 132, 255, 0.2) 0, rgba(91, 132, 255, 0.08) 34%, transparent 66%),
+      radial-gradient(ellipse at 68% 44%, rgba(255, 139, 77, 0.16) 0, rgba(255, 139, 77, 0.06) 34%, transparent 62%);
+    opacity: 0.86;
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual::after) {
+    background:
+      linear-gradient(90deg, rgba(1, 18, 57, 0.76) 0 8%, transparent 31% 70%, rgba(1, 18, 57, 0.76) 92% 100%),
+      linear-gradient(180deg, rgba(1, 18, 57, 0.82) 0, transparent 20% 76%, rgba(1, 18, 57, 0.82) 100%);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__route) {
+    stroke: rgba(168, 180, 199, 0.32);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__arrow-route) {
+    stroke: rgba(91, 132, 255, 0.26);
+    filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.18));
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__card),
+  :global(:root[data-theme="dark"] .withdrawal-visual__request-card),
+  :global(:root[data-theme="dark"] .withdrawal-visual__card--document),
+  :global(:root[data-theme="dark"] .withdrawal-visual__card--clock) {
+    border-color: rgba(139, 164, 214, 0.2);
+    background:
+      radial-gradient(circle at 42% 18%, rgba(91, 132, 255, 0.12) 0, transparent 38%),
+      linear-gradient(145deg, rgba(19, 40, 86, 0.7), rgba(4, 18, 50, 0.48));
+    box-shadow:
+      0 24px 52px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset -12px -15px 26px rgba(0, 0, 0, 0.12);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__request-avatar),
+  :global(:root[data-theme="dark"] .withdrawal-visual__document-check) {
+    filter: brightness(0.9) saturate(0.96);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__shield-glass) {
+    fill: rgba(20, 39, 82, 0.44);
+    stroke: rgba(139, 164, 214, 0.28);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__shield-edge) {
+    fill: rgba(11, 26, 61, 0.28);
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-visual__wallet) {
+    filter: drop-shadow(0 30px 26px rgba(0, 0, 0, 0.34)) saturate(0.96);
   }
 
   @media (max-width: 1199px) {
