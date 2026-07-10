@@ -1553,6 +1553,8 @@
   .withdrawal-page {
     --withdrawal-orb-x: 0px;
     --withdrawal-orb-y: 0px;
+    position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     gap: clamp(82px, 7vw, 116px);
@@ -3223,6 +3225,24 @@
   :global(:root[data-theme="dark"] .flow-steps h3),
   :global(:root[data-theme="dark"] .withdrawal-details p) {
     color: var(--landing-text-primary);
+  }
+
+  :global(:root[data-theme="dark"] body.withdrawal-of-funds-route),
+  :global(:root[data-theme="dark"] body.withdrawal-of-funds-route .page-content),
+  :global(:root[data-theme="dark"] body.withdrawal-of-funds-route .page--inner) {
+    background-color: var(--landing-bg) !important;
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-page::before) {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -140px calc(50% - 50vw) -120px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 16% 14%, rgba(91, 132, 255, 0.16) 0%, transparent 34%),
+      radial-gradient(circle at 82% 12%, rgba(255, 139, 77, 0.08) 0%, transparent 36%),
+      linear-gradient(180deg, rgba(3, 23, 67, 0.92) 0%, var(--landing-bg) 42%, var(--landing-bg) 100%);
   }
 
   :global(:root[data-theme="dark"] .method-card),
