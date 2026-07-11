@@ -2,23 +2,57 @@
   <UiContainer>
     <section class="about-page">
       <header class="about-hero">
-        <span class="about-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
-        <h1>{{ t("landing.pages.company.about.title") }}</h1>
-        <p>
-          <strong>{{ t("landing.pages.company.about.intro_1.highlight") }}</strong>
-          {{ t("landing.pages.company.about.intro_1.text") }}
-        </p>
+        <div class="about-hero__copy">
+          <span class="about-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
+          <h1>{{ t("landing.pages.company.about.title") }}</h1>
+          <p>
+            <strong>{{ t("landing.pages.company.about.intro_1.highlight") }}</strong>
+            {{ t("landing.pages.company.about.intro_1.text") }}
+          </p>
 
-        <div class="about-hero__meta">
-          <span
-            v-for="item in pageCopy.meta"
-            :key="item">
-            {{ item }}
-          </span>
+          <ul class="about-hero__meta">
+            <li
+              v-for="item in pageCopy.meta"
+              :key="item.text">
+              <img
+                :src="assetPath(item.icon)"
+                alt=""
+                aria-hidden="true"
+                loading="lazy" />
+              <span>{{ item.text }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="about-hero__visual"
+          aria-hidden="true">
+          <img
+            :src="assetPath('hero.svg')"
+            alt=""
+            loading="eager" />
         </div>
       </header>
 
       <section class="about-story">
+        <div class="about-principles">
+          <article
+            v-for="item in pageCopy.principles"
+            :key="item.title">
+            <span class="about-icon">
+              <img
+                :src="assetPath(item.icon)"
+                alt=""
+                aria-hidden="true"
+                loading="lazy" />
+            </span>
+            <div>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.text }}</p>
+            </div>
+          </article>
+        </div>
+
         <div class="about-story__copy">
           <span>{{ pageCopy.storyEyebrow }}</span>
           <h2>{{ pageCopy.storyTitle }}</h2>
@@ -31,20 +65,12 @@
             <strong>{{ t("landing.pages.company.about.intro_5.highlight") }}</strong>
             {{ t("landing.pages.company.about.intro_5.text") }}
           </p>
-        </div>
-
-        <div class="about-principles">
-          <article
-            v-for="(item, index) in pageCopy.principles"
-            :key="item.title">
-            <span
-              class="about-icon"
-              :data-symbol="pageCopy.principleSymbols[index]" />
-            <div>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.text }}</p>
-            </div>
-          </article>
+          <a
+            class="about-story__button"
+            href="#">
+            <span>{{ pageCopy.storyButton }}</span>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
       </section>
 
@@ -145,6 +171,7 @@
 
 <script setup lang="ts">
   import { computed } from "vue";
+  import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -154,13 +181,28 @@
     alias: "/about-company",
   });
 
+  useHead({
+    bodyAttrs: {
+      class: "about-company-route",
+    },
+  });
+
+  const ASSET_BASE = "/static/about-company/";
+
+  const assetPath = (name: string): string => `${ASSET_BASE}${name}`;
+
+  type IconTextItem = {
+    icon: string;
+    text: string;
+  };
+
   type AboutPageCopy = {
     eyebrow: string;
-    meta: string[];
+    meta: IconTextItem[];
     storyEyebrow: string;
     storyTitle: string;
-    principleSymbols: string[];
-    principles: Array<{ title: string; text: string }>;
+    storyButton: string;
+    principles: Array<{ icon: string; title: string; text: string }>;
     flowTitle: string;
     activityTitle: string;
     activityText: string;
@@ -179,20 +221,27 @@
   const localizedCopy: Record<string, AboutPageCopy> = {
     en: {
       eyebrow: "Company profile",
-      meta: ["Financial holding", "Client-first service", "Transparent execution"],
+      meta: [
+        { icon: "icon-financial-holding.svg", text: "Financial holding" },
+        { icon: "icon-client-first.svg", text: "Client-first service" },
+        { icon: "icon-transparent-execution.svg", text: "Transparent execution" },
+      ],
       storyEyebrow: "How Ester works",
       storyTitle: "A financial company focused on stable client outcomes",
-      principleSymbols: ["TC", "QA", "LAW"],
+      storyButton: "Lorem Ipsum",
       principles: [
         {
+          icon: "icon-trading-conditions.svg",
           title: "Trading conditions",
           text: "Competitive terms and access to the tools traders expect in daily work.",
         },
         {
+          icon: "icon-service-quality.svg",
           title: "Service quality",
           text: "Operational support, analytics and knowledge are part of the same client workflow.",
         },
         {
+          icon: "icon-legal-clarity.svg",
           title: "Legal clarity",
           text: "The relationship with clients is built around clear documents and transparent procedures.",
         },
@@ -213,20 +262,27 @@
     },
     uk: {
       eyebrow: "Профіль компанії",
-      meta: ["Фінансовий холдинг", "Сервіс навколо клієнта", "Прозоре виконання"],
+      meta: [
+        { icon: "icon-financial-holding.svg", text: "Фінансовий холдинг" },
+        { icon: "icon-client-first.svg", text: "Сервіс навколо клієнта" },
+        { icon: "icon-transparent-execution.svg", text: "Прозоре виконання" },
+      ],
       storyEyebrow: "Як працює Ester",
       storyTitle: "Фінансова компанія, сфокусована на стабільному результаті клієнта",
-      principleSymbols: ["TC", "QA", "LAW"],
+      storyButton: "Lorem Ipsum",
       principles: [
         {
+          icon: "icon-trading-conditions.svg",
           title: "Торгові умови",
           text: "Конкурентні умови та доступ до інструментів, які потрібні трейдеру щодня.",
         },
         {
+          icon: "icon-service-quality.svg",
           title: "Якість сервісу",
           text: "Операційна підтримка, аналітика та знання працюють в одному клієнтському процесі.",
         },
         {
+          icon: "icon-legal-clarity.svg",
           title: "Юридична ясність",
           text: "Взаємодія з клієнтами будується навколо зрозумілих документів і прозорих процедур.",
         },
@@ -247,20 +303,27 @@
     },
     ru: {
       eyebrow: "Профиль компании",
-      meta: ["Финансовый холдинг", "Сервис вокруг клиента", "Прозрачное исполнение"],
+      meta: [
+        { icon: "icon-financial-holding.svg", text: "Финансовый холдинг" },
+        { icon: "icon-client-first.svg", text: "Сервис вокруг клиента" },
+        { icon: "icon-transparent-execution.svg", text: "Прозрачное исполнение" },
+      ],
       storyEyebrow: "Как работает Ester",
       storyTitle: "Финансовая компания, сфокусированная на стабильном результате клиента",
-      principleSymbols: ["TC", "QA", "LAW"],
+      storyButton: "Lorem Ipsum",
       principles: [
         {
+          icon: "icon-trading-conditions.svg",
           title: "Торговые условия",
           text: "Конкурентные условия и доступ к инструментам, которые нужны трейдеру ежедневно.",
         },
         {
+          icon: "icon-service-quality.svg",
           title: "Качество сервиса",
           text: "Операционная поддержка, аналитика и знания работают в одном клиентском процессе.",
         },
         {
+          icon: "icon-legal-clarity.svg",
           title: "Юридическая ясность",
           text: "Взаимодействие с клиентами строится вокруг понятных документов и прозрачных процедур.",
         },
@@ -301,17 +364,31 @@
 </script>
 
 <style lang="scss" scoped>
+  :global(body.about-company-route),
+  :global(body.about-company-route .page-content),
+  :global(body.about-company-route .page--inner) {
+    background-color: var(--landing-bg) !important;
+  }
+
   .about-page {
     display: flex;
     flex-direction: column;
-    gap: clamp(52px, 6vw, 86px);
+    gap: clamp(72px, 7vw, 112px);
     color: var(--landing-text-primary);
   }
 
   .about-hero {
-    max-width: 1000px;
-    margin: 0 auto;
-    text-align: center;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.2fr);
+    gap: clamp(34px, 5vw, 72px);
+    align-items: center;
+    min-height: clamp(420px, 48vw, 620px);
+
+    &__copy {
+      position: relative;
+      z-index: 2;
+      max-width: 555px;
+    }
 
     &__eyebrow {
       display: inline-flex;
@@ -326,18 +403,18 @@
     h1 {
       margin: 0;
       color: var(--landing-text-strong);
-      font-size: clamp(44px, 6vw, 78px);
-      font-weight: 500;
+      font-size: clamp(46px, 5.2vw, 82px);
+      font-weight: 400;
       line-height: 0.98;
     }
 
     p {
-      max-width: 820px;
-      margin: 20px auto 0;
+      max-width: 440px;
+      margin: 26px 0 0;
       color: var(--landing-text-secondary);
-      font-size: clamp(17px, 1.4vw, 20px);
+      font-size: 16px;
       font-weight: 600;
-      line-height: 1.55;
+      line-height: 1.35;
 
       strong {
         color: var(--landing-text-primary);
@@ -345,46 +422,76 @@
     }
 
     &__meta {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px 18px;
-      margin-top: 28px;
+      display: grid;
+      gap: 17px;
+      margin: 30px 0 0;
+      padding: 0;
+      list-style: none;
 
-      span {
+      li {
         display: inline-flex;
         align-items: center;
-        color: var(--landing-text-secondary);
+        gap: 12px;
+        color: var(--landing-text-primary);
         font-size: 14px;
         font-weight: 800;
         line-height: 1.2;
 
-        &::before {
-          content: "";
-          width: 6px;
-          height: 6px;
-          margin-right: 10px;
-          border-radius: 50%;
-          background: var(--landing-accent);
+        img {
+          width: 24px;
+          height: 24px;
+          object-fit: contain;
         }
+      }
+    }
+
+    &__visual {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      margin-right: clamp(-52px, -3vw, -18px);
+
+      img {
+        display: block;
+        width: min(100%, 760px);
+        margin-left: auto;
+        filter: drop-shadow(0 24px 42px rgba(0, 81, 255, 0.05));
       }
     }
   }
 
   .about-icon {
+    position: relative;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 58px;
-    height: 58px;
-    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
+    width: 78px;
+    height: 78px;
+    border: 1px solid color-mix(in srgb, var(--landing-border-strong) 78%, transparent);
+    border-radius: 18px;
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--landing-surface-elevated) 78%, transparent),
+      color-mix(in srgb, var(--landing-surface-muted) 46%, transparent)
+    );
     color: var(--landing-accent);
     font-size: 13px;
     font-weight: 900;
     line-height: 1;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 32%, transparent),
+      inset 0 -20px 28px color-mix(in srgb, var(--landing-accent) 5%, transparent),
+      0 16px 38px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+
+    img {
+      position: relative;
+      z-index: 1;
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
 
     &::before {
       content: attr(data-symbol);
@@ -393,12 +500,12 @@
 
   .about-story {
     display: grid;
-    grid-template-columns: minmax(320px, 0.88fr) minmax(0, 1.12fr);
-    gap: clamp(42px, 5vw, 86px);
-    align-items: start;
+    grid-template-columns: minmax(340px, 0.96fr) minmax(0, 1.04fr);
+    gap: clamp(34px, 5vw, 62px);
+    align-items: center;
 
     &__copy {
-      span {
+      > span {
         color: var(--landing-accent);
         font-size: 13px;
         font-weight: 900;
@@ -408,7 +515,7 @@
       h2 {
         margin: 12px 0 0;
         color: var(--landing-text-strong);
-        font-size: clamp(30px, 3.2vw, 46px);
+        font-size: clamp(32px, 3vw, 42px);
         font-weight: 500;
         line-height: 1.08;
       }
@@ -425,6 +532,31 @@
         }
       }
     }
+
+    &__button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 26px;
+      min-width: 186px;
+      margin-top: 24px;
+      border-radius: 14px;
+      background: var(--landing-accent);
+      padding: 14px 18px;
+      color: var(--landing-on-accent);
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      text-decoration: none;
+      transition:
+        transform 180ms ease,
+        background-color 180ms ease;
+
+      &:hover {
+        background: var(--landing-accent-hover);
+        transform: translateY(-1px);
+      }
+    }
   }
 
   .about-principles {
@@ -433,15 +565,24 @@
 
     article {
       display: grid;
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-      padding-bottom: 18px;
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      min-height: 132px;
+      border: 4px solid color-mix(in srgb, var(--landing-border-strong) 82%, transparent);
+      border-radius: 20px;
+      background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--landing-surface-elevated) 76%, transparent) 0%,
+        color-mix(in srgb, var(--landing-surface-muted) 58%, transparent) 100%
+      );
+      padding: 18px;
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 30%, transparent),
+        inset 0 -28px 44px color-mix(in srgb, var(--landing-accent) 5%, transparent);
 
       &:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
+        padding-bottom: 18px;
       }
     }
 
@@ -558,13 +699,15 @@
   }
 
   .about-flow-section {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.52fr) minmax(0, 1.48fr);
-    gap: clamp(34px, 5vw, 70px);
-    border-top: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-    padding-top: clamp(38px, 4vw, 58px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(34px, 4vw, 58px);
 
     &__intro {
+      max-width: 780px;
+      text-align: center;
+
       span {
         color: var(--landing-accent);
         font-size: 13px;
@@ -596,6 +739,7 @@
     grid-template-columns: minmax(0, 1fr) 120px minmax(220px, 0.72fr);
     gap: 20px;
     align-items: center;
+    width: min(100%, 850px);
 
     &__column {
       display: grid;
@@ -777,13 +921,11 @@
   }
 
   .about-activity {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
-    gap: 34px;
-    border-top: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-    padding-top: clamp(38px, 4vw, 58px);
+    display: block;
 
     &__intro {
+      max-width: 650px;
+
       span {
         color: var(--landing-accent);
         font-size: 13px;
@@ -810,39 +952,100 @@
 
     &__list {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
-      margin: 0;
+      margin: 32px 0 0;
       padding: 0;
       list-style: none;
 
       li {
         display: grid;
-        grid-template-columns: 76px minmax(0, 1fr);
+        grid-template-columns: 58px minmax(0, 1fr);
         gap: 16px;
-        align-items: start;
-        border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-        padding-bottom: 16px;
+        align-items: center;
+        min-height: 118px;
+        border: 4px solid color-mix(in srgb, var(--landing-border-strong) 82%, transparent);
+        border-radius: 18px;
+        background: linear-gradient(
+          145deg,
+          color-mix(in srgb, var(--landing-surface-elevated) 76%, transparent) 0%,
+          color-mix(in srgb, var(--landing-surface-muted) 58%, transparent) 100%
+        );
+        padding: 18px;
         color: var(--landing-text-primary);
         font-size: 16px;
         font-weight: 700;
         line-height: 1.45;
+        box-shadow:
+          inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 30%, transparent),
+          inset 0 -28px 44px color-mix(in srgb, var(--landing-accent) 5%, transparent);
 
         &:last-child {
-          border-bottom: 0;
-          padding-bottom: 0;
+          padding-bottom: 18px;
         }
       }
     }
   }
 
+  .about-activity__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--landing-accent);
+    color: var(--landing-on-accent);
+    font-size: 10px;
+    box-shadow: none;
+  }
+
+  :global(:root[data-theme="dark"] .about-hero__visual img) {
+    opacity: 0.9;
+    filter: brightness(0.88) saturate(0.92) contrast(1.02) drop-shadow(0 24px 54px rgba(0, 81, 255, 0.12));
+    mix-blend-mode: screen;
+  }
+
+  :global(:root[data-theme="dark"] .about-principles article),
+  :global(:root[data-theme="dark"] .about-activity__list li) {
+    border-color: rgba(139, 164, 214, 0.24);
+    background: linear-gradient(145deg, rgba(17, 39, 82, 0.72) 0%, rgba(2, 19, 58, 0.9) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -28px 44px rgba(0, 81, 255, 0.08),
+      0 22px 54px rgba(0, 0, 0, 0.18);
+  }
+
+  :global(:root[data-theme="dark"] .about-icon:not(.about-activity__icon)) {
+    border-color: rgba(139, 164, 214, 0.24);
+    background: linear-gradient(145deg, rgba(31, 57, 105, 0.52) 0%, rgba(8, 23, 55, 0.82) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -20px 28px rgba(0, 81, 255, 0.09);
+  }
+
   @media (max-width: 991px) {
     .about-page {
-      gap: 32px;
+      gap: 56px;
+    }
+
+    .about-hero {
+      grid-template-columns: 1fr;
+      min-height: 0;
+
+      &__visual {
+        margin-right: 0;
+
+        img {
+          width: min(100%, 720px);
+          margin-right: auto;
+        }
+      }
     }
 
     .about-story,
-    .about-flow-section,
-    .about-activity {
+    .about-flow-section {
+      grid-template-columns: 1fr;
+    }
+
+    .about-activity__list {
       grid-template-columns: 1fr;
     }
 
@@ -860,7 +1063,7 @@
       text-align: left;
 
       &__meta {
-        justify-content: flex-start;
+        gap: 14px;
       }
     }
 

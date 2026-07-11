@@ -440,6 +440,7 @@
 
       :deep(.swiper-slide) {
         height: auto;
+        overflow: hidden;
       }
     }
 
@@ -470,6 +471,7 @@
       padding: 0 40px 0;
       box-sizing: border-box;
       align-items: center;
+      overflow: hidden;
 
       > * {
         min-width: 0;
@@ -1014,7 +1016,6 @@
   @media (max-width: 1279px) {
     .welcome-v2 {
       padding-top: 104px;
-      padding-inline: 20px;
     }
 
     .hero {
