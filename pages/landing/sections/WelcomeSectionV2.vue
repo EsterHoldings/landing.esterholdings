@@ -433,6 +433,7 @@
       position: relative;
       z-index: 1;
       overflow: visible;
+      height: 90vh;
 
       :deep(.swiper-wrapper) {
         align-items: stretch;
