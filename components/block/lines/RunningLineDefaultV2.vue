@@ -648,7 +648,7 @@
 
     &__card {
       box-sizing: border-box;
-      inline-size: clamp(286px, 20vw, 320px);
+      inline-size: clamp(304px, 20vw, 334px);
       border-radius: 20px;
       border: 0;
       background: var(--landing-surface-glass);
@@ -657,8 +657,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 40px;
+      gap: 20px;
       flex-shrink: 0;
+      overflow: hidden;
       user-select: none;
       transition: background 0.2s ease;
     }
@@ -667,6 +668,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      min-width: 0;
     }
 
     &__icon {
@@ -712,11 +714,16 @@
       line-height: 1.302;
       white-space: nowrap;
       inline-size: 17ch;
+      max-inline-size: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
     }
 
     &__btn {
+      flex: 0 0 auto;
+      min-inline-size: 72px;
       height: 42px;
       padding: 10px 16px;
       border: 0;
@@ -754,9 +761,9 @@
       }
 
       &__card {
-        inline-size: clamp(218px, 62vw, 250px);
+        inline-size: clamp(232px, 68vw, 268px);
         padding: 10px 14px;
-        gap: 14px;
+        gap: 10px;
         border-radius: 14px;
       }
 
@@ -779,8 +786,9 @@
       }
 
       &__btn {
+        min-inline-size: 58px;
         height: 32px;
-        padding: 6px 12px;
+        padding: 6px 10px;
         font-size: 13px;
         border-radius: 8px;
       }

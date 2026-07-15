@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <main
-      ref="pageRef"
-      class="replenishment-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <main class="replenishment-page">
       <section class="replenishment-hero">
         <div class="replenishment-hero__content">
           <span class="section-kicker">{{ copy.hero.eyebrow }}</span>
@@ -26,12 +22,7 @@
         </div>
 
         <div class="replenishment-hero__media">
-          <img
-            :src="assetPath('hero.png')"
-            :alt="copy.hero.imageAlt"
-            width="842"
-            height="559"
-            loading="eager" />
+          <AccountReplenishmentHeroVisual :label="copy.hero.imageAlt" />
         </div>
       </section>
 
@@ -165,10 +156,11 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from "vue";
+  import { computed } from "vue";
   import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
+  import AccountReplenishmentHeroVisual from "~/components/block/pages/account-replenishment/AccountReplenishmentHeroVisual.vue";
   import useCabinetLink from "~/composables/useCabinetLink";
 
   type IconTextItem = {
@@ -230,7 +222,6 @@
 
   const assetPath = (name: string): string => `${ASSET_BASE}${name}`;
 
-  const pageRef = ref<HTMLElement | null>(null);
   const { locale } = useI18n();
   const { cabinetLink } = useCabinetLink();
 
@@ -1777,26 +1768,6 @@
   });
 
   const depositHref = computed(() => cabinetLink("/payments/create"));
-
-  const updatePointerOffset = (x = 0, y = 0) => {
-    pageRef.value?.style.setProperty("--replenishment-orb-x", `${x}px`);
-    pageRef.value?.style.setProperty("--replenishment-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = pageRef.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
 </script>
 
 <style scoped lang="scss">
@@ -1890,14 +1861,6 @@
       z-index: 1;
       min-width: 0;
       margin-left: clamp(-60px, -3vw, -20px);
-
-      img {
-        display: block;
-        width: min(100%, 842px);
-        height: auto;
-        mix-blend-mode: multiply;
-        object-fit: contain;
-      }
     }
   }
 
@@ -2528,38 +2491,6 @@
 
   :global(:root[data-theme="dark"] .method-card__ghost) {
     color: rgba(255, 255, 255, 0.04);
-  }
-
-  :global(:root[data-theme="dark"] .replenishment-hero__media) {
-    overflow: hidden;
-    border-radius: 26px;
-  }
-
-  :global(:root[data-theme="dark"] .replenishment-hero__media::after) {
-    content: "";
-    position: absolute;
-    z-index: 2;
-    inset: 0;
-    max-width: 842px;
-    pointer-events: none;
-    background:
-      linear-gradient(
-        90deg,
-        rgba(1, 18, 57, 0.72) 0%,
-        rgba(1, 18, 57, 0.42) 38%,
-        rgba(1, 18, 57, 0.3) 62%,
-        rgba(1, 18, 57, 0.5) 100%
-      ),
-      radial-gradient(circle at 82% 75%, rgba(91, 132, 255, 0.16) 0%, transparent 36%);
-    mix-blend-mode: multiply;
-  }
-
-  :global(:root[data-theme="dark"] .replenishment-hero__media img) {
-    position: relative;
-    z-index: 1;
-    filter: brightness(0.72) saturate(0.88) contrast(1.04);
-    mix-blend-mode: normal;
-    opacity: 0.9;
   }
 
   @media (max-width: 1199px) {

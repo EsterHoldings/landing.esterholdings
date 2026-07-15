@@ -28,9 +28,13 @@
           class="about-hero__visual"
           aria-hidden="true">
           <img
-            :src="assetPath('hero.svg')"
+            :src="assetPath('hero.png')"
             alt=""
-            loading="eager" />
+            width="1537"
+            height="1023"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high" />
         </div>
       </header>
 
@@ -84,64 +88,142 @@
         <div
           class="business-flow"
           aria-label="Ester business model">
-          <div class="business-flow__column business-flow__column--left">
-            <article class="flow-node flow-node--bank">
-              <span class="flow-node__icon flow-node__icon--bank" />
-              <div>
+          <div class="business-flow__stage">
+            <svg
+              class="business-flow__routes"
+              viewBox="0 0 850 490"
+              aria-hidden="true">
+              <defs>
+                <marker
+                  id="about-flow-arrow-blue"
+                  markerWidth="6"
+                  markerHeight="6"
+                  refX="5"
+                  refY="3"
+                  orient="auto"
+                  markerUnits="strokeWidth">
+                  <path
+                    d="M0 0 6 3 0 6Z"
+                    fill="#0051ff" />
+                </marker>
+                <marker
+                  id="about-flow-arrow-orange"
+                  markerWidth="6"
+                  markerHeight="6"
+                  refX="5"
+                  refY="3"
+                  orient="auto"
+                  markerUnits="strokeWidth">
+                  <path
+                    d="M0 0 6 3 0 6Z"
+                    fill="#f75709" />
+                </marker>
+              </defs>
+
+              <path
+                class="business-flow__route business-flow__route--price"
+                d="M323 116H377"
+                marker-end="url(#about-flow-arrow-blue)" />
+              <path
+                class="business-flow__route business-flow__route--price"
+                d="M293 129V172"
+                marker-end="url(#about-flow-arrow-blue)" />
+              <path
+                class="business-flow__route business-flow__route--price"
+                d="M293 274V319H377"
+                marker-end="url(#about-flow-arrow-blue)" />
+
+              <path
+                class="business-flow__route business-flow__route--order"
+                d="M525 116H473"
+                marker-end="url(#about-flow-arrow-orange)" />
+              <path
+                class="business-flow__route business-flow__route--order"
+                d="M557 129V172"
+                marker-end="url(#about-flow-arrow-orange)" />
+              <path
+                class="business-flow__route business-flow__route--order"
+                d="M557 306V274"
+                marker-end="url(#about-flow-arrow-orange)" />
+              <path
+                class="business-flow__route business-flow__route--order"
+                d="M525 319H473"
+                marker-end="url(#about-flow-arrow-orange)" />
+
+              <path
+                class="business-flow__route business-flow__route--exchange"
+                d="M341 223H509" />
+            </svg>
+
+            <article class="flow-entity flow-entity--ecn">
+              <div class="flow-entity__copy">
                 <h3>{{ pageCopy.flow.ecn }}</h3>
                 <p>{{ pageCopy.flow.banks }}</p>
               </div>
+              <span class="flow-hex">
+                <img
+                  :src="assetPath('flow-ecn.svg')"
+                  alt=""
+                  aria-hidden="true" />
+              </span>
             </article>
 
-            <span class="flow-chip flow-chip--price">
-              {{ pageCopy.flow.prices }}
-              <span>↓</span>
-            </span>
-
-            <article class="flow-node flow-node--chart">
-              <span class="flow-node__icon flow-node__icon--chart" />
-              <div>
+            <article class="flow-entity flow-entity--aggregation">
+              <div class="flow-entity__copy">
                 <h3>{{ pageCopy.flow.integration }}</h3>
                 <p>{{ businessModelList[0] }}</p>
               </div>
+              <span class="flow-hex">
+                <img
+                  :src="assetPath('flow-aggregation.svg')"
+                  alt=""
+                  aria-hidden="true" />
+              </span>
             </article>
 
-            <span class="flow-chip flow-chip--price">
-              {{ pageCopy.flow.prices }}
-              <span>↓</span>
-            </span>
-
-            <article class="flow-node flow-node--customers">
-              <span class="flow-node__icon flow-node__icon--network" />
-              <div>
-                <h3>{{ pageCopy.flow.customers }}</h3>
-                <p>{{ businessModelList[1] }}</p>
-              </div>
-            </article>
-          </div>
-
-          <div class="business-flow__connector">
-            <span />
-            <span />
-          </div>
-
-          <div class="business-flow__column business-flow__column--right">
-            <span class="flow-chip flow-chip--order">
-              <span>↑</span>
-              {{ pageCopy.flow.orders }}
-            </span>
-
-            <article class="flow-node flow-node--broker">
-              <span class="flow-node__icon flow-node__icon--bank" />
-              <div>
+            <article class="flow-entity flow-entity--broker">
+              <span class="flow-hex">
+                <img
+                  :src="assetPath('flow-broker.svg')"
+                  alt=""
+                  aria-hidden="true" />
+              </span>
+              <div class="flow-entity__copy">
                 <h3>{{ pageCopy.flow.broker }}</h3>
                 <p>{{ businessModelList[3] }}</p>
               </div>
             </article>
 
-            <span class="flow-chip flow-chip--order">
-              <span>↑</span>
+            <article class="flow-entity flow-entity--customers">
+              <span class="flow-hex">
+                <img
+                  :src="assetPath('flow-customers.svg')"
+                  alt=""
+                  aria-hidden="true" />
+              </span>
+              <div class="flow-entity__copy">
+                <h3>{{ pageCopy.flow.customers }}</h3>
+                <p>{{ businessModelList[1] }}</p>
+              </div>
+            </article>
+
+            <span class="flow-pill flow-pill--price flow-pill--price-top">
+              {{ pageCopy.flow.prices }}
+            </span>
+            <span class="flow-pill flow-pill--price flow-pill--price-bottom">
+              {{ pageCopy.flow.prices }}
+            </span>
+            <span class="flow-pill flow-pill--order flow-pill--order-top">
               {{ pageCopy.flow.orders }}
+            </span>
+            <span class="flow-pill flow-pill--order flow-pill--order-bottom">
+              {{ pageCopy.flow.orders }}
+            </span>
+
+            <span
+              class="business-flow__exchange"
+              aria-hidden="true">
+              ⇄
             </span>
           </div>
         </div>
@@ -699,225 +781,312 @@
   }
 
   .about-flow-section {
+    position: relative;
+    isolation: isolate;
     display: flex;
+    overflow: clip;
     flex-direction: column;
     align-items: center;
-    gap: clamp(34px, 4vw, 58px);
+    gap: clamp(30px, 3vw, 40px);
+    margin-top: clamp(-24px, -1.5vw, -12px);
+    padding-bottom: clamp(18px, 2vw, 30px);
+    font-family: "DM Sans", sans-serif;
 
     &__intro {
-      max-width: 780px;
+      width: 100%;
+      max-width: 696px;
       text-align: center;
 
       span {
-        color: var(--landing-accent);
-        font-size: 13px;
-        font-weight: 900;
+        display: inline-block;
+        color: #0051ff;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0;
         text-transform: uppercase;
       }
 
       h2 {
-        margin: 12px 0 0;
-        color: var(--landing-text-strong);
-        font-size: clamp(28px, 3vw, 42px);
+        max-width: 650px;
+        margin: 12px auto 0;
+        color: var(--landing-text-primary);
+        font-size: 42px;
         font-weight: 500;
-        line-height: 1.08;
+        line-height: 1;
+        letter-spacing: 0;
       }
 
       p {
-        margin: 16px 0 0;
+        max-width: 696px;
+        margin: 16px auto 0;
         color: var(--landing-text-secondary);
         font-size: 16px;
-        font-weight: 600;
-        line-height: 1.55;
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0;
+        white-space: nowrap;
       }
     }
   }
 
   .business-flow {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 120px minmax(220px, 0.72fr);
-    gap: 20px;
-    align-items: center;
+    isolation: isolate;
     width: min(100%, 850px);
+    height: 490px;
 
-    &__column {
-      display: grid;
-      gap: 18px;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(
+          ellipse 32% 48% at 35% 48%,
+          rgba(0, 81, 255, 0.07) 0%,
+          rgba(0, 81, 255, 0.04) 42%,
+          transparent 78%
+        ),
+        radial-gradient(
+          ellipse 27% 46% at 65% 47%,
+          rgba(247, 87, 9, 0.055) 0%,
+          rgba(247, 87, 9, 0.028) 42%,
+          transparent 78%
+        );
+      filter: blur(14px);
+      pointer-events: none;
     }
 
-    &__column--right {
-      align-content: center;
-    }
-
-    &__connector {
+    &__stage {
       position: relative;
-      align-self: stretch;
-      min-height: 330px;
+      width: 850px;
+      height: 490px;
+      margin: 0 auto;
+      transform-origin: top center;
+    }
 
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        width: 92px;
-        border-top: 1px dashed color-mix(in srgb, var(--landing-line) 82%, transparent);
-      }
+    &__routes {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
 
-      &::before {
-        top: 24%;
-        transform: translateX(-50%);
-      }
+    &__route {
+      fill: none;
+      stroke-width: 1.25;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
 
-      &::after {
-        bottom: 24%;
-        transform: translateX(-50%);
-      }
+    &__route--price {
+      stroke: #0051ff;
+    }
 
-      span {
-        position: absolute;
-        left: 50%;
-        width: 1px;
-        height: 42%;
-        border-left: 1px dashed color-mix(in srgb, var(--landing-line) 82%, transparent);
-        transform: translateX(-50%);
+    &__route--order {
+      stroke: #f75709;
+    }
 
-        &:first-child {
-          top: 24%;
-        }
+    &__route--exchange {
+      stroke: color-mix(in srgb, var(--landing-text-secondary) 48%, transparent);
+      stroke-dasharray: 3 4;
+    }
 
-        &:last-child {
-          bottom: 24%;
-        }
-      }
+    &__exchange {
+      position: absolute;
+      left: 50%;
+      top: 205px;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid color-mix(in srgb, var(--landing-line) 62%, transparent);
+      border-radius: 50%;
+      background: var(--landing-surface-elevated);
+      color: var(--landing-text-primary);
+      font-size: 18px;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+      transform: translateX(-50%);
     }
   }
 
-  .flow-node {
-    display: grid;
-    grid-template-columns: 74px minmax(0, 1fr);
-    gap: 18px;
-    align-items: center;
-    min-height: 118px;
+  .flow-entity {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    margin: 0;
+
+    &__copy {
+      min-width: 0;
+    }
 
     h3 {
       margin: 0;
-      color: var(--landing-text-strong);
-      font-size: clamp(20px, 1.8vw, 28px);
-      font-weight: 700;
-      line-height: 1.12;
+      color: var(--landing-text-primary);
+      font-size: 29px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: 0;
+      text-transform: uppercase;
     }
 
     p {
-      margin: 8px 0 0;
+      margin: 10px 0 0;
       color: var(--landing-text-secondary);
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.45;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0;
     }
 
-    &__icon {
-      position: relative;
-      display: block;
-      width: 66px;
-      height: 66px;
-      color: var(--landing-accent);
-    }
+    &--ecn {
+      left: 50%;
+      top: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 330px;
+      text-align: center;
+      transform: translateX(-50%);
 
-    &__icon--bank {
-      border-bottom: 7px solid currentColor;
-
-      &::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 3px;
-        margin: auto;
-        width: 56px;
-        height: 18px;
-        background: currentColor;
-        clip-path: polygon(50% 0, 100% 100%, 0 100%);
-      }
-
-      &::after {
-        content: "";
-        position: absolute;
-        left: 8px;
-        right: 8px;
-        top: 26px;
-        height: 28px;
-        background: repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 16px);
+      h3 {
+        font-size: 29px;
       }
     }
 
-    &__icon--chart {
-      &::before {
-        content: "";
-        position: absolute;
-        inset: 16px 10px 8px;
-        background:
-          linear-gradient(currentColor, currentColor) 0 100% / 10px 28px no-repeat,
-          linear-gradient(currentColor, currentColor) 22px 100% / 10px 44px no-repeat,
-          linear-gradient(currentColor, currentColor) 44px 100% / 10px 34px no-repeat;
-      }
+    &--aggregation {
+      left: 0;
+      top: 172px;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 18px;
+      width: 341px;
 
-      &::after {
-        content: "";
-        position: absolute;
-        left: 8px;
-        top: 14px;
-        width: 50px;
-        height: 30px;
-        border-left: 6px solid currentColor;
-        border-top: 6px solid currentColor;
-        transform: skewY(-24deg) rotate(6deg);
+      .flow-entity__copy {
+        width: 227px;
+        padding-top: 18px;
+        text-align: right;
       }
     }
 
-    &__icon--network {
-      &::before {
-        content: "";
-        position: absolute;
-        inset: 10px;
-        border-radius: 50%;
-        border: 2px dotted color-mix(in srgb, var(--landing-accent) 70%, transparent);
-      }
+    &--broker {
+      right: 0;
+      top: 172px;
+      align-items: flex-start;
+      gap: 18px;
+      width: 341px;
 
-      &::after {
-        content: "";
-        position: absolute;
-        inset: 20px;
-        border-radius: 50%;
-        background:
-          radial-gradient(circle at 18% 35%, currentColor 0 4px, transparent 5px),
-          radial-gradient(circle at 48% 20%, currentColor 0 4px, transparent 5px),
-          radial-gradient(circle at 76% 48%, currentColor 0 4px, transparent 5px),
-          radial-gradient(circle at 38% 74%, currentColor 0 4px, transparent 5px);
+      .flow-entity__copy {
+        width: 227px;
+        padding-top: 18px;
+        text-align: left;
       }
+    }
+
+    &--customers {
+      left: 50%;
+      top: 277px;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 340px;
+      text-align: center;
+      transform: translateX(-50%);
     }
   }
 
-  .flow-chip {
-    justify-self: start;
+  .flow-hex {
+    position: relative;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 96px;
+    height: 102px;
+    background: rgba(255, 255, 255, 0.96);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    filter: drop-shadow(0 9px 12px rgba(22, 43, 81, 0.1));
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      background: var(--landing-surface-elevated);
+      clip-path: inherit;
+    }
+
+    img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+  }
+
+  .flow-pill {
+    position: absolute;
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    min-width: 102px;
-    min-height: 52px;
-    border: 1px dashed color-mix(in srgb, var(--landing-accent-secondary) 64%, transparent);
+    height: 26px;
+    border: 1px solid currentColor;
     border-radius: 999px;
-    color: var(--landing-accent-secondary);
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1.1;
+    background: var(--landing-bg);
+    padding: 0 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1;
     text-transform: uppercase;
 
-    span {
-      font-size: 19px;
-      line-height: 1;
+    &--price {
+      left: 263px;
+      width: 60px;
+      color: #0051ff;
     }
+
+    &--order {
+      left: 525px;
+      width: 64px;
+      color: #f75709;
+    }
+
+    &--price-top,
+    &--order-top {
+      top: 103px;
+    }
+
+    &--price-bottom,
+    &--order-bottom {
+      top: 306px;
+    }
+  }
+
+  :global(:root[data-theme="dark"] .flow-hex::before) {
+    background: #071735;
+  }
+
+  :global(:root[data-theme="dark"] .flow-pill) {
+    background: var(--landing-bg);
+  }
+
+  :global(:root[data-theme="dark"] .business-flow__exchange) {
+    border-color: rgba(139, 164, 214, 0.24);
+    background: #071735;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  }
+
+  :global(:root[data-theme="dark"] .flow-entity--ecn .flow-hex img),
+  :global(:root[data-theme="dark"] .flow-entity--customers .flow-hex img) {
+    filter: invert(1);
   }
 
   .about-activity {
@@ -1021,6 +1190,28 @@
       inset 0 -20px 28px rgba(0, 81, 255, 0.09);
   }
 
+  @media (min-width: 1200px) {
+    .business-flow {
+      width: min(100%, 1122px);
+      height: 647px;
+
+      &__stage {
+        transform: scale(1.32);
+      }
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .business-flow {
+      width: min(100%, 1233px);
+      height: 711px;
+
+      &__stage {
+        transform: scale(1.45);
+      }
+    }
+  }
+
   @media (max-width: 991px) {
     .about-page {
       gap: 56px;
@@ -1045,16 +1236,72 @@
       grid-template-columns: 1fr;
     }
 
+    .about-flow-section__intro {
+      h2 {
+        font-size: clamp(30px, 6vw, 36px);
+      }
+
+      p {
+        line-height: 1.15;
+        white-space: normal;
+      }
+    }
+
     .about-activity__list {
       grid-template-columns: 1fr;
     }
 
     .business-flow {
-      grid-template-columns: 1fr;
+      height: auto;
+
+      &__stage {
+        display: grid;
+        gap: 16px;
+        width: 100%;
+        height: auto;
+        transform: none;
+      }
     }
 
-    .business-flow__connector {
+    .business-flow__routes,
+    .business-flow__exchange,
+    .flow-pill {
       display: none;
+    }
+
+    .flow-entity {
+      position: relative;
+      inset: auto;
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
+      width: 100%;
+      min-height: 132px;
+      border: 1px solid color-mix(in srgb, var(--landing-line) 58%, transparent);
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--landing-surface-elevated) 74%, transparent);
+      padding: 14px 18px;
+      text-align: left;
+      transform: none;
+
+      .flow-hex {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .flow-entity__copy {
+        grid-column: 2;
+        grid-row: 1;
+        width: auto;
+        padding-top: 0;
+        text-align: left;
+      }
+
+      h3,
+      &--ecn h3 {
+        font-size: 25px;
+      }
     }
   }
 
@@ -1072,9 +1319,31 @@
       grid-template-columns: 1fr;
     }
 
-    .flow-node {
-      grid-template-columns: 1fr;
-      min-height: 0;
+    .flow-entity {
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 14px;
+      min-height: 112px;
+      padding: 12px;
+
+      h3,
+      &--ecn h3 {
+        font-size: 21px;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+
+    .flow-hex {
+      width: 76px;
+      height: 82px;
+      flex-basis: 76px;
+
+      img {
+        width: 46px;
+        height: 46px;
+      }
     }
   }
 </style>
