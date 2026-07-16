@@ -535,9 +535,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Yasal belgeler",
+          "hero_links": ["Müşteri sözleşmesi", "İşlem kuralları", "Operasyonel prosedürler"],
+          "contract_facts": ["Haklar ve yükümlülükler", "Para yatırma ve çekme", "Destek iletişimi"],
+          "process_eyebrow": "Belgeler nasıl kullanılır",
+          "process_title": "Başlamadan önce temel kuralları elinizin altında bulundurun",
+          "process_text": "Belgeler hesap koşullarını, işlem operasyonlarını ve destek taleplerinin nasıl ele alındığını hızlıca kontrol etmenize yardımcı olur.",
+          "process_steps": [
+            {
+              "title": "Yönetmelikleri inceleyin",
+              "text": "Pozisyon açma kurallarını, marjin gereksinimlerini ve emir gerçekleştirme ayrıntılarını kontrol edin."
+            },
+            {
+              "title": "Sözleşme koşullarını karşılaştırın",
+              "text": "Müşteri ile şirket arasındaki hakları, yükümlülükleri ve etkileşim kurallarını inceleyin."
+            },
+            {
+              "title": "Destekle iletişime geçin",
+              "text": "Açıklamaya ihtiyacınız varsa kişisel hesabınızdan talep oluşturun veya destek ekibiyle iletişime geçin."
+            }
+          ],
           "title": "Belgeler",
           "intro": "Ester Holdings Inc. ile tüm etkileşim süreci standart belgelerle düzenlenir",
-          "regulations_title": "KOTASYON YÖNETMELİKLERİ",
+          "regulations_title": "Kotasyon yönetmelikleri",
           "regulations_subtitle": "Yönetmelikler şunları belirler:",
           "regulations_list": [
             "müşterinin işlem operasyonlarında kullanılan terimler;",
@@ -548,7 +568,7 @@
           ],
           "contract_title": "Sözleşme",
           "contract_description": "Sözleşme, müşteri ve Ester Holdings Inc. işbirliği kurallarını içerir. Tarafların yükümlülüklerini yerine getirme sorumlulukları burada tanımlanır.",
-          "button": "İNDİR"
+          "button": "İndir"
         }
       },
       "partnership": {

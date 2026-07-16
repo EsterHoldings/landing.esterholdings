@@ -543,9 +543,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Documentos legales",
+          "hero_links": ["Acuerdo del cliente", "Reglas de trading", "Procedimientos operativos"],
+          "contract_facts": ["Derechos y obligaciones", "Depósitos y retiros", "Comunicación con soporte"],
+          "process_eyebrow": "Cómo utilizar los documentos",
+          "process_title": "Mantén las reglas clave a mano antes de comenzar",
+          "process_text": "Los documentos te ayudan a comprobar rápidamente las condiciones de la cuenta, las operaciones de trading y cómo se gestionan las solicitudes de soporte.",
+          "process_steps": [
+            {
+              "title": "Revisar las regulaciones",
+              "text": "Comprueba las reglas de apertura de posiciones, los requisitos de margen y los detalles de ejecución de órdenes."
+            },
+            {
+              "title": "Comparar las condiciones del contrato",
+              "text": "Revisa los derechos, las obligaciones y las reglas de interacción entre el cliente y la empresa."
+            },
+            {
+              "title": "Contactar con soporte",
+              "text": "Si necesitas una aclaración, crea una solicitud en tu área personal o contacta con soporte."
+            }
+          ],
           "title": "Documentos",
           "intro": "Todo el proceso de interacción con Ester Holdings Inc. está regulado por documentos estándar",
-          "regulations_title": "REGULACIONES DE COTIZACIONES",
+          "regulations_title": "Regulaciones de cotizaciones",
           "regulations_subtitle": "Las regulaciones fijan:",
           "regulations_list": [
             "términos, utilizados en operaciones de trading del cliente;",
@@ -556,7 +576,7 @@
           ],
           "contract_title": "Contrato",
           "contract_description": "El contrato contiene reglas de cooperación del cliente y Ester Holdings Inc. Las responsabilidades de las partes en cuanto al cumplimiento de sus obligaciones están definidas en él.",
-          "button": "DESCARGAR"
+          "button": "Descargar"
         }
       },
       "partnership": {

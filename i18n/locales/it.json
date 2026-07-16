@@ -543,9 +543,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Documenti legali",
+          "hero_links": ["Accordo con il cliente", "Regole di trading", "Procedure operative"],
+          "contract_facts": ["Diritti e obblighi", "Depositi e prelievi", "Comunicazione con l’assistenza"],
+          "process_eyebrow": "Come utilizzare i documenti",
+          "process_title": "Tieni a portata di mano le regole principali prima di iniziare",
+          "process_text": "I documenti aiutano a verificare rapidamente le condizioni del conto, le operazioni di trading e la gestione delle richieste di assistenza.",
+          "process_steps": [
+            {
+              "title": "Consulta i regolamenti",
+              "text": "Controlla le regole di apertura delle posizioni, i requisiti di margine e i dettagli di esecuzione degli ordini."
+            },
+            {
+              "title": "Confronta le condizioni del contratto",
+              "text": "Verifica diritti, obblighi e regole di interazione tra il cliente e la società."
+            },
+            {
+              "title": "Contatta l’assistenza",
+              "text": "Se hai bisogno di chiarimenti, crea una richiesta nel tuo account o contatta il team di assistenza."
+            }
+          ],
           "title": "Documenti",
           "intro": "Tutto il processo di interazione con Ester Holdings Inc. è regolato da documenti standard",
-          "regulations_title": "REGOLAMENTI SULLE QUOTAZIONI",
+          "regulations_title": "Regolamenti sulle quotazioni",
           "regulations_subtitle": "I regolamenti fissano:",
           "regulations_list": [
             "termini, utilizzati nelle operazioni di trading del cliente;",
@@ -556,7 +576,7 @@
           ],
           "contract_title": "Contratto",
           "contract_description": "Il contratto contiene regole di cooperazione del cliente e Ester Holdings Inc. Le responsabilità delle parti per l'adempimento dei loro obblighi sono definite in esso.",
-          "button": "SCARICA"
+          "button": "Scarica"
         }
       },
       "partnership": {

@@ -543,9 +543,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Documentos legais",
+          "hero_links": ["Contrato do cliente", "Regras de negociação", "Procedimentos operacionais"],
+          "contract_facts": ["Direitos e obrigações", "Depósitos e levantamentos", "Comunicação com o suporte"],
+          "process_eyebrow": "Como utilizar os documentos",
+          "process_title": "Mantenha as regras principais por perto antes de começar",
+          "process_text": "Os documentos ajudam a verificar rapidamente as condições da conta, as operações de negociação e a forma como os pedidos de suporte são tratados.",
+          "process_steps": [
+            {
+              "title": "Rever os regulamentos",
+              "text": "Verifique as regras de abertura de posições, os requisitos de margem e os detalhes de execução de ordens."
+            },
+            {
+              "title": "Comparar os termos do contrato",
+              "text": "Reveja os direitos, as obrigações e as regras de interação entre o cliente e a empresa."
+            },
+            {
+              "title": "Contactar o suporte",
+              "text": "Se precisar de esclarecimentos, crie um pedido na sua área pessoal ou contacte a equipa de suporte."
+            }
+          ],
           "title": "Documentos",
           "intro": "Todo o processo de interação com a Ester Holdings Inc. é regulado por documentos padrão",
-          "regulations_title": "REGULAMENTOS DE COTAÇÕES",
+          "regulations_title": "Regulamentos de cotações",
           "regulations_subtitle": "Os regulamentos fixam:",
           "regulations_list": [
             "termos, usados nas operações de negociação do cliente;",
@@ -556,7 +576,7 @@
           ],
           "contract_title": "Contrato",
           "contract_description": "O contrato contém regras de cooperação do cliente e Ester Holdings Inc. As responsabilidades das partes quanto ao cumprimento de suas obrigações são definidas nele.",
-          "button": "BAIXAR"
+          "button": "Baixar"
         }
       },
       "partnership": {

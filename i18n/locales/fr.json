@@ -539,9 +539,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Documents juridiques",
+          "hero_links": ["Accord client", "Règles de trading", "Procédures opérationnelles"],
+          "contract_facts": ["Droits et obligations", "Dépôts et retraits", "Communication avec le support"],
+          "process_eyebrow": "Comment utiliser les documents",
+          "process_title": "Gardez les règles essentielles à portée de main avant de commencer",
+          "process_text": "Les documents vous permettent de vérifier rapidement les conditions du compte, les opérations de trading et le traitement des demandes d’assistance.",
+          "process_steps": [
+            {
+              "title": "Consulter les règlements",
+              "text": "Vérifiez les règles d’ouverture de position, les exigences de marge et les détails d’exécution des ordres."
+            },
+            {
+              "title": "Vérifier les conditions du contrat",
+              "text": "Examinez les droits, les obligations et les règles d’interaction entre le client et la société."
+            },
+            {
+              "title": "Contacter le support",
+              "text": "Si vous avez besoin d’une précision, créez une demande dans votre espace personnel ou contactez le support."
+            }
+          ],
           "title": "Documents",
           "intro": "Tout le processus d'interaction avec Ester Holdings Inc. est réglementé par des documents standard",
-          "regulations_title": "RÈGLEMENTS SUR LES COTATIONS",
+          "regulations_title": "Règlements sur les cotations",
           "regulations_subtitle": "Les règlements fixent:",
           "regulations_list": [
             "termes, utilisés dans les opérations de trading du client;",
@@ -552,7 +572,7 @@
           ],
           "contract_title": "Contrat",
           "contract_description": "Le contrat contient les règles de coopération du client et d'Ester Holdings Inc. Les responsabilités des parties quant à l'exécution de leurs obligations y sont définies.",
-          "button": "TÉLÉCHARGER"
+          "button": "Télécharger"
         }
       },
       "partnership": {

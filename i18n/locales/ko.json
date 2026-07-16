@@ -535,6 +535,26 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "법률 문서",
+          "hero_links": ["고객 계약", "거래 규칙", "운영 절차"],
+          "contract_facts": ["권리와 의무", "입금 및 출금", "고객지원 문의"],
+          "process_eyebrow": "문서 이용 방법",
+          "process_title": "시작하기 전에 주요 규칙을 가까이 두세요",
+          "process_text": "이 문서는 계좌 조건, 거래 작업 및 고객지원 요청 처리 방식을 빠르게 확인하는 데 도움이 됩니다.",
+          "process_steps": [
+            {
+              "title": "규정 검토",
+              "text": "포지션 개설 규칙, 증거금 요건 및 주문 실행 세부사항을 확인하세요."
+            },
+            {
+              "title": "계약 조건 확인",
+              "text": "고객과 회사 간의 권리, 의무 및 상호작용 규칙을 검토하세요."
+            },
+            {
+              "title": "고객지원 문의",
+              "text": "설명이 필요하면 개인 계정에서 요청을 만들거나 고객지원팀에 문의하세요."
+            }
+          ],
           "title": "문서",
           "intro": "Ester Holdings Inc.와의 모든 상호 작용 프로세스는 표준 문서로 규제됩니다",
           "regulations_title": "호가 규정",

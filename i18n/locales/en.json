@@ -535,9 +535,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Legal documents",
+          "hero_links": ["Client agreement", "Trading rules", "Operational procedures"],
+          "contract_facts": ["Rights and obligations", "Funding and withdrawals", "Support communication"],
+          "process_eyebrow": "How to use the documents",
+          "process_title": "Keep the key rules close before you start",
+          "process_text": "The documents help you quickly verify account terms, trading operations and how support requests are handled.",
+          "process_steps": [
+            {
+              "title": "Review the regulations",
+              "text": "Check position opening rules, margin requirements and order execution details."
+            },
+            {
+              "title": "Match contract terms",
+              "text": "Review the rights, obligations and interaction rules between the client and the company."
+            },
+            {
+              "title": "Contact support",
+              "text": "If you need clarification, create a request in your cabinet or contact the support team."
+            }
+          ],
           "title": "Documents",
           "intro": "All interaction process with Ester Holdings Inc. is regulated by standard documents",
-          "regulations_title": "QUOTES REGULATIONS",
+          "regulations_title": "Quotes regulations",
           "regulations_subtitle": "Regulations fix:",
           "regulations_list": [
             "terms, used in trading operations of the customer;",
@@ -548,7 +568,7 @@
           ],
           "contract_title": "Contract",
           "contract_description": "Contract contain rules of cooperation of the customer and Ester Holdings Inc. Parties liabilities as for fulfillment of their obligations are defined in it.",
-          "button": "DOWNLOAD"
+          "button": "Download"
         }
       },
       "partnership": {

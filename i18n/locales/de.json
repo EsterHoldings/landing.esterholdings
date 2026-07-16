@@ -535,9 +535,29 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "Rechtsdokumente",
+          "hero_links": ["Kundenvereinbarung", "Handelsregeln", "Operative Verfahren"],
+          "contract_facts": ["Rechte und Pflichten", "Ein- und Auszahlungen", "Kommunikation mit dem Support"],
+          "process_eyebrow": "So verwenden Sie die Dokumente",
+          "process_title": "Halten Sie die wichtigsten Regeln bereit, bevor Sie beginnen",
+          "process_text": "Die Dokumente helfen Ihnen, Kontobedingungen, Handelsvorgänge und die Bearbeitung von Supportanfragen schnell zu prüfen.",
+          "process_steps": [
+            {
+              "title": "Vorschriften prüfen",
+              "text": "Prüfen Sie Regeln zur Positionseröffnung, Margin-Anforderungen und Details zur Orderausführung."
+            },
+            {
+              "title": "Vertragsbedingungen abgleichen",
+              "text": "Prüfen Sie Rechte, Pflichten und Regeln der Zusammenarbeit zwischen Kunde und Unternehmen."
+            },
+            {
+              "title": "Support kontaktieren",
+              "text": "Wenn Sie eine Klärung benötigen, erstellen Sie eine Anfrage im Kundenbereich oder wenden Sie sich an den Support."
+            }
+          ],
           "title": "Dokumente",
           "intro": "Alle Interaktionsprozesse mit Ester Holdings Inc. werden durch Standarddokumente geregelt",
-          "regulations_title": "KURSREGELUNGEN",
+          "regulations_title": "Kursregelungen",
           "regulations_subtitle": "Regelungen legen fest:",
           "regulations_list": [
             "Begriffe, die in Handelsoperationen des Kunden verwendet werden;",
@@ -548,7 +568,7 @@
           ],
           "contract_title": "Vertrag",
           "contract_description": "Der Vertrag enthält Regeln für die Zusammenarbeit zwischen dem Kunden und Ester Holdings Inc. Die Verbindlichkeiten der Parteien bezüglich der Erfüllung ihrer Verpflichtungen sind darin festgelegt.",
-          "button": "HERUNTERLADEN"
+          "button": "Herunterladen"
         }
       },
       "partnership": {

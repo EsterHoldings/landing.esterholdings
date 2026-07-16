@@ -531,6 +531,26 @@
           "marketing_email": "marketing{'@'}esterholdings.com"
         },
         "documents": {
+          "eyebrow": "法律文件",
+          "hero_links": ["客户协议", "交易规则", "操作程序"],
+          "contract_facts": ["权利与义务", "入金与出金", "支持沟通"],
+          "process_eyebrow": "如何使用文件",
+          "process_title": "开始前请将关键规则放在手边",
+          "process_text": "这些文件可帮助您快速核对账户条款、交易操作以及支持请求的处理方式。",
+          "process_steps": [
+            {
+              "title": "查看规定",
+              "text": "检查开仓规则、保证金要求和订单执行详情。"
+            },
+            {
+              "title": "核对合同条款",
+              "text": "查看客户与公司之间的权利、义务和互动规则。"
+            },
+            {
+              "title": "联系支持",
+              "text": "如需说明，请在个人中心创建请求或联系支持团队。"
+            }
+          ],
           "title": "文件",
           "intro": "与Ester Holdings Inc.的所有互动过程均由标准文件规范",
           "regulations_title": "报价规定",
