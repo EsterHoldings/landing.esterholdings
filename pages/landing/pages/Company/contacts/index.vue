@@ -1,59 +1,87 @@
 <template>
   <UiContainer>
-    <section class="contacts-page">
-      <header class="contacts-hero">
-        <span class="contacts-hero__eyebrow">{{ pageCopy.eyebrow }}</span>
-        <h1>{{ t("landing.pages.company.contacts.title") }}</h1>
-        <p>{{ pageCopy.intro }}</p>
-
-        <div class="contacts-hero__meta">
-          <span
-            v-for="item in pageCopy.meta"
-            :key="item">
-            {{ item }}
-          </span>
+    <main
+      class="contacts-page"
+      :dir="isRtl ? 'rtl' : 'ltr'">
+      <section class="contacts-hero">
+        <div
+          class="contacts-hero__visual"
+          aria-hidden="true">
+          <img
+            src="/static/contacts/hero.png"
+            alt=""
+            width="933"
+            height="658" />
         </div>
-      </header>
 
-      <section class="contacts-grid">
+        <div class="contacts-hero__copy">
+          <p class="contacts-eyebrow">
+            {{ t("landing.pages.company.contacts.eyebrow") }}
+          </p>
+
+          <h1>{{ t("landing.pages.company.contacts.title") }}</h1>
+
+          <p class="contacts-hero__intro">
+            {{ t("landing.pages.company.contacts.intro") }}
+          </p>
+        </div>
+
+        <ul class="contacts-hero__links">
+          <li
+            v-for="(item, index) in heroLinks"
+            :key="item">
+            <img
+              :src="heroLinkIcons[index]"
+              alt=""
+              width="24"
+              height="24" />
+            <span>{{ item }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="contacts-office-section">
         <article class="contacts-office">
-          <span>{{ t("landing.pages.company.contacts.office_title") }}</span>
+          <p class="contacts-eyebrow">
+            {{ t("landing.pages.company.contacts.office_title") }}
+          </p>
           <h2>{{ t("landing.pages.company.contacts.office_name") }}</h2>
-          <p>{{ t("landing.pages.company.contacts.office_address") }}</p>
+          <p class="contacts-office__address">
+            {{ t("landing.pages.company.contacts.office_address") }}
+          </p>
           <strong>{{ t("landing.pages.company.contacts.office_registration") }}</strong>
         </article>
 
         <div class="contacts-channels">
           <a
-            v-for="(channel, index) in channels"
+            v-for="channel in channels"
             :key="channel.email"
             :href="`mailto:${channel.email}`"
             class="contacts-channel">
-            <span
-              class="contacts-icon"
-              :data-symbol="channel.symbol" />
-            <span class="contacts-channel__body">
-              <span class="contacts-channel__label">{{ channel.label }}</span>
-              <strong>{{ channel.email }}</strong>
-            </span>
+            <span class="contacts-channel__label">{{ channel.label }}</span>
+            <span class="contacts-channel__email">{{ channel.email }}</span>
           </a>
         </div>
       </section>
 
       <section class="contacts-process">
         <div class="contacts-process__intro">
-          <span>{{ pageCopy.processEyebrow }}</span>
-          <h2>{{ pageCopy.processTitle }}</h2>
-          <p>{{ pageCopy.processText }}</p>
+          <p class="contacts-eyebrow">
+            {{ t("landing.pages.company.contacts.process_eyebrow") }}
+          </p>
+          <h2>{{ t("landing.pages.company.contacts.process_title") }}</h2>
+          <p>{{ t("landing.pages.company.contacts.process_text") }}</p>
         </div>
 
         <ol class="contacts-process__steps">
           <li
-            v-for="(step, index) in pageCopy.steps"
+            v-for="(step, index) in processSteps"
             :key="step.title">
-            <span
-              class="contacts-icon contacts-process__icon"
-              :data-symbol="pageCopy.stepSymbols[index]" />
+            <img
+              :src="processIcons[index]"
+              alt=""
+              width="50"
+              height="50" />
             <div>
               <h3>{{ step.title }}</h3>
               <p>{{ step.text }}</p>
@@ -61,7 +89,7 @@
           </li>
         </ol>
       </section>
-    </section>
+    </main>
   </UiContainer>
 </template>
 
@@ -76,94 +104,44 @@
     alias: "/contacts",
   });
 
-  type ContactsPageCopy = {
-    eyebrow: string;
-    intro: string;
-    meta: string[];
-    processEyebrow: string;
-    processTitle: string;
-    processText: string;
-    stepSymbols: string[];
-    steps: Array<{ title: string; text: string }>;
+  type ProcessStep = {
+    title: string;
+    text: string;
   };
 
-  const localizedCopy: Record<string, ContactsPageCopy> = {
-    en: {
-      eyebrow: "Contact Ester",
-      intro: "Choose the right team for operational questions, financial requests and partnership communication.",
-      meta: ["Technical support", "Finance", "Marketing"],
-      processEyebrow: "Before you write",
-      processTitle: "Route the request to the right team",
-      processText: "The correct channel helps the team process your request faster and keep the answer precise.",
-      stepSymbols: ["SUP", "$", "PR"],
-      steps: [
-        {
-          title: "Use support for platform questions",
-          text: "Login, cabinet, verification and terminal access questions should go to the support team.",
-        },
-        {
-          title: "Use finance for money operations",
-          text: "Funding, withdrawal and payment clarification requests should be sent to the financial service.",
-        },
-        {
-          title: "Use marketing for business requests",
-          text: "Partnership, media and brand communication should be routed to the marketing team.",
-        },
-      ],
-    },
-    uk: {
-      eyebrow: "Зв'язок з Ester",
-      intro: "Оберіть потрібну команду для операційних питань, фінансових запитів і партнерської комунікації.",
-      meta: ["Технічна підтримка", "Фінанси", "Маркетинг"],
-      processEyebrow: "Перед зверненням",
-      processTitle: "Спрямуйте запит у правильну команду",
-      processText: "Правильний канал допомагає швидше обробити звернення та дати точну відповідь.",
-      stepSymbols: ["SUP", "$", "PR"],
-      steps: [
-        {
-          title: "Підтримка для питань платформи",
-          text: "Логін, кабінет, верифікація та доступ до терміналу надсилайте команді підтримки.",
-        },
-        {
-          title: "Фінанси для грошових операцій",
-          text: "Поповнення, виведення коштів і уточнення платежів надсилайте фінансовій службі.",
-        },
-        {
-          title: "Маркетинг для бізнес-запитів",
-          text: "Партнерство, медіа та бренд-комунікацію спрямовуйте до маркетингової команди.",
-        },
-      ],
-    },
-    ru: {
-      eyebrow: "Связь с Ester",
-      intro: "Выберите нужную команду для операционных вопросов, финансовых запросов и партнерской коммуникации.",
-      meta: ["Техническая поддержка", "Финансы", "Маркетинг"],
-      processEyebrow: "Перед обращением",
-      processTitle: "Направьте запрос в правильную команду",
-      processText: "Правильный канал помогает быстрее обработать обращение и дать точный ответ.",
-      stepSymbols: ["SUP", "$", "PR"],
-      steps: [
-        {
-          title: "Поддержка для вопросов платформы",
-          text: "Логин, кабинет, верификация и доступ к терминалу отправляйте команде поддержки.",
-        },
-        {
-          title: "Финансы для денежных операций",
-          text: "Пополнения, выводы и уточнения платежей отправляйте финансовой службе.",
-        },
-        {
-          title: "Маркетинг для бизнес-запросов",
-          text: "Партнерство, медиа и бренд-коммуникацию направляйте маркетинговой команде.",
-        },
-      ],
-    },
+  const { t, tm, locale } = useI18n();
+
+  const heroLinkIcons = [
+    "/static/contacts/icon-technical-support.svg",
+    "/static/contacts/icon-finance.svg",
+    "/static/contacts/icon-marketing.svg",
+  ];
+
+  const processIcons = [
+    "/static/contacts/icon-support-route.svg",
+    "/static/contacts/icon-finance-route.svg",
+    "/static/contacts/icon-marketing-route.svg",
+  ];
+
+  const isRtl = computed(() => locale.value.split("-")[0] === "he");
+
+  const getTranslatedList = (key: string) => {
+    const list = tm(key) as unknown[];
+    return Array.isArray(list) ? list.map((_, index) => t(`${key}[${index}]`)) : [];
   };
 
-  const { t, locale } = useI18n();
+  const heroLinks = computed(() => getTranslatedList("landing.pages.company.contacts.hero_links"));
 
-  const pageCopy = computed(() => {
-    const language = locale.value.split("-")[0];
-    return localizedCopy[language] ?? localizedCopy.en;
+  const processSteps = computed<ProcessStep[]>(() => {
+    const key = "landing.pages.company.contacts.process_steps";
+    const steps = tm(key) as unknown[];
+
+    if (!Array.isArray(steps)) return [];
+
+    return steps.map((_, index) => ({
+      title: t(`${key}[${index}].title`),
+      text: t(`${key}[${index}].text`),
+    }));
   });
 
   const cleanEmail = (value: string) => value.replace("{'@'}", "@");
@@ -172,381 +150,498 @@
     {
       label: t("landing.pages.company.contacts.support_label"),
       email: cleanEmail(t("landing.pages.company.contacts.support_email")),
-      symbol: "SUP",
     },
     {
       label: t("landing.pages.company.contacts.finance_label"),
       email: cleanEmail(t("landing.pages.company.contacts.finance_email")),
-      symbol: "$",
     },
     {
       label: t("landing.pages.company.contacts.marketing_label"),
       email: cleanEmail(t("landing.pages.company.contacts.marketing_email")),
-      symbol: "PR",
     },
   ]);
 </script>
 
 <style lang="scss" scoped>
   .contacts-page {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(52px, 6vw, 86px);
+    padding: 0 40px 80px;
+    background: #f6f6f6;
     color: var(--landing-text-primary);
+    font-family: "DM Sans", sans-serif;
+  }
+
+  .contacts-eyebrow {
+    margin: 0;
+    color: #0051ff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
   .contacts-hero {
-    max-width: 980px;
-    margin: 0 auto;
-    text-align: center;
+    display: grid;
+    grid-template-areas:
+      "visual copy"
+      "visual links";
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+    min-height: 520px;
+    padding-top: 38px;
 
-    &__eyebrow {
-      display: inline-flex;
-      margin-bottom: 14px;
-      color: var(--landing-accent);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--landing-text-strong);
-      font-size: clamp(44px, 6vw, 78px);
-      font-weight: 500;
-      line-height: 0.98;
-    }
-
-    p {
-      max-width: 760px;
-      margin: 20px auto 0;
-      color: var(--landing-text-secondary);
-      font-size: clamp(17px, 1.4vw, 20px);
-      font-weight: 600;
-      line-height: 1.55;
-    }
-
-    &__meta {
+    &__visual {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px 18px;
-      margin-top: 28px;
+      grid-area: visual;
+      align-items: center;
+      min-width: 0;
+      margin-block-start: -60px;
+      margin-inline: -40px 0;
 
-      span {
-        display: inline-flex;
+      img {
+        display: block;
+        width: 100%;
+        max-width: 780px;
+        height: auto;
+      }
+    }
+
+    &__copy {
+      grid-area: copy;
+      align-self: end;
+      padding-top: 20px;
+
+      h1 {
+        max-width: 555px;
+        margin: 34px 0 0;
+        color: #000;
+        font-size: 82px;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 80px;
+      }
+    }
+
+    &__intro {
+      max-width: 440px;
+      margin: 39px 0 0;
+      color: #7b7b7b;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.32;
+    }
+
+    &__links {
+      display: grid;
+      grid-area: links;
+      align-self: start;
+      gap: 20px;
+      margin: 20px 0 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        display: flex;
         align-items: center;
-        color: var(--landing-text-secondary);
-        font-size: 14px;
-        font-weight: 800;
-        line-height: 1.2;
+        gap: 16px;
+        color: #000;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+      }
 
-        &::before {
-          content: "";
-          width: 6px;
-          height: 6px;
-          margin-right: 10px;
-          border-radius: 50%;
-          background: var(--landing-accent);
-        }
+      img {
+        flex: 0 0 24px;
       }
     }
   }
 
-  .contacts-icon {
-    display: inline-flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    width: 58px;
-    height: 58px;
-    border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 42%, transparent);
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--landing-surface-elevated) 20%, transparent);
-    color: var(--landing-accent);
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1;
-
-    &::before {
-      content: attr(data-symbol);
-    }
-  }
-
-  .contacts-grid {
+  .contacts-office-section {
     display: grid;
-    grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
-    gap: clamp(40px, 5vw, 86px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
     align-items: start;
+    margin-top: 10px;
   }
 
   .contacts-office {
-    span {
-      color: var(--landing-accent);
-      font-size: 13px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
+    min-width: 0;
+    padding: 0;
 
     h2 {
-      margin: 12px 0 0;
-      color: var(--landing-text-strong);
-      font-size: clamp(28px, 3vw, 42px);
+      margin: 18px 0 0;
+      color: #000;
+      font-size: 36px;
       font-weight: 500;
-      line-height: 1.08;
+      line-height: 1;
     }
 
-    p {
-      margin: 16px 0 0;
-      color: var(--landing-text-secondary);
+    &__address {
+      max-width: 300px;
+      margin: 20px 0 0;
+      color: #7b7b7b;
       font-size: 16px;
-      font-weight: 600;
-      line-height: 1.55;
+      font-weight: 400;
+      line-height: 1.32;
     }
 
     strong {
       display: block;
-      margin-top: 18px;
-      color: var(--landing-text-primary);
-      font-size: 15px;
-      line-height: 1.35;
+      margin-top: 14px;
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
     }
   }
 
   .contacts-channels {
-    display: grid;
-    gap: 14px;
+    display: contents;
   }
 
   .contacts-channel {
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
-    gap: 16px;
-    align-items: start;
-    border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-    padding-bottom: 16px;
+    display: flex;
+    min-width: 0;
+    height: 180px;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 16px 42px rgba(64, 85, 133, 0.035);
     color: inherit;
     text-decoration: none;
 
-    &:last-child {
-      border-bottom: 0;
-      padding-bottom: 0;
-    }
-
     &__label {
-      display: block;
-      color: var(--landing-text-secondary);
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1.35;
+      color: #000;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
     }
 
-    strong {
-      display: block;
-      margin-top: 6px;
-      color: var(--landing-text-primary);
-      font-size: clamp(18px, 2vw, 25px);
+    &__email {
+      color: #0051ff;
+      font-size: 18px;
       font-weight: 700;
-      line-height: 1.18;
-      word-break: break-word;
+      line-height: 1;
+      overflow-wrap: anywhere;
       transition: color 0.2s ease;
     }
 
-    &:hover strong {
-      color: var(--landing-accent);
+    &:hover .contacts-channel__email {
+      color: #003dc2;
     }
-  }
-
-  .contacts-number {
-    position: relative;
-    display: inline-flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    width: 66px;
-    height: 66px;
-    border: 0;
-    border-radius: 18px;
-    overflow: visible;
-    isolation: isolate;
-    background: transparent;
-    box-shadow: none;
-
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-
-    &::before {
-      z-index: 1;
-      border: 1px solid color-mix(in srgb, var(--landing-text-accent-soft) 58%, transparent);
-      background: linear-gradient(
-        145deg,
-        color-mix(in srgb, var(--landing-surface-elevated) 27%, transparent),
-        color-mix(in srgb, var(--landing-surface-elevated) 17%, transparent)
-      );
-      backdrop-filter: blur(16px) saturate(145%);
-      -webkit-backdrop-filter: blur(16px) saturate(145%);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 28%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 8%, transparent);
-    }
-
-    &::after {
-      z-index: 2;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01)),
-        linear-gradient(145deg, transparent, color-mix(in srgb, var(--landing-accent) 4%, transparent));
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--landing-on-accent) 22%, transparent),
-        inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
-    }
-
-    &__orb {
-      position: absolute;
-      pointer-events: none;
-      border-radius: 999px;
-      transform: translate(var(--contacts-orb-x), var(--contacts-orb-y));
-      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
-    }
-
-    &__orb--solid {
-      z-index: 0;
-      width: 31px;
-      height: 31px;
-      top: -8px;
-      right: -10px;
-      background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
-    }
-
-    &__orb--glow {
-      z-index: 0;
-      width: 22px;
-      height: 22px;
-      top: 8px;
-      right: 5px;
-      background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
-      filter: blur(3px);
-    }
-
-    &__value {
-      position: relative;
-      z-index: 3;
-      color: var(--landing-accent);
-      font-size: 32px;
-      font-weight: 500;
-      line-height: 1;
-    }
-  }
-
-  :global(:root[data-theme="dark"] .contacts-number::before) {
-    border-color: rgba(139, 164, 214, 0.36);
-    background: linear-gradient(145deg, rgba(25, 48, 96, 0.27) 0%, rgba(8, 23, 55, 0.19) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -16px 24px rgba(0, 81, 255, 0.08);
   }
 
   .contacts-process {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
-    gap: 34px;
-    border-top: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-    padding-top: clamp(38px, 4vw, 58px);
+    margin-top: 124px;
 
     &__intro {
-      span {
-        color: var(--landing-accent);
-        font-size: 13px;
-        font-weight: 900;
-        text-transform: uppercase;
-      }
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
 
       h2 {
-        margin: 12px 0 0;
-        color: var(--landing-text-strong);
-        font-size: clamp(28px, 3vw, 42px);
+        margin: 28px 0 0;
+        color: #000;
+        font-size: 42px;
         font-weight: 500;
-        line-height: 1.08;
+        line-height: 1;
       }
 
-      p {
-        margin: 16px 0 0;
-        color: var(--landing-text-secondary);
+      > p:last-child {
+        margin: 22px 0 0;
+        color: #7b7b7b;
         font-size: 16px;
-        font-weight: 600;
-        line-height: 1.55;
+        font-weight: 400;
+        line-height: 1.32;
       }
     }
 
     &__steps {
       display: grid;
-      gap: 14px;
-      margin: 0;
+      max-width: 900px;
+      gap: 16px;
+      margin: 58px auto 0;
       padding: 0;
       list-style: none;
 
       li {
         display: grid;
-        grid-template-columns: 76px minmax(0, 1fr);
-        gap: 16px;
-        align-items: start;
-        border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 70%, transparent);
-        padding-bottom: 16px;
+        grid-template-columns: 66px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.92);
+        border-radius: 16px;
+        padding: 18px 24px;
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.95),
+          0 16px 42px rgba(64, 85, 133, 0.035);
+      }
 
-        &:last-child {
-          border-bottom: 0;
-          padding-bottom: 0;
-        }
+      img {
+        width: 50px;
+        height: 50px;
       }
 
       h3 {
         margin: 0;
-        color: var(--landing-text-primary);
+        color: #000;
         font-size: 18px;
-        font-weight: 800;
-        line-height: 1.25;
+        font-weight: 700;
+        line-height: 1.15;
       }
 
       p {
-        margin: 7px 0 0;
-        color: var(--landing-text-secondary);
-        font-size: 15px;
-        font-weight: 600;
-        line-height: 1.5;
+        margin: 8px 0 0;
+        color: #7b7b7b;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.32;
       }
     }
   }
 
-  @media (max-width: 991px) {
+  [dir="rtl"] {
+    .contacts-hero__visual {
+      margin-inline: 0 -40px;
+
+      img {
+        margin-inline: 0 auto;
+      }
+    }
+  }
+
+  @media (max-width: 1480px) {
     .contacts-page {
-      gap: 32px;
+      padding-inline: 20px;
     }
 
-    .contacts-grid,
-    .contacts-process {
-      grid-template-columns: 1fr;
+    .contacts-hero__visual {
+      margin-inline-start: -20px;
+    }
+
+    [dir="rtl"] .contacts-hero__visual {
+      margin-inline-start: 0;
+      margin-inline-end: -20px;
     }
   }
 
-  @media (max-width: 575px) {
+  @media (max-width: 1180px) {
     .contacts-hero {
-      text-align: left;
+      grid-template-columns: minmax(0, 1fr) minmax(370px, 0.72fr);
+      min-height: 500px;
 
-      &__meta {
-        justify-content: flex-start;
+      &__copy h1 {
+        font-size: 66px;
+        line-height: 0.98;
       }
     }
 
-    .contacts-channel,
-    .contacts-process__steps li {
-      grid-template-columns: 1fr;
+    .contacts-office h2 {
+      font-size: 30px;
+    }
+
+    .contacts-channel {
+      padding: 20px;
+
+      &__label {
+        font-size: 20px;
+      }
+
+      &__email {
+        font-size: 15px;
+      }
+    }
+  }
+
+  @media (max-width: 920px) {
+    .contacts-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.78fr);
+
+      &__visual {
+        margin-inline-start: -20px;
+      }
+
+      &__copy h1 {
+        font-size: 56px;
+      }
+    }
+
+    .contacts-office-section {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .contacts-office {
+      padding-bottom: 18px;
+    }
+
+    .contacts-channels {
+      display: grid;
+      grid-column: 2;
+      gap: 16px;
+    }
+
+    .contacts-channel {
+      height: 140px;
+    }
+
+    [dir="rtl"] .contacts-hero__visual {
+      margin-inline-start: 0;
+      margin-inline-end: -20px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contacts-page {
+      padding: 0 0 64px;
+    }
+
+    .contacts-eyebrow {
+      font-size: 14px;
+    }
+
+    .contacts-hero {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      padding-top: 24px;
+
+      &__copy {
+        order: 1;
+        padding-top: 0;
+
+        h1 {
+          margin-top: 24px;
+          font-size: 42px;
+          letter-spacing: -0.03em;
+          line-height: 1;
+        }
+      }
+
+      &__intro {
+        margin-top: 22px;
+        font-size: 14px;
+        line-height: 1.3;
+      }
+
+      &__visual {
+        order: 2;
+        width: calc(100% + 16px);
+        margin: 10px -8px 0;
+
+        img {
+          width: 100%;
+          max-width: none;
+        }
+      }
+
+      &__links {
+        order: 3;
+        gap: 18px;
+        margin-top: 4px;
+
+        li {
+          gap: 12px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .contacts-office-section {
+      display: block;
+      margin-top: 72px;
+    }
+
+    .contacts-office {
+      padding: 0;
+
+      h2 {
+        margin-top: 18px;
+        font-size: 30px;
+      }
+
+      &__address {
+        margin-top: 18px;
+        font-size: 14px;
+      }
+
+      strong {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+    }
+
+    .contacts-channels {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .contacts-channel {
+      height: 104px;
+      padding: 18px;
+
+      &__label {
+        font-size: 16px;
+      }
+
+      &__email {
+        font-size: 14px;
+      }
+    }
+
+    .contacts-process {
+      margin-top: 84px;
+
+      &__intro {
+        text-align: start;
+
+        h2 {
+          margin-top: 22px;
+          font-size: 34px;
+          line-height: 1.05;
+        }
+
+        > p:last-child {
+          margin-top: 18px;
+          font-size: 14px;
+        }
+      }
+
+      &__steps {
+        gap: 12px;
+        margin-top: 34px;
+
+        li {
+          grid-template-columns: 50px minmax(0, 1fr);
+          gap: 16px;
+          align-items: start;
+          padding: 18px;
+        }
+
+        h3 {
+          font-size: 16px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+    }
+
+    [dir="rtl"] .contacts-hero__visual {
+      margin: 10px -8px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contacts-channel__email {
+      transition: none;
     }
   }
 </style>

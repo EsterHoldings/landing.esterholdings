@@ -523,6 +523,9 @@
         },
         "contacts": {
           "title": "お問い合わせ",
+          "eyebrow": "Esterへのお問い合わせ",
+          "intro": "運用上の質問、金融に関する依頼、パートナーシップの連絡内容に応じて適切なチームをお選びください。",
+          "hero_links": ["技術サポート", "財務", "マーケティング"],
           "office_title": "本社",
           "office_name": "Ester Holdings Ltd",
           "office_address": "1階、ソザビービル、ロドニービレッジ、ロドニーベイ、グロスアイレット、セントルシア",
@@ -532,7 +535,24 @@
           "finance_label": "財務サービス：",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "マーケティングサービス：",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "お問い合わせの前に",
+          "process_title": "適切なチームにお問い合わせください",
+          "process_text": "適切な窓口を選ぶことで、より迅速で正確な回答が可能になります。",
+          "process_steps": [
+            {
+              "title": "プラットフォームの質問はサポートへ",
+              "text": "ログイン、個人ページ、本人確認、取引ターミナルへのアクセスに関する質問はサポートチームへお送りください。"
+            },
+            {
+              "title": "資金操作は財務へ",
+              "text": "入金、出金、支払いに関するお問い合わせは財務サービスへお送りください。"
+            },
+            {
+              "title": "ビジネスの依頼はマーケティングへ",
+              "text": "パートナーシップ、メディア、ブランドに関する連絡はマーケティングチームへお送りください。"
+            }
+          ]
         },
         "documents": {
           "eyebrow": "法的文書",

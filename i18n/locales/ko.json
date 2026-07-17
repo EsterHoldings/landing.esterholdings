@@ -523,6 +523,9 @@
         },
         "contacts": {
           "title": "연락처",
+          "eyebrow": "Ester 문의",
+          "intro": "운영 관련 질문, 금융 요청 및 파트너십 문의에 맞는 팀을 선택하세요.",
+          "hero_links": ["기술 지원", "금융", "마케팅"],
           "office_title": "본사",
           "office_name": "Ester Holdings Ltd",
           "office_address": "1층, 소더비 빌딩, 로드니 빌리지, 로드니 베이, 그로스 아일렛, 세인트루시아",
@@ -532,7 +535,24 @@
           "finance_label": "금융 서비스:",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "마케팅 서비스:",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "문의하기 전에",
+          "process_title": "요청을 적합한 팀에 전달하세요",
+          "process_text": "올바른 채널을 선택하면 팀이 요청을 더 빠르게 처리하고 정확하게 답변할 수 있습니다.",
+          "process_steps": [
+            {
+              "title": "플랫폼 질문은 고객지원으로",
+              "text": "로그인, 개인 계정, 인증 및 거래 터미널 접근 관련 질문은 고객지원팀에 문의하세요."
+            },
+            {
+              "title": "자금 관련 업무는 금융팀으로",
+              "text": "입금, 출금 및 결제 관련 요청은 금융 서비스로 보내세요."
+            },
+            {
+              "title": "비즈니스 요청은 마케팅팀으로",
+              "text": "파트너십, 미디어 및 브랜드 관련 문의는 마케팅팀으로 보내세요."
+            }
+          ]
         },
         "documents": {
           "eyebrow": "법률 문서",

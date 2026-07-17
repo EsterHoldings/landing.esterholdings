@@ -523,6 +523,9 @@
         },
         "contacts": {
           "title": "Kontakte",
+          "eyebrow": "Kontakt zu Ester",
+          "intro": "Wählen Sie das richtige Team für operative Fragen, Finanzanfragen und die Kommunikation zu Partnerschaften.",
+          "hero_links": ["Technischer Support", "Finanzen", "Marketing"],
           "office_title": "Hauptsitz",
           "office_name": "Ester Holdings Ltd",
           "office_address": "Erdgeschoss, The Sotheby Building, Rodney Village, Rodney Bay, Gros-Islet, Saint Lucia",
@@ -532,7 +535,24 @@
           "finance_label": "Finanzservice:",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "Marketingservice:",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "Bevor Sie schreiben",
+          "process_title": "Leiten Sie Ihre Anfrage an das richtige Team weiter",
+          "process_text": "Der richtige Kanal hilft dem Team, Ihre Anfrage schneller zu bearbeiten und präzise zu beantworten.",
+          "process_steps": [
+            {
+              "title": "Support für Plattformfragen",
+              "text": "Fragen zu Login, Kundenbereich, Verifizierung und Terminalzugang gehören an das Support-Team."
+            },
+            {
+              "title": "Finanzen für Geldtransaktionen",
+              "text": "Anfragen zu Einzahlungen, Auszahlungen und Zahlungen senden Sie bitte an den Finanzservice."
+            },
+            {
+              "title": "Marketing für Geschäftsanfragen",
+              "text": "Partnerschaften, Medien- und Markenkommunikation gehören an das Marketing-Team."
+            }
+          ]
         },
         "documents": {
           "eyebrow": "Rechtsdokumente",

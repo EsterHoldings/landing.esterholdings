@@ -531,6 +531,9 @@
         },
         "contacts": {
           "title": "Contactos",
+          "eyebrow": "Contacto con Ester",
+          "intro": "Elige el equipo adecuado para cuestiones operativas, solicitudes financieras y comunicación sobre colaboraciones.",
+          "hero_links": ["Soporte técnico", "Finanzas", "Marketing"],
           "office_title": "Oficina Principal",
           "office_name": "Ester Holdings Ltd",
           "office_address": "Planta Baja, Edificio Sotheby, Rodney Village, Rodney Bay, Gros-Islet, Santa Lucía",
@@ -540,7 +543,24 @@
           "finance_label": "Servicio financiero:",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "Servicio de marketing:",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "Antes de escribir",
+          "process_title": "Dirige la solicitud al equipo adecuado",
+          "process_text": "El canal correcto ayuda al equipo a procesar tu solicitud más rápido y responder con precisión.",
+          "process_steps": [
+            {
+              "title": "Usa soporte para preguntas sobre la plataforma",
+              "text": "Las preguntas sobre acceso, área personal, verificación y terminal deben enviarse al equipo de soporte."
+            },
+            {
+              "title": "Usa finanzas para operaciones monetarias",
+              "text": "Las solicitudes sobre depósitos, retiros y pagos deben enviarse al servicio financiero."
+            },
+            {
+              "title": "Usa marketing para solicitudes comerciales",
+              "text": "Las colaboraciones y la comunicación con medios y marca deben dirigirse al equipo de marketing."
+            }
+          ]
         },
         "documents": {
           "eyebrow": "Documentos legales",

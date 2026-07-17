@@ -527,6 +527,9 @@
         },
         "contacts": {
           "title": "Контакты",
+          "eyebrow": "Связь с Ester",
+          "intro": "Выберите нужную команду для операционных вопросов, финансовых запросов и партнерской коммуникации.",
+          "hero_links": ["Техническая поддержка", "Финансы", "Маркетинг"],
           "office_title": "Головной офис",
           "office_name": "Ester Holdings Ltd",
           "office_address": "Ground Floor, The Sotheby Building, Rodney Village, Rodney Bay, Gros-Islet, Saint Lucia",
@@ -536,7 +539,24 @@
           "finance_label": "Финансовая служба:",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "Маркетинговая служба:",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "Перед обращением",
+          "process_title": "Направьте запрос в правильную команду",
+          "process_text": "Правильный канал помогает быстрее обработать обращение и дать точный ответ.",
+          "process_steps": [
+            {
+              "title": "Поддержка для вопросов платформы",
+              "text": "Логин, кабинет, верификация и доступ к терминалу отправляйте команде поддержки."
+            },
+            {
+              "title": "Финансы для денежных операций",
+              "text": "Пополнения, выводы и уточнения платежей отправляйте финансовой службе."
+            },
+            {
+              "title": "Маркетинг для бизнес-запросов",
+              "text": "Партнерство, медиа и бренд-коммуникацию направляйте маркетинговой команде."
+            }
+          ]
         },
         "documents": {
           "eyebrow": "Юридические документы",

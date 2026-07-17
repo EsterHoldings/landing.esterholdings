@@ -519,6 +519,9 @@
         },
         "contacts": {
           "title": "联系方式",
+          "eyebrow": "联系 Ester",
+          "intro": "请根据运营问题、财务请求和合作沟通选择合适的团队。",
+          "hero_links": ["技术支持", "财务", "市场营销"],
           "office_title": "总部",
           "office_name": "Ester Holdings Ltd",
           "office_address": "一楼，索斯比大楼，罗德尼村，罗德尼湾，格罗斯伊斯莱特，圣卢西亚",
@@ -528,7 +531,24 @@
           "finance_label": "财务服务：",
           "finance_email": "finance{'@'}esterholdings.com",
           "marketing_label": "营销服务：",
-          "marketing_email": "marketing{'@'}esterholdings.com"
+          "marketing_email": "marketing{'@'}esterholdings.com",
+          "process_eyebrow": "联系之前",
+          "process_title": "将请求发送给合适的团队",
+          "process_text": "选择正确的渠道有助于团队更快处理您的请求并提供准确答复。",
+          "process_steps": [
+            {
+              "title": "平台问题请联系技术支持",
+              "text": "登录、个人中心、身份验证和交易终端访问问题应发送给支持团队。"
+            },
+            {
+              "title": "资金操作请联系财务",
+              "text": "入金、出金和支付相关请求应发送给财务服务。"
+            },
+            {
+              "title": "商务请求请联系市场营销",
+              "text": "合作、媒体和品牌沟通应发送给市场营销团队。"
+            }
+          ]
         },
         "documents": {
           "eyebrow": "法律文件",
