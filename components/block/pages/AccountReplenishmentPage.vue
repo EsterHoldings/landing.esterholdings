@@ -6,24 +6,35 @@
           <span class="section-kicker">{{ copy.hero.eyebrow }}</span>
           <h1>{{ copy.hero.title }}</h1>
           <p>{{ copy.hero.text }}</p>
-
-          <ul class="replenishment-hero__badges">
-            <li
-              v-for="item in copy.hero.badges"
-              :key="item.text">
-              <img
-                :src="assetPath(item.icon)"
-                alt=""
-                aria-hidden="true"
-                loading="lazy" />
-              <span>{{ item.text }}</span>
-            </li>
-          </ul>
         </div>
 
         <div class="replenishment-hero__media">
-          <AccountReplenishmentHeroVisual :label="copy.hero.imageAlt" />
+          <AccountReplenishmentHeroVisual
+            class="replenishment-hero__visual replenishment-hero__visual--light"
+            :label="copy.hero.imageAlt" />
+          <img
+            class="replenishment-hero__visual replenishment-hero__visual--dark"
+            :src="assetPath('hero-dark.png')"
+            :alt="copy.hero.imageAlt"
+            width="842"
+            height="559"
+            loading="eager"
+            decoding="async"
+            draggable="false" />
         </div>
+
+        <ul class="replenishment-hero__badges">
+          <li
+            v-for="item in copy.hero.badges"
+            :key="item.text">
+            <img
+              :src="assetPath(item.icon)"
+              alt=""
+              aria-hidden="true"
+              loading="lazy" />
+            <span>{{ item.text }}</span>
+          </li>
+        </ul>
       </section>
 
       <section
@@ -1802,15 +1813,22 @@
     isolation: isolate;
     display: grid;
     grid-template-columns: minmax(360px, 0.72fr) minmax(520px, 1.28fr);
+    grid-template-areas:
+      "content media"
+      "badges media";
+    grid-template-rows: auto auto;
+    align-content: center;
     align-items: center;
     gap: clamp(24px, 3vw, 60px);
     min-height: min(620px, calc(100svh - 132px));
     padding: clamp(24px, 3vw, 38px) 0 clamp(36px, 5vw, 76px);
 
     &__content {
+      grid-area: content;
       position: relative;
       z-index: 2;
       max-width: 555px;
+      align-self: end;
     }
 
     h1 {
@@ -1832,6 +1850,8 @@
     }
 
     &__badges {
+      grid-area: badges;
+      align-self: start;
       display: grid;
       gap: 18px;
       margin: 36px 0 0;
@@ -1857,10 +1877,22 @@
     }
 
     &__media {
+      grid-area: media;
       position: relative;
       z-index: 1;
       min-width: 0;
       margin-left: clamp(-60px, -3vw, -20px);
+    }
+
+    &__visual {
+      display: block;
+      width: min(100%, 842px);
+      height: auto;
+      object-fit: contain;
+    }
+
+    &__visual--dark {
+      display: none;
     }
   }
 
@@ -2439,6 +2471,20 @@
     color: var(--landing-text-primary);
   }
 
+  :global(:root[data-theme="dark"] .replenishment-page) {
+    --landing-accent: #2f78ff;
+    --landing-accent-hover: #4b8aff;
+    --landing-text-secondary: #aab6c9;
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-hero__visual--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .replenishment-hero__visual--dark) {
+    display: block;
+  }
+
   :global(:root[data-theme="dark"] body.account-replenishment-route),
   :global(:root[data-theme="dark"] body.account-replenishment-route .page-content),
   :global(:root[data-theme="dark"] body.account-replenishment-route .page--inner) {
@@ -2446,21 +2492,13 @@
   }
 
   :global(:root[data-theme="dark"] .replenishment-page::before) {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: -140px calc(50% - 50vw) -120px;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 14% 14%, rgba(91, 132, 255, 0.16) 0%, transparent 34%),
-      radial-gradient(circle at 86% 6%, rgba(255, 139, 77, 0.09) 0%, transparent 36%),
-      linear-gradient(180deg, rgba(3, 23, 67, 0.9) 0%, var(--landing-bg) 42%, var(--landing-bg) 100%);
+    content: none;
   }
 
   :global(:root[data-theme="dark"] .method-card),
   :global(:root[data-theme="dark"] .flow-steps li) {
-    border-color: rgba(255, 255, 255, 0.08);
-    background: linear-gradient(145deg, rgba(18, 34, 70, 0.88), rgba(6, 20, 52, 0.76));
+    border-color: rgba(62, 109, 204, 0.22);
+    background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
       inset -20px -22px 50px rgba(0, 0, 0, 0.16);
@@ -2512,10 +2550,19 @@
 
     .replenishment-hero {
       grid-template-columns: 1fr;
+      grid-template-areas:
+        "content"
+        "media"
+        "badges";
+      grid-template-rows: auto;
+      align-content: start;
       min-height: 0;
 
+      &__content {
+        align-self: auto;
+      }
+
       &__media {
-        order: -1;
         margin-left: 0;
       }
     }
@@ -2551,6 +2598,14 @@
 
       p {
         margin-top: 22px;
+      }
+
+      &__media {
+        margin: 8px -8px 0;
+      }
+
+      &__badges {
+        margin-top: 16px;
       }
     }
 
