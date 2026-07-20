@@ -1906,6 +1906,20 @@
       min-height: 176px;
       padding-right: clamp(22px, 3vw, 46px);
 
+      &:first-child {
+        padding-left: clamp(22px, 3vw, 46px);
+      }
+
+      &:first-child::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1px;
+        height: 100%;
+        background: color-mix(in srgb, var(--landing-line) 54%, transparent);
+      }
+
       &:not(:last-child)::after {
         content: "";
         position: absolute;
@@ -2579,6 +2593,7 @@
       padding: 0 0 32px;
       border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 54%, transparent);
 
+      &::before,
       &::after {
         display: none;
       }
