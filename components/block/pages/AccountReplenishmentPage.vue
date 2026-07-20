@@ -2031,7 +2031,7 @@
     position: relative;
     min-height: 190px;
     overflow: hidden;
-    border: 6px solid var(--landing-border-strong);
+    border: 1px solid var(--landing-border-strong);
     border-radius: 16px;
     background:
       linear-gradient(
@@ -2042,11 +2042,7 @@
       ),
       linear-gradient(145deg, #ffffff 0%, #f7f7f7 54%, #ececec 100%);
     padding: 28px 30px 22px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.98),
-      inset 28px 30px 72px rgba(255, 255, 255, 0.86),
-      inset -38px -42px 86px rgba(210, 210, 210, 0.38),
-      0 1px 0 rgba(255, 255, 255, 0.88);
+    box-shadow: 0 14px 34px rgba(22, 36, 64, 0.05);
 
     &::before,
     &::after {
@@ -2058,10 +2054,7 @@
     }
 
     &::before {
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.62),
-        inset 0 -22px 38px rgba(208, 208, 208, 0.16);
+      content: none;
     }
 
     &::after {
@@ -2509,7 +2502,12 @@
     content: none;
   }
 
-  :global(:root[data-theme="dark"] .method-card),
+  :global(:root[data-theme="dark"] .method-card) {
+    border-color: rgba(62, 109, 204, 0.22);
+    background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
+  }
+
   :global(:root[data-theme="dark"] .flow-steps li) {
     border-color: rgba(62, 109, 204, 0.22);
     background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
@@ -2518,7 +2516,6 @@
       inset -20px -22px 50px rgba(0, 0, 0, 0.16);
   }
 
-  :global(:root[data-theme="dark"] .method-card::before),
   :global(:root[data-theme="dark"] .flow-steps li::before) {
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
