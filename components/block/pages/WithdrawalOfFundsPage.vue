@@ -10,24 +10,11 @@
           <span class="section-kicker">{{ copy.hero.eyebrow }}</span>
           <h1>{{ copy.hero.title }}</h1>
           <p>{{ copy.hero.text }}</p>
-
-          <ul class="withdrawal-hero__badges">
-            <li
-              v-for="item in copy.hero.badges"
-              :key="item.text">
-              <img
-                :src="assetPath(item.icon)"
-                alt=""
-                aria-hidden="true"
-                loading="lazy" />
-              <span>{{ item.text }}</span>
-            </li>
-          </ul>
         </div>
 
         <div class="withdrawal-hero__media">
           <img
-            class="withdrawal-hero__image"
+            class="withdrawal-hero__image withdrawal-hero__image--light"
             :src="assetPath('hero.png')"
             :alt="copy.hero.imageAlt"
             width="836"
@@ -35,7 +22,29 @@
             loading="eager"
             decoding="async"
             fetchpriority="high" />
+          <img
+            class="withdrawal-hero__image withdrawal-hero__image--dark"
+            :src="assetPath('hero-dark.png')"
+            :alt="copy.hero.imageAlt"
+            width="836"
+            height="624"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high" />
         </div>
+
+        <ul class="withdrawal-hero__badges">
+          <li
+            v-for="item in copy.hero.badges"
+            :key="item.text">
+            <img
+              :src="assetPath(item.icon)"
+              alt=""
+              aria-hidden="true"
+              loading="lazy" />
+            <span>{{ item.text }}</span>
+          </li>
+        </ul>
       </section>
 
       <section
@@ -1386,20 +1395,26 @@
     isolation: isolate;
     display: grid;
     grid-template-columns: minmax(0, 836px) minmax(420px, 650px);
+    grid-template-areas:
+      "media content"
+      "media badges";
+    grid-template-rows: auto auto;
+    align-content: center;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: clamp(74px, 10.7vw, 205px);
+    column-gap: clamp(74px, 10.7vw, 205px);
+    row-gap: 0;
     width: var(--withdrawal-hero-width);
     margin-inline: calc((100% - var(--withdrawal-hero-width)) / 2);
     min-height: min(820px, calc(100svh - 132px));
     padding: clamp(56px, 4.4vw, 82px) 0 clamp(78px, 6vw, 118px);
 
     &__content {
+      grid-area: content;
       position: relative;
       z-index: 2;
-      grid-column: 2;
-      grid-row: 1;
       max-width: 650px;
+      align-self: end;
     }
 
     h1 {
@@ -1421,6 +1436,8 @@
     }
 
     &__badges {
+      grid-area: badges;
+      align-self: start;
       display: grid;
       gap: 18px;
       margin: 36px 0 0;
@@ -1446,10 +1463,9 @@
     }
 
     &__media {
+      grid-area: media;
       position: relative;
       z-index: 1;
-      grid-column: 1;
-      grid-row: 1;
       justify-self: end;
       width: min(100%, 836px);
       min-width: 0;
@@ -1463,6 +1479,10 @@
       height: auto;
       object-fit: contain;
     }
+
+    &__image--dark {
+      display: none;
+    }
   }
 
   .withdrawal-benefits {
@@ -1474,6 +1494,20 @@
       position: relative;
       min-height: 176px;
       padding-right: clamp(22px, 3vw, 46px);
+
+      &:first-child {
+        padding-left: clamp(22px, 3vw, 46px);
+      }
+
+      &:first-child::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1px;
+        height: 100%;
+        background: color-mix(in srgb, var(--landing-line) 54%, transparent);
+      }
 
       &:not(:last-child)::after {
         content: "";
@@ -1586,7 +1620,7 @@
     position: relative;
     min-height: 190px;
     overflow: hidden;
-    border: 6px solid var(--landing-border-strong);
+    border: 1px solid var(--landing-border-strong);
     border-radius: 16px;
     background:
       linear-gradient(
@@ -1597,11 +1631,7 @@
       ),
       linear-gradient(145deg, #ffffff 0%, #f7f7f7 54%, #ececec 100%);
     padding: 28px 30px 22px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.98),
-      inset 28px 30px 72px rgba(255, 255, 255, 0.86),
-      inset -38px -42px 86px rgba(210, 210, 210, 0.38),
-      0 1px 0 rgba(255, 255, 255, 0.88);
+    box-shadow: 0 14px 34px rgba(22, 36, 64, 0.05);
 
     &::before,
     &::after {
@@ -1613,10 +1643,7 @@
     }
 
     &::before {
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.62),
-        inset 0 -22px 38px rgba(208, 208, 208, 0.16);
+      content: none;
     }
 
     &::after {
@@ -2040,6 +2067,20 @@
     color: var(--landing-text-primary);
   }
 
+  :global(:root[data-theme="dark"] .withdrawal-page) {
+    --landing-accent: #2f78ff;
+    --landing-accent-hover: #4b8aff;
+    --landing-text-secondary: #aab6c9;
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-hero__image--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .withdrawal-hero__image--dark) {
+    display: block;
+  }
+
   :global(:root[data-theme="dark"] body.withdrawal-of-funds-route),
   :global(:root[data-theme="dark"] body.withdrawal-of-funds-route .page-content),
   :global(:root[data-theme="dark"] body.withdrawal-of-funds-route .page--inner) {
@@ -2047,27 +2088,23 @@
   }
 
   :global(:root[data-theme="dark"] .withdrawal-page::before) {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: -140px calc(50% - 50vw) -120px;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 16% 14%, rgba(91, 132, 255, 0.16) 0%, transparent 34%),
-      radial-gradient(circle at 82% 12%, rgba(255, 139, 77, 0.08) 0%, transparent 36%),
-      linear-gradient(180deg, rgba(3, 23, 67, 0.92) 0%, var(--landing-bg) 42%, var(--landing-bg) 100%);
+    content: none;
   }
 
-  :global(:root[data-theme="dark"] .method-card),
+  :global(:root[data-theme="dark"] .method-card) {
+    border-color: rgba(62, 109, 204, 0.22);
+    background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
+  }
+
   :global(:root[data-theme="dark"] .flow-steps li) {
-    border-color: rgba(255, 255, 255, 0.08);
-    background: linear-gradient(145deg, rgba(18, 34, 70, 0.88), rgba(6, 20, 52, 0.76));
+    border-color: rgba(62, 109, 204, 0.22);
+    background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
       inset -20px -22px 50px rgba(0, 0, 0, 0.16);
   }
 
-  :global(:root[data-theme="dark"] .method-card::before),
   :global(:root[data-theme="dark"] .flow-steps li::before) {
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
@@ -2116,21 +2153,23 @@
       width: 100%;
       margin-inline: 0;
       grid-template-columns: 1fr;
+      grid-template-areas:
+        "content"
+        "media"
+        "badges";
+      grid-template-rows: auto;
+      align-content: start;
       min-height: 0;
 
-      &__content,
       &__media {
-        grid-column: auto;
-        grid-row: auto;
-      }
-
-      &__media {
-        order: -1;
         margin-left: 0;
+        margin-top: 20px;
+        transform: none;
       }
 
       &__content {
         max-width: 100%;
+        align-self: auto;
       }
     }
 
@@ -2151,6 +2190,7 @@
       padding: 0 0 32px;
       border-bottom: 1px solid color-mix(in srgb, var(--landing-line) 54%, transparent);
 
+      &::before,
       &::after {
         display: none;
       }
