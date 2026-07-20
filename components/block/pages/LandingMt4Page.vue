@@ -13,7 +13,7 @@
 
         <div class="mt4-hero__media">
           <img
-            :src="assetPath('mt4-devices.png')"
+            :src="themedAssetPath('mt4-devices.png', 'mt4-devices-dark.png')"
             :alt="copy.heroImageAlt"
             width="1012"
             height="787"
@@ -68,7 +68,7 @@
           </div>
           <img
             class="terminal-card__image terminal-card__image--desktop"
-            :src="assetPath('desktop-terminal.png')"
+            :src="themedAssetPath('desktop-terminal.png', 'desktop-terminal-dark.png')"
             :alt="copy.desktop.imageAlt"
             width="470"
             height="313"
@@ -99,7 +99,7 @@
           </div>
           <img
             class="terminal-card__image terminal-card__image--phone"
-            :src="assetPath('mobile-terminal.png')"
+            :src="themedAssetPath('mobile-terminal.png', 'mobile-terminal-dark.png')"
             :alt="copy.mobile.imageAlt"
             width="231"
             height="317"
@@ -192,6 +192,7 @@
   import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import UiContainer from "~/components/ui/UiContainer.vue";
+  import { useThemeStore } from "~/stores/themeStore";
 
   defineProps<{
     mode?: "desktop" | "mobile";
@@ -253,6 +254,9 @@
   const ASSET_BASE = "/static/mt4-redesign/";
 
   const assetPath = (name: string): string => `${ASSET_BASE}${name}`;
+  const themeStore = useThemeStore();
+  const themedAssetPath = (lightAsset: string, darkAsset: string): string =>
+    assetPath(themeStore.currentTheme === "dark" ? darkAsset : lightAsset);
 
   const downloadLinks = {
     windows: "https://download.mql5.com/cdn/web/ester.holdings.ltd/mt4/ester4setup.exe",
