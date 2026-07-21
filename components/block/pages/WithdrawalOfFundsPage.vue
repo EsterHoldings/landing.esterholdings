@@ -1,10 +1,6 @@
 <template>
   <UiContainer>
-    <main
-      ref="pageRef"
-      class="withdrawal-page"
-      @pointermove="handlePointerMove"
-      @pointerleave="resetPointer">
+    <main class="withdrawal-page">
       <section class="withdrawal-hero">
         <div class="withdrawal-hero__content">
           <span class="section-kicker">{{ copy.hero.eyebrow }}</span>
@@ -72,11 +68,13 @@
 
         <div class="method-grid">
           <article
-            v-for="method in copy.methods.items"
+            v-for="(method, index) in copy.methods.items"
             :key="method.name"
             class="method-card">
             <span class="method-card__ghost">{{ method.asset }}</span>
-            <div class="method-card__title">
+            <div
+              class="method-card__title"
+              :class="`method-card__title--${index + 1}`">
               <h3>{{ method.name }}</h3>
               <span
                 class="method-card__title-orbs"
@@ -139,9 +137,7 @@
             v-for="(step, index) in copy.flow.steps"
             :key="step.title">
             <div class="flow-step-number">
-              <span class="flow-step-number__orb flow-step-number__orb--solid" />
-              <span class="flow-step-number__orb flow-step-number__orb--glow" />
-              <span>{{ index + 1 }}</span>
+              <span class="flow-step-number__value">{{ index + 1 }}</span>
             </div>
             <div>
               <h3>{{ step.title }}</h3>
@@ -242,7 +238,6 @@
 
   const assetPath = (name: string): string => `${ASSET_BASE}${name}`;
 
-  const pageRef = ref<HTMLElement | null>(null);
   const { locale } = useI18n();
   const { cabinetLink } = useCabinetLink();
 
@@ -1340,26 +1335,6 @@
   });
 
   const withdrawalHref = computed(() => cabinetLink("/payments"));
-
-  const updatePointerOffset = (x = 0, y = 0) => {
-    pageRef.value?.style.setProperty("--withdrawal-orb-x", `${x}px`);
-    pageRef.value?.style.setProperty("--withdrawal-orb-y", `${y}px`);
-  };
-
-  const handlePointerMove = (event: PointerEvent) => {
-    const element = pageRef.value;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
-
-    updatePointerOffset(x, y);
-  };
-
-  const resetPointer = () => {
-    updatePointerOffset();
-  };
 </script>
 
 <style scoped lang="scss">
@@ -1369,8 +1344,6 @@
   }
 
   .withdrawal-page {
-    --withdrawal-orb-x: 0px;
-    --withdrawal-orb-y: 0px;
     position: relative;
     isolation: isolate;
     display: flex;
@@ -1666,23 +1639,38 @@
     &__title {
       position: relative;
       z-index: 2;
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-width: 100%;
       min-height: 64px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52)),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(238, 238, 238, 0.28));
-      padding: 0 54px 0 22px;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        inset -18px -18px 36px rgba(225, 225, 225, 0.32),
-        0 18px 38px rgba(0, 0, 0, 0.035);
-      backdrop-filter: blur(18px) saturate(130%);
-      -webkit-backdrop-filter: blur(18px) saturate(130%);
+      isolation: isolate;
+      padding: 0 32px;
+      text-align: center;
+
+      &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42)),
+          linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(238, 238, 238, 0.18));
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          inset -18px -18px 36px rgba(225, 225, 225, 0.24),
+          0 18px 38px rgba(0, 0, 0, 0.035);
+        backdrop-filter: blur(13px) saturate(130%);
+        -webkit-backdrop-filter: blur(13px) saturate(130%);
+        pointer-events: none;
+      }
 
       h3 {
+        position: relative;
+        z-index: 2;
         margin: 0;
         color: var(--landing-accent);
         font-size: clamp(24px, 2vw, 32px);
@@ -1693,38 +1681,57 @@
 
     &__title-orbs {
       position: absolute;
-      top: 50%;
-      right: -18px;
-      width: 38px;
+      z-index: 0;
+      width: 48px;
       height: 48px;
-      transform: translateY(-50%);
+      pointer-events: none;
     }
 
     &__title-orb {
       position: absolute;
       border-radius: 999px;
       pointer-events: none;
-      transform: translate(var(--withdrawal-orb-x), var(--withdrawal-orb-y));
-      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
     }
 
     &__title-orb--solid {
+      top: 0;
       right: 0;
-      bottom: 4px;
-      width: 24px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(145deg, #0051ff 0%, #1b63ff 100%);
       box-shadow: 0 10px 22px rgba(0, 81, 255, 0.2);
     }
 
     &__title-orb--glow {
-      top: 0;
-      right: 12px;
+      top: 16px;
+      right: 16px;
       width: 25px;
       height: 25px;
       background: radial-gradient(circle, rgba(138, 178, 255, 0.98) 0%, rgba(40, 108, 255, 0.66) 48%, transparent 74%);
       filter: blur(3px);
+    }
+
+    &__title--1,
+    &__title--4 {
+      .method-card__title-orbs {
+        top: 50%;
+        right: -18px;
+        transform: translateY(-50%);
+      }
+    }
+
+    &__title--2 {
+      .method-card__title-orbs {
+        top: -19px;
+        right: -17px;
+      }
+    }
+
+    &__title--3 {
+      .method-card__title-orbs {
+        right: -17px;
+        bottom: -19px;
+      }
     }
 
     dl {
@@ -1911,34 +1918,7 @@
         inset 0 -16px 24px color-mix(in srgb, var(--landing-accent) 7%, transparent);
     }
 
-    &__orb {
-      position: absolute;
-      z-index: 0;
-      border-radius: 999px;
-      pointer-events: none;
-      transform: translate(var(--withdrawal-orb-x), var(--withdrawal-orb-y));
-      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
-    }
-
-    &__orb--solid {
-      top: -8px;
-      right: -8px;
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(145deg, #1b63ff 0%, #4d86ff 100%);
-    }
-
-    &__orb--glow {
-      top: 8px;
-      right: 4px;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, rgba(142, 181, 255, 0.95) 0%, rgba(60, 122, 255, 0.62) 44%, transparent 72%);
-      filter: blur(3px);
-    }
-
-    span {
+    &__value {
       position: relative;
       z-index: 3;
       color: var(--landing-accent);
@@ -2115,7 +2095,7 @@
       linear-gradient(145deg, rgba(255, 255, 255, 0) 42%, rgba(0, 0, 0, 0.1) 100%);
   }
 
-  :global(:root[data-theme="dark"] .method-card__title) {
+  :global(:root[data-theme="dark"] .method-card__title::before) {
     border-color: rgba(139, 164, 214, 0.2);
     background:
       linear-gradient(145deg, rgba(33, 52, 96, 0.82), rgba(7, 22, 56, 0.44)),
