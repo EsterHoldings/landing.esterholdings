@@ -46,10 +46,17 @@
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9ecfGnvuktF2LkwRKXrzXlJfAKQ_Os9Vqrw&s",
   ];
 
-  const { data: latestNews, refresh } = await useAsyncData("landing-news-row", async () => {
-    const response = await appCore.news.getLatest({ limit: 4, locale: locale.value });
-    return response.data.data;
-  });
+  const { data: latestNews, refresh } = await useAsyncData(
+    "landing-news-row",
+    async () => {
+      const response = await appCore.news.getLatest({ limit: 4, locale: locale.value });
+      return response.data.data;
+    },
+    {
+      lazy: true,
+      default: () => [],
+    }
+  );
 
   const fallbackItems = computed(() => {
     const raw = tm("landing.sections.news_row__items") as any[];

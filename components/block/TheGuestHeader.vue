@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <NuxtLink to="/"
+    <NuxtLink :to="localePath('/')"
       ><UiIconLogo
         :class="{
           'svg-invert': isThemeLight,
@@ -10,35 +10,37 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useThemeStore } from "~/stores/themeStore.js";
-import UiIconLogo from "~/components/ui/UiIconLogo.vue";
+  import { computed } from "vue";
+  import { useLocalePath } from "#imports";
+  import { useThemeStore } from "~/stores/themeStore.js";
+  import UiIconLogo from "~/components/ui/UiIconLogo.vue";
 
-const themeStore = useThemeStore();
+  const themeStore = useThemeStore();
+  const localePath = useLocalePath();
 
-const isThemeLight = computed(() => {
-  return themeStore.currentTheme !== "dark";
-});
+  const isThemeLight = computed(() => {
+    return themeStore.currentTheme !== "dark";
+  });
 </script>
 
 <style scoped lang="scss">
-.router-link-exact-active {
-  color: red;
-}
+  .router-link-exact-active {
+    color: red;
+  }
 
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100px;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.svg-invert {
-  filter: invert(1);
-}
+  .svg-invert {
+    filter: invert(1);
+  }
 </style>

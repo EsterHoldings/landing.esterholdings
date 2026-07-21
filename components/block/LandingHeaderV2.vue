@@ -12,7 +12,7 @@
           class="header-v2__bar"
           :class="{ 'header-v2__bar--menu-open': isMobileMenuOpen }">
           <NuxtLink
-            to="/"
+            :to="localePath('/')"
             class="logo">
             <UiIconLogoLight v-if="themeStore.currentTheme === 'light'" />
             <UiIconLogo v-else />
@@ -144,6 +144,7 @@
 
 <script setup>
   import { useI18n } from "vue-i18n";
+  import { useLocalePath } from "#imports";
   import { ref, computed, onMounted, onBeforeUnmount, watch, provide } from "vue";
   import { useRoute } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
@@ -168,6 +169,7 @@
   const route = useRoute();
   const { isBlurred } = useTrackScroll();
   const { t, locale } = useI18n();
+  const localePath = useLocalePath();
   const { cabinetLink } = useCabinetLink();
 
   const activeLink = ref("");

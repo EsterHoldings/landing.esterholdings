@@ -11,7 +11,7 @@
           class="header"
           :class="{ 'header-is-open-menu ': isMobileMenuOpen }">
           <div class="logo">
-            <NuxtLink to="/">
+            <NuxtLink :to="localePath('/')">
               <UiIconLogo
                 :class="{
                   'svg-invert': useDarkHeaderIcons,
@@ -172,6 +172,7 @@
 
 <script setup>
   import { useI18n } from "vue-i18n";
+  import { useLocalePath } from "#imports";
   import { ref, computed, onMounted, onBeforeUnmount, watch, provide } from "vue";
   import { useRoute, onBeforeRouteLeave } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
@@ -199,6 +200,7 @@
 
   const { isBlurred } = useTrackScroll();
   const { t } = useI18n();
+  const localePath = useLocalePath();
 
   const activeLink = ref("");
   provide("stateLink", activeLink);

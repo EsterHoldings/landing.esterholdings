@@ -35,10 +35,17 @@
   const { t, locale } = useI18n();
   const appCore = useAppCore();
 
-  const { data: latestNews, refresh } = await useAsyncData("landing-latest-news", async () => {
-    const response = await appCore.news.getLatest({ limit: 3, locale: locale.value });
-    return response.data.data;
-  });
+  const { data: latestNews, refresh } = await useAsyncData(
+    "landing-latest-news",
+    async () => {
+      const response = await appCore.news.getLatest({ limit: 3, locale: locale.value });
+      return response.data.data;
+    },
+    {
+      lazy: true,
+      default: () => [],
+    }
+  );
 
   const mapToCard = (item: NewsItem) => ({
     slug: item.slug,
