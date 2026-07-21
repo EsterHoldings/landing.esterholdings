@@ -2029,7 +2029,7 @@
     position: relative;
     min-height: 190px;
     overflow: hidden;
-    border: 1px solid var(--landing-border-strong);
+    border: 6px solid var(--landing-border-strong);
     border-radius: 16px;
     background:
       linear-gradient(
