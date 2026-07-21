@@ -1378,8 +1378,8 @@
     row-gap: 0;
     width: 100%;
     margin-inline: 0;
-    min-height: min(820px, calc(100svh - 132px));
-    padding: clamp(56px, 4.4vw, 82px) 0 clamp(78px, 6vw, 118px);
+    min-height: 680px;
+    padding: clamp(24px, 3vw, 38px) 0 clamp(36px, 5vw, 76px);
 
     &__content {
       grid-area: content;
@@ -2138,6 +2138,7 @@
       grid-template-rows: auto;
       align-content: start;
       min-height: 0;
+      padding: 32px 0 48px;
 
       &__media {
         margin-left: 0;
@@ -2181,6 +2182,8 @@
     }
 
     .withdrawal-hero {
+      padding: 24px 0 32px;
+
       h1 {
         margin-top: 18px;
         font-size: 46px;
@@ -2188,6 +2191,14 @@
 
       p {
         margin-top: 22px;
+      }
+
+      &__media {
+        margin: 8px -8px 0;
+      }
+
+      &__badges {
+        margin-top: 16px;
       }
     }
 

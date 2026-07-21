@@ -1818,7 +1818,7 @@
     align-content: center;
     align-items: center;
     gap: clamp(24px, 3vw, 60px);
-    min-height: min(620px, calc(100svh - 132px));
+    min-height: 680px;
     padding: clamp(24px, 3vw, 38px) 0 clamp(36px, 5vw, 76px);
 
     &__content {
@@ -2573,13 +2573,15 @@
       grid-template-rows: auto;
       align-content: start;
       min-height: 0;
+      padding: 32px 0 48px;
 
       &__content {
+        max-width: 100%;
         align-self: auto;
       }
 
       &__media {
-        margin-left: 0;
+        margin: 20px 0 0;
       }
     }
 
@@ -2608,6 +2610,8 @@
     }
 
     .replenishment-hero {
+      padding: 24px 0 32px;
+
       h1 {
         margin-top: 18px;
         font-size: 46px;
