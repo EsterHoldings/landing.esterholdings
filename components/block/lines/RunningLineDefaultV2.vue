@@ -400,15 +400,9 @@
     }
 
     staleQuotesTimer = setTimeout(() => {
-      pendingQuoteItems.clear();
-      if (quoteFlushFrame !== null) {
-        cancelAnimationFrame(quoteFlushFrame);
-        quoteFlushFrame = null;
-      }
-      liveQuoteMap.value = {};
-      liveQuoteOrder.value = [];
       staleQuotesTimer = null;
-      logQuoteDebug("stale live quotes cleared");
+      logQuoteDebug("live quotes are stale; refreshing latest snapshot");
+      startLatestQuotesPolling();
     }, 15000);
   };
 
@@ -470,6 +464,25 @@
     latestQuotesPollTimer = null;
   };
 
+  const applySocketQuotesPayload = (payload: unknown) => {
+    stopLatestQuotesPolling();
+    applyQuotesPayload(payload);
+  };
+
+  const handleQuoteConnectionState = (state: unknown) => {
+    logQuoteDebug("state", state);
+
+    const current = toText((state as { current?: unknown } | null)?.current).toLowerCase();
+    if (current && current !== "connected") {
+      startLatestQuotesPolling();
+    }
+  };
+
+  const handleQuoteConnectionError = (error: unknown) => {
+    logQuoteDebug("connection_error", error);
+    startLatestQuotesPolling();
+  };
+
   const priceDirection = (item: TickerItem): QuoteDirection => {
     if (item.isUp === true) return "up";
     if (item.isUp === false) return "down";
@@ -509,22 +522,24 @@
     const eventNames = quoteEventNames(props.event);
     quotesChannel = pusher.subscribe(props.channel);
     eventNames.forEach(name => {
-      quotesChannel.bind(name, applyQuotesPayload);
+      quotesChannel.bind(name, applySocketQuotesPayload);
     });
     if (quotesChannel.bind_global) {
       quotesGlobalHandler = (incomingEventName: string, payload: unknown) => {
         const normalizedIncomingEventName = normalizePusherEventName(incomingEventName);
         if (normalizedIncomingEventName === eventName) {
-          applyQuotesPayload(payload);
+          applySocketQuotesPayload(payload);
         }
       };
       quotesChannel.bind_global(quotesGlobalHandler);
     }
     quotesChannel.bind("pusher:subscription_succeeded", () => {
+      stopLatestQuotesPolling();
       logQuoteDebug("subscribed", { channel: props.channel, events: eventNames });
     });
     quotesChannel.bind("pusher:subscription_error", (error: unknown) => {
       logQuoteDebug("subscription_error", error);
+      startLatestQuotesPolling();
     });
   };
 
@@ -538,6 +553,8 @@
     if (sharedPusher?.subscribe) {
       quotesPusher = sharedPusher;
       ownsQuotesPusher = false;
+      quotesPusher.connection?.bind("state_change", handleQuoteConnectionState);
+      quotesPusher.connection?.bind("error", handleQuoteConnectionError);
       bindQuotesChannel(sharedPusher);
       logQuoteDebug("using shared Echo pusher");
       return;
@@ -556,8 +573,8 @@
       enableStats: false,
     });
     ownsQuotesPusher = true;
-    quotesPusher.connection.bind("state_change", (state: unknown) => logQuoteDebug("state", state));
-    quotesPusher.connection.bind("error", (error: unknown) => logQuoteDebug("connection_error", error));
+    quotesPusher.connection.bind("state_change", handleQuoteConnectionState);
+    quotesPusher.connection.bind("error", handleQuoteConnectionError);
     bindQuotesChannel(quotesPusher);
     logQuoteDebug("using direct pusher", socketConfig);
   };
@@ -567,7 +584,7 @@
 
     if (quotesChannel?.unbind) {
       eventNames.forEach(name => {
-        quotesChannel.unbind(name, applyQuotesPayload);
+        quotesChannel.unbind(name, applySocketQuotesPayload);
       });
     }
 
@@ -578,6 +595,9 @@
     if (quotesPusher?.unsubscribe) {
       quotesPusher.unsubscribe(props.channel);
     }
+
+    quotesPusher?.connection?.unbind("state_change", handleQuoteConnectionState);
+    quotesPusher?.connection?.unbind("error", handleQuoteConnectionError);
 
     if (ownsQuotesPusher && quotesPusher?.disconnect) {
       quotesPusher.disconnect();
@@ -597,8 +617,11 @@
 
   onMounted(() => {
     debugQuotes = quoteDebugEnabled();
-    void subscribeToLiveQuotes();
     startLatestQuotesPolling();
+    void subscribeToLiveQuotes().catch(error => {
+      logQuoteDebug("subscription setup error", error);
+      startLatestQuotesPolling();
+    });
     resetLoopPosition();
     window.setTimeout(() => resetLoopPosition(), 150);
     startAnimation();

@@ -20,7 +20,14 @@
           class="documents-hero__visual"
           aria-hidden="true">
           <img
+            class="documents-hero__image documents-hero__image--light"
             src="/static/documents/hero.png"
+            alt=""
+            width="864"
+            height="691" />
+          <img
+            class="documents-hero__image documents-hero__image--dark"
+            src="/static/documents/hero-dark.png"
             alt=""
             width="864"
             height="691" />
@@ -116,6 +123,7 @@
 
 <script setup lang="ts">
   import { computed } from "vue";
+  import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -123,6 +131,12 @@
   definePageMeta({
     layout: "main",
     alias: "/documents",
+  });
+
+  useHead({
+    bodyAttrs: {
+      class: "documents-route",
+    },
   });
 
   type ProcessStep = {
@@ -170,6 +184,7 @@
 <style lang="scss" scoped>
   .documents-page {
     padding: 0 40px 76px;
+    background: var(--landing-bg);
     color: var(--landing-text-primary);
     font-family: "DM Sans", sans-serif;
   }
@@ -466,6 +481,39 @@
         opacity: 0.95;
       }
     }
+  }
+
+  .documents-hero__image--dark {
+    display: none;
+  }
+
+  :global(body.documents-route),
+  :global(body.documents-route .page-content),
+  :global(body.documents-route .page--inner) {
+    background-color: var(--landing-bg) !important;
+  }
+
+  :global(:root[data-theme="dark"] .documents-page) {
+    --landing-accent: #3374ff;
+    --landing-accent-hover: #5b8cff;
+    --landing-text-secondary: #a8b4c7;
+  }
+
+  :global(:root[data-theme="dark"] .documents-hero__image--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .documents-hero__visual .documents-hero__image--dark) {
+    display: block;
+  }
+
+  :global(:root[data-theme="dark"] .documents-process__number) {
+    border-color: rgba(139, 164, 214, 0.24);
+    background: linear-gradient(145deg, rgba(25, 49, 94, 0.82), rgba(4, 23, 61, 0.94));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset -18px -20px 38px rgba(0, 0, 0, 0.16),
+      0 16px 34px rgba(0, 0, 0, 0.16);
   }
 
   [dir="rtl"] {

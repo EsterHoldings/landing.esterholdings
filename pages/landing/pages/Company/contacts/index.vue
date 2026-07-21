@@ -8,7 +8,14 @@
           class="contacts-hero__visual"
           aria-hidden="true">
           <img
+            class="contacts-hero__image contacts-hero__image--light"
             src="/static/contacts/hero.png"
+            alt=""
+            width="933"
+            height="658" />
+          <img
+            class="contacts-hero__image contacts-hero__image--dark"
+            src="/static/contacts/hero-dark.png"
             alt=""
             width="933"
             height="658" />
@@ -95,6 +102,7 @@
 
 <script setup lang="ts">
   import { computed } from "vue";
+  import { useHead } from "nuxt/app";
   import { useI18n } from "vue-i18n";
   import { definePageMeta } from "~/.nuxt/imports";
   import UiContainer from "~/components/ui/UiContainer.vue";
@@ -102,6 +110,12 @@
   definePageMeta({
     layout: "main",
     alias: "/contacts",
+  });
+
+  useHead({
+    bodyAttrs: {
+      class: "contacts-route",
+    },
   });
 
   type ProcessStep = {
@@ -165,14 +179,14 @@
 <style lang="scss" scoped>
   .contacts-page {
     padding: 0 40px 80px;
-    background: #f6f6f6;
+    background: var(--landing-bg);
     color: var(--landing-text-primary);
     font-family: "DM Sans", sans-serif;
   }
 
   .contacts-eyebrow {
     margin: 0;
-    color: #0051ff;
+    color: var(--landing-accent);
     font-size: 18px;
     font-weight: 700;
     line-height: 1;
@@ -214,7 +228,7 @@
       h1 {
         max-width: 555px;
         margin: 34px 0 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 82px;
         font-weight: 400;
         letter-spacing: -0.03em;
@@ -225,7 +239,7 @@
     &__intro {
       max-width: 440px;
       margin: 39px 0 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       font-size: 16px;
       font-weight: 400;
       line-height: 1.32;
@@ -244,7 +258,7 @@
         display: flex;
         align-items: center;
         gap: 16px;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 16px;
         font-weight: 700;
         line-height: 1;
@@ -270,7 +284,7 @@
 
     h2 {
       margin: 18px 0 0;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 36px;
       font-weight: 500;
       line-height: 1;
@@ -279,7 +293,7 @@
     &__address {
       max-width: 300px;
       margin: 20px 0 0;
-      color: #7b7b7b;
+      color: var(--landing-text-secondary);
       font-size: 16px;
       font-weight: 400;
       line-height: 1.32;
@@ -288,7 +302,7 @@
     strong {
       display: block;
       margin-top: 14px;
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 16px;
       font-weight: 700;
       line-height: 1.2;
@@ -316,14 +330,14 @@
     text-decoration: none;
 
     &__label {
-      color: #000;
+      color: var(--landing-text-primary);
       font-size: 24px;
       font-weight: 700;
       line-height: 1;
     }
 
     &__email {
-      color: #0051ff;
+      color: var(--landing-accent);
       font-size: 18px;
       font-weight: 700;
       line-height: 1;
@@ -332,7 +346,7 @@
     }
 
     &:hover .contacts-channel__email {
-      color: #003dc2;
+      color: var(--landing-accent-hover);
     }
   }
 
@@ -346,7 +360,7 @@
 
       h2 {
         margin: 28px 0 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 42px;
         font-weight: 500;
         line-height: 1;
@@ -354,7 +368,7 @@
 
       > p:last-child {
         margin: 22px 0 0;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         font-size: 16px;
         font-weight: 400;
         line-height: 1.32;
@@ -390,7 +404,7 @@
 
       h3 {
         margin: 0;
-        color: #000;
+        color: var(--landing-text-primary);
         font-size: 18px;
         font-weight: 700;
         line-height: 1.15;
@@ -398,12 +412,46 @@
 
       p {
         margin: 8px 0 0;
-        color: #7b7b7b;
+        color: var(--landing-text-secondary);
         font-size: 16px;
         font-weight: 400;
         line-height: 1.32;
       }
     }
+  }
+
+  .contacts-hero__image--dark {
+    display: none;
+  }
+
+  :global(body.contacts-route),
+  :global(body.contacts-route .page-content),
+  :global(body.contacts-route .page--inner) {
+    background-color: var(--landing-bg) !important;
+  }
+
+  :global(:root[data-theme="dark"] .contacts-page) {
+    --landing-accent: #3374ff;
+    --landing-accent-hover: #5b8cff;
+    --landing-text-secondary: #a8b4c7;
+  }
+
+  :global(:root[data-theme="dark"] .contacts-hero__image--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .contacts-hero__visual .contacts-hero__image--dark) {
+    display: block;
+  }
+
+  :global(:root[data-theme="dark"] .contacts-channel),
+  :global(:root[data-theme="dark"] .contacts-process__steps li) {
+    border-color: rgba(62, 109, 204, 0.22);
+    background: linear-gradient(145deg, rgba(13, 37, 82, 0.94), rgba(4, 23, 61, 0.9));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset -20px -22px 50px rgba(0, 0, 0, 0.16),
+      0 18px 42px rgba(0, 0, 0, 0.14);
   }
 
   [dir="rtl"] {
