@@ -4,16 +4,31 @@
       class="documents-page"
       :dir="isRtl ? 'rtl' : 'ltr'">
       <section class="documents-hero">
-        <div class="documents-hero__copy">
-          <p class="documents-eyebrow">
-            {{ t("landing.pages.company.documents.eyebrow") }}
-          </p>
+        <div class="documents-hero__content">
+          <div class="documents-hero__copy">
+            <p class="documents-eyebrow">
+              {{ t("landing.pages.company.documents.eyebrow") }}
+            </p>
 
-          <h1>{{ t("landing.pages.company.documents.title") }}</h1>
+            <h1>{{ t("landing.pages.company.documents.title") }}</h1>
 
-          <p class="documents-hero__intro">
-            {{ t("landing.pages.company.documents.intro") }}
-          </p>
+            <p class="documents-hero__intro">
+              {{ t("landing.pages.company.documents.intro") }}
+            </p>
+          </div>
+
+          <ul class="documents-hero__links">
+            <li
+              v-for="(item, index) in heroLinks"
+              :key="item">
+              <img
+                :src="heroLinkIcons[index]"
+                alt=""
+                width="24"
+                height="24" />
+              <span>{{ item }}</span>
+            </li>
+          </ul>
         </div>
 
         <div
@@ -32,19 +47,6 @@
             width="864"
             height="691" />
         </div>
-
-        <ul class="documents-hero__links">
-          <li
-            v-for="(item, index) in heroLinks"
-            :key="item">
-            <img
-              :src="heroLinkIcons[index]"
-              alt=""
-              width="24"
-              height="24" />
-            <span>{{ item }}</span>
-          </li>
-        </ul>
       </section>
 
       <section class="documents-details">
@@ -200,19 +202,21 @@
 
   .documents-hero {
     display: grid;
-    grid-template-areas:
-      "copy visual"
-      "links visual";
+    grid-template-areas: "content visual";
     grid-template-columns: minmax(430px, 0.77fr) minmax(0, 1.23fr);
-    grid-template-rows: auto 1fr;
+    align-items: center;
     min-height: 655px;
     padding-top: 56px;
 
-    &__copy {
-      grid-area: copy;
-      align-self: end;
-      padding-bottom: 22px;
+    &__content {
+      display: grid;
+      grid-area: content;
+      gap: 30px;
+      align-content: center;
+      min-width: 0;
+    }
 
+    &__copy {
       h1 {
         max-width: 555px;
         margin: 34px 0 0;
@@ -235,7 +239,6 @@
 
     &__visual {
       grid-area: visual;
-      align-self: center;
       min-width: 0;
       margin-inline: -22px -30px;
 
@@ -250,10 +253,8 @@
 
     &__links {
       display: grid;
-      grid-area: links;
-      align-self: start;
       gap: 20px;
-      margin: 8px 0 0;
+      margin: 0;
       padding: 0;
       list-style: none;
 
@@ -483,7 +484,7 @@
     }
   }
 
-  .documents-hero__image--dark {
+  .documents-hero__visual .documents-hero__image--dark {
     display: none;
   }
 
@@ -559,9 +560,13 @@
       min-height: 0;
       padding-top: 0;
 
+      &__content {
+        display: contents;
+      }
+
       &__copy {
+        grid-area: copy;
         align-self: auto;
-        padding-bottom: 0;
 
         h1 {
           max-width: none;
@@ -579,6 +584,7 @@
       }
 
       &__visual {
+        grid-area: visual;
         margin: 20px -14px 0;
 
         img {
@@ -589,6 +595,7 @@
       }
 
       &__links {
+        grid-area: links;
         gap: 14px;
         margin-top: 12px;
 
