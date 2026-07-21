@@ -131,7 +131,7 @@
             <div class="flow-step-number">
               <span class="flow-step-number__orb flow-step-number__orb--solid" />
               <span class="flow-step-number__orb flow-step-number__orb--glow" />
-              <span>{{ index + 1 }}</span>
+              <span class="flow-step-number__value">{{ index + 1 }}</span>
             </div>
             <div>
               <h3>{{ step.title }}</h3>
@@ -2078,15 +2078,18 @@
     &__title {
       position: relative;
       z-index: 2;
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
+      width: min(100%, 320px);
       min-height: 64px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.8);
       background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52)),
         linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(238, 238, 238, 0.28));
-      padding: 0 54px 0 22px;
+      padding: 0 32px;
+      text-align: center;
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.9),
         inset -18px -18px 36px rgba(225, 225, 225, 0.32),
@@ -2105,11 +2108,10 @@
 
     &__title-orbs {
       position: absolute;
-      top: 50%;
+      top: -18px;
       right: -18px;
-      width: 38px;
+      width: 48px;
       height: 48px;
-      transform: translateY(-50%);
     }
 
     &__title-orb {
@@ -2122,17 +2124,17 @@
     }
 
     &__title-orb--solid {
+      top: 0;
       right: 0;
-      bottom: 4px;
-      width: 24px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(145deg, #0051ff 0%, #1b63ff 100%);
       box-shadow: 0 10px 22px rgba(0, 81, 255, 0.2);
     }
 
     &__title-orb--glow {
-      top: 0;
-      right: 12px;
+      top: 16px;
+      right: 16px;
       width: 25px;
       height: 25px;
       background: radial-gradient(circle, rgba(138, 178, 255, 0.98) 0%, rgba(40, 108, 255, 0.66) 48%, transparent 74%);
@@ -2350,7 +2352,7 @@
       filter: blur(3px);
     }
 
-    span {
+    &__value {
       position: relative;
       z-index: 3;
       color: var(--landing-accent);
