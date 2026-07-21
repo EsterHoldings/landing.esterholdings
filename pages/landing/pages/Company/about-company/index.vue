@@ -28,10 +28,20 @@
           class="about-hero__visual"
           aria-hidden="true">
           <img
+            class="about-hero__image about-hero__image--light"
             :src="assetPath('hero.png')"
             alt=""
             width="1537"
             height="1023"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high" />
+          <img
+            class="about-hero__image about-hero__image--dark"
+            :src="assetPath('hero-dark.png')"
+            alt=""
+            width="979"
+            height="654"
             loading="eager"
             decoding="async"
             fetchpriority="high" />
@@ -103,6 +113,7 @@
                   orient="auto"
                   markerUnits="strokeWidth">
                   <path
+                    class="business-flow__arrow business-flow__arrow--price"
                     d="M0 0 6 3 0 6Z"
                     fill="#0051ff" />
                 </marker>
@@ -115,6 +126,7 @@
                   orient="auto"
                   markerUnits="strokeWidth">
                   <path
+                    class="business-flow__arrow business-flow__arrow--order"
                     d="M0 0 6 3 0 6Z"
                     fill="#f75709" />
                 </marker>
@@ -162,7 +174,13 @@
               </div>
               <span class="flow-hex">
                 <img
+                  class="flow-icon flow-icon--light"
                   :src="assetPath('flow-ecn.svg')"
+                  alt=""
+                  aria-hidden="true" />
+                <img
+                  class="flow-icon flow-icon--dark flow-icon--tile"
+                  :src="assetPath('flow-ecn-dark.svg')"
                   alt=""
                   aria-hidden="true" />
               </span>
@@ -175,7 +193,13 @@
               </div>
               <span class="flow-hex">
                 <img
+                  class="flow-icon flow-icon--light"
                   :src="assetPath('flow-aggregation.svg')"
+                  alt=""
+                  aria-hidden="true" />
+                <img
+                  class="flow-icon flow-icon--dark"
+                  :src="assetPath('flow-aggregation-dark.svg')"
                   alt=""
                   aria-hidden="true" />
               </span>
@@ -184,7 +208,13 @@
             <article class="flow-entity flow-entity--broker">
               <span class="flow-hex">
                 <img
+                  class="flow-icon flow-icon--light"
                   :src="assetPath('flow-broker.svg')"
+                  alt=""
+                  aria-hidden="true" />
+                <img
+                  class="flow-icon flow-icon--dark"
+                  :src="assetPath('flow-broker-dark.svg')"
                   alt=""
                   aria-hidden="true" />
               </span>
@@ -453,6 +483,9 @@
   }
 
   .about-page {
+    --about-flow-blue: #0051ff;
+    --about-flow-orange: #f75709;
+
     display: flex;
     flex-direction: column;
     gap: clamp(72px, 7vw, 112px);
@@ -538,6 +571,10 @@
         width: min(100%, 760px);
         margin-left: auto;
         filter: drop-shadow(0 24px 42px rgba(0, 81, 255, 0.05));
+      }
+
+      .about-hero__image--dark {
+        display: none;
       }
     }
   }
@@ -884,12 +921,20 @@
       vector-effect: non-scaling-stroke;
     }
 
+    &__arrow--price {
+      fill: var(--about-flow-blue);
+    }
+
+    &__arrow--order {
+      fill: var(--about-flow-orange);
+    }
+
     &__route--price {
-      stroke: #0051ff;
+      stroke: var(--about-flow-blue);
     }
 
     &__route--order {
-      stroke: #f75709;
+      stroke: var(--about-flow-orange);
     }
 
     &__route--exchange {
@@ -1029,6 +1074,16 @@
       height: 56px;
       object-fit: contain;
     }
+
+    .flow-icon--dark {
+      display: none;
+    }
+
+    .flow-icon--tile {
+      width: 116px;
+      max-width: none;
+      height: 127px;
+    }
   }
 
   .flow-pill {
@@ -1050,13 +1105,13 @@
     &--price {
       left: 263px;
       width: 60px;
-      color: #0051ff;
+      color: var(--about-flow-blue);
     }
 
     &--order {
       left: 525px;
       width: 64px;
-      color: #f75709;
+      color: var(--about-flow-orange);
     }
 
     &--price-top,
@@ -1070,12 +1125,74 @@
     }
   }
 
+  :global(:root[data-theme="dark"] .about-page) {
+    --about-flow-blue: #3374ff;
+    --about-flow-orange: #fa7432;
+    --landing-accent: #3374ff;
+    --landing-accent-hover: #4d85ff;
+    --landing-accent-secondary: #fa7432;
+  }
+
+  :global(:root[data-theme="dark"] .about-hero__image--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .about-hero__visual .about-hero__image--dark) {
+    display: block;
+    opacity: 1;
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  :global(:root[data-theme="dark"] .business-flow::before) {
+    background:
+      radial-gradient(
+        ellipse 34% 52% at 35% 49%,
+        rgba(51, 116, 255, 0.18) 0%,
+        rgba(51, 116, 255, 0.08) 44%,
+        transparent 78%
+      ),
+      radial-gradient(
+        ellipse 30% 50% at 65% 48%,
+        rgba(250, 116, 50, 0.13) 0%,
+        rgba(250, 116, 50, 0.055) 44%,
+        transparent 78%
+      );
+    filter: blur(18px);
+  }
+
+  :global(:root[data-theme="dark"] .flow-hex) {
+    background: rgba(72, 105, 169, 0.24);
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.2));
+  }
+
   :global(:root[data-theme="dark"] .flow-hex::before) {
-    background: #071735;
+    inset: 3px;
+    background: linear-gradient(145deg, rgba(17, 39, 82, 0.96), rgba(3, 20, 59, 0.98));
+  }
+
+  :global(:root[data-theme="dark"] .flow-icon--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .flow-hex .flow-icon--dark) {
+    display: block;
+  }
+
+  :global(:root[data-theme="dark"] .flow-entity--ecn .flow-hex) {
+    width: 116px;
+    height: 127px;
+    background: transparent;
+    clip-path: none;
+    filter: none;
+  }
+
+  :global(:root[data-theme="dark"] .flow-entity--ecn .flow-hex::before) {
+    content: none;
   }
 
   :global(:root[data-theme="dark"] .flow-pill) {
-    background: var(--landing-bg);
+    background: #011239;
   }
 
   :global(:root[data-theme="dark"] .business-flow__exchange) {
@@ -1084,7 +1201,6 @@
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
   }
 
-  :global(:root[data-theme="dark"] .flow-entity--ecn .flow-hex img),
   :global(:root[data-theme="dark"] .flow-entity--customers .flow-hex img) {
     filter: invert(1);
   }
@@ -1164,12 +1280,6 @@
     color: var(--landing-on-accent);
     font-size: 10px;
     box-shadow: none;
-  }
-
-  :global(:root[data-theme="dark"] .about-hero__visual img) {
-    opacity: 0.9;
-    filter: brightness(0.88) saturate(0.92) contrast(1.02) drop-shadow(0 24px 54px rgba(0, 81, 255, 0.12));
-    mix-blend-mode: screen;
   }
 
   :global(:root[data-theme="dark"] .about-principles article),
@@ -1344,6 +1454,16 @@
         width: 46px;
         height: 46px;
       }
+    }
+
+    :global(:root[data-theme="dark"] .flow-entity--ecn .flow-hex) {
+      width: 76px;
+      height: 82px;
+    }
+
+    :global(:root[data-theme="dark"] .flow-entity--ecn .flow-icon--tile) {
+      width: 92px;
+      height: 101px;
     }
   }
 </style>

@@ -1390,22 +1390,21 @@
   }
 
   .withdrawal-hero {
-    --withdrawal-hero-width: min(1808px, calc(100vw - 104px));
     position: relative;
     isolation: isolate;
     display: grid;
-    grid-template-columns: minmax(0, 836px) minmax(420px, 650px);
+    grid-template-columns: minmax(0, 836px) minmax(420px, 1fr);
     grid-template-areas:
       "media content"
       "media badges";
     grid-template-rows: auto auto;
     align-content: center;
-    justify-content: flex-start;
+    justify-content: stretch;
     align-items: flex-start;
-    column-gap: clamp(74px, 10.7vw, 205px);
+    column-gap: clamp(48px, 5vw, 72px);
     row-gap: 0;
-    width: var(--withdrawal-hero-width);
-    margin-inline: calc((100% - var(--withdrawal-hero-width)) / 2);
+    width: 100%;
+    margin-inline: 0;
     min-height: min(820px, calc(100svh - 132px));
     padding: clamp(56px, 4.4vw, 82px) 0 clamp(78px, 6vw, 118px);
 
@@ -2133,7 +2132,6 @@
 
   @media (max-width: 1199px) {
     .withdrawal-hero {
-      --withdrawal-hero-width: min(100%, calc(100vw - 40px));
       grid-template-columns: minmax(420px, 1.08fr) minmax(320px, 0.92fr);
     }
 
