@@ -136,10 +136,6 @@
   function articlePath(article: NewsItem): string {
     const fallbackPath = localizedPath(`${detailBasePath.value}/${article.slug}`);
 
-    if (props.articleType === "trader_blog") {
-      return fallbackPath;
-    }
-
     return article.urlPath || fallbackPath;
   }
 
