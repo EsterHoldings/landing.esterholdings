@@ -837,8 +837,12 @@
   }
 
   .funding-hero {
+    display: grid;
+    place-content: center;
     max-width: 1040px;
+    min-height: var(--landing-inner-hero-min-height);
     margin: 0 auto;
+    padding-block: var(--landing-inner-hero-padding-block);
     text-align: center;
 
     &__eyebrow {
@@ -1405,6 +1409,8 @@
 
   @media (max-width: 575px) {
     .funding-hero {
+      min-height: 0;
+      padding-block: 32px 0;
       text-align: left;
 
       &__meta {

@@ -205,8 +205,8 @@
     grid-template-areas: "content visual";
     grid-template-columns: minmax(430px, 0.77fr) minmax(0, 1.23fr);
     align-items: center;
-    min-height: 655px;
-    padding-top: 56px;
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__content {
       display: grid;
@@ -246,8 +246,10 @@
         display: block;
         width: 100%;
         max-width: 770px;
+        max-height: var(--landing-inner-hero-media-max-height);
         height: auto;
         margin-inline: auto 0;
+        object-fit: contain;
       }
     }
 
@@ -558,7 +560,7 @@
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto;
       min-height: 0;
-      padding-top: 0;
+      padding: 0;
 
       &__content {
         display: contents;

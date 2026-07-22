@@ -1818,8 +1818,8 @@
     align-content: center;
     align-items: center;
     gap: clamp(24px, 3vw, 60px);
-    min-height: 680px;
-    padding: clamp(24px, 3vw, 38px) 0 clamp(36px, 5vw, 76px);
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__content {
       grid-area: content;

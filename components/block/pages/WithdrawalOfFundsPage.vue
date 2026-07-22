@@ -1373,13 +1373,13 @@
     grid-template-rows: auto auto;
     align-content: center;
     justify-content: stretch;
-    align-items: flex-start;
+    align-items: center;
     column-gap: clamp(48px, 5vw, 72px);
     row-gap: 0;
     width: 100%;
     margin-inline: 0;
-    min-height: 680px;
-    padding: clamp(24px, 3vw, 38px) 0 clamp(36px, 5vw, 76px);
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__content {
       grid-area: content;
@@ -1442,12 +1442,12 @@
       width: min(100%, 836px);
       min-width: 0;
       margin-left: 0;
-      transform: translateY(-18px);
     }
 
     &__image {
       display: block;
       width: 100%;
+      max-height: var(--landing-inner-hero-media-max-height);
       height: auto;
       object-fit: contain;
     }

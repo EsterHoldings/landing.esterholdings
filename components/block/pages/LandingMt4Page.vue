@@ -1292,8 +1292,8 @@
     grid-template-columns: minmax(0, 1.26fr) minmax(360px, 0.74fr);
     align-items: center;
     gap: clamp(36px, 4vw, 72px);
-    min-height: min(720px, calc(100svh - 132px));
-    padding: clamp(20px, 3vw, 38px) 0 clamp(32px, 4vw, 58px);
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__glows {
       position: absolute;
@@ -1366,6 +1366,7 @@
       img {
         display: block;
         width: min(100%, 860px);
+        max-height: var(--landing-inner-hero-media-max-height);
         height: auto;
         object-fit: contain;
       }

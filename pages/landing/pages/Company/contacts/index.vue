@@ -199,17 +199,17 @@
       "visual copy"
       "visual links";
     grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
     column-gap: 24px;
-    min-height: 520px;
-    padding-top: 38px;
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__visual {
       display: flex;
       grid-area: visual;
       align-items: center;
       min-width: 0;
-      margin-block-start: -60px;
       margin-inline: -40px 0;
 
       img {
@@ -223,7 +223,6 @@
     &__copy {
       grid-area: copy;
       align-self: end;
-      padding-top: 20px;
 
       h1 {
         max-width: 555px;
@@ -420,7 +419,7 @@
     }
   }
 
-  .contacts-hero__image--dark {
+  .contacts-hero__visual .contacts-hero__image--dark {
     display: none;
   }
 
@@ -482,7 +481,6 @@
   @media (max-width: 1180px) {
     .contacts-hero {
       grid-template-columns: minmax(0, 1fr) minmax(370px, 0.72fr);
-      min-height: 500px;
 
       &__copy h1 {
         font-size: 66px;
@@ -557,7 +555,7 @@
       display: flex;
       min-height: 0;
       flex-direction: column;
-      padding-top: 24px;
+      padding: 24px 0 0;
 
       &__copy {
         order: 1;

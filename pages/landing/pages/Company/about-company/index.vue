@@ -497,7 +497,8 @@
     grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.2fr);
     gap: clamp(34px, 5vw, 72px);
     align-items: center;
-    min-height: clamp(420px, 48vw, 620px);
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
 
     &__copy {
       position: relative;
@@ -1330,6 +1331,7 @@
     .about-hero {
       grid-template-columns: 1fr;
       min-height: 0;
+      padding-block: 0;
 
       &__visual {
         margin-right: 0;

@@ -104,6 +104,9 @@
   --landing-hero-backdrop-blend: normal;
   --landing-hero-screen-opacity: 1;
   --landing-hero-screen-filter: none;
+  --landing-inner-hero-min-height: 680px;
+  --landing-inner-hero-media-max-height: 568px;
+  --landing-inner-hero-padding-block: clamp(32px, 4vw, 56px);
 
   //MAIN COLOR VAR-----
   // Ui elements settings

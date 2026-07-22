@@ -55,7 +55,11 @@
   }
 
   .landing-static-page__hero {
+    display: grid;
+    align-content: center;
     max-width: 920px;
+    min-height: var(--landing-inner-hero-min-height);
+    padding-block: var(--landing-inner-hero-padding-block);
   }
 
   .landing-static-page__eyebrow {
@@ -187,6 +191,11 @@
 
     .landing-static-page__title {
       font-size: clamp(38px, 12vw, 58px);
+    }
+
+    .landing-static-page__hero {
+      min-height: 0;
+      padding-block: 32px 0;
     }
   }
 </style>
