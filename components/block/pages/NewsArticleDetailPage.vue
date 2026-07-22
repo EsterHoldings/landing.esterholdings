@@ -28,6 +28,19 @@
       </article>
 
       <section
+        v-else-if="loading"
+        class="article-detail__skeleton"
+        aria-busy="true"
+        aria-label="Loading article">
+        <div class="article-detail__skeleton-title"></div>
+        <div class="article-detail__skeleton-subtitle"></div>
+        <div class="article-detail__skeleton-cover"></div>
+        <div class="article-detail__skeleton-line article-detail__skeleton-line--wide"></div>
+        <div class="article-detail__skeleton-line"></div>
+        <div class="article-detail__skeleton-line article-detail__skeleton-line--short"></div>
+      </section>
+
+      <section
         v-else
         class="article-detail__not-found">
         <h1>{{ notFoundTitle }}</h1>
@@ -55,11 +68,13 @@
     defineProps<{
       article: NewsItem | null;
       renderedContent?: string;
+      loading?: boolean;
       notFoundTitle?: string;
       notFoundText?: string;
     }>(),
     {
       renderedContent: "",
+      loading: false,
       notFoundTitle: "Article not found",
       notFoundText: "The requested article is not available.",
     }
@@ -104,10 +119,63 @@
     font-family: "DM Sans", "Inter", "Muli", sans-serif;
 
     &__article,
+    &__skeleton,
     &__not-found {
       width: 100%;
       max-width: 900px;
       margin: 0 auto;
+    }
+
+    &__skeleton {
+      min-height: 760px;
+    }
+
+    &__skeleton-title,
+    &__skeleton-subtitle,
+    &__skeleton-cover,
+    &__skeleton-line {
+      border-radius: 10px;
+      background: linear-gradient(
+        100deg,
+        var(--landing-surface-muted) 20%,
+        var(--landing-surface) 42%,
+        var(--landing-surface-muted) 64%
+      );
+      background-size: 220% 100%;
+      animation: article-detail-skeleton 1.25s ease-in-out infinite;
+    }
+
+    &__skeleton-title {
+      width: 78%;
+      height: 80px;
+    }
+
+    &__skeleton-subtitle {
+      width: 56%;
+      height: 20px;
+      margin-top: 34px;
+    }
+
+    &__skeleton-cover {
+      width: 100%;
+      aspect-ratio: 900 / 600;
+      margin-top: 38px;
+      border-radius: 14px;
+    }
+
+    &__skeleton-line {
+      width: 76%;
+      height: 16px;
+      margin-top: 18px;
+
+      &--wide {
+        width: 100%;
+        margin-top: 54px;
+      }
+
+      &--short {
+        width: 48%;
+      }
     }
 
     &__header {
@@ -391,6 +459,16 @@
     }
   }
 
+  @keyframes article-detail-skeleton {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: -120% 0;
+    }
+  }
+
   @media (max-width: 991px) {
     .article-detail {
       padding: 36px 0 72px;
@@ -400,6 +478,10 @@
           font-size: 60px;
           line-height: 58px;
         }
+      }
+
+      &__skeleton-title {
+        height: 58px;
       }
 
       &__content {
@@ -434,6 +516,31 @@
         border-radius: 10px;
       }
 
+      &__skeleton {
+        min-height: 580px;
+      }
+
+      &__skeleton-title {
+        width: 88%;
+        height: 42px;
+      }
+
+      &__skeleton-subtitle {
+        width: 72%;
+        height: 16px;
+        margin-top: 22px;
+      }
+
+      &__skeleton-cover {
+        aspect-ratio: 4 / 3;
+        margin-top: 28px;
+        border-radius: 10px;
+      }
+
+      &__skeleton-line--wide {
+        margin-top: 36px;
+      }
+
       &__content {
         margin-top: 36px;
 
@@ -459,6 +566,15 @@
           min-width: 0;
         }
       }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-detail__skeleton-title,
+    .article-detail__skeleton-subtitle,
+    .article-detail__skeleton-cover,
+    .article-detail__skeleton-line {
+      animation: none;
     }
   }
 </style>

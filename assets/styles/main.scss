@@ -61,14 +61,9 @@ html {
   transform: translate3d(0, 0, 0);
 }
 
-.page-content > .page.page-route-leave {
-  animation: page-route-leave 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
-  will-change: opacity, transform;
-}
-
 .page-content > .page.page-route-enter {
   opacity: 0;
-  transform: translate3d(56px, 0, 0);
+  transform: translate3d(12px, 0, 0);
   will-change: opacity, transform;
 }
 
@@ -76,20 +71,8 @@ html {
   opacity: 1;
   transform: translate3d(0, 0, 0);
   transition:
-    opacity 0.36s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes page-route-leave {
-  from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translate3d(-56px, 0, 0);
-  }
+    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes theme-fade-out {
@@ -123,26 +106,12 @@ html {
     animation: none;
   }
 
-  .page-content > .page.page-route-leave {
-    animation: page-route-reduced-leave 0.18s ease forwards;
-  }
-
   .page-content > .page.page-route-enter {
     transform: none;
   }
 
   .page-content > .page.page-route-enter.page-route-enter-active {
     transition: opacity 0.18s ease;
-  }
-}
-
-@keyframes page-route-reduced-leave {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
   }
 }
 

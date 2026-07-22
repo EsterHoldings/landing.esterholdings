@@ -1,7 +1,6 @@
 import { defineNuxtPlugin, useRouter } from "#app";
 
-const LEAVE_MS = 220;
-const ENTER_MS = 360;
+const ENTER_MS = 220;
 
 const getPage = () => document.querySelector<HTMLElement>(".page-content > .page");
 
@@ -16,16 +15,9 @@ export default defineNuxtPlugin(() => {
   router.beforeEach((to, from) => {
     if (!from.name || to.path === from.path) return true;
 
-    const page = getPage();
-    if (!page) return true;
-
-    cleanupPageClasses(page);
+    cleanupPageClasses(getPage());
     document.documentElement.classList.add("page-route-is-changing");
-    page.classList.add("page-route-leave");
-
-    return new Promise<void>(resolve => {
-      window.setTimeout(resolve, LEAVE_MS);
-    });
+    return true;
   });
 
   router.afterEach((to, from, failure) => {

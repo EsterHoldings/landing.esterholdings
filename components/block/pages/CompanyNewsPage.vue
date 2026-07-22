@@ -19,7 +19,8 @@
           :message="card.subtitle"
           :date="card.publishedAt"
           :button-text="buttonText"
-          :link="articlePath(card)" />
+          :link="articlePath(card)"
+          @select="rememberArticle(card, articlePath(card))" />
       </div>
 
       <div
@@ -47,6 +48,11 @@
   import UiContainer from "~/components/ui/UiContainer.vue";
   import NewsCard from "~/pages/landing/pages/Company/company-news/components/NewsCard.vue";
   import useAppCore from "~/composables/useAppCore";
+  import {
+    createNewsNavigationCacheKey,
+    setNewsNavigationCache,
+    useNewsNavigationCache,
+  } from "~/composables/useNewsNavigationCache";
   import type { NewsArticleType, NewsItem, NewsListResponse } from "~/composables/core/modules/news/news.types";
 
   const PAGE_SIZE = 9;
@@ -88,6 +94,7 @@
 
   const { t, locale } = useI18n();
   const appCore = useAppCore();
+  const navigationCache = useNewsNavigationCache();
   const buttonText = computed(() => t("landing.pages.company.news.button"));
   const pageTitle = computed(() => t(props.titleKey, props.titleFallback));
   const pageSubtitle = computed(() => t(props.subtitleKey, props.subtitleFallback));
@@ -134,6 +141,15 @@
     }
 
     return article.urlPath || fallbackPath;
+  }
+
+  function rememberArticle(article: NewsItem, path: string): void {
+    const routeSlug = path.split(/[?#]/, 1)[0].replace(/\/+$/, "").split("/").filter(Boolean).at(-1);
+
+    setNewsNavigationCache(navigationCache, {
+      key: createNewsNavigationCacheKey(props.articleType, effectiveLocale.value, routeSlug || article.slug),
+      article,
+    });
   }
 
   async function loadMore(): Promise<void> {

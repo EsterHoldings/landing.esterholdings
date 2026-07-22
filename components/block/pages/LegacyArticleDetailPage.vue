@@ -1,14 +1,20 @@
 <template>
   <NewsArticleDetailPage
     :article="article"
-    :rendered-content="renderedContent" />
+    :rendered-content="renderedContent"
+    :loading="isLoading" />
 </template>
 
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { computed, watch } from "vue";
   import { setResponseStatus, useAsyncData, useHead, useRequestEvent, useRoute, useSeoMeta } from "#app";
   import NewsArticleDetailPage from "~/components/block/pages/NewsArticleDetailPage.vue";
   import useAppCore from "~/composables/useAppCore";
+  import {
+    createNewsNavigationCacheKey,
+    setNewsNavigationCache,
+    useNewsNavigationCache,
+  } from "~/composables/useNewsNavigationCache";
   import type { NewsArticleType, NewsItem } from "~/composables/core/modules/news/news.types";
   import { renderArticleContent } from "~/utils/renderArticleContent";
 
@@ -35,18 +41,42 @@
   });
   const apiLocale = computed(() => (legacyLocalePrefix.value === "ua" ? "uk" : legacyLocalePrefix.value));
   const legacyPath = computed(() => route.path);
+  const navigationCache = useNewsNavigationCache();
+  const newsCacheKey = computed(() =>
+    createNewsNavigationCacheKey(NewsArticleTypeValue.NEWS, apiLocale.value, legacySlug.value)
+  );
+  const traderBlogCacheKey = computed(() =>
+    createNewsNavigationCacheKey(NewsArticleTypeValue.TRADER_BLOG, apiLocale.value, legacySlug.value)
+  );
 
-  const { data: articleData } = await useAsyncData<NewsItem | false>(
+  const { data: articleData, status } = await useAsyncData<NewsItem | false>(
     `legacy-article-detail-${legacyLocalePrefix.value}-${legacySlug.value}`,
     async () => {
       const newsArticle = await fetchArticle(NewsArticleTypeValue.NEWS);
       if (newsArticle) return newsArticle;
 
       return (await fetchArticle(NewsArticleTypeValue.TRADER_BLOG)) || false;
+    },
+    {
+      lazy: import.meta.client,
+      default: () => {
+        const cachedEntry = navigationCache.value;
+        if (!cachedEntry) return false;
+
+        const cachedPath = String(cachedEntry.article.urlPath || "").replace(/\/+$/, "");
+        const currentPath = legacyPath.value.replace(/\/+$/, "");
+        const matchesCurrentArticle =
+          cachedEntry.key === newsCacheKey.value ||
+          cachedEntry.key === traderBlogCacheKey.value ||
+          cachedEntry.article.slug === legacySlug.value ||
+          cachedPath === currentPath;
+
+        return matchesCurrentArticle ? cachedEntry.article : false;
+      },
     }
   );
 
-  if (!articleData.value) {
+  if (import.meta.server && !articleData.value) {
     const event = useRequestEvent();
     if (event) {
       setResponseStatus(event, 404, "Legacy article not found");
@@ -54,7 +84,17 @@
   }
 
   const article = computed<NewsItem | null>(() => articleData.value || null);
+  const isLoading = computed(() => !article.value && (status.value === "idle" || status.value === "pending"));
   const renderedContent = computed(() => renderArticleContent(article.value?.content || ""));
+
+  watch(articleData, value => {
+    if (!value) return;
+
+    setNewsNavigationCache(navigationCache, {
+      key: createNewsNavigationCacheKey(value.articleType, apiLocale.value, value.slug),
+      article: value,
+    });
+  });
 
   useSeoMeta({
     title: computed(() => article.value?.seo.meta_title || article.value?.title || "Article not found"),

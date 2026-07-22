@@ -1,7 +1,8 @@
 <template>
-  <NuxtLink
-    :to="link"
-    class="news-card">
+  <a
+    :href="link"
+    class="news-card"
+    @click="handleNavigation">
     <div class="news-card__image-wrap">
       <img
         class="news-card__image"
@@ -21,11 +22,16 @@
         <span class="news-card__link">{{ buttonText }}</span>
       </div>
     </div>
-  </NuxtLink>
+  </a>
 </template>
 
 <script setup lang="ts">
   import { ref, watch } from "vue";
+  import { navigateTo } from "#app";
+
+  const emit = defineEmits<{
+    select: [];
+  }>();
 
   const fallbackImage = "/static/newsBg.jpg";
   const props = defineProps({
@@ -58,6 +64,17 @@
 
     currentImage.value = fallbackImage;
     isImageLoaded.value = false;
+  }
+
+  function handleNavigation(event: MouseEvent): void {
+    emit("select");
+
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    event.preventDefault();
+    void navigateTo(props.link || "/");
   }
 </script>
 
