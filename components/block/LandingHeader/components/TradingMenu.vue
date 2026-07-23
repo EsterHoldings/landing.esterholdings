@@ -39,6 +39,7 @@
   const headerItems = tm(`landing.header.megaMenu.${props.activeLink}`);
   const menuRoutes = routes(props.activeLink, t);
   const hiddenSectionIndexes = new Set([1, 5]);
+  const textOnlySectionIndexes = new Set([2, 3, 4]);
   const hiddenItemIndexesBySection = {
     4: new Set([2]),
   };
@@ -50,7 +51,7 @@
     const title = t(`landing.header.megaMenu.${props.activeLink}[${sectionIndex}].section`);
     return {
       name: title,
-      path: menuRoutes[title]?.path ?? "#",
+      path: textOnlySectionIndexes.has(sectionIndex) ? null : (menuRoutes[title]?.path ?? "#"),
     };
   }
 

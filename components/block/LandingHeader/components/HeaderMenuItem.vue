@@ -2,11 +2,14 @@
   <div class="menu-category">
     <UiTextH6
       class="menu-category_title"
-      :class="{ 'menu-category_title_mobile': props.isMobile }"
-      @click="handleLinkClick">
-      <NuxtLink :to="localizedPath(props.titles.path)">
+      :class="{ 'menu-category_title_mobile': props.isMobile }">
+      <NuxtLink
+        v-if="props.titles.path"
+        :to="localizedPath(props.titles.path)"
+        @click="handleLinkClick">
         {{ props.titles.name }}
       </NuxtLink>
+      <span v-else>{{ props.titles.name }}</span>
       <div
         class="menu-category_line"
         :class="{ 'menu-category_line_mobile': props.isMobile }"></div>

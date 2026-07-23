@@ -536,11 +536,11 @@
     &__panel {
       height: 100%;
       border-radius: 0 0 20px 20px;
-      background: var(--landing-surface-glass-strong);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: var(--landing-surface-glass);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border: 1px solid var(--landing-border-strong);
-      box-shadow: var(--landing-shadow-glass-raised);
+      box-shadow: var(--landing-shadow-glass);
       display: flex;
       flex-direction: column;
       justify-content: space-between;

@@ -98,22 +98,21 @@
 
     &__inner {
       display: grid;
-      grid-template-columns: 270px 1fr;
+      grid-template-columns: 420px minmax(0, 1fr);
       gap: 0 40px;
       align-items: start;
     }
 
     &__title {
       margin: 0;
-      width: 510px;
+      width: 100%;
+      max-width: 420px;
       color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 500;
       line-height: 1.302;
       position: sticky;
       top: 100px;
-      z-index: 1;
-      pointer-events: none;
     }
 
     &__list {
@@ -221,8 +220,8 @@
       &__title {
         position: static;
         width: auto;
+        max-width: none;
         font-size: 34px;
-        pointer-events: auto;
       }
 
       &__list {

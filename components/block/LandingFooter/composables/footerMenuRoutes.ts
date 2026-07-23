@@ -1,8 +1,14 @@
 export const footerMenuRoutes = () => {
   return {
     trading: [
-      { labelKey: "landing.footer.trading.items[2]", path: "platform" },
-      { labelKey: "landing.footer.trading.items[3]", path: "trading-conditions" },
+      {
+        labelKey: "landing.header.megaMenu.Trading[3].items[0]",
+        path: "account-replenishment",
+      },
+      {
+        labelKey: "landing.header.megaMenu.Trading[3].items[1]",
+        path: "withdrawal-of-funds",
+      },
     ],
     company: [
       { labelKey: "landing.footer.company.items[0]", path: "about-company" },
