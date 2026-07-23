@@ -375,8 +375,10 @@
     }
 
     &__steps {
+      --contacts-process-step-offset: 120px;
+
       display: grid;
-      max-width: 900px;
+      max-width: 1020px;
       gap: 16px;
       margin: 58px auto 0;
       padding: 0;
@@ -384,6 +386,7 @@
 
       li {
         display: grid;
+        width: calc(100% - var(--contacts-process-step-offset));
         grid-template-columns: 66px minmax(0, 1fr);
         gap: 18px;
         align-items: center;
@@ -394,6 +397,10 @@
         box-shadow:
           inset 0 1px 0 rgba(255, 255, 255, 0.95),
           0 16px 42px rgba(64, 85, 133, 0.035);
+      }
+
+      li:nth-child(2) {
+        margin-inline-start: var(--contacts-process-step-offset);
       }
 
       img {
@@ -660,6 +667,8 @@
       }
 
       &__steps {
+        --contacts-process-step-offset: 0px;
+
         gap: 12px;
         margin-top: 34px;
 
