@@ -105,12 +105,15 @@
 
     &__title {
       margin: 0;
+      width: 510px;
       color: var(--landing-text-primary);
       font-size: 42px;
       font-weight: 500;
       line-height: 1.302;
       position: sticky;
       top: 100px;
+      z-index: 1;
+      pointer-events: none;
     }
 
     &__list {
@@ -217,7 +220,9 @@
 
       &__title {
         position: static;
+        width: auto;
         font-size: 34px;
+        pointer-events: auto;
       }
 
       &__list {

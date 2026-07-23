@@ -127,7 +127,7 @@
     &__cards {
       margin-top: auto;
       display: flex;
-      gap: 0;
+      gap: 40px;
     }
 
     &__card {
@@ -278,7 +278,7 @@
 
       &__cards {
         margin-top: 32px;
-        gap: 32px;
+        gap: 64px;
       }
 
       &__card {
@@ -328,11 +328,11 @@
 
       &__cards {
         margin-top: 36px;
-        gap: 16px;
+        gap: 32px;
       }
 
       &__card {
-        width: calc(50% - 8px);
+        width: calc(50% - 16px);
         gap: 12px;
       }
 

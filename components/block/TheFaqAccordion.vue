@@ -11,17 +11,14 @@
         <UiIconArrowDown :rotate180="item.isActive" />
       </div>
 
-      <transition
-        @enter="onEnter"
-        @after-enter="onAfterEnter"
-        @leave="onLeave"
-        @after-leave="onAfterLeave">
-        <div
-          v-if="item.isActive"
-          class="faq-answer">
+      <div
+        class="faq-answer-collapse"
+        :class="{ 'faq-answer-collapse--active': item.isActive }"
+        :aria-hidden="!item.isActive">
+        <div class="faq-answer">
           <p>{{ item.description }}</p>
         </div>
-      </transition>
+      </div>
 
       <div class="faq-divider"></div>
     </div>
@@ -61,40 +58,6 @@
       isActive: i === index ? !item.isActive : false,
     }));
   };
-
-  const onEnter = (el: Element) => {
-    const element = el as HTMLElement;
-    element.style.height = "0";
-    element.style.overflow = "hidden";
-    requestAnimationFrame(() => {
-      element.style.transition = "height 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      element.style.height = `${element.scrollHeight}px`;
-    });
-  };
-
-  const onAfterEnter = (el: Element) => {
-    const element = el as HTMLElement;
-    element.style.height = "";
-    element.style.overflow = "";
-    element.style.transition = "";
-  };
-
-  const onLeave = (el: Element) => {
-    const element = el as HTMLElement;
-    element.style.height = `${element.scrollHeight}px`;
-    element.style.overflow = "hidden";
-    requestAnimationFrame(() => {
-      element.style.transition = "height 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
-      element.style.height = "0";
-    });
-  };
-
-  const onAfterLeave = (el: Element) => {
-    const element = el as HTMLElement;
-    element.style.height = "";
-    element.style.overflow = "";
-    element.style.transition = "";
-  };
 </script>
 
 <style lang="scss" scoped>
@@ -102,6 +65,7 @@
     display: flex;
     flex-direction: column;
     gap: 0;
+    overflow-anchor: none;
   }
 
   .faq-item {
@@ -136,11 +100,34 @@
     flex: 1;
   }
 
+  .faq-answer-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.28s ease,
+      visibility 0s linear 0.45s;
+
+    &--active {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      visibility: visible;
+      transition:
+        grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        visibility 0s linear;
+    }
+  }
+
   .faq-answer {
-    padding: 0 0 16px 0;
+    min-height: 0;
     overflow: hidden;
 
     p {
+      padding: 0 0 16px;
       color: var(--ui-text-secondary);
       font-family: Muli, sans-serif;
       font-size: 16px;
@@ -157,4 +144,10 @@
     margin: 12px 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .faq-answer-collapse,
+    .faq-answer-collapse--active {
+      transition-duration: 0.01ms;
+    }
+  }
 </style>

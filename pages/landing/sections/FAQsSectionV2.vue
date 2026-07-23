@@ -1,9 +1,9 @@
 <template>
   <section class="faq-v2">
     <UiContainer>
-      <h2>{{ t("landing.sections.faqs__title") }}</h2>
       <div class="layout">
         <div class="left">
+          <h2>{{ t("landing.sections.faqs__title") }}</h2>
           <TheFaqAccordion :items="displayedFaqData" />
           <p
             v-if="showHelpLink"
@@ -293,7 +293,6 @@
   }
 
   .layout {
-    margin-top: 34px;
     display: grid;
     grid-template-columns: 1fr 555px;
     gap: 20px;
@@ -334,10 +333,11 @@
   }
 
   :deep(.faq-answer) {
-    padding: 0 0 30px !important;
+    padding: 0 !important;
   }
 
   :deep(.faq-answer p) {
+    padding: 0 0 30px !important;
     color: var(--landing-text-secondary) !important;
     font-size: 16px !important;
     font-weight: 400 !important;
