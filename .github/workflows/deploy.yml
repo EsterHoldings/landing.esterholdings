@@ -1,0 +1,91 @@
+name: CD Production (Landing)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: landing-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy landing to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+
+    steps:
+      - name: Deploy to production via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          APP_DIR: ${{ vars.PROD_APP_DIR || '/var/www/landing.esterholdings.com' }}
+          BRANCH: ${{ vars.PROD_DEPLOY_BRANCH || 'main' }}
+          PM2_APP_NAME: ${{ vars.PROD_PM2_APP_NAME || 'landing-esterholdings' }}
+          APP_HOST: ${{ vars.PROD_APP_HOST || '127.0.0.1' }}
+          APP_PORT: ${{ vars.PROD_APP_PORT || '3001' }}
+          NODE_BIN_DIR: ${{ vars.PROD_NODE_BIN_DIR || '/opt/node-v20.20.1/bin' }}
+          HEALTHCHECK_URL: ${{ vars.PROD_HEALTHCHECK_URL }}
+          NODE_OPTIONS: ${{ vars.PROD_NODE_OPTIONS || '--max-old-space-size=4096' }}
+          NUXT_PUBLIC_SITE_URL: ${{ vars.NUXT_PUBLIC_SITE_URL || 'https://esterholdings.com' }}
+          NUXT_PUBLIC_HOST_BASE: ${{ vars.NUXT_PUBLIC_HOST_BASE || 'https://server.esterholdings.com' }}
+          NUXT_PUBLIC_API_BASE: ${{ vars.NUXT_PUBLIC_API_BASE || 'https://server.esterholdings.com/api' }}
+          NUXT_PUBLIC_CABINET_URL: ${{ vars.NUXT_PUBLIC_CABINET_URL || 'https://my.esterholdings.space' }}
+        with:
+          host: ${{ secrets.LANDING_SSH_HOST }}
+          username: ${{ secrets.LANDING_SSH_USER }}
+          key: ${{ secrets.LANDING_SSH_KEY }}
+          port: ${{ secrets.LANDING_SSH_PORT }}
+          envs: APP_DIR,BRANCH,PM2_APP_NAME,APP_HOST,APP_PORT,NODE_BIN_DIR,HEALTHCHECK_URL,NODE_OPTIONS,NUXT_PUBLIC_SITE_URL,NUXT_PUBLIC_HOST_BASE,NUXT_PUBLIC_API_BASE,NUXT_PUBLIC_CABINET_URL
+          script: |
+            set -Eeuo pipefail
+
+            [ -d "$APP_DIR" ] || {
+              echo "Production directory does not exist: $APP_DIR"
+              exit 1
+            }
+
+            [ -d "$APP_DIR/.git" ] || {
+              echo "Production directory is not a Git checkout: $APP_DIR"
+              exit 1
+            }
+
+            [ -w "$APP_DIR" ] || {
+              echo "SSH user $(id -un) cannot write to $APP_DIR"
+              exit 1
+            }
+
+            cd "$APP_DIR"
+
+            if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+              echo "Production checkout contains tracked local changes. Deployment stopped to avoid overwriting them."
+              git status --short
+              exit 1
+            fi
+
+            git fetch --prune origin \
+              "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            remote_head="$(git rev-parse --verify "origin/$BRANCH^{commit}")"
+            current_head="$(git rev-parse --verify HEAD)"
+
+            if [ "$current_head" != "$remote_head" ] &&
+              ! git merge-base --is-ancestor "$current_head" "$remote_head"; then
+              backup_ref="refs/deploy-backups/$BRANCH/$(date -u +%Y%m%d%H%M%S)"
+              git update-ref "$backup_ref" "$current_head"
+              echo "Saved diverged production HEAD $current_head to $backup_ref"
+            fi
+
+            git checkout -B "$BRANCH" "$remote_head"
+            echo "Deploying commit $(git rev-parse --short HEAD)"
+
+            deploy_script="$APP_DIR/scripts/deploy_prod.sh"
+
+            [ -f "$deploy_script" ] || {
+              echo "Deployment script not found: $deploy_script"
+              exit 1
+            }
+
+            chmod +x "$deploy_script"
+            "$deploy_script"
