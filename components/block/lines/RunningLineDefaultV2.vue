@@ -113,7 +113,7 @@
   const { cabinetLink } = useCabinetLink();
   const liveQuoteMap = ref<Record<string, TickerItem>>({});
   const liveQuoteOrder = ref<string[]>([]);
-  const tradeHref = computed(() => props.tradeHref || cabinetLink("/auth/login"));
+  const tradeHref = computed(() => props.tradeHref || cabinetLink("/dashboard"));
   const viewport = ref<HTMLElement | null>(null);
   const track = ref<HTMLElement | null>(null);
   const {
