@@ -234,7 +234,7 @@ export default defineNuxtConfig({
 
       baseApi: process.env.NUXT_PUBLIC_BASE_API || "https://server.esterholdings.com/api/",
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://server.esterholdings.com/",
-      cabinetUrl: process.env.NUXT_PUBLIC_CABINET_URL || "https://my.esterholdings.space",
+      cabinetUrl: process.env.NUXT_PUBLIC_CABINET_URL || "https://my.esterholdings.com",
       mt4QuotesSymbols:
         process.env.NUXT_PUBLIC_MT4_QUOTES_SYMBOLS ||
         "EURUSD,USDCHF,GBPUSD,USDJPY,USDCAD,AUDUSD,NZDUSD,EURGBP,EURJPY,EURCHF,EURAUD,EURCAD,EURNZD,GBPJPY,GBPCHF,GBPAUD,GBPCAD,GBPNZD,AUDJPY,AUDCHF,AUDCAD,AUDNZD,NZDJPY,NZDCHF,NZDCAD,CADJPY,CADCHF,CHFJPY,XAUUSD,XAGUSD",

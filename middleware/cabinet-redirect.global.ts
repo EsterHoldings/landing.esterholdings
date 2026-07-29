@@ -1,6 +1,6 @@
 import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig } from "nuxt/app";
 
-const DEFAULT_CABINET_URL = "https://my.esterholdings.space";
+const DEFAULT_CABINET_URL = "https://my.esterholdings.com";
 const LOCALE_RE = /^[a-z]{2}$/i;
 const CABINET_SEGMENTS = new Set([
   "auth",
@@ -16,7 +16,7 @@ const CABINET_SEGMENTS = new Set([
 
 const normalizeBaseUrl = (value: unknown): string => {
   const candidate = String(value || "").trim();
-  return (candidate || DEFAULT_CABINET_URL).replace(/\/+$/, "");
+  return (candidate || DEFAULT_CABINET_URL).replace(/esterholdings\.space/gi, "esterholdings.com").replace(/\/+$/, "");
 };
 
 const splitPath = (path: string): { locale: string; rest: string[] } => {

@@ -2,11 +2,11 @@ import { computed } from "vue";
 import { useRuntimeConfig } from "nuxt/app";
 import { useI18n } from "vue-i18n";
 
-const DEFAULT_CABINET_URL = "https://my.esterholdings.space";
+const DEFAULT_CABINET_URL = "https://my.esterholdings.com";
 
 const normalizeBaseUrl = (value: unknown): string => {
   const candidate = String(value || "").trim();
-  return (candidate || DEFAULT_CABINET_URL).replace(/\/+$/, "");
+  return (candidate || DEFAULT_CABINET_URL).replace(/esterholdings\.space/gi, "esterholdings.com").replace(/\/+$/, "");
 };
 
 const normalizePath = (value: string): string => {
