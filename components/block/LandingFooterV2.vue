@@ -4,8 +4,12 @@
       <div class="line"></div>
       <div class="top">
         <div class="brand">
-          <UiIconLogoLight v-if="themeStore.currentTheme !== 'dark'" />
-          <UiIconLogo v-else />
+          <span class="brand__logo brand__logo--light">
+            <UiIconLogoLight />
+          </span>
+          <span class="brand__logo brand__logo--dark">
+            <UiIconLogo />
+          </span>
           <p>{{ t("landing.footer.description") }}</p>
           <div class="social">
             <a
@@ -73,7 +77,6 @@
 
 <script setup lang="ts">
   import { useI18n } from "vue-i18n";
-  import { useThemeStore } from "~/stores/themeStore";
   import UiContainer from "~/components/ui/UiContainer.vue";
   import UiIconLogo from "~/components/ui/UiIconLogo.vue";
   import UiIconLogoLight from "~/components/ui/UiIconLogoLight.vue";
@@ -83,7 +86,6 @@
   import FooterLink from "~/components/block/LandingFooter/components/FooterLink.vue";
 
   const { t } = useI18n();
-  const themeStore = useThemeStore();
 </script>
 
 <style lang="scss" scoped>
@@ -111,6 +113,15 @@
       font-size: 14px;
       line-height: 1.302;
       font-weight: 500;
+    }
+
+    .brand__logo {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .brand__logo--dark {
+      display: none;
     }
 
     .social {
@@ -170,6 +181,14 @@
         font-weight: 500;
       }
     }
+  }
+
+  :global(:root[data-theme="dark"] .brand__logo--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .brand__logo--dark) {
+    display: inline-flex;
   }
 
   @media (max-width: 991px) {

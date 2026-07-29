@@ -14,8 +14,12 @@
           <NuxtLink
             :to="localePath('/')"
             class="logo">
-            <UiIconLogoLight v-if="themeStore.currentTheme === 'light'" />
-            <UiIconLogo v-else />
+            <span class="logo__theme logo__theme--light">
+              <UiIconLogoLight />
+            </span>
+            <span class="logo__theme logo__theme--dark">
+              <UiIconLogo />
+            </span>
           </NuxtLink>
 
           <nav class="desktop-nav">
@@ -36,10 +40,10 @@
               type="button"
               @click="themeStore.toggleTheme()">
               <UiIconMoon
-                v-if="themeStore.currentTheme === 'light'"
+                class="theme-btn__icon theme-btn__icon--light"
                 :class="{ 'svg-invert': useDarkHeaderIcons }" />
               <UiIconSun
-                v-else
+                class="theme-btn__icon theme-btn__icon--dark"
                 :class="{ 'svg-invert': useDarkHeaderIcons }" />
             </button>
             <a
@@ -357,6 +361,15 @@
     display: inline-flex;
     align-items: center;
 
+    &__theme {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &__theme--dark {
+      display: none;
+    }
+
     :deep(svg:not(.logo-flat)) {
       width: 88px;
       height: 39px;
@@ -434,6 +447,26 @@
       height: 18px;
       color: var(--landing-text-secondary);
     }
+  }
+
+  .theme-btn__icon--dark {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .logo__theme--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .logo__theme--dark) {
+    display: inline-flex;
+  }
+
+  :global(:root[data-theme="dark"] .theme-btn__icon--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .theme-btn__icon--dark) {
+    display: inline-flex;
   }
 
   .auth-link {
