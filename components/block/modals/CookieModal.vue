@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <Teleport to="body">
     <div v-if="showCookieModal" class="cookie-modal">
       <UiTextH5 class="cookie-modal_text">
         {{ t("ui-components.modals.cookie-modal.text") }}
@@ -13,7 +13,7 @@
         </UiButtonDefault>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup>
