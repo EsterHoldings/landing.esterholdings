@@ -177,8 +177,14 @@
     }));
   });
 
+  const contractFileByLocale: Record<string, string> = {
+    ru: "/static/documents/offerts/ESTER_HOLDINGS_INC_RU.pdf",
+    uk: "/static/documents/offerts/ESTER_HOLDINGS_INC_UA.pdf",
+    ua: "/static/documents/offerts/ESTER_HOLDINGS_INC_UA.pdf",
+  };
+
   const handleClickContract = () => {
-    const url = "https://esterholdings.com/wp-content/uploads/ESTER-HOLDINGS-INC_PUBLIC_OFFER_2024_EN.pdf";
+    const url = contractFileByLocale[locale.value] ?? "/static/documents/offerts/ESTER_HOLDINGS_INC_EN.pdf";
     window.open(url, "_blank", "noopener,noreferrer");
   };
 </script>
