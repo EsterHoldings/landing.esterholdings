@@ -97,10 +97,12 @@
             aria-hidden="true">
             <div class="hero__visual-stage w-full max-w-[715px]">
               <template v-if="slide.assets.length || slide.showBanner">
-                <component
-                  :is="themeStore.currentTheme === 'dark' ? UiHomeBannerV2Night : UiHomeBannerV2"
+                <UiHomeBannerV2
                   v-if="slide.showBanner"
-                  class="hero__asset hero__asset--slide2-city" />
+                  class="hero__asset hero__asset--slide2-city hero__theme-asset hero__theme-asset--light" />
+                <UiHomeBannerV2Night
+                  v-if="slide.showBanner"
+                  class="hero__asset hero__asset--slide2-city hero__theme-asset hero__theme-asset--dark" />
 
                 <span
                   v-for="(asset, index) in slide.assets"
@@ -124,9 +126,8 @@
                     :src="visualCenterFrame"
                     alt=""
                     class="hero__asset hero__asset--center" />
-                  <component
-                    :is="themeStore.currentTheme === 'dark' ? UiIconLogo : UiIconLogoLight"
-                    class="hero__logo" />
+                  <UiIconLogoLight class="hero__logo hero__theme-logo hero__theme-logo--light" />
+                  <UiIconLogo class="hero__logo hero__theme-logo hero__theme-logo--dark" />
                 </div>
               </template>
 
@@ -176,11 +177,9 @@
   import visualCenterFrame from "~/assets/landing/welcome-v2/visual-center-frame.svg";
   import UiHomeBannerV2Night from "~/components/ui/UiHomeBannerV2Night.vue";
   import { useCabinetLink } from "~/composables/useCabinetLink";
-  import { useThemeStore } from "~/stores/themeStore";
 
   const { t } = useI18n();
   const { cabinetLink } = useCabinetLink();
-  const themeStore = useThemeStore();
 
   const currentSlideIndex = ref(0);
 
@@ -830,6 +829,11 @@
       }
     }
 
+    &__theme-asset--dark,
+    &__theme-logo--dark {
+      display: none;
+    }
+
     &__asset-img {
       display: block;
       width: 100%;
@@ -963,6 +967,16 @@
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex::after) {
     opacity: 0;
     animation: none;
+  }
+
+  :global(:root[data-theme="dark"] .hero__theme-asset--light),
+  :global(:root[data-theme="dark"] .hero__theme-logo--light) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"] .hero__theme-asset--dark),
+  :global(:root[data-theme="dark"] .hero__theme-logo--dark) {
+    display: block;
   }
 
   :global(:root[data-theme="dark"] .hero__asset-wrap--hex .hero__asset-img) {
