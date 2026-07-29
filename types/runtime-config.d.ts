@@ -10,7 +10,6 @@ declare module "nuxt/schema" {
     mt4QuotesFallbackIntervalMs: string;
     mt4QuotesLatestUrl: string;
     mt4QuotesSymbols: string;
-    showLandingNewsTicker: string;
     reverbCluster: string;
     reverbHost: string;
     reverbKey: string;

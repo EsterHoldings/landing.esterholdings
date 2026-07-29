@@ -7,7 +7,7 @@
     <AdvantagesSectionV2 />
     <TradingPlatformSectionV2 />
     <AccountTypesSectionV2 />
-    <NewsRowSectionV2 v-if="showLandingNewsTicker" />
+    <NewsRowSectionV2 />
     <FeaturesSectionV2 />
     <WideRangeSectionV2 />
     <FourStepsSectionV2 />
@@ -19,9 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { useRuntimeConfig } from "nuxt/app";
   import { definePageMeta } from "~/.nuxt/imports";
-  import { computed, onMounted, onUnmounted, ref } from "vue";
+  import { onMounted, onUnmounted, ref } from "vue";
   import { useUiStore } from "~/stores/uiStore";
   import WelcomeSectionV2 from "~/pages/landing/sections/WelcomeSectionV2.vue";
   import TickerSectionV2 from "~/pages/landing/sections/TickerSectionV2.vue";
@@ -42,11 +41,7 @@
   });
 
   const uiStore = useUiStore();
-  const runtimeConfig = useRuntimeConfig();
   const welcomeRef = ref<HTMLElement | null>(null);
-  const showLandingNewsTicker = computed(
-    () => String(runtimeConfig.public?.showLandingNewsTicker || "").trim().toLowerCase() === "true"
-  );
 
   const clearLegacyScrollLock = () => {
     const elements = [document.documentElement, document.body];
