@@ -5,7 +5,7 @@ set -Eeuo pipefail
 APP_DIR="${APP_DIR:-/var/www/landing.esterholdings.com}"
 PM2_APP_NAME="${PM2_APP_NAME:-landing-esterholdings}"
 APP_HOST="${APP_HOST:-127.0.0.1}"
-APP_PORT="${APP_PORT:-3001}"
+APP_PORT="${APP_PORT:-3002}"
 NODE_BIN_DIR="${NODE_BIN_DIR:-/opt/node-v20.20.1/bin}"
 NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
 HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://${APP_HOST}:${APP_PORT}/}"

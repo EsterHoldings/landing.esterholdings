@@ -25,7 +25,7 @@ jobs:
           BRANCH: ${{ vars.PROD_DEPLOY_BRANCH || 'main' }}
           PM2_APP_NAME: ${{ vars.PROD_PM2_APP_NAME || 'landing-esterholdings' }}
           APP_HOST: ${{ vars.PROD_APP_HOST || '127.0.0.1' }}
-          APP_PORT: ${{ vars.PROD_APP_PORT || '3001' }}
+          APP_PORT: ${{ vars.PROD_APP_PORT || '3002' }}
           NODE_BIN_DIR: ${{ vars.PROD_NODE_BIN_DIR || '/opt/node-v20.20.1/bin' }}
           HEALTHCHECK_URL: ${{ vars.PROD_HEALTHCHECK_URL }}
           NODE_OPTIONS: ${{ vars.PROD_NODE_OPTIONS || '--max-old-space-size=4096' }}
