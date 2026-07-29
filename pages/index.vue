@@ -7,7 +7,7 @@
     <AdvantagesSectionV2 />
     <TradingPlatformSectionV2 />
     <AccountTypesSectionV2 />
-    <NewsRowSectionV2 />
+    <NewsRowSectionV2 v-if="showNewsRowSection" />
     <FeaturesSectionV2 />
     <WideRangeSectionV2 />
     <FourStepsSectionV2 />
@@ -20,7 +20,8 @@
 
 <script lang="ts" setup>
   import { definePageMeta } from "~/.nuxt/imports";
-  import { onMounted, onUnmounted, ref } from "vue";
+  import { computed, onMounted, onUnmounted, ref } from "vue";
+  import { useRoute } from "vue-router";
   import { useUiStore } from "~/stores/uiStore";
   import WelcomeSectionV2 from "~/pages/landing/sections/WelcomeSectionV2.vue";
   import TickerSectionV2 from "~/pages/landing/sections/TickerSectionV2.vue";
@@ -40,8 +41,14 @@
     layout: "main-v2",
   });
 
+  const route = useRoute();
   const uiStore = useUiStore();
   const welcomeRef = ref<HTMLElement | null>(null);
+  const showNewsRowSection = computed(() => {
+    const queryValue = route.query.newstline;
+
+    return Array.isArray(queryValue) ? queryValue.includes("1") : queryValue === "1";
+  });
 
   const clearLegacyScrollLock = () => {
     const elements = [document.documentElement, document.body];

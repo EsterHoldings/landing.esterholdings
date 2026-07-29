@@ -1,7 +1,15 @@
 import { defineStore } from "pinia";
+import { useCookie } from "#app";
 import { nextTick, ref } from "vue";
+import {
+  DEFAULT_THEME,
+  resolveThemeName,
+  THEME_COOKIE_KEY,
+  THEME_COOKIE_OPTIONS,
+  THEME_STORAGE_KEY,
+  type ThemeName,
+} from "~/composables/theme/theme.shared";
 
-type ThemeName = "light" | "dark";
 type ThemeViewTransition = {
   finished: Promise<void>;
   ready: Promise<void>;
@@ -12,14 +20,11 @@ type ThemeTransitionDocument = Document & {
   startViewTransition?: (callback: () => void | Promise<void>) => ThemeViewTransition;
 };
 
-const DEFAULT_THEME: ThemeName = "light";
-const THEME_STORAGE_KEY = "theme";
 const THEME_TRANSITION_MS = 200;
 
-const isThemeName = (value: string | null): value is ThemeName => value === "light" || value === "dark";
-
 export const useThemeStore = defineStore("theme", () => {
-  const currentTheme = ref<ThemeName>(DEFAULT_THEME);
+  const themeCookie = useCookie<ThemeName | null>(THEME_COOKIE_KEY, THEME_COOKIE_OPTIONS);
+  const currentTheme = ref<ThemeName>(resolveThemeName(themeCookie.value));
   const lightTheme = {
     "--ui-background": "#ffffff",
     "--ui-background-secondary": "#2a5bbd",
@@ -97,6 +102,14 @@ export const useThemeStore = defineStore("theme", () => {
   const shouldReduceMotion = () =>
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  const persistTheme = (themeName: ThemeName) => {
+    themeCookie.value = themeName;
+
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(THEME_STORAGE_KEY, themeName);
+    }
+  };
+
   function commitTheme(themeName: ThemeName) {
     const theme = themeName === "light" ? lightTheme : darkTheme;
     const root = document.documentElement;
@@ -151,7 +164,7 @@ export const useThemeStore = defineStore("theme", () => {
 
   function setTheme(themeName: ThemeName) {
     applyTheme(themeName, true);
-    localStorage.setItem(THEME_STORAGE_KEY, themeName);
+    persistTheme(themeName);
   }
 
   function toggleTheme() {
@@ -159,8 +172,11 @@ export const useThemeStore = defineStore("theme", () => {
   }
 
   function initTheme() {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    applyTheme(isThemeName(saved) ? saved : DEFAULT_THEME, false);
+    const savedTheme = typeof localStorage !== "undefined" ? localStorage.getItem(THEME_STORAGE_KEY) : null;
+    const themeName = resolveThemeName(savedTheme, themeCookie.value);
+
+    applyTheme(themeName, false);
+    persistTheme(themeName);
   }
 
   if (process.client) {
