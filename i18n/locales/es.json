@@ -733,6 +733,12 @@
     },
     "footer": {
       "description": "El objetivo principal de Ester es crear las mejores y más transparentes condiciones para traders minoristas y corporativos.",
+      "legal_documents": {
+        "title": "Información legal",
+        "risks": "Aviso de riesgos",
+        "offer": "Oferta pública",
+        "privacy": "Política de privacidad"
+      },
       "trading": {
         "title": "Trading",
         "items": ["Descripción de cuentas", "Mercados", "Plataforma", "Términos de trading", "Trading tándem"]

@@ -725,6 +725,12 @@
     },
     "footer": {
       "description": "Das Hauptziel von Ester ist es, die besten und transparentesten Bedingungen für Privat- und Firmenhändler zu schaffen.",
+      "legal_documents": {
+        "title": "Rechtliche Informationen",
+        "risks": "Risikohinweis",
+        "offer": "Öffentliches Angebot",
+        "privacy": "Datenschutzerklärung"
+      },
       "trading": {
         "title": "Handel",
         "items": ["Kontoübersicht", "Märkte", "Plattform", "Handelsbedingungen", "Tandem-Handel"]

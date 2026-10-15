@@ -42,6 +42,9 @@
           <div class="nav-links__item nav-links__item--company">
             <FooterLink basePath="landing.footer.company" />
           </div>
+          <div class="nav-links__item nav-links__item--legal">
+            <FooterLegalLinks />
+          </div>
         </div>
       </div>
 
@@ -84,6 +87,7 @@
   import UiIconLinkedIn from "~/components/ui/UiIconLinkedIn.vue";
   import UiIconInstagram from "~/components/ui/UiIconInstagram.vue";
   import FooterLink from "~/components/block/LandingFooter/components/FooterLink.vue";
+  import FooterLegalLinks from "~/components/block/LandingFooter/components/FooterLegalLinks.vue";
 
   const { t } = useI18n();
 </script>
@@ -102,7 +106,7 @@
 
     .nav-links {
       display: flex;
-      gap: 106px;
+      gap: clamp(28px, 5.5vw, 106px);
       align-items: start;
     }
 
@@ -215,7 +219,9 @@
         display: grid;
         width: 100%;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-areas: "trading company";
+        grid-template-areas:
+          "trading company"
+          "legal .";
         gap: 30px 20px;
       }
 
@@ -225,6 +231,10 @@
 
       .nav-links__item--company {
         grid-area: company;
+      }
+
+      .nav-links__item--legal {
+        grid-area: legal;
       }
 
       .nav-links :deep(.footer-list) {

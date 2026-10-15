@@ -222,6 +222,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      legalDocsBaseUrl: process.env.NUXT_PUBLIC_LEGAL_DOCS_BASE_URL || "https://my.esterholdings.com",
       hostBase: process.env.NUXT_PUBLIC_HOST_BASE || "https://server.esterholdings.com",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://server.esterholdings.com/api",
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "https://esterholdings.space",

@@ -712,6 +712,12 @@
     },
     "footer": {
       "description": "Ester的主要目标是为零售和企业交易者创造最佳和最透明的条件。",
+      "legal_documents": {
+        "title": "法律信息",
+        "risks": "风险披露",
+        "offer": "公开要约",
+        "privacy": "隐私政策"
+      },
       "trading": {
         "title": "交易",
         "items": ["账户概览", "市场", "平台", "交易条款", "双人交易"]

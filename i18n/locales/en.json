@@ -727,6 +727,12 @@
     },
     "footer": {
       "description": "The main goal of Ester is to create the best and most transparent conditions for retail and corporate traders.",
+      "legal_documents": {
+        "title": "Legal information",
+        "risks": "Risk disclosure",
+        "offer": "Public offer",
+        "privacy": "Privacy policy"
+      },
       "trading": {
         "title": "Trading",
         "items": ["Account overview", "Markets", "Platform", "Terms of trade", "Tandem trading"]

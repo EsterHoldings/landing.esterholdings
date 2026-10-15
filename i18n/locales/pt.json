@@ -733,6 +733,12 @@
     },
     "footer": {
       "description": "O objetivo principal da Ester é criar as melhores e mais transparentes condições para traders de varejo e corporativos.",
+      "legal_documents": {
+        "title": "Informações legais",
+        "risks": "Aviso de risco",
+        "offer": "Oferta pública",
+        "privacy": "Política de privacidade"
+      },
       "trading": {
         "title": "Negociação",
         "items": ["Visão geral de contas", "Mercados", "Plataforma", "Termos de negociação", "Negociação tandem"]

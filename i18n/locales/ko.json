@@ -725,6 +725,12 @@
     },
     "footer": {
       "description": "Ester의 주요 목표는 소매 및 기업 트레이더를 위한 최상의 가장 투명한 조건을 만드는 것입니다.",
+      "legal_documents": {
+        "title": "법률 정보",
+        "risks": "위험 고지",
+        "offer": "공개 제안",
+        "privacy": "개인정보 처리방침"
+      },
       "trading": {
         "title": "거래",
         "items": ["계좌 개요", "시장", "플랫폼", "거래 조건", "탠덤 거래"]

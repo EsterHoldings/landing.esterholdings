@@ -725,6 +725,12 @@
     },
     "footer": {
       "description": "Ester'in ana hedefi, perakende ve kurumsal trader'lar için en iyi ve en şeffaf koşulları oluşturmaktır.",
+      "legal_documents": {
+        "title": "Yasal bilgiler",
+        "risks": "Risk bildirimi",
+        "offer": "Kamuya açık teklif",
+        "privacy": "Gizlilik politikası"
+      },
       "trading": {
         "title": "İşlem",
         "items": ["Hesap özeti", "Piyasalar", "Platform", "İşlem koşulları", "Tandem işlem"]

@@ -729,6 +729,12 @@
     },
     "footer": {
       "description": "L'objectif principal d'Ester est de créer les meilleures conditions et les plus transparentes pour les traders particuliers et institutionnels.",
+      "legal_documents": {
+        "title": "Informations légales",
+        "risks": "Avertissement sur les risques",
+        "offer": "Offre publique",
+        "privacy": "Politique de confidentialité"
+      },
       "trading": {
         "title": "Trading",
         "items": ["Aperçu des comptes", "Marchés", "Plateforme", "Conditions de trading", "Trading tandem"]

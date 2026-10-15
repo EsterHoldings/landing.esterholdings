@@ -733,6 +733,12 @@
     },
     "footer": {
       "description": "L'obiettivo principale di Ester è creare le migliori e più trasparenti condizioni per trader retail e aziendali.",
+      "legal_documents": {
+        "title": "Informazioni legali",
+        "risks": "Informativa sui rischi",
+        "offer": "Offerta pubblica",
+        "privacy": "Informativa sulla privacy"
+      },
       "trading": {
         "title": "Trading",
         "items": ["Panoramica account", "Mercati", "Piattaforma", "Termini di trading", "Trading tandem"]
