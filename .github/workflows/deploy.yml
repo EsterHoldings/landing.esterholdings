@@ -38,6 +38,7 @@ jobs:
           username: ${{ secrets.LANDING_SSH_USER }}
           key: ${{ secrets.LANDING_SSH_KEY }}
           port: ${{ secrets.LANDING_SSH_PORT }}
+          command_timeout: 25m
           envs: APP_DIR,BRANCH,PM2_APP_NAME,APP_HOST,APP_PORT,NODE_BIN_DIR,HEALTHCHECK_URL,NODE_OPTIONS,NUXT_PUBLIC_SITE_URL,NUXT_PUBLIC_HOST_BASE,NUXT_PUBLIC_API_BASE,NUXT_PUBLIC_CABINET_URL
           script: |
             set -Eeuo pipefail
